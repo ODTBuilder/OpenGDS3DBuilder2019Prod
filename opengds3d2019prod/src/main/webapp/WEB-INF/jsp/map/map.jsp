@@ -122,37 +122,20 @@ html {
 		</div>
 		<div class="collapse navbar-collapse" id="navbar-collapse-2">
 			<ul class="nav navbar-nav">
-				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
-						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
-				</a></li>
 				<li><a href="#" title="Edit" id="editTool"> <i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
 							code="lang.edit" />
 				</a></li>
-				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
-						<spring:message code="lang.baseMap" />
+				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
+						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
+				</a></li>
+				<li><a href="#" title="Geoserver" id="geoserverAdmin"> <i class="fas fa-server fa-lg" style="color: #91d050;"></i>
+						<spring:message code="lang.geoserver" />
 				</a></li>
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
 				</a></li>
-				<!-- <li><a href="#" title="QA Status" id="qastat">
-					<i class="fas fa-th-list fa-lg" style="color: #7f7f7f;"></i>
-					QA Status</a></li> -->
-				<!-- 				<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" -->
-				<!-- 					aria-expanded="false" title="Generalization"> <i class="fas fa-object-group fa-lg" style="color: #00b0f0;"></i> -->
-				<%-- 						<spring:message code="lang.generalization" /> --%>
-				<!-- 				</a> -->
-				<!-- 					<ul class="dropdown-menu" role="menu"> -->
-				<!-- 						<li><a href="#" title="Generalization Process" id="gen">Generalization</a></li> -->
-				<!-- 						<li><a href="#" title="Generalization Result" id="genstat">Result</a></li> -->
-				<!-- 					</ul></li> -->
-				<li><a href="#" title="Version Control" id="vermodal"> <i class="fas fa-code-branch fa-lg"
-						style="color: #344762;"></i> <spring:message code="lang.versioning" />
-				</a></li>
 				<li><a href="#" title="Information" id="binfo" data-toggle="modal" data-target="#infoModal"> <i
 						class="fas fa-info-circle fa-lg" style="color: #ffc000;"></i> <spring:message code="lang.info" />
-				</a></li>
-				<li><a href="#" title="setting" id="editSetting"> <i class="fas fa-cog fa-lg" style="color: #c0c1c2;"></i>
-						<spring:message code="lang.setting" />
 				</a></li>
 			</ul>
 		</div>
