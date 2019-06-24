@@ -30,7 +30,7 @@ spring:
       max-file-size: 10485760KB
       max-request-size: 10485760KB
 server:
-  port: 8889
+  port: 8080
   context-path: /geodt
   servlet:
     session:
@@ -42,7 +42,7 @@ server:
     whitelabel:
       enabled: false
 gitrnd:
-  serverhost: localhost
+  serverhost: 175.116.181.34
   apache:
     host: 127.0.0.1
     port: 8888
