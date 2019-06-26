@@ -2275,6 +2275,7 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 	width: 100%;
 	display: flex;
 	flex-direction: row;
+	margin: 5px 0px;
 }
 
 .gb-object-row > span:first-child {
@@ -2292,5 +2293,5 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 	background-color: transparent;
 	width: 50px;
 	flex: 1;
-	margin: 2px 5px;
+	margin: 0px 5px;
 }

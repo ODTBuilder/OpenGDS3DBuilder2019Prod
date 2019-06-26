@@ -5,10 +5,10 @@
 	<div class="row">
 		<div class="col-xs-7 col-sm-9 col-md-10">
 			<div class="row">
-				<div class="col-xs-12 col-sm-12 col-md-6">
+				<div class="col-xs-12 col-sm-12 col-md-6" style="padding: 0;">
 					<div class="bind" style="width: 100%;"></div>
 				</div>
-				<div class="col-xs-12 col-sm-12 col-md-6" style="background-color: #bfbfbf;">
+				<div class="col-xs-12 col-sm-12 col-md-6" style="padding: 0; background-color: #bfbfbf;">
 					<div class="cesium-three">Cesium</div>
 				</div>
 			</div>
@@ -73,7 +73,7 @@
 							</div>
 							<div class="gb-object-row">
 								<span class="Text">Name</span>
-								<input class="Input" style="padding: 2px; border: 1px solid transparent; width: 150px; font-size: 12px;">
+								<input class="form-control" style="flex: 1;">
 							</div>
 							<div class="gb-object-row">
 								<span class="Text">Position</span>
@@ -166,11 +166,11 @@
 								<input class="Checkbox" type="checkbox">
 							</div>
 							<div class="gb-object-row">
-								<span class="Text" style="cursor: default; display: inline-block; vertical-align: middle; width: 90px;">Render Order</span>
-								<input class="form-control gb-object-input">
+								<span class="Text">Render Order</span>
+								<input class="form-control" style="flex: 1;">
 							</div>
 							<div class="gb-object-row">
-								<span class="Text" style="cursor: default; display: inline-block; vertical-align: middle; width: 90px;">User data</span>
+								<span class="Text">User data</span>
 								<textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea>
 							</div>
 						</div>
