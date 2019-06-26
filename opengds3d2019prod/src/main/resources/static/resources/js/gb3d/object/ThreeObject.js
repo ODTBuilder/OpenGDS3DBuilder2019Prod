@@ -19,11 +19,13 @@ if (!gb3d.object)
  * @author SOYIJUN
  */
 gb3d.object.ThreeObject = function(obj) {
+	var that = this;
+	var options = obj ? obj : {};
 	// THREEJS 3DObject.mesh
-	this.threeMesh = null;
+	this.threeMesh = options.threeMesh;
 	// location bounding box
-	this.minCRS = null;
-	this.maxCRS = null;
+	this.minCRS = options.minCRS;
+	this.maxCRS = options.maxCRS;
 }
 
 /**

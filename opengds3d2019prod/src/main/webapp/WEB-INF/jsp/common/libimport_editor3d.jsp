@@ -159,3 +159,4 @@
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>

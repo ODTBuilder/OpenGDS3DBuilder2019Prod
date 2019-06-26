@@ -6,10 +6,10 @@
 		<div class="col-xs-7 col-sm-9 col-md-10">
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-6" style="padding: 0;">
-					<div class="bind" style="width: 100%;"></div>
+					<div class="area-2d"></div>
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-6" style="padding: 0; background-color: #bfbfbf;">
-					<div class="cesium-three">Cesium</div>
+					<div class="area-3d"></div>
 				</div>
 			</div>
 		</div>
