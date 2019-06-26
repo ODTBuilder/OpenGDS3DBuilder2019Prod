@@ -68,6 +68,7 @@ gb.tree.GeoServer = function(obj) {
 	this.height = options.height || undefined;
 	this.downloadGeoserver = url.downloadGeoserver || undefined;
 
+	this.addGeoserverModal = $("#geoserverAdd");
 	/**
 	 * @private
 	 * @type {Array.<string>}
@@ -1519,6 +1520,27 @@ gb.tree.GeoServer = function(obj) {
 	if (!!this.properties) {
 		this.properties.setRefer(this.jstree);
 	}
+	
+	$(document).on("click", "#geoserverAddConfirm", function(e){
+		var name,
+			url,
+			id,
+			pass;
+		
+		$(".gb-geoserver-add-input").each(function(index){
+			if($(this).hasClass("geoserver-name")){
+				name = $(this).val();
+			} else if($(this).hasClass("geoserver-url")){
+				url = $(this).val();
+			} else if($(this).hasClass("geoserver-id")){
+				id = $(this).val();
+			} else if($(this).hasClass("geoserver-password")){
+				pass = $(this).val();
+			}
+		});
+		
+		that.addGeoServer(name, url, id, pass);
+	});
 };
 gb.tree.GeoServer.prototype = Object.create(gb.tree.GeoServer.prototype);
 gb.tree.GeoServer.prototype.constructor = gb.tree.GeoServer;
@@ -1672,6 +1694,7 @@ gb.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var gNameInput = $("<input>").attr({
 		"type" : "text",
 		"placeholder" : "EX) Geoserver",
+		"val" : "geo42"
 	}).addClass("gb-geoserver-add-input");
 	var gNameInputDiv = $("<div>").append(gNameInput).addClass("gb-geoserver-add-input-cell");
 	var gNameArea = $("<div>").append(gName).append(gNameInputDiv).addClass("gb-geoserver-add-row");
@@ -1687,7 +1710,8 @@ gb.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var gID = $("<div>").text(that.translation["id"][that.locale]+": ").addClass("gb-geoserver-add-label");
 	var gIDInput = $("<input>").attr({
 		"type" : "text",
-		"placeholder" : "EX) admin"
+		"placeholder" : "EX) admin",
+		"val" : "admin"
 	}).addClass("gb-geoserver-add-input");
 	var gIDInputDiv = $("<div>").append(gIDInput).addClass("gb-geoserver-add-input-cell");
 	var gIDArea = $("<div>").append(gID).append(gIDInputDiv).addClass("gb-geoserver-add-row");
@@ -1695,7 +1719,9 @@ gb.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var gPass = $("<div>").text(that.translation["password"][that.locale]+": ").addClass("gb-geoserver-add-label");
 	var gPassInput = $("<input>").attr({
 		"type" : "password",
-		"placeholder" : "EX) geoserver"
+		"autocomplete": "username",
+		"placeholder" : "EX) geoserver",
+		"val" : "geoserver"
 	}).addClass("gb-geoserver-add-input");
 	var gPassInputDiv = $("<div>").append(gPassInput).addClass("gb-geoserver-add-input-cell");
 	var gPassArea = $("<div>").append(gPass).append(gPassInputDiv).addClass("gb-geoserver-add-row");
@@ -1706,22 +1732,23 @@ gb.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 	var modalFooter = $("<div>").append(buttonArea);
 
-	var gBody = $("<div>").addClass("gb-geoserver-add-table").append(gNameArea).append(gURLArea).append(gIDArea).append(gPassArea);
+	var gBody = $("<form>").addClass("gb-geoserver-add-table").append(gNameArea).append(gURLArea).append(gIDArea).append(gPassArea);
 
-	var addGeoServerModal = new gb.modal.ModalBase({
-		"title" : that.translation["addgeoserver"][that.locale],
-		"width" : 540,
-		"height" : 400,
-		"autoOpen" : true,
-		"body" : gBody,
-		"footer" : modalFooter
-	});
-	$(closeBtn).click(function() {
-		addGeoServerModal.close();
-	});
-	$(okBtn).click(function() {
-		that.addGeoServer($(gNameInput).val(), $(gURLInput).val(), $(gIDInput).val(), $(gPassInput).val(), addGeoServerModal);
-	});
+//	var addGeoServerModal = new gb.modal.ModalBase({
+//		"title" : that.translation["addgeoserver"][that.locale],
+//		"width" : 540,
+//		"height" : 400,
+//		"autoOpen" : true,
+//		"body" : gBody,
+//		"footer" : modalFooter
+//	});
+//	$(closeBtn).click(function() {
+//		addGeoServerModal.close();
+//	});
+//	$(okBtn).click(function() {
+//		that.addGeoServer($(gNameInput).val(), $(gURLInput).val(), $(gIDInput).val(), $(gPassInput).val(), addGeoServerModal);
+//	});
+	that.addGeoserverModal.modal("show");
 };
 
 /**
@@ -1739,7 +1766,7 @@ gb.tree.GeoServer.prototype.openAddGeoServer = function() {
  * @param {gb.modal.ModalBase}
  *            modal - 완료 후 창을 닫을 모달 객체
  */
-gb.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, modal) {
+gb.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password) {
 	var that = this;
 	console.log("add geoserver");
 	console.log(name);
@@ -1758,15 +1785,15 @@ gb.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, mod
 		contentType : "application/json; charset=UTF-8",
 		beforeSend : function() {
 			$("body").css("cursor", "wait");
-			that.showSpinner(true, modal);
+			that.showSpinner(true, that.addGeoserverModal);
 		},
 		complete : function() {
 			$("body").css("cursor", "default");
-			that.showSpinner(false, modal);
+			that.showSpinner(false, that.addGeoserverModal);
 		},
 		success : function(data,textStatus,jqXHR) {
 			console.log(data);
-			modal.close();
+			that.addGeoserverModal.modal("hide");
 			if (data === true) {
 				that.refreshList();
 			}
@@ -2382,8 +2409,8 @@ gb.tree.GeoServer.prototype.geoserverInfoModal = function(serverName) {
 gb.tree.GeoServer.prototype.showSpinner = function(show, modal) {
 	if (show) {
 		var spinnerArea = $("<div>").addClass("gb-spinner-wrap").addClass("gb-spinner-body").append($("<i>").addClass("fas fa-spinner fa-spin fa-5x").addClass("gb-spinner-position"));
-		$(modal.modal).append(spinnerArea);
+		$(modal).append(spinnerArea);
 	} else {
-		$(modal.modal).find(".gb-spinner-wrap").remove();
+		$(modal).find(".gb-spinner-wrap").remove();
 	}
 };

@@ -416,7 +416,8 @@ gb.tree.OpenLayers = function(obj) {
 	 * @private
 	 */
 	this.panelBody = $("<div>").addClass("gb-article-body").css({
-		"overflow-y" : "auto"
+		"overflow-y" : "auto",
+		"flex": "1"
 	});
 	
 	/**
@@ -425,7 +426,10 @@ gb.tree.OpenLayers = function(obj) {
 	 * @private
 	 */
 	this.panel = $("<div>").addClass("gb-article").css({
-		"margin" : "0"
+		"margin" : "0",
+		"height" : "100%",
+		"display" : "flex",
+		"flex-direction" : "column"
 	}).append(this.panelHead).append(this.panelBody);
 	
 	var options = obj ? obj : {};
@@ -459,7 +463,7 @@ gb.tree.OpenLayers = function(obj) {
 		$(options.append).append(this.panel);
 	}
 
-	$(document).ready(function() {
+	/*$(document).ready(function() {
 		var parentHeight = $(that.panel).parent().innerHeight();
 		var headHeight = $(that.panel).find(".gb-article-head").outerHeight();
 		var bodyHeight = parentHeight - headHeight;
@@ -476,7 +480,7 @@ gb.tree.OpenLayers = function(obj) {
 		var headHeight = $(that.panel).find(".gb-article-head").outerHeight();
 		var bodyHeight = parentHeight - headHeight;
 		$(that.panelBody).outerHeight(bodyHeight);
-	}, 1000);
+	}, 1000);*/
 
 	$(this.panelBody).jstreeol3(
 			{
