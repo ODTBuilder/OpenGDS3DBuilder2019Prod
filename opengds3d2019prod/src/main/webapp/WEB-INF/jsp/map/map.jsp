@@ -21,24 +21,26 @@
 	min-height: 100px;
 }
 
-html {
+html, body{
 	position: relative;
-	min-height: 100%;
+	height: 100%;
 	overflow: hidden;
 }
 
 .mainHeader {
 	margin-bottom: 0;
+	height: 6%;
 }
 
 .builderHeader {
 	border-radius: 4px 4px 0 0;
 	margin-bottom: 0;
-	min-height: 30px;
+	height: 4%;
+	min-height: 41px;
 }
 
-#builderContent {
-	padding: 0;
+.builderContent {
+	height: 86%;
 }
 
 .builderLayer {
@@ -52,23 +54,13 @@ html {
 	float: left;
 }
 
-#builderMap {
-	
-}
-
-#builderBaseMap {
-	position: relative;
-	top: -906px;
-	left: 0;
-}
-
 .builderFooter {
-	min-height: 30px;
-	line-height: 30px;
+	min-height: 41px;
+	line-height: 41px;
 	margin-bottom: 0;
 	border-radius: 0;
 	position: relative;
-	height: 30px;
+	height: 4%;
 	padding: 0 8px;
 }
 
@@ -77,6 +69,7 @@ html {
 }
 
 .builderLayerClientPanel {
+	height: 100%;
 	margin-bottom: 0;
 }
 
@@ -122,48 +115,47 @@ html {
 		</div>
 		<div class="collapse navbar-collapse" id="navbar-collapse-2">
 			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" title="File" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-folder-open fa-lg" style="color: #bfbfbf;"></i>
+						<spring:message code="lang.file" /><span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li>
+						<li><a href="#"><spring:message code="lang.importZip"></spring:message></a></li>
+						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li>
+					</ul>
+				</li>
 				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
-						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
+						class="fas fa-save fa-lg" style="color: #4dadf7;"></i>
+						<spring:message code="lang.save" />
 				</a></li>
-				<li><a href="#" title="Edit" id="editTool"> <i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
-							code="lang.edit" />
+				<li><a href="#" title="Geoserver"  data-toggle="modal" data-target="#geoserverModal"> <i class="fas fa-server fa-lg" style="color: #91d050;"></i>
+						<spring:message code="lang.geoserver" />
 				</a></li>
-				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
-						<spring:message code="lang.baseMap" />
-				</a></li>
+				<li>
+					<a href="#" title="Edit" id="editTool">
+						<i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i>
+						<spring:message code="lang.edit" />
+					</a>
+				</li>
+				
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
-				</a></li>
-				<!-- <li><a href="#" title="QA Status" id="qastat">
-					<i class="fas fa-th-list fa-lg" style="color: #7f7f7f;"></i>
-					QA Status</a></li> -->
-				<!-- 				<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" -->
-				<!-- 					aria-expanded="false" title="Generalization"> <i class="fas fa-object-group fa-lg" style="color: #00b0f0;"></i> -->
-				<%-- 						<spring:message code="lang.generalization" /> --%>
-				<!-- 				</a> -->
-				<!-- 					<ul class="dropdown-menu" role="menu"> -->
-				<!-- 						<li><a href="#" title="Generalization Process" id="gen">Generalization</a></li> -->
-				<!-- 						<li><a href="#" title="Generalization Result" id="genstat">Result</a></li> -->
-				<!-- 					</ul></li> -->
-				<li><a href="#" title="Version Control" id="vermodal"> <i class="fas fa-code-branch fa-lg"
-						style="color: #344762;"></i> <spring:message code="lang.versioning" />
 				</a></li>
 				<li><a href="#" title="Information" id="binfo" data-toggle="modal" data-target="#infoModal"> <i
 						class="fas fa-info-circle fa-lg" style="color: #ffc000;"></i> <spring:message code="lang.info" />
 				</a></li>
-				<li><a href="#" title="setting" id="editSetting"> <i class="fas fa-cog fa-lg" style="color: #c0c1c2;"></i>
-						<spring:message code="lang.setting" />
-				</a></li>
 			</ul>
 		</div>
 	</nav>
-	<div class="builderContent">
+	<!-- <div class="builderContent">
 		<div class="builderLayer">
-			<div class="builderLayerGeoServerPanel"></div>
 			<div class="builderLayerClientPanel"></div>
 		</div>
 		<div class="bind"></div>
-	</div>
+	</div> -->
+	<jsp:include page="/WEB-INF/jsp/map/content.jsp" />
 	<nav class="navbar navbar-default builderFooter">
 		<!-- 		<span class="navbar-left gb-footer-span"><span class="gb-scale-line-area" style="margin-right: 118px;"></span></span> -->
 		<span class="navbar-left gb-footer-span"><i class="fas fa-globe"></i>&nbsp;<a href="#"
@@ -175,124 +167,10 @@ html {
 			style="display: inline-block;"></span></span> <span class="text-muted navbar-right gb-footer-span"><span
 			class="help-message"></span></span>
 	</nav>
-	<div id="infoModal" tabindex="-1" role="dialog" class="modal fade" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" data-dismiss="modal" aria-label="Close" class="close">
-						<span aria-hidden="true">×</span>
-					</button>
-					<h4 class="modal-title">
-						<spring:message code="lang.info" />
-					</h4>
-				</div>
-				<div class="modal-body" style="height: 550px; overflow-y: auto;">
-					<h4 class="gb-horizontal">
-						<spring:message code="lang.buildInfo" />
-					</h4>
-					<table style="width: 100%; margin-bottom: 50px;">
-						<tbody>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">GeoDT Web <spring:message
-										code="lang.version" /></td>
-								<td style="padding: 0.785714em;">1.0</td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;"><spring:message
-										code="lang.gitAddress" /></td>
-								<td style="padding: 0.785714em;"><a href="https://github.com/ODTBuilder/OpenGDSBuilder2018Prod"
-									title="Generalization Process">https://github.com/ODTBuilder/OpenGDSBuilder2018Prod</a></td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;"><spring:message
-										code="lang.buildDate" /></td>
-								<td style="padding: 0.785714em;">2019-01-08 18:00</td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">Java <spring:message
-										code="lang.version" /></td>
-								<td style="padding: 0.785714em;">OpenJDK 1.8.0.111 64bit</td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">PostgreSQL <spring:message
-										code="lang.version" /></td>
-								<td style="padding: 0.785714em;">9.4</td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">GeoTools <spring:message
-										code="lang.version" /></td>
-								<td style="padding: 0.785714em;">16.5</td>
-							</tr>
-						</tbody>
-					</table>
-					<h4 class="gb-horizontal">
-						<spring:message code="lang.license" />
-					</h4>
-					<table style="width: 100%; margin-bottom: 50px;">
-						<tbody>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;"><spring:message
-										code="lang.licenseLGPL" /> 3.0 (LGPL v3.0)</td>
-								<td style="padding: 0.785714em;"><a href="http://www.opensource.org/licenses/lgpl-3.0.html"
-									class="gb-href-link"> GNU LESSER GENERAL PUBLIC LICENSE </a><br>
-									<p>Version 3, 29 June 2007
-									<p>
-									<p>
-										Copyright (C) 2007 Free Software Foundation, Inc. <a href="http://fsf.org" class="gb-href-link">http://fsf.org</a>
-									</p>
-									<p>Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it
-										is not allowed.
-									<p>
-									<p>This version of the GNU Lesser General Public License incorporates the terms and conditions of version 3
-										of the GNU General Public License, supplemented by the additional permissions listed below.</p></td>
-							</tr>
-						</tbody>
-					</table>
-					<h4 class="gb-horizontal">
-						<spring:message code="lang.useLibrary" />
-					</h4>
-					<table style="width: 100%;">
-						<tbody>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">GeoTools</td>
-								<td style="padding: 0.785714em;"><a href="http://www.gnu.org/licenses/lgpl-2.1.html" class="gb-href-link">
-										<spring:message code="lang.licenseLGPL" /> 2.1 (LGPL v2.1)
-								</a></td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">PostgreSQL</td>
-								<td style="padding: 0.785714em;"><a href="https://www.postgresql.org/about/licence/" class="gb-href-link">
-										The PostgreSQL Licence (PostgreSQL) </a></td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">Geoserver</td>
-								<td style="padding: 0.785714em;"><a href="https://opensource.org/licenses/gpl-2.0.php" class="gb-href-link">
-										<spring:message code="lang.licenseGPL" /> (GPLv2)
-								</a></td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">Geogig</td>
-								<td style="padding: 0.785714em;"><a href="http://opensource.org/licenses/BSD-3-Clause" class="gb-href-link">
-										3-Clause BSD License (BSD-3-Clause) </a></td>
-							</tr>
-							<tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-								<td style="padding: 0.785714em; background: rgba(0, 0, 0, 0.03); font-weight: 700;">Apache</td>
-								<td style="padding: 0.785714em;"><a href="http://www.apache.org/licenses/LICENSE-2.0" class="gb-href-link">
-										Apache License 2.0 </a></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div class="modal-footer">
-					<span style="float: right;">
-						<button type="button" data-dismiss="modal" class="btn btn-default">
-							<spring:message code="lang.close" />
-						</button>
-					</span>
-				</div>
-			</div>
-		</div>
-	</div>
+	
+	<!-- modal area -->
+	<jsp:include page="/WEB-INF/jsp/map/geoserverModal.jsp" />
+	<jsp:include page="/WEB-INF/jsp/map/infoModal.jsp" />
 	<script type="text/javascript">
 		var locale = '<spring:message code="lang.localeCode" />';
 
@@ -321,7 +199,7 @@ html {
 		});
 
 		var gbBaseMap = new gb.style.BaseMap({
-			"map" : gbMap.getLowerMap(),
+			"map" : gbMap.getLowerMap(), 
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
 		});
@@ -421,7 +299,7 @@ html {
 		var otree = new gb.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
-			"map" : gbMap.getUpperMap(),
+			//"map" : gbMap.getUpperMap(),
 			"frecord" : frecord,
 			"uploadJSON" : uploadjson,
 			"token" : urlList.token,
@@ -437,9 +315,10 @@ html {
 
 		var gtree = new gb.tree.GeoServer({
 			"locale" : locale !== "" ? locale : "en",
+			"height" : "400px",
 			"append" : $(".builderLayerGeoServerPanel")[0],
 			"clientTree" : otree.getJSTree(),
-			"map" : gbMap.getUpperMap(),
+			//"map" : gbMap.getUpperMap(),
 			"properties" : new gb.edit.ModifyLayerProperties({
 				"token" : urlList.token,
 				"locale" : locale !== "" ? locale : "en"
@@ -470,7 +349,7 @@ html {
 		});
 
 		// EditTool 활성화
-		var epan = new gb.edit.EditingTool({
+		/* var epan = new gb.edit.EditingTool({
 			targetElement : gbMap.getLowerDiv()[0],
 			map : gbMap.getUpperMap(),
 			featureRecord : frecord,
@@ -480,7 +359,7 @@ html {
 			locale : locale || "en",
 			versioning : fhist,
 			isEditing : gb.module.isEditing
-		});
+		}); */
 
 		$("#editTool").click(function(e) {
 			e.preventDefault();
@@ -492,7 +371,7 @@ html {
 		});
 
 		// 거리, 면적 측정 기능 추가
-		var measureArea = new gb.interaction.MeasureTip({
+		/* var measureArea = new gb.interaction.MeasureTip({
 			type : "Polygon",
 			map : gbMap.getUpperMap(),
 			snapSource : epan.snapSource
@@ -535,10 +414,10 @@ html {
 			clickEvent : function() {
 				console.log("mesure length");
 			}
-		});
+		}); */
 
 		// hole draw interaction
-		var hole = new gb.interaction.HoleDraw({
+		/* var hole = new gb.interaction.HoleDraw({
 			editTool : epan,
 			featureRecord : frecord
 		});
@@ -615,10 +494,10 @@ html {
 			toggleTarget : "#cmd-toggle-btn",
 			isDisplay : false,
 			map : gbMap.getUpperMap()
-		});
+		}); */
 
 		// geocoder
-		var geocoder = new Geocoder('nominatim', {
+		/* var geocoder = new Geocoder('nominatim', {
 			provider : 'osm',
 			countrycodes : 'KR',
 			key : '__some_key__',
@@ -638,14 +517,19 @@ html {
 		// 			"target" : $(".gb-scale-line-area")[0],
 		// 			"className" : "gb-scale-line"
 		});
-		gbMap.getUpperMap().addControl(scaleLine);
+		gbMap.getUpperMap().addControl(scaleLine); */
 
 		var gitrnd = {
 			resize : function() {
 				//현재 보이는 브라우저 내부 영역의 높이
 				var winHeight = $(window).innerHeight();
+				var builderHeaderHeight = $(".builderHeader").outerHeight(true);
+				
+				if(builderHeaderHeight != 41){
+					return;
+				}
 				//컨텐츠 영역의 높이 지정
-				//#mainHeader -> 헤더1
+				//.mainHeader -> 헤더1
 				//.builderHeader -> 헤더2
 				//.builderFooter -> 푸터
 				// 없으면 삭제한다.
@@ -656,13 +540,22 @@ html {
 				var winWidth = $(window).innerWidth();
 				//컨텐츠 (지도) 영역의 너비 지정
 				//.builderLayer -> 사이드바
-				var mapWidth = winWidth - ($(".builderLayer").outerWidth(true)) - 1;
+				var mapWidth = ($(".bind").parent().innerWidth(true)) - 1;
 				//사이드바의 높이 지정
 				$(".builderLayer").outerHeight(conHeight);
 				//편집영역의 높이 지정
 				$(".builderContent").outerHeight(conHeight);
 				//컨텐츠 영역의 너비 지정
 				gbMap.setSize(mapWidth, conHeight);
+				$(".bind").outerHeight(conHeight);
+				$(".cesium-three").outerHeight(conHeight);
+				
+				if(winWidth <= 992){
+					gbMap.setSize(mapWidth, conHeight/2);
+					$(".bind").outerHeight(conHeight/2);
+					$(".cesium-three").outerHeight(conHeight/2);
+				}
+				$(".attribute-content").outerHeight(conHeight);
 				//컨텐츠 영역(겹친 지도 부분, 베이스맵과 편집영역을 겹쳐서 베이스맵이 편집에 영향이 없도록하기 위함)의 위치를 같게함
 				var str = "-" + conHeight + "px";
 				// 				$("#builderBaseMap").css("top", str);
@@ -675,8 +568,8 @@ html {
 				var treeHeight = listHeight - (41);
 				var searchHeight = $(".builder-tree-search").outerHeight();
 				// 				$(".gitbuilder-layer-panel").outerHeight(treeHeight - searchHeight);
-				$(".builderLayerGeoServerPanel").outerHeight(listHeight);
-				$(".builderLayerClientPanel").outerHeight(listHeight);
+				//$(".builderLayerGeoServerPanel").outerHeight(listHeight);
+				//$(".builderLayerClientPanel").outerHeight(listHeight);
 			}
 		}
 

@@ -69,7 +69,7 @@ gb.modal.ModalBase = function(obj) {
 		"width" : typeof this.width === "number" ? this.width+"px" : this.width,
 				"height" : typeof this.height === "number" ? this.height+"px" : this.height,
 						"position" : "absolute",
-						"z-Index" : "999"
+						"z-Index" : "1041"
 	}).append(this.modalHead).append(this.modalBody).append(this.modalFooter);
 	/**
 	 * @private
