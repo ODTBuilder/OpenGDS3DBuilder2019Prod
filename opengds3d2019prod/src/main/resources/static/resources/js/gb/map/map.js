@@ -89,8 +89,7 @@ gb.Map = function(obj) {
 	}
 	// 윗 지도 영역을 상단에 정렬
 	$(this.upperDiv).css({
-		"width" : "100%",
-		"height" : "100%"
+		"top" : 0
 	});
 	// 아래 지도 영역을 윗 지도 영역과 동일하게(겹치도록) 정렬
 	$(this.lowerDiv).css({

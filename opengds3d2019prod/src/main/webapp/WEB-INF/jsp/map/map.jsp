@@ -198,11 +198,11 @@ html, body{
 			}
 		});
 
-		/* var gbBaseMap = new gb.style.BaseMap({
-			"map" : gbMap.getLowerMap(),
+		var gbBaseMap = new gb.style.BaseMap({
+			"map" : gbMap.getLowerMap(), 
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
-		}); */
+		});
 
 		$("#changeBase").click(function() {
 			gbBaseMap.open();
@@ -251,12 +251,12 @@ html, body{
 			vrepo.open();
 		});
 
-		/* var crs = new gb.crs.BaseCRS({
+		var crs = new gb.crs.BaseCRS({
 			"locale" : locale !== "" ? locale : "en",
 			"message" : $(".epsg-now")[0],
 			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
 			"epsg" : "4326"
-		}); */
+		});
 
 		$(".epsg-now").click(function() {
 			crs.open();
@@ -540,18 +540,18 @@ html, body{
 				var winWidth = $(window).innerWidth();
 				//컨텐츠 (지도) 영역의 너비 지정
 				//.builderLayer -> 사이드바
-				var mapWidth = winWidth - ($(".builderLayer").outerWidth(true)) - 1;
+				var mapWidth = ($(".bind").parent().innerWidth(true)) - 1;
 				//사이드바의 높이 지정
 				$(".builderLayer").outerHeight(conHeight);
 				//편집영역의 높이 지정
 				$(".builderContent").outerHeight(conHeight);
 				//컨텐츠 영역의 너비 지정
-				//gbMap.setSize(mapWidth, conHeight);
+				gbMap.setSize(mapWidth, conHeight);
 				$(".bind").outerHeight(conHeight);
 				$(".cesium-three").outerHeight(conHeight);
 				
 				if(winWidth <= 992){
-					//gbMap.setSize(mapWidth, conHeight/2);
+					gbMap.setSize(mapWidth, conHeight/2);
 					$(".bind").outerHeight(conHeight/2);
 					$(".cesium-three").outerHeight(conHeight/2);
 				}

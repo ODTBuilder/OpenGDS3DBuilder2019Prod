@@ -428,6 +428,7 @@ if (!gb.validation)
 		var footer = this.createModalFooter();
 		this.setModalFooter(footer);
 
+		this.modal.css("display", "none");
 		$("body").append(this.modal);
 		$("body").append(this.background);
 	}
