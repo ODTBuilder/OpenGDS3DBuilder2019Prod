@@ -152,81 +152,6 @@ gb3d.Map = function(obj) {
 
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 
-	function init3DObject(){
-		// Cesium entity
-		var entity = {
-				name : 'Polygon',
-				polygon : {
-					hierarchy : Cesium.Cartesian3.fromDegreesArray([
-						minCRS[0], minCRS[1],
-						maxCRS[0], minCRS[1],
-						maxCRS[0], maxCRS[1],
-						minCRS[0], maxCRS[1],
-						]),
-						material : Cesium.Color.RED.withAlpha(0.2)
-				}
-		};
-		var Polygon = that.cesiumViewer.entities.add(entity);
-
-		// Three.js Objects
-		// Lathe geometry
-		var doubleSideMaterial = new THREE.MeshNormalMaterial({
-			side: THREE.DoubleSide
-		});
-		var segments = 10;
-		var points = [];
-		for ( var i = 0; i < segments; i ++ ) {
-			points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * segments + 5, ( i - 5 ) * 2 ) );
-		}
-		var geometry = new THREE.LatheGeometry( points );
-		var latheMesh = new THREE.Mesh( geometry, doubleSideMaterial ) ;
-		latheMesh.scale.set(1500,1500,1500); // scale object to be visible at
-		// planet scale
-		latheMesh.position.z += 15000.0; // translate "up" in Three.js space
-		// so the "bottom" of the mesh is
-		// the handle
-		latheMesh.rotation.x = Math.PI / 2; // rotate mesh for Cesium's Y-up
-		// system
-		var latheMeshYup = new THREE.Group();
-		latheMeshYup.add(latheMesh);
-		that.threeScene.add(latheMeshYup); // don’t forget to add it to the
-		// Three.js scene manually
-		// three.control.attach(latheMeshYup);
-
-		// Assign Three.js object mesh to our object array
-//		var _3DOB = new _3DObject();
-//		_3DOB.threeMesh = latheMeshYup;
-//		_3DOB.minCRS = minCRS;
-//		_3DOB.maxCRS = maxCRS;
-		threeObjects.push(latheMeshYup);
-
-		// dodecahedron
-		geometry = new THREE.DodecahedronGeometry();
-		var dodecahedronMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial()) ;
-		dodecahedronMesh.scale.set(5000,5000,5000); // scale object to be
-		// visible at planet scale
-		dodecahedronMesh.position.z += 5000.0; // translate "up" in Three.js
-		// space so the "bottom" of the
-		// mesh is the handle
-		dodecahedronMesh.rotation.x = Math.PI / 2; // rotate mesh for Cesium's
-		// Y-up system
-		var dodecahedronMeshYup = new THREE.Group();
-		dodecahedronMeshYup.add(dodecahedronMesh);
-		that.threeScene.add(dodecahedronMeshYup); // don’t forget to add it to
-		// the
-		// Three.js scene manually
-		that.threeTransformControls.attach(dodecahedronMeshYup);
-
-		// Assign Three.js object mesh to our object array
-//		_3DOB = new _3DObject();
-//		_3DOB.threeMesh = dodecahedronMeshYup;
-//		_3DOB.minCRS = minCRS;
-//		_3DOB.maxCRS = maxCRS;
-		threeObjects.push(dodecahedronMeshYup);
-
-		that.threeScene.add(that.threeTransformControls);
-	}
-
 	var hiding;
 
 	function delayHideTransform() {
@@ -246,7 +171,7 @@ gb3d.Map = function(obj) {
 
 	// initCesium(); // Initialize Cesium renderer
 	// initThree(); // Initialize Three.js renderer
-	init3DObject(); // Initialize Three.js object mesh with Cesium Cartesian
+	// init3DObject(); // Initialize Three.js object mesh with Cesium Cartesian
 	// coordinate system
 	this.loop(); // Looping renderer
 	
@@ -391,9 +316,9 @@ gb3d.Map.prototype.renderThreeObj = function(){
 
 	// Configure Three.js meshes to stand against globe center position up
 	// direction
-	for(var id in threeObjects){
-		minCRS = threeObjects[id].minCRS;
-		maxCRS = threeObjects[id].maxCRS;
+	for(var id in this.getThreeObjects()){
+		var minCRS = this.getThreeObjects()[id].getMinCRS();
+		var maxCRS = this.getThreeObjects()[id].getMaxCRS();
 		// convert lat/long center position to Cartesian3
 		var center = Cesium.Cartesian3.fromDegrees((minCRS[0] + maxCRS[0]) / 2, (minCRS[1] + maxCRS[1]) / 2);
 
@@ -406,9 +331,9 @@ gb3d.Map.prototype.renderThreeObj = function(){
 		var latDir  = new THREE.Vector3().subVectors(bottomLeft,topLeft ).normalize();
 
 		// configure entity position and orientation
-		threeObjects[id].threeMesh.position.copy(center);
-		threeObjects[id].threeMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-		threeObjects[id].threeMesh.up.copy(latDir);
+		this.getThreeObjects()[id].getThreeMesh().position.copy(center);
+		this.getThreeObjects()[id].getThreeMesh().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+		this.getThreeObjects()[id].getThreeMesh().up.copy(latDir);
 	}
 
 	// Clone Cesium Camera projection position so the
@@ -457,7 +382,28 @@ gb3d.Map.prototype.render = function(){
  */
 gb3d.Map.prototype.loop = function(){
 	var that = this;
-	requestAnimationFrame(loop);
+//	requestAnimationFrame(that.loop);
 	that.renderCesium();
 	that.renderThreeObj();
 }
+
+/**
+ * three transform controls 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getThreeObjects
+ * @return {Array.<gb3d.object.ThreeObject>} ThreeObject 배열
+ */
+gb3d.Map.prototype.getThreeObjects = function() {
+	return this.threeObjects;
+};
+
+/**
+ * three transform controls 객체를 설정한다.
+ * 
+ * @method gb3d.Map#setThreeObjects
+ * @param {Array.
+ *            <gb3d.object.ThreeObject>} ThreeObject 배열
+ */
+gb3d.Map.prototype.setThreeObjects = function(objects) {
+	this.threeObjects = objects;
+};
