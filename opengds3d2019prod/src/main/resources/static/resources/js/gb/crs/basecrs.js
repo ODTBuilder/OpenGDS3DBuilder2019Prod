@@ -53,7 +53,7 @@ gb.crs.BaseCRS = function(obj) {
 	obj.title = this.translation.bcrs[this.locale];
 	obj.width = 435;
 	obj.height = 180;
-	obj.keep = true;
+	obj.keep = false;
 	gb.modal.ModalBase.call(this, obj);
 
 	/**

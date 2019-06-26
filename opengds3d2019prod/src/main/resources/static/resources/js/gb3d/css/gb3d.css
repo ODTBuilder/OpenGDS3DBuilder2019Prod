@@ -1,0 +1,30 @@
+.gb3d-map-cesium-area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+.gb3d-map-three-area {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	font-family: sans-serif;
+	pointer-events: none;
+}
+
+.gb3d-map-bind3d-area {
+	position: relative;
+	width: inherit;
+	height: inherit;
+}

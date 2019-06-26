@@ -104,7 +104,7 @@ public class MainController {
 			mav.addObject("fname", loginUser.getFname());
 			mav.addObject("lname", loginUser.getLname());
 		}
-		mav.setViewName("/map/map");
+		mav.setViewName("/map/map3d");
 		String header = request.getHeader("User-Agent");
 		if (header != null) {
 			if (header.indexOf("Trident") > -1) {
