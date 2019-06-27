@@ -43,7 +43,78 @@
 							<div class="builderLayerClientPanel"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrDeclare">
-							<div class="Panel" style="border-top: 0px; padding-top: 20px; display: block;">
+							<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+								<div class="panel panel-default"  id="declareTemp" style="display: none;">
+									<div class="panel-heading" role="tab" id="headingOne">
+										<h4 class="panel-title gb-flex-between">
+											<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapseOne">
+												TileSet #1
+											</a>
+											<select class="form-control" style="flex: 0 0 90px;">
+												<option>Key1</option>
+												<option>Key2</option>
+												<option>Key3</option>
+											</select>
+										</h4>
+									</div>
+									<div id="collapse1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+										<div class="panel-body">
+											<div class="gb-declare-row">
+												<span class="Text">Condition</span>
+												<span class="Text">Value</span>
+												<span class="Text">Color</span>
+												<span class="Text">Hide</span>
+												<span class="Text"><a href="#"><i class="fas fa-plus"></i></a></span>
+											</div>
+											<div class="gb-declare-row">
+												<div class="gb-declare-item">
+													<select class="form-control">
+														<option>&lt=</option>
+														<option>&gt=</option>
+														<option>&lt</option>
+														<option>&gt</option>
+														<option>=</option>
+													</select>
+												</div>
+												<div class="gb-declare-item">
+													<input class="form-control">
+												</div>
+												<div class="gb-declare-item">
+													<input class="form-control">
+												</div>
+												<div class="gb-declare-item">
+													<input type="checkbox">
+												</div>
+												<a href="#"><i class="far fa-trash-alt"></i></a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab" id="heading2">
+										<h4 class="panel-title gb-flex-between">
+											<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="true" aria-controls="collapse2">
+												TileSet #2
+											</a>
+											<select class="form-control" style="flex: 0 0 90px;">
+												<option>Key1</option>
+												<option>Key2</option>
+												<option>Key3</option>
+											</select>
+										</h4>
+									</div>
+									<div id="collapse2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading2">
+										<div class="panel-body">
+											<div class="gb-declare-row">
+												<span class="Text">Condition</span>
+												<span class="Text">Value</span>
+												<span class="Text">Color</span>
+												<span class="Text">Hide</span>
+												<span class="Text"><a href="#"><i class="fas fa-plus"></i></a></span>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -93,62 +164,6 @@
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Fov</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Left</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Right</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Top</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Bottom</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Near</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Far</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Intensity</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Color</span>
-								<input class="Color" type="color" style="width: 64px; height: 17px; border: 0px; padding: 2px; background-color: transparent;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Ground Color</span>
-								<input class="Color" type="color" style="width: 64px; height: 17px; border: 0px; padding: 2px; background-color: transparent;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Distance</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Angle</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Penumbra</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
-							<div class="gb-object-row" style="display: none;">
-								<span class="Text">Decay</span>
-								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize;">
-							</div>
 							<div class="gb-object-row">
 								<span class="Text">Shadow</span>
 								<span style="margin-right: 10px;">
@@ -174,8 +189,57 @@
 								<textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea>
 							</div>
 						</div>
-						<div role="tabpanel" class="tab-pane" id="attrStyle">Style</div>
-						<div role="tabpanel" class="tab-pane" id="attrMaterial">Material</div>
+						<div role="tabpanel" class="tab-pane" id="attrStyle">
+							<div class="gb-object-row">
+								<span class="Text">Opacity</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Width</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Height</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Radius</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Color</span>
+								<input id="styleColor" class="form-control" style="flex: 1;">
+							</div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="attrMaterial">
+							<div class="gb-object-row">
+								<span class="Text">Blending</span>
+								<select class="form-control" style="flex: 1;">
+									<option>hochul</option>
+								</select>
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Wireframe</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Roughness</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Metalness</span>
+								<input class="form-control" style="flex: 1;">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Texture</span>
+								<input class="form-control" style="flex: 1;">
+								<img id="textureImage" src="resources/img/git_new_logo.png" alt="..." class="img-thumbnail" data-toggle="modal" data-target="#textureImageModal">
+							</div>
+							<div class="gb-object-row">
+								<span class="Text">Emissive</span>
+								<input id="textureEmissive" class="form-control" style="flex: 1;">
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

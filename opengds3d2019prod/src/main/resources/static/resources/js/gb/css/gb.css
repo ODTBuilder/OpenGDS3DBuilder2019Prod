@@ -2265,10 +2265,11 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 
 .gb-attribute-item {
 	flex: 1;
+	overflow: auto;
 }
 
 .gb-attribute-item > .tab-pane {
-	height: 100%;
+	/* height: 100%; */
 }
 
 .gb-object-row {
@@ -2279,7 +2280,7 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 }
 
 .gb-object-row > span:first-child {
-	width: 90px;
+	flex: 0 0 90px;
 	margin: auto 0;
 }
 
@@ -2291,7 +2292,51 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 
 .gb-object-input {
 	background-color: transparent;
-	width: 50px;
-	flex: 1;
+	flex: 1 1 50px;
 	margin: 0px 5px;
+}
+
+.gb-declare-row {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	text-align: center;
+	margin-bottom: 2px;
+}
+
+.gb-declare-row:first-child {
+	border-bottom: 1px solid #ccc;
+}
+
+.gb-declare-row > span {
+	flex: 0 0 20%;
+}
+
+.gb-declare-row > span:first-child {
+	flex: 0 0 30%;
+}
+
+.gb-declare-row > span:last-child {
+	flex: 0 0 10%;
+}
+
+.gb-declare-row > .gb-declare-item {
+	flex: 0 0 20%;
+	padding: 0px 4px;
+	margin: auto 0px;
+}
+
+.gb-declare-row > div:first-child {
+	flex: 0 0 30%;
+}
+
+.gb-declare-row > a {
+	flex: 0 0 10%;
+	margin: auto 0px;
+}
+
+.gb-flex-between {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }

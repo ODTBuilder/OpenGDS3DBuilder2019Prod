@@ -165,9 +165,22 @@ html, body {
 	<!-- modal area -->
 	<jsp:include page="/WEB-INF/jsp/map/geoserverModal.jsp" />
 	<jsp:include page="/WEB-INF/jsp/map/infoModal.jsp" />
+	<jsp:include page="/WEB-INF/jsp/map/objectModal.jsp" />
 	<script type="text/javascript">
 		var locale = '<spring:message code="lang.localeCode" />';
 
+		var urlList = {
+			token : "?${_csrf.parameterName}=${_csrf.token}",
+			wfst : "${pageContext.request.contextPath}/geoserver/geoserverWFSTransaction.ajax",
+			getLayerInfo : "geoserver/getGeoLayerInfoList.ajax",
+			getMapWMS : "geoserver/geoserverWMSGetMap.ajax",
+			getFeatureInfo : "geoserver/geoserverWFSGetFeature.ajax",
+			getWFSFeature : "geoserver/geoserverWFSGetFeature.ajax",
+			getLegend : "geoserver/geoserverWMSGetLegendGraphic.ajax",
+			requestValidate : "web/validate.do",
+			geoserverFileUpload : "geoserver/upload.do"
+		}
+		
 		$(document).ready(function() {
 			var map = new gb3d.Map({
 				"target2d" : $(".area-2d")[0],
@@ -268,6 +281,76 @@ html, body {
 				that.threeScene.add(that.threeTransformControls);
 			}
 
+			var frecord = new gb.edit.FeatureRecord({
+				//id : "feature_id",
+				locale : locale,
+				wfstURL : urlList.wfst + urlList.token,
+				layerInfoURL : urlList.getLayerInfo + urlList.token
+			});
+			
+			var uploadjson = new gb.geoserver.UploadGeoJSON({
+				"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"epsg" : function() {
+					return crs.getEPSGCode();
+				},
+				"geoserverTree" : function() {
+					return gtree;
+				},
+				"locale" : locale !== "" ? locale : "en"
+			});
+			
+			otree = new gb.tree.OpenLayers({
+				"locale" : locale || "en",
+				"append" : $(".builderLayerClientPanel")[0],
+				"map" : gbMap.getUpperMap(),
+				"frecord" : frecord,
+				"uploadJSON" : uploadjson,
+				"token" : urlList.token,
+				"url" : {
+					"getLegend" : urlList.getLegend + urlList.token
+				}
+			});
+
+			var gtree = new gb.tree.GeoServer({
+				"locale" : locale !== "" ? locale : "en",
+				"height" : "300px",
+				"append" : $(".builderLayerGeoServerPanel")[0],
+				"clientTree" : otree.getJSTree(),
+				"map" : gbMap.getUpperMap(),
+				"properties" : new gb.edit.ModifyLayerProperties({
+					"token" : urlList.token,
+					"locale" : locale !== "" ? locale : "en"
+				}),
+				//"uploadSHP" : uploadSHP,
+				"url" : {
+					"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
+					"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+					"deleteGeoServer" : "geoserver/removeGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+					"deleteGeoServerLayer" : "geoserver/geoserverRemoveLayers.ajax?${_csrf.parameterName}=${_csrf.token}",
+					"getMapWMS" : urlList.getMapWMS + urlList.token,
+					"getLayerInfo" : urlList.getLayerInfo + urlList.token,
+					"getWFSFeature" : urlList.getWFSFeature + urlList.token,
+					"switchGeoGigBranch" : "geoserver/updateGeogigGsStore.do?${_csrf.parameterName}=${_csrf.token}",
+					"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
+				}
+			});
+			
+			// 검수 수행 Modal 생성
+			var validation = new gb.validation.Validation({
+				"autoOpen" : false,
+				"locale" : locale,
+				"title" : "<spring:message code='lang.validation' />",
+				"url" : {
+					"token" : urlList.token,
+					"requestValidate" : urlList.requestValidate
+				},
+				"isEditing" : gb.module.isEditing
+			});
+
+			$("#validation").click(function() {
+				validation.open();
+			});
+			
 			var gitrnd = {
 				resize : function() {
 					//현재 보이는 브라우저 내부 영역의 높이
@@ -287,20 +370,20 @@ html, body {
 					var winWidth = $(window).innerWidth();
 					//컨텐츠 (지도) 영역의 너비 지정
 					//.builderLayer -> 사이드바
-					var mapWidth = ($(".bind").parent().innerWidth(true)) - 1;
+					var mapWidth = ($(".area-2d").parent().innerWidth());
 					//사이드바의 높이 지정
 					$(".builderLayer").outerHeight(conHeight);
 					//편집영역의 높이 지정
 					$(".builderContent").outerHeight(conHeight);
 					//컨텐츠 영역의 너비 지정
 					gbMap.setSize(mapWidth, conHeight);
-					$(".bind").outerHeight(conHeight);
-					$(".cesium-three").outerHeight(conHeight);
+					$(".area-2d").outerHeight(conHeight);
+					$(".area-3d").outerHeight(conHeight);
 
 					if (winWidth <= 992) {
 						gbMap.setSize(mapWidth, conHeight / 2);
-						$(".bind").outerHeight(conHeight / 2);
-						$(".cesium-three").outerHeight(conHeight / 2);
+						$(".area-2d").outerHeight(conHeight / 2);
+						$(".area-3d").outerHeight(conHeight / 2);
 					}
 					$(".attribute-content").outerHeight(conHeight);
 					//컨텐츠 영역(겹친 지도 부분, 베이스맵과 편집영역을 겹쳐서 베이스맵이 편집에 영향이 없도록하기 위함)의 위치를 같게함
@@ -330,6 +413,28 @@ html, body {
 					return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
 				}
 			});
+			
+			$("#styleColor").spectrum({
+				color: "#fff",
+				showAlpha: true
+			});
+			
+			$("#textureEmissive").spectrum({
+				color: "#fff",
+				showAlpha: true
+			});
+			
+			$("#textureImage").on("click", function(){
+				
+			});
+		});
+		
+		$(document).on("click", ".gb-declare-row > span > a", function(){
+			$("#declareTemp .gb-declare-row:last-child").clone().appendTo($(this).parent().parent().parent());
+		});
+		
+		$(document).on("click", ".gb-declare-row > a", function(){
+			$(this).parent().remove();
 		});
 	</script>
 </body>
