@@ -259,7 +259,7 @@ html, body {
 				wfstURL : urlList.wfst + urlList.token,
 				layerInfoURL : urlList.getLayerInfo + urlList.token
 			});
-			
+
 			var uploadjson = new gb.geoserver.UploadGeoJSON({
 				"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
 				"epsg" : function() {
@@ -270,7 +270,7 @@ html, body {
 				},
 				"locale" : locale !== "" ? locale : "en"
 			});
-			
+
 			otree = new gb.tree.OpenLayers({
 				"locale" : locale || "en",
 				"append" : $(".builderLayerClientPanel")[0],
@@ -306,7 +306,7 @@ html, body {
 					"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
 				}
 			});
-			
+
 			// 검수 수행 Modal 생성
 			var validation = new gb.validation.Validation({
 				"autoOpen" : false,
@@ -322,7 +322,7 @@ html, body {
 			$("#validation").click(function() {
 				validation.open();
 			});
-			
+
 			var gitrnd = {
 				resize : function() {
 					//현재 보이는 브라우저 내부 영역의 높이
@@ -381,32 +381,31 @@ html, body {
 			gitrnd.resize();
 		});
 
-			$(window).on("beforeunload", function() {
-				if (frecord.isEditing()) {
-					return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
-				}
-			});
-			
-			$("#styleColor").spectrum({
-				color: "#fff",
-				showAlpha: true
-			});
-			
-			$("#textureEmissive").spectrum({
-				color: "#fff",
-				showAlpha: true
-			});
-			
-			$("#textureImage").on("click", function(){
-				
-			});
+		$(window).on("beforeunload", function() {
+			if (frecord.isEditing()) {
+				return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
+			}
 		});
-		
-		$(document).on("click", ".gb-declare-row > span > a", function(){
+
+		$("#styleColor").spectrum({
+			color : "#fff",
+			showAlpha : true
+		});
+
+		$("#textureEmissive").spectrum({
+			color : "#fff",
+			showAlpha : true
+		});
+
+		$("#textureImage").on("click", function() {
+
+		});
+
+		$(document).on("click", ".gb-declare-row > span > a", function() {
 			$("#declareTemp .gb-declare-row:last-child").clone().appendTo($(this).parent().parent().parent());
 		});
-		
-		$(document).on("click", ".gb-declare-row > a", function(){
+
+		$(document).on("click", ".gb-declare-row > a", function() {
 			$(this).parent().remove();
 
 		});
