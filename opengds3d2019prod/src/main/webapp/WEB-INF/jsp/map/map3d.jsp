@@ -168,105 +168,88 @@ html, body {
 	<script type="text/javascript">
 		var locale = '<spring:message code="lang.localeCode" />';
 
-		$(document).ready(function() {
-			var map = new gb3d.Map({
-				"target2d" : $(".area-2d")[0],
-				"target3d" : $(".area-3d")[0]
-			});
-			var gbMap = map.getGbMap();
-			gbMap.setSize(800, 836);
+		var map = new gb3d.Map({
+			"target2d" : $(".area-2d")[0],
+			"target3d" : $(".area-3d")[0]
+		});
+		var gbMap = map.getGbMap();
 
-			var crs = new gb.crs.BaseCRS({
-				"locale" : locale !== "" ? locale : "en",
-				"message" : $(".epsg-now")[0],
-				"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
-				"epsg" : "4326"
-			});
-			crs.close();
+		gbMap.setSize($(".area-2d").width(), $(".area-2d").height());
 
-			var gbBaseMap = new gb.style.BaseMap({
-				"map" : gbMap.getLowerMap(),
-				"defaultBaseMap" : "osm",
-				"locale" : locale !== "" ? locale : "en"
-			});
+		var crs = new gb.crs.BaseCRS({
+			"locale" : locale !== "" ? locale : "en",
+			"message" : $(".epsg-now")[0],
+			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
+			"epsg" : "4326"
+		});
+		crs.close();
 
-			function init3DObject() {
-				// Cesium entity
-				var entity = {
-					name : 'Polygon',
-					polygon : {
-						hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1], ]),
-						material : Cesium.Color.RED.withAlpha(0.2)
-					}
-				};
-				var Polygon = map.getCesiumViewer().entities.add(entity);
+		var gbBaseMap = new gb.style.BaseMap({
+			"map" : gbMap.getLowerMap(),
+			"defaultBaseMap" : "osm",
+			"locale" : locale !== "" ? locale : "en"
+		});
 
-				// Three.js Objects
-				// Lathe geometry
-				var doubleSideMaterial = new THREE.MeshNormalMaterial({
-					side : THREE.DoubleSide
-				});
-				var segments = 10;
-				var points = [];
-				for (var i = 0; i < segments; i++) {
-					points.push(new THREE.Vector2(Math.sin(i * 0.2) * segments + 5, (i - 5) * 2));
+		function init3DObject() {
+			var minCRS = [ -180.0, -90.0 ];
+			var maxCRS = [ 180.0, 90.0 ];
+
+			// Cesium entity
+			var entity = {
+				name : 'Polygon',
+				polygon : {
+					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1], ]),
+					material : Cesium.Color.RED.withAlpha(0.2)
 				}
-				var geometry = new THREE.LatheGeometry(points);
-				var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-				latheMesh.scale.set(1500, 1500, 1500); // scale object to be visible at
-				// planet scale
-				latheMesh.position.z += 15000.0; // translate "up" in Three.js space
-				// so the "bottom" of the mesh is
-				// the handle
-				latheMesh.rotation.x = Math.PI / 2;
-				// rotate mesh for Cesium's Y-up
-				// system
-				var latheMeshYup = new THREE.Group();
-				latheMeshYup.add(latheMesh);
-				map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
-				// Three.js scene manually
-				// three.control.attach(latheMeshYup);
+			};
+			var Polygon = map.getCesiumViewer().entities.add(entity);
 
-				// Assign Three.js object mesh to our object array
-				//				var _3DOB = new _3DObject();
-				//				_3DOB.threeMesh = latheMeshYup;
-				//				_3DOB.minCRS = minCRS;
-				//				_3DOB.maxCRS = maxCRS;
-				var minCRS = [ 125.23, 39.55 ];
-				var maxCRS = [ 126.23, 41.55 ];
-				var obj3d = new gb3d.object.ThreeObject({
-					"threeMesh" : latheMeshYup,
-					"minCRS" : minCRS,
-					"maxCRS" : maxCRS
-				});
-
-				this.threeObjects.push(obj3d);
-
-				// dodecahedron
-				geometry = new THREE.DodecahedronGeometry();
-				var dodecahedronMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
-				dodecahedronMesh.scale.set(5000, 5000, 5000); // scale object to be
-				// visible at planet scale
-				dodecahedronMesh.position.z += 5000.0; // translate "up" in Three.js
-				// space so the "bottom" of the
-				// mesh is the handle
-				dodecahedronMesh.rotation.x = Math.PI / 2;
-				var dodecahedronMeshYup = new THREE.Group();
-				dodecahedronMeshYup.add(dodecahedronMesh);
-				that.threeScene.add(dodecahedronMeshYup); // don’t forget to add it to
-				// the
-				// Three.js scene manually
-				that.threeTransformControls.attach(dodecahedronMeshYup);
-
-				// Assign Three.js object mesh to our object array
-				//				_3DOB = new _3DObject();
-				//				_3DOB.threeMesh = dodecahedronMeshYup;
-				//				_3DOB.minCRS = minCRS;
-				//				_3DOB.maxCRS = maxCRS;
-				threeObjects.push(dodecahedronMeshYup);
-
-				that.threeScene.add(that.threeTransformControls);
+			// Three.js Objects
+			// Lathe geometry
+			var doubleSideMaterial = new THREE.MeshNormalMaterial({
+				side : THREE.DoubleSide
+			});
+			var segments = 10;
+			var points = [];
+			for (var i = 0; i < segments; i++) {
+				points.push(new THREE.Vector2(Math.sin(i * 0.2) * segments + 5, (i - 5) * 2));
 			}
+			var geometry = new THREE.LatheGeometry(points);
+			var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
+			latheMesh.scale.set(1500, 1500, 1500); // scale object to be visible at
+			// planet scale
+			latheMesh.position.z += 15000.0; // translate "up" in Three.js space
+			// so the "bottom" of the mesh is
+			// the handle
+			latheMesh.rotation.x = Math.PI / 2;
+			// rotate mesh for Cesium's Y-up
+			// system
+			var latheMeshYup = new THREE.Group();
+			latheMeshYup.add(latheMesh);
+			map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
+			// Three.js scene manually
+			// three.control.attach(latheMeshYup);
+
+			var obj3d = new gb3d.object.ThreeObject({
+				"object" : latheMeshYup,
+				"center" : [ 127.100912, 37.401746 ]
+			});
+
+			map.getThreeObjects().push(obj3d);
+
+		}
+
+		// 		map.loop();
+		// 		function loop() {
+		// 			requestAnimationFrame(loop);
+		// 			map.renderCesium();
+		// 			map.renderThreeObj();
+		// 		};
+		// 		loop();
+
+		init3DObject();
+
+		$(document).ready(function() {
 
 			var gitrnd = {
 				resize : function() {
@@ -293,14 +276,14 @@ html, body {
 					//편집영역의 높이 지정
 					$(".builderContent").outerHeight(conHeight);
 					//컨텐츠 영역의 너비 지정
+					$(".area-2d").outerHeight(conHeight);
+					$(".area-3d").outerHeight(conHeight);
 					gbMap.setSize(mapWidth, conHeight);
-					$(".bind").outerHeight(conHeight);
-					$(".cesium-three").outerHeight(conHeight);
 
 					if (winWidth <= 992) {
 						gbMap.setSize(mapWidth, conHeight / 2);
-						$(".bind").outerHeight(conHeight / 2);
-						$(".cesium-three").outerHeight(conHeight / 2);
+						$(".area-2d").outerHeight(conHeight / 2);
+						$(".area-3d").outerHeight(conHeight / 2);
 					}
 					$(".attribute-content").outerHeight(conHeight);
 					//컨텐츠 영역(겹친 지도 부분, 베이스맵과 편집영역을 겹쳐서 베이스맵이 편집에 영향이 없도록하기 위함)의 위치를 같게함
@@ -320,16 +303,16 @@ html, body {
 				}
 			}
 			gitrnd.resize();
+		});
 
-			$(window).resize(function() {
-				gitrnd.resize();
-			});
+		$(window).resize(function() {
+			gitrnd.resize();
+		});
 
-			$(window).on("beforeunload", function() {
-				if (frecord.isEditing()) {
-					return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
-				}
-			});
+		$(window).on("beforeunload", function() {
+			if (frecord.isEditing()) {
+				return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
+			}
 		});
 	</script>
 </body>
