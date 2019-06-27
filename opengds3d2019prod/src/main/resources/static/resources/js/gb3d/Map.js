@@ -67,7 +67,6 @@ gb3d.Map = function(obj) {
 		console.error("target must be div element");
 		return;
 	}
-
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
 // useDefaultRenderLoop : false,
@@ -109,10 +108,13 @@ gb3d.Map = function(obj) {
 	this.maxCRS = [ 180.0, 90.0 ];
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
-
+	
+	// 초기 위치
+	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : this.center; 
+	
 	// cesium 카메라를 지도 중심으로 이동
 	this.cesiumViewer.camera.flyTo({
-		destination : this.center,
+		destination : this.initPosition,
 		orientation : {
 			heading : Cesium.Math.toRadians(0),
 			pitch : Cesium.Math.toRadians(-60),

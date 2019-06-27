@@ -170,11 +170,12 @@ html, body {
 
 		var map = new gb3d.Map({
 			"target2d" : $(".area-2d")[0],
-			"target3d" : $(".area-3d")[0]
+			"target3d" : $(".area-3d")[0],
+			"initPosition" : [ 127.100912, 37.401746 ]
 		});
 		var gbMap = map.getGbMap();
 
-		gbMap.setSize($(".area-2d").width(), $(".area-2d").height());
+		// 		gbMap.setSize($(".area-2d").width(), $(".area-2d").height());
 
 		var crs = new gb.crs.BaseCRS({
 			"locale" : locale !== "" ? locale : "en",
@@ -191,15 +192,14 @@ html, body {
 		});
 
 		function init3DObject() {
-			var minCRS = [ -180.0, -90.0 ];
-			var maxCRS = [ 180.0, 90.0 ];
-
+			var minCRS = [ -180, -89 ];
+			var maxCRS = [ 179, 89 ];
 			// Cesium entity
 			var entity = {
 				name : 'Polygon',
 				polygon : {
 					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1], ]),
-					material : Cesium.Color.RED.withAlpha(0.2)
+					material : Cesium.Color.RED.withAlpha(1)
 				}
 			};
 			var Polygon = map.getCesiumViewer().entities.add(entity);
@@ -216,9 +216,10 @@ html, body {
 			}
 			var geometry = new THREE.LatheGeometry(points);
 			var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-			latheMesh.scale.set(1500, 1500, 1500); // scale object to be visible at
+			latheMesh.scale.set(1000, 1000, 1000); // scale object to be visible at 
 			// planet scale
-			latheMesh.position.z += 15000.0; // translate "up" in Three.js space
+			// 아마 z값은 스케일의 10배?
+			latheMesh.position.z += 10000; // translate "up" in Three.js space
 			// so the "bottom" of the mesh is
 			// the handle
 			latheMesh.rotation.x = Math.PI / 2;
@@ -278,7 +279,7 @@ html, body {
 					//컨텐츠 영역의 너비 지정
 					$(".area-2d").outerHeight(conHeight);
 					$(".area-3d").outerHeight(conHeight);
-					gbMap.setSize(mapWidth, conHeight);
+					gbMap.updateSize();
 
 					if (winWidth <= 992) {
 						gbMap.setSize(mapWidth, conHeight / 2);
