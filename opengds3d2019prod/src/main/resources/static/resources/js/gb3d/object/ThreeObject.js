@@ -14,79 +14,59 @@ if (!gb3d.object)
  * @memberof gb3d
  * @param {Object}
  *            obj - 생성자 옵션을 담은 객체
- * @param {HTMLElement}
- *            obj.target2d - 지도 영역이 될 Div의 HTMLElement
+ * @param {THREE.Object3D}
+ *            object - Three Object3D 객체
+ * @param {Array.
+ *            <Number>} center - 모델의 위치점
  * @author SOYIJUN
  */
 gb3d.object.ThreeObject = function(obj) {
 	var that = this;
 	var options = obj ? obj : {};
 	// THREEJS 3DObject.mesh
-	this.threeMesh = options.threeMesh;
-	// location bounding box
-	this.minCRS = options.minCRS;
-	this.maxCRS = options.maxCRS;
+	this.object = options.object;
+	// center point
+	this.center = options.center;
 }
 
 /**
- * three mesh 객체를 반환한다.
+ * three object 객체를 반환한다.
  * 
- * @method gb3d.Map#getThreeMesh
- * @return {THREE.Mesh} three mesh 객체
+ * @method gb3d.object.ThreeObject#getObject
+ * @return {THREE.Object3D} three object 객체
  */
-gb3d.Map.prototype.getThreeMesh = function() {
-	return this.threeMesh;
+gb3d.object.ThreeObject.prototype.getObject = function() {
+	return this.object;
 };
 
 /**
  * three mesh 객체를 할당한다.
  * 
- * @method gb3d.Map#setThreeMesh
- * @param {THREE.Mesh}
- *            mesh - three mesh 객체
+ * @method gb3d.object.ThreeObject#setObject
+ * @param {THREE.Object3D}
+ *            obj - three object객체
  */
-gb3d.Map.prototype.setThreeMesh = function(mesh) {
-	this.threeMesh = mesh;
+gb3d.object.ThreeObject.prototype.setObject = function(obj) {
+	this.object = obj;
 };
 
 /**
- * 최대 좌표값을 반환한다.
+ * 중심 위치점을 반환한다.
  * 
- * @method gb3d.Map#getgetMinCRS
- * @return {Array.<Number>} x, y 최대 좌표값
+ * @method gb3d.object.ThreeObject#getCenter
+ * @return {Array.<Number>} 중심 위치 좌표
  */
-gb3d.Map.prototype.getMinCRS = function() {
-	return this.minCRS;
+gb3d.object.ThreeObject.prototype.getCenter = function() {
+	return this.center;
 };
 
 /**
- * 최대 좌표값을 할당한다.
+ * 중심 위치점을 할당한다.
  * 
- * @method gb3d.Map#setMinCRS
- * @param {THREE.Mesh}
- *            mesh - three mesh 객체
+ * @method gb3d.object.ThreeObject#setCenter
+ * @param {Array.
+ *            <Number>} center - 중심 위치 좌표
  */
-gb3d.Map.prototype.setMinCRS = function(mesh) {
-	this.minCRS = mesh;
-};
-
-/**
- * three mesh 객체를 반환한다.
- * 
- * @method gb3d.Map#getMaxCRS
- * @return {THREE.Mesh} three mesh 객체
- */
-gb3d.Map.prototype.getMaxCRS = function() {
-	return this.maxCRS;
-};
-
-/**
- * three mesh 객체를 할당한다.
- * 
- * @method gb3d.Map#setMaxCRS
- * @param {THREE.Mesh}
- *            mesh - three mesh 객체
- */
-gb3d.Map.prototype.setMaxCRS = function(mesh) {
-	this.maxCRS = mesh;
+gb3d.object.ThreeObject.prototype.setCenter = function(center) {
+	this.center = center;
 };

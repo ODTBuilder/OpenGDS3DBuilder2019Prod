@@ -30,8 +30,10 @@ gb3d.Map = function(obj) {
 	this.threeElem = $("<div>").addClass("gb3d-map-three-area")[0];
 	// cesium, three 묶을 영역
 	this.bind3dElem = $("<div>").addClass("gb3d-map-bind3d-area")[0];
+	
 	// 2d 지도 영역으로 설정할 부분이 div 객체인지 확인
 	if ($(options.target2d).is("div")) {
+		// 2d 지도 영역 엘리먼트 저장
 		this.target2d = $(options.target2d)[0];
 	} else {
 		console.error("target must be div element");
@@ -51,25 +53,23 @@ gb3d.Map = function(obj) {
 		}
 	});
 
-	// this.gbMap.setSize(width2d, height2d);
-
-	// 세슘 뷰어 객체
-	this.cesium = undefined;
-
 	// 3d 지도 영역으로 설정할 부분이 div 객체인지 확인
 	if ($(options.target3d).is("div")) {
+		// 3d 지도 영역 엘리먼트 저장
 		this.target3d = $(options.target3d)[0];
+		// cesium, three 묶을 영역 생성
 		$(this.target3d).append(this.bind3dElem);
+		// cesium 영역 생성
 		$(this.bind3dElem).append(this.cesiumElem);
+		// three 영역 생성
 		$(this.bind3dElem).append(this.threeElem);
 	} else {
 		console.error("target must be div element");
 		return;
 	}
-
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
-		useDefaultRenderLoop : false,
+// useDefaultRenderLoop : false,
 		selectionIndicator : false,
 		homeButton : false,
 		sceneModePicker : true,
@@ -103,12 +103,18 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
-	var minCRS = [125.23,39.55];
-	var maxCRS = [126.23,41.55];
-	this.center = Cesium.Cartesian3.fromDegrees((minCRS[0] + maxCRS[0]) / 2, ((minCRS[1] + maxCRS[1]) / 2) - 1, 200000);
-
+	// 좌표계 바운딩 박스
+	this.minCRS = [ -180.0, -90.0 ];
+	this.maxCRS = [ 180.0, 90.0 ];
+	// 좌표계 중심
+	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
+	
+	// 초기 위치
+	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : this.center; 
+	
+	// cesium 카메라를 지도 중심으로 이동
 	this.cesiumViewer.camera.flyTo({
-		destination : this.center,
+		destination : this.initPosition,
 		orientation : {
 			heading : Cesium.Math.toRadians(0),
 			pitch : Cesium.Math.toRadians(-60),
@@ -117,8 +123,10 @@ gb3d.Map = function(obj) {
 		duration: 3
 	});
 
+	// 지도에 표시할 객체 배열
 	this.threeObjects = [];
-	
+
+	// three 생성자 옵션
 	var fov = 45;
 	var width = window.innerWidth;
 	var height = window.innerHeight;
@@ -126,104 +134,53 @@ gb3d.Map = function(obj) {
 	var near = 1;
 	var far = 10*1000*1000;
 
+	// three js scene 객체
 	this.threeScene = new THREE.Scene();
+	// 그리드 추가
 	this.threeScene.add(new THREE.GridHelper());
-
+	// three 카메라 선언
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-
+	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
-
+	// 렌더링 함수
+	function render(){
+		// var that = this;
+		that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
+	};
+	// three orbit 컨트롤 선언
 	this.threeOrbitControls = new THREE.OrbitControls(this.threeCamera, this.threeRenderer.domElement);
 	this.threeOrbitControls.update();
-	this.threeOrbitControls.addEventListener('change', that.render);
-	
-     this.threeOrbitControls.addEventListener( 'start', function () {
-       cancelHideTransform();
-     });
-     this.threeOrbitControls.addEventListener( 'end', function () {
-       delayHideTransform();
-     });
-
-	this.threeTransformControls = new THREE.TransformControls(this.threeCamera, this.threeRenderer.domElement);
-	this.threeTransformControls.addEventListener('change', that.render);
-	this.threeTransformControls.addEventListener('dragging-changed', function(event){
-		that.threeOrbitControls.enabled = !event.vale;
+	// 변경시 렌더링 함수 수행
+	this.threeOrbitControls.addEventListener('change', render);
+	// orbit 시작 이벤트
+	this.threeOrbitControls.addEventListener( 'start', function () {
+		// cancelHideTransform();
 	});
-
+	// orbit 종료 이벤트
+	this.threeOrbitControls.addEventListener( 'end', function () {
+		// delayHideTransform();
+	});
+	// transform 컨트롤 선언
+// this.threeTransformControls = new THREE.TransformControls(this.threeCamera,
+// this.threeRenderer.domElement);
+	// 변경시 렌더링 함수 수행
+// this.threeTransformControls.addEventListener('change', render);
+	// 드래그 시
+// this.threeTransformControls.addEventListener('dragging-changed',
+// function(event){
+// that.threeOrbitControls.enabled = !event.vale;
+// });
+	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 
-	var hiding;
-
-	function delayHideTransform() {
-		cancelHideTransform();
-		hideTransform();
-	}
-
-	function hideTransform() {
-		hiding = setTimeout( function () {
-			that.transformControl.detach( that.transformControl.object );
-		}, 2500 );
-	}
-
-	function cancelHideTransform(){
-		if ( hiding ) clearTimeout( hiding );
-	}
-
-	// initCesium(); // Initialize Cesium renderer
-	// initThree(); // Initialize Three.js renderer
-	// init3DObject(); // Initialize Three.js object mesh with Cesium Cartesian
-	// coordinate system
-	this.loop(); // Looping renderer
-	
-	window.addEventListener( 'keydown', function ( event ) {
-	    switch ( event.keyCode ) {
-	      case 81: // Q
-	        that.threeTransformControls.setSpace( that.threeTransformControls.space === "local" ? "world" : "local" );
-	        break;
-	      case 17: // Ctrl
-	        that.threeTransformControls.setTranslationSnap( 100 );
-	        that.threeTransformControls.setRotationSnap( THREE.Math.degToRad( 15 ) );
-	        break;
-	      case 87: // W
-	        that.threeTransformControls.setMode( "translate" );
-	        break;
-	      case 69: // E
-	        that.threeTransformControls.setMode( "rotate" );
-	        break;
-	      case 82: // R
-	        that.threeTransformControls.setMode( "scale" );
-	        break;
-	      case 187:
-	      case 107: // +, =, num+
-	        that.threeTransformControls.setSize( that.threeTransformControls.size + 0.1 );
-	        break;
-	      case 189:
-	      case 109: // -, _, num-
-	        that.threeTransformControls.setSize( Math.max( that.threeTransformControls.size - 0.1, 0.1 ) );
-	        break;
-	      case 88: // X
-	        that.threeTransformControls.showX = ! that.threeTransformControls.showX;
-	        break;
-	      case 89: // Y
-	        that.threeTransformControls.showY = ! that.threeTransformControls.showY;
-	        break;
-	      case 90: // Z
-	        that.threeTransformControls.showZ = ! that.threeTransformControls.showZ;
-	        break;
-	      case 32: // Spacebar
-	        that.threeTransformControls.enabled = ! that.threeTransformControls.enabled;
-	        break;
-	    }
-	  });
-
-	  window.addEventListener( 'keyup', function ( event ) {
-	    switch ( event.keyCode ) {
-	      case 17: // Ctrl
-	        that.threeTransformControls.setTranslationSnap( null );
-	        that.threeTransformControls.setRotationSnap( null );
-	        break;
-	    }
-	  });
+	// 렌더링을 위한 루프 함수
+	function loop() {
+		requestAnimationFrame(loop);
+// that.renderCesium();
+		that.renderThreeObj();
+	};
+	// 렌더링 시작
+	loop();
 }
 
 /**
@@ -292,7 +249,8 @@ gb3d.Map.prototype.getThreeTransformControls = function() {
  * @method gb3d.Map#renderCesium
  */
 gb3d.Map.prototype.renderCesium = function(){
-	this.cesiumViewer.render();
+// var that = this;
+	this.getCesiumViewer().render();
 	// cesium.viewer.scene.screenSpaceCameraController.enableInputs = false;
 }
 
@@ -304,11 +262,11 @@ gb3d.Map.prototype.renderCesium = function(){
 gb3d.Map.prototype.renderThreeObj = function(){
 	var that = this;
 	// register Three.js scene with Cesium
-	that.threeCamera.fov = Cesium.Math.toDegrees(that.cesiumViewer.camera.frustum.fovy); // ThreeJS
+	that.getThreeCamera().fov = Cesium.Math.toDegrees(that.getCesiumViewer().camera.frustum.fovy); // ThreeJS
 	// FOV
 	// is
 	// vertical
-	that.threeCamera.updateProjectionMatrix();
+	that.getThreeCamera().updateProjectionMatrix();
 
 	var cartToVec = function(cart){
 		return new THREE.Vector3(cart.x, cart.y, cart.z);
@@ -316,39 +274,38 @@ gb3d.Map.prototype.renderThreeObj = function(){
 
 	// Configure Three.js meshes to stand against globe center position up
 	// direction
-	for(var id in this.getThreeObjects()){
-		var minCRS = this.getThreeObjects()[id].getMinCRS();
-		var maxCRS = this.getThreeObjects()[id].getMaxCRS();
-		// convert lat/long center position to Cartesian3
-		var center = Cesium.Cartesian3.fromDegrees((minCRS[0] + maxCRS[0]) / 2, (minCRS[1] + maxCRS[1]) / 2);
-
+	var objs = this.getThreeObjects();
+	for (var i = 0; i < objs.length; i++) {
+		// 모델의 위치
+		var cfo = this.getThreeObjects()[i].getCenter();
+		// 카티시안 위치
+		var center = Cesium.Cartesian3.fromDegrees(cfo[0], cfo[1]);
 		// get forward direction for orienting model
-		var centerHigh = Cesium.Cartesian3.fromDegrees((minCRS[0] + maxCRS[0]) / 2, (minCRS[1] + maxCRS[1]) / 2,1);
-
+		var centerHigh = Cesium.Cartesian3.fromDegrees(cfo[0], cfo[1],1);
 		// use direction from bottom left to top left as up-vector
-		var bottomLeft  = cartToVec(Cesium.Cartesian3.fromDegrees(minCRS[0], minCRS[1]));
-		var topLeft = cartToVec(Cesium.Cartesian3.fromDegrees(minCRS[0], maxCRS[1]));
-		var latDir  = new THREE.Vector3().subVectors(bottomLeft,topLeft ).normalize();
+		var bottomLeft  = cartToVec(Cesium.Cartesian3.fromDegrees(this.minCRS[0], this.minCRS[1]));
+		var topLeft = cartToVec(Cesium.Cartesian3.fromDegrees(this.minCRS[0], this.maxCRS[1]));
+		var latDir  = new THREE.Vector3().subVectors(bottomLeft,topLeft).normalize();
 
 		// configure entity position and orientation
-		this.getThreeObjects()[id].getThreeMesh().position.copy(center);
-		this.getThreeObjects()[id].getThreeMesh().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-		this.getThreeObjects()[id].getThreeMesh().up.copy(latDir);
+		this.getThreeObjects()[i].getObject().position.copy(center);
+		this.getThreeObjects()[i].getObject().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+		this.getThreeObjects()[i].getObject().up.copy(latDir);
 	}
 
 	// Clone Cesium Camera projection position so the
 	// Three.js Object will appear to be at the same place as above the
 	// Cesium Globe
-	that.threeCamera.matrixAutoUpdate = false;
-	var cvm = that.cesiumViewer.camera.viewMatrix;
-	var civm = that.cesiumViewer.camera.inverseViewMatrix;
-	that. threeCamera.matrixWorld.set(
+	that.getThreeCamera().matrixAutoUpdate = false;
+	var cvm = that.getCesiumViewer().camera.viewMatrix;
+	var civm = that.getCesiumViewer().camera.inverseViewMatrix;
+	that.getThreeCamera().matrixWorld.set(
 			civm[0], civm[4], civm[8 ], civm[12],
 			civm[1], civm[5], civm[9 ], civm[13],
 			civm[2], civm[6], civm[10], civm[14],
 			civm[3], civm[7], civm[11], civm[15]
 	);
-	that.threeCamera.matrixWorldInverse.set(
+	that.getThreeCamera().matrixWorldInverse.set(
 			cvm[0], cvm[4], cvm[8 ], cvm[12],
 			cvm[1], cvm[5], cvm[9 ], cvm[13],
 			cvm[2], cvm[6], cvm[10], cvm[14],
@@ -358,11 +315,11 @@ gb3d.Map.prototype.renderThreeObj = function(){
 	var width = that.threeElem.clientWidth;
 	var height = that.threeElem.clientHeight;
 	var aspect = width / height;
-	that.threeCamera.aspect = aspect;
-	that.threeCamera.updateProjectionMatrix();
+	that.getThreeCamera().aspect = aspect;
+	that.getThreeCamera().updateProjectionMatrix();
 
-	that.threeRenderer.setSize(width, height);
-	that.threeRenderer.render(that.threeScene, that.threeCamera);
+	that.getThreeRenderer().setSize(width, height);
+	that.getThreeRenderer().render(that.threeScene, that.threeCamera);
 }
 
 /**
@@ -370,22 +327,22 @@ gb3d.Map.prototype.renderThreeObj = function(){
  * 
  * @method gb3d.Map#render
  */
-gb3d.Map.prototype.render = function(){
-	var that = this;
-	that.threeRenderer.render(that.threeScene, that.threeCamera);
-}
+// gb3d.Map.prototype.render = function(){
+// // var that = this;
+// that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
+// }
 
 /**
  * 렌더링 함수를 반복한다
  * 
  * @method gb3d.Map#loop
  */
-gb3d.Map.prototype.loop = function(){
-	var that = this;
-//	requestAnimationFrame(that.loop);
-	that.renderCesium();
-	that.renderThreeObj();
-}
+// gb3d.Map.prototype.loop = function(){
+// var that = this;
+// requestAnimationFrame(that.loop);
+// that.renderCesium();
+// that.renderThreeObj();
+// }
 
 /**
  * three transform controls 객체를 반환한다.
@@ -406,4 +363,14 @@ gb3d.Map.prototype.getThreeObjects = function() {
  */
 gb3d.Map.prototype.setThreeObjects = function(objects) {
 	this.threeObjects = objects;
+};
+
+/**
+ * three transform renderer 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getThreeRenderer
+ * @return {THREE.WebGLRenderer} three renderer 객체
+ */
+gb3d.Map.prototype.getThreeRenderer = function() {
+	return this.threeRenderer;
 };
