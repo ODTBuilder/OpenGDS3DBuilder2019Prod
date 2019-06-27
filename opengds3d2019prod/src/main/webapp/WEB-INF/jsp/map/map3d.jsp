@@ -169,6 +169,18 @@ html, body {
 	<script type="text/javascript">
 		var locale = '<spring:message code="lang.localeCode" />';
 
+		var urlList = {
+			token : "?${_csrf.parameterName}=${_csrf.token}",
+			wfst : "${pageContext.request.contextPath}/geoserver/geoserverWFSTransaction.ajax",
+			getLayerInfo : "geoserver/getGeoLayerInfoList.ajax",
+			getMapWMS : "geoserver/geoserverWMSGetMap.ajax",
+			getFeatureInfo : "geoserver/geoserverWFSGetFeature.ajax",
+			getWFSFeature : "geoserver/geoserverWFSGetFeature.ajax",
+			getLegend : "geoserver/geoserverWMSGetLegendGraphic.ajax",
+			requestValidate : "web/validate.do",
+			geoserverFileUpload : "geoserver/upload.do"
+		}
+
 		var map = new gb3d.Map({
 			"target2d" : $(".area-2d")[0],
 			"target3d" : $(".area-3d")[0],
