@@ -2269,7 +2269,8 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 }
 
 .gb-attribute-item > .tab-pane {
-	/* height: 100%; */
+	height: 100%;
+	padding: 2px 0px;
 }
 
 .gb-object-row {

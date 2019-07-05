@@ -130,10 +130,9 @@ html, body {
 				<li><a href="#" title="Geoserver" data-toggle="modal" data-target="#geoserverModal"> <i
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
 				</a></li>
-				<li><a href="#" title="Edit" id="editTool"> <i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
+				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
 							code="lang.edit" />
 				</a></li>
-
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
 				</a></li>
@@ -143,12 +142,6 @@ html, body {
 			</ul>
 		</div>
 	</nav>
-	<!-- <div class="builderContent">
-		<div class="builderLayer">
-			<div class="builderLayerClientPanel"></div>
-		</div>
-		<div class="bind"></div>
-	</div> -->
 	<jsp:include page="/WEB-INF/jsp/map/content.jsp" />
 	<nav class="navbar navbar-default builderFooter">
 		<!-- 		<span class="navbar-left gb-footer-span"><span class="gb-scale-line-area" style="margin-right: 118px;"></span></span> -->
@@ -240,7 +233,7 @@ html, body {
 			// system
 			var latheMeshYup = new THREE.Group();
 			latheMeshYup.add(latheMesh);
-			map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
+			//map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
 			// Three.js scene manually
 			// three.control.attach(latheMeshYup);
 
@@ -249,17 +242,9 @@ html, body {
 				"center" : [ 127.100912, 37.401746 ]
 			});
 
-			map.getThreeObjects().push(obj3d);
+			//map.addThreeObject(obj3d);
 
 		}
-
-		// 		map.loop();
-		// 		function loop() {
-		// 			requestAnimationFrame(loop);
-		// 			map.renderCesium();
-		// 			map.renderThreeObj();
-		// 		};
-		// 		loop();
 
 		init3DObject();
 
@@ -319,6 +304,30 @@ html, body {
 				}
 			});
 
+			// EditTool 활성화
+			var epan = new gb.edit.EditingTool2D({
+				targetElement : gbMap.getLowerDiv()[0],
+				map : gbMap.getUpperMap(),
+				featureRecord : frecord,
+				otree : otree,
+				wfsURL : urlList.getWFSFeature + urlList.token,
+				layerInfo : urlList.getLayerInfo + urlList.token,
+				locale : locale || "en",
+				isEditing : gb.module.isEditing
+			});
+			
+			var epan3d = new gb.edit.EditingTool3D({
+				targetElement : $(".area-3d")[0],
+				isDisplay: false,
+				locale : locale || "en"
+			});
+
+			$("#editTool").click(function(e) {
+				e.preventDefault();
+				epan.editToolToggle();
+				epan3d.toggleTool();
+			});
+			
 			// 검수 수행 Modal 생성
 			var validation = new gb.validation.Validation({
 				"autoOpen" : false,
@@ -345,10 +354,6 @@ html, body {
 						return;
 					}
 					//컨텐츠 영역의 높이 지정
-					//.mainHeader -> 헤더1
-					//.builderHeader -> 헤더2
-					//.builderFooter -> 푸터
-					// 없으면 삭제한다.
 					var conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
 					//현재 보이는 브라우저 내부 영역의 너비
 					var winWidth = $(window).innerWidth();
@@ -362,7 +367,7 @@ html, body {
 					//컨텐츠 영역의 너비 지정
 					$(".area-2d").outerHeight(conHeight);
 					$(".area-3d").outerHeight(conHeight);
-					gbMap.updateSize();
+					gbMap.setSize(mapWidth, conHeight);
 
 					if (winWidth <= 992) {
 						gbMap.setSize(mapWidth, conHeight / 2);
@@ -370,27 +375,13 @@ html, body {
 						$(".area-3d").outerHeight(conHeight / 2);
 					}
 					$(".attribute-content").outerHeight(conHeight);
-					//컨텐츠 영역(겹친 지도 부분, 베이스맵과 편집영역을 겹쳐서 베이스맵이 편집에 영향이 없도록하기 위함)의 위치를 같게함
-					var str = "-" + conHeight + "px";
-					// 				$("#builderBaseMap").css("top", str);
-					//편집영역이 베이스맵 위로 오도록 겹친 영역의 z-index를 조정
-					// 				$("#builderBaseMap").find(".ol-viewport").css("z-index", 1);
-					// 				$("#builderMap").find(".ol-viewport").css("z-index", 2);
-					//16은 아래 마진, 1은 위 아래 보더 
-					var listHeight = $(".builderLayer").innerHeight() / 2 - (16 + 1 + 1);
-					// 				41은 패널 헤더의 높이
-					var treeHeight = listHeight - (41);
-					var searchHeight = $(".builder-tree-search").outerHeight();
-					// 				$(".gitbuilder-layer-panel").outerHeight(treeHeight - searchHeight);
-					//$(".builderLayerGeoServerPanel").outerHeight(listHeight);
-					//$(".builderLayerClientPanel").outerHeight(listHeight);
 				}
 			}
 			gitrnd.resize();
-		});
-
-		$(window).resize(function() {
-			gitrnd.resize();
+			
+			$(window).resize(function() {
+				gitrnd.resize();
+			});
 		});
 
 		$(window).on("beforeunload", function() {

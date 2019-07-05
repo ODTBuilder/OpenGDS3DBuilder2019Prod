@@ -697,7 +697,7 @@ gb.edit.EditingTool.prototype.toggleFeatureHistoryModal = function(feature) {
 		return;
 	}
 	if ($(vfeature.getPanel().getPanel()).css("display") !== "none") {
-		vfeature.close();
+//		vfeature.close();
 	} else {
 		var nfeature = feature instanceof ol.Feature ? feature : this.interaction.select !== undefined ? this.interaction.select.getFeatures().getLength() === 1 ? this.interaction.select.getFeatures().item(0) : undefined : undefined;
 // this.interaction.select.getFeatures().getLength() === 1 ?
@@ -787,7 +787,7 @@ gb.edit.EditingTool.prototype.updateFeatureHistoryModal = function(feature) {
 			}
 		} else {
 			if ($(vfeature.getPanel().getPanel()).css("display") !== "none") {
-				vfeature.close();	
+//				vfeature.close();	
 			}
 		}
 	}
@@ -1075,7 +1075,7 @@ gb.edit.EditingTool.prototype.select = function(source) {
 		var gitAttr = that.selectedSource.get("git");
 		
 		if (that.features.getLength() > 1) {
-			vfeature.close();
+//			vfeature.close();
 			that.featurePop.close();
 			for (var i = 0; i < that.features.getLength(); i++) {
 				var idx = that.features.item(i).getId();
@@ -1173,7 +1173,7 @@ gb.edit.EditingTool.prototype.select = function(source) {
 				that.updateFeatureHistoryModal(feature);
 			} else {
 				var vfeature = that.getVersioningFeature();
-				vfeature.close();
+//				vfeature.close();
 			}
 			//피처 버저닝 이력 끝
 			
@@ -1329,7 +1329,7 @@ gb.edit.EditingTool.prototype.select = function(source) {
 		} else {
 			that.featurePop.close();
 			that.attrPop.close();
-			vfeature.close();
+//			vfeature.close();
 		}
 
 	});

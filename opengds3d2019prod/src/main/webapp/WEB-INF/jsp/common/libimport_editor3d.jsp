@@ -24,7 +24,7 @@
 	integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 <!-- 스윗얼럿(알림) -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/sweetalert2/sweetalert2.css">
-<script src="${pageContext.request.contextPath}/resources/js/sweetalert2/sweetalert2.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/sweetalert2/sweetalert2.all.js"></script>
 <!-- 드롭존(파일업로드) -->
 <script src="${pageContext.request.contextPath}/resources/js/dropzone/dropzone.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/dropzone/basic.css">
@@ -100,8 +100,6 @@
 <!-- gb.modal -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/modal/base.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/validation/validation.js"></script>
-<!-- gb.header -->
-<script src="${pageContext.request.contextPath}/resources/js/gb/header/base.js"></script>
 <!-- gb.footer -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/footer/base.js"></script>
 <!-- gb panel  base -->
@@ -123,10 +121,12 @@
 <!-- gb.versioning.Feature -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/versioning/feature.js"></script>
 <!-- gb.edit -->
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/edithistory.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/undo.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/modifylayerprop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb/edit/editingtool.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
 <!-- gb.interaction -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/overriding/olinteractiondraw.js"></script>

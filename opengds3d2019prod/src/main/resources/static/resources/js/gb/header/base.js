@@ -215,7 +215,7 @@ gb.header.HeaderBase.prototype.createContent = function(list){
 	this.headerTag = $("<header>").addClass("gb-headerbase-header");
 //	adjustStyle(this.headerTag, this.headerStyle);t
 	
-	this.ulTagLeft = $("<ul class='left-content'>").addClass("gb-headerbase-ul-lef");
+	this.ulTagLeft = $("<ul class='left-content'>").addClass("gb-headerbase-ul-left");
 //	adjustStyle(this.ulTagLeft, this.ulStyleLeft);
 	
 	this.ulTagRight = $("<ul class='right-conent'>").addClass("gb-headerbase-ul-right");
@@ -304,7 +304,7 @@ gb.header.HeaderBase.prototype.createContent = function(list){
 	
 	//this.headerTag.append(closeBtn);
 	this.headerTag.append(this.ulTagLeft);
-	this.headerTag.append(this.ulTagRight);
+//	this.headerTag.append(this.ulTagRight);
 	
 	this.targetElement.prepend(this.headerTag);
 }

@@ -27,6 +27,8 @@ gb3d.object.ThreeObject = function(obj) {
 	this.object = options.object;
 	// center point
 	this.center = options.center;
+	// extent point [a,b,c,d]
+	this.extent = options.extent;
 }
 
 /**
@@ -70,3 +72,25 @@ gb3d.object.ThreeObject.prototype.getCenter = function() {
 gb3d.object.ThreeObject.prototype.setCenter = function(center) {
 	this.center = center;
 };
+
+/**
+ * Extent 반환
+ * 
+ * @method gb3d.object.ThreeObject#getExtent
+ * @return {Array.<Number>}
+ */
+gb3d.object.ThreeObject.prototype.getExtent = function() {
+	return this.extent;
+};
+
+/**
+ * Extent 할당
+ * 
+ * @method gb3d.object.ThreeObject#setExtent
+ * @param {Array.
+ *            <Number>} extent
+ */
+gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
+	this.extent = extent;
+};
+
