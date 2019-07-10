@@ -1,14 +1,14 @@
-var gb;
-if (!gb)
-	gb = {};
-if (!gb.edit)
-	gb.edit = {};
+var gb3d;
+if (!gb3d)
+	gb3d = {};
+if (!gb3d.edit)
+	gb3d.edit = {};
 
 /**
  * @classdesc
  * 2차원,3차원 편집 기능을 정의한다.
  */
-gb.edit.EditingToolBase = function(obj){
+gb3d.edit.EditingToolBase = function(obj){
 	var that = this;
 	// 다국적 언어 지원
 	this.translator = {
@@ -168,7 +168,7 @@ gb.edit.EditingToolBase = function(obj){
 	}
 }
 
-gb.edit.EditingToolBase.prototype.createContent = function(list){
+gb3d.edit.EditingToolBase.prototype.createContent = function(list){
 	
 	var that = this;
 	
@@ -293,9 +293,9 @@ gb.edit.EditingToolBase.prototype.createContent = function(list){
 
 /**
  * header를 나타낸다.
- * @method gb.edit.EditingToolBase#openTool
+ * @method gb3d.edit.EditingToolBase#openTool
  */
-gb.edit.EditingToolBase.prototype.openTool = function(){
+gb3d.edit.EditingToolBase.prototype.openTool = function(){
 	if(this.active_){
 		this.headerTag.css("display", "block");
 		this.isDisplay = true;
@@ -304,18 +304,18 @@ gb.edit.EditingToolBase.prototype.openTool = function(){
 
 /**
  * header를 숨긴다
- * @method gb.edit.EditingToolBase#closeTool
+ * @method gb3d.edit.EditingToolBase#closeTool
  */
-gb.edit.EditingToolBase.prototype.closeTool = function(){
+gb3d.edit.EditingToolBase.prototype.closeTool = function(){
 	this.headerTag.css("display", "none");
 	this.isDisplay = false;
 }
 
 /**
  * header open/close toggle
- * @method gb.edit.EditingToolBase#toggleTool
+ * @method gb3d.edit.EditingToolBase#toggleTool
  */
-gb.edit.EditingToolBase.prototype.toggleTool = function(){
+gb3d.edit.EditingToolBase.prototype.toggleTool = function(){
 	if(this.isDisplay){
 		this.active_ = false;
 		this.closeTool();
@@ -327,10 +327,10 @@ gb.edit.EditingToolBase.prototype.toggleTool = function(){
 
 /**
  * header를 open, close 하는 이벤트 함수를 생성한다.
- * @method gb.edit.EditingToolBase#createToggleEvent
+ * @method gb3d.edit.EditingToolBase#createToggleEvent
  * @param {string} className - header 토글 이벤트를 바인딩할 element의 클래스 이름
  */
-gb.edit.EditingToolBase.prototype.createToggleEvent = function(className){
+gb3d.edit.EditingToolBase.prototype.createToggleEvent = function(className){
 	var that = this;
 	
 	$("." + className).on("click", function(){
@@ -340,10 +340,10 @@ gb.edit.EditingToolBase.prototype.createToggleEvent = function(className){
 
 /**
  * header 활성화 설정
- * @method gb.edit.EditingToolBase#setActiveTool
+ * @method gb3d.edit.EditingToolBase#setActiveTool
  * @param {boolean} bool - header 활성화 여부
  */
-gb.edit.EditingToolBase.prototype.setActiveTool = function(bool){
+gb3d.edit.EditingToolBase.prototype.setActiveTool = function(bool){
 	this.active_ = bool;
 	
 	if(bool){
@@ -355,9 +355,9 @@ gb.edit.EditingToolBase.prototype.setActiveTool = function(bool){
 
 /**
  * header 활성화 설정값 반환
- * @method gb.edit.EditingToolBase#getActiveTool
+ * @method gb3d.edit.EditingToolBase#getActiveTool
  * @return {boolean} 
  */
-gb.edit.EditingToolBase.prototype.getActiveTool = function(){
+gb3d.edit.EditingToolBase.prototype.getActiveTool = function(){
 	return this.active_;
 }

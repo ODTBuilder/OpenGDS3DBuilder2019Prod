@@ -133,38 +133,38 @@
 					</ul>
 					<div class="tab-content gb-attribute-item">
 						<div role="tabpanel" class="tab-pane active" id="attrAttr">
-							<div class="gb-object-row">
+							<!-- <div class="gb-object-row" data-key="type">
 								<span class="Text">Type</span>
 								<span class="Text">Mesh</span>
 							</div>
-							<div class="gb-object-row">
+							<div class="gb-object-row" data-key="uuid">
 								<span class="Text">UUID</span>
 								<input class="Input" disabled="" style="padding: 2px; border: 1px solid transparent; width: 102px; font-size: 12px;">
 								<button class="Button" style="margin-left: 7px;">New</button>
-							</div>
-							<div class="gb-object-row">
+							</div> -->
+							<div class="gb-object-row" data-key="name">
 								<span class="Text">Name</span>
 								<input class="form-control" style="flex: 1;">
 							</div>
-							<div class="gb-object-row">
+							<div class="gb-object-row" data-key="position">
 								<span class="Text">Position</span>
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 							</div>
-							<div class="gb-object-row">
+							<div class="gb-object-row" data-key="rotation">
 								<span class="Text">Rotation</span>
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 							</div>
-							<div class="gb-object-row">
+							<div class="gb-object-row" data-key="scale">
 								<span class="Text">Scale</span>
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 							</div>
-							<div class="gb-object-row">
+							<!-- <div class="gb-object-row">
 								<span class="Text">Shadow</span>
 								<span style="margin-right: 10px;">
 									<input class="Checkbox" type="checkbox">
@@ -175,16 +175,16 @@
 									<span class="Text" style=" margin-left: 3px;">receive</span>
 								</span>
 								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize; display: none;">
-							</div>
-							<div class="gb-object-row">
+							</div> -->
+							<div class="gb-object-row" data-key="visible">
 								<span class="Text">Visible</span>
 								<input class="Checkbox" type="checkbox">
 							</div>
-							<div class="gb-object-row">
+							<!-- <div class="gb-object-row">
 								<span class="Text">Render Order</span>
 								<input class="form-control" style="flex: 1;">
-							</div>
-							<div class="gb-object-row">
+							</div> -->
+							<div class="gb-object-row" data-key="userData">
 								<span class="Text">User data</span>
 								<textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea>
 							</div>

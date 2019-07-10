@@ -46,6 +46,32 @@
 </div>
 
 <div id="lineObjectCreateModal" tabindex="-1" role="dialog" class="modal fade" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">3D Object Attribute</h4>
+			</div>
+			<div class="modal-body">
+				<div class="type-content">
+					<div class="gb-object-row" data-val="width">
+						<span class="Text">Width</span>
+						<input class="form-control" style="flex: 1;" placeholder="default 40">
+					</div>
+					<div class="gb-object-row" data-val="depth">
+						<span class="Text">Depth</span>
+						<input class="form-control" style="flex: 1;" placeholder="default 40">
+					</div>
+				</div>
+				<div class="gb-object-row" data-val="texture">
+					<span class="Text">Texture</span>
+					<input class="form-control" style="flex: 1;">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="lineObjectConfirm" class="btn btn-primary"><spring:message code="lang.confirm" /></button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div id="polygonObjectCreateModal" tabindex="-1" role="dialog" class="modal fade" aria-hidden="true">
@@ -58,7 +84,7 @@
 				<div class="type-content">
 					<div class="gb-object-row" data-val="depth">
 						<span class="Text">Depth</span>
-						<input class="form-control" style="flex: 1;" placeholder="default 500">
+						<input class="form-control" style="flex: 1;" placeholder="default 50">
 					</div>
 				</div>
 			</div>

@@ -190,13 +190,13 @@ html, body {
 			"epsg" : "4326"
 		});
 		crs.close();
-
+		
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
 		});
-
+		
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];
 			var maxCRS = [ 179, 89 ];
@@ -305,7 +305,7 @@ html, body {
 			});
 
 			// EditTool 활성화
-			var epan = new gb.edit.EditingTool2D({
+			var epan = new gb3d.edit.EditingTool2D({
 				targetElement : gbMap.getLowerDiv()[0],
 				map : gbMap.getUpperMap(),
 				featureRecord : frecord,
@@ -316,8 +316,9 @@ html, body {
 				isEditing : gb.module.isEditing
 			});
 			
-			var epan3d = new gb.edit.EditingTool3D({
+			var epan3d = new gb3d.edit.EditingTool3D({
 				targetElement : $(".area-3d")[0],
+				map: map,
 				isDisplay: false,
 				locale : locale || "en"
 			});
@@ -350,20 +351,20 @@ html, body {
 					var winHeight = $(window).innerHeight();
 					var builderHeaderHeight = $(".builderHeader").outerHeight(true);
 
-					if (builderHeaderHeight != 41) {
-						return;
-					}
+					var conHeight;
 					//컨텐츠 영역의 높이 지정
-					var conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
+					if (builderHeaderHeight != 41) {
+						conHeight = $(".builderContent").outerHeight();
+						$(".builderContent").css("height", "86%");
+					} else {
+						conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
+						$(".builderContent").css("height", conHeight);
+					}
+					
 					//현재 보이는 브라우저 내부 영역의 너비
 					var winWidth = $(window).innerWidth();
 					//컨텐츠 (지도) 영역의 너비 지정
-					//.builderLayer -> 사이드바
 					var mapWidth = ($(".area-2d").parent().innerWidth());
-					//사이드바의 높이 지정
-					$(".builderLayer").outerHeight(conHeight);
-					//편집영역의 높이 지정
-					$(".builderContent").outerHeight(conHeight);
 					//컨텐츠 영역의 너비 지정
 					$(".area-2d").outerHeight(conHeight);
 					$(".area-3d").outerHeight(conHeight);
@@ -382,6 +383,9 @@ html, body {
 			$(window).resize(function() {
 				gitrnd.resize();
 			});
+			
+			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
+			gbMap.getLowerMap().getView().setZoom(15);
 		});
 
 		$(window).on("beforeunload", function() {

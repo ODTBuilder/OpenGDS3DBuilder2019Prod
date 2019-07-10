@@ -156,6 +156,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/OrbitControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/TransformControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/DragControls.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/renderers/Projector.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
