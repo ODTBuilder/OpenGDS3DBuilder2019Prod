@@ -30,6 +30,8 @@ gb3d.object.ThreeObject = function(obj) {
 	// extent point [a,b,c,d]
 	this.extent = options.extent;
 	
+	this.attrs = options.attrs;
+	
 	this.modCount = 0;
 }
 
@@ -94,6 +96,26 @@ gb3d.object.ThreeObject.prototype.getExtent = function() {
  */
 gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
 	this.extent = extent;
+};
+
+/**
+ * 사용자 정의 속성 목록을 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getAttrs
+ * @return {Array.<gb.layer.Attribute>} 사용자 정의 속성 목록
+ */
+gb3d.object.ThreeObject.prototype.getAttrs = function() {
+	return this.attrs;
+};
+
+/**
+ * 사용자 정의 속성 목록을 설정한다.
+ * 
+ * @method gb3d.object.ThreeObject#setAttrs
+ * @param {Array.<gb.layer.Attribute>} attrs - 사용자 정의 속성 목록
+ */
+gb3d.object.ThreeObject.prototype.setAttrs = function(attrs) {
+	this.attrs = attrs;
 };
 
 /**

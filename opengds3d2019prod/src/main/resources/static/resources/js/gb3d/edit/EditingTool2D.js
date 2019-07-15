@@ -414,7 +414,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 	
 	var options = obj ? obj : {};
 	this.locale = options.locale || "en";
-	this.map = options.map ? options.map : undefined;
+	this.mapObj = options.map ? options.map : undefined;
+	this.map = options.map ? options.map.getGbMap().getUpperMap() : undefined;
 	if(!this.map){
 		console.error("gb3d.edit.EditingTool2D: 'map'" + this.translation.requiredOption[this.locale]);
 	}
@@ -555,17 +556,19 @@ gb3d.edit.EditingTool2D = function(obj) {
 	var ahd = $("<thead>").append(atr);
 	this.attrTB = $("<tbody>");
 	var atb = $("<table>").addClass("gb-table").append(ahd).append(this.attrTB);
-	this.attrPop = new gb.panel.PanelBase({
-		"width" : "300px",
-		"positionX" : 384,
-		"positionY" : 150,
-		"autoOpen" : false,
-		"body" : atb
-	});
-	$(this.attrPop.getPanel()).find(".gb-panel-body").css({
-		"max-height" : "400px",
-		"overflow-y" : "auto"
-	});
+//	this.attrPop = new gb.panel.PanelBase({
+//		"width" : "300px",
+//		"positionX" : 384,
+//		"positionY" : 150,
+//		"autoOpen" : false,
+//		"body" : atb
+//	});
+//	$(this.attrPop.getPanel()).find(".gb-panel-body").css({
+//		"max-height" : "400px",
+//		"overflow-y" : "auto"
+//	});
+	$("#attrAttr").find(".gb-table").remove();
+	$("#attrAttr").append(atb);
 
 	this.map.on('postcompose', function(evt) {
 		that.map.getInteractions().forEach(function(interaction) {
@@ -1153,7 +1156,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				"of" : that.headerTag,
 				"collision" : "fit"
 			});
-			that.attrPop.close();
+//			that.attrPop.close();
 		} else if (that.features.getLength() === 1) {
 			//피처 버저닝 이력 시작
 			var features = that.interaction.select.getFeatures();
@@ -1316,19 +1319,19 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 					var tr = $("<tr>").append(td1).append(td2).append(td3);
 					that.attrTB.append(tr);
 				}
-				that.attrPop.open();
-				that.attrPop.getPanel().position({
-					"my" : "left top",
-					"at" : "left bottom",
-					"of" : that.headerTag,
-					"collision" : "fit"
-				});
+//				that.attrPop.open();
+//				that.attrPop.getPanel().position({
+//					"my" : "left top",
+//					"at" : "left bottom",
+//					"of" : that.headerTag,
+//					"collision" : "fit"
+//				});
 			} else {
-				that.attrPop.close();
+//				that.attrPop.close();
 			}
 		} else {
 			that.featurePop.close();
-			that.attrPop.close();
+//			that.attrPop.close();
 //			vfeature.close();
 		}
 
@@ -1426,8 +1429,39 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 			var item = arr[0];
 			var prop, notNull = {}, setProp = {};
 			
-			// ----- ThreeJS Object Create --------
-			map.createObjectByCoord(this.selectedType(), feature.getGeometry().getCoordinates(), feature.getGeometry().getExtent());
+			if (!!source) {
+				var l = source.getFeatureById(source.get("git").treeID + ".new0")
+				
+				if (!l) {
+					var fid = source.get("git").treeID + ".new0";
+					feature.setId(fid);
+					that.featureRecord.create(layer, feature);
+				} else {
+					var count = 1;
+					while(source.getFeatureById(source.get("git").treeID + ".new" + count) !== null){
+						count++;
+					}
+					var fid = source.get("git").treeID + ".new" + count;
+					feature.setId(fid);
+					that.featureRecord.create(layer, feature);
+				}
+
+				gb.undo.pushAction({
+					undo: function(data){
+						data.layer.getSource().removeFeature(data.feature);
+						data.that.featureRecord.deleteFeatureCreated(data.layer.get("id"), data.feature.getId());
+					},
+					redo: function(data){
+						data.layer.getSource().addFeature(data.feature);
+						data.that.featureRecord.create(data.layer, data.feature);
+					},
+					data: {
+						that: that,
+						layer: layer,
+						feature: feature
+					}
+				});
+			}
 			
 			if(source.get("git") instanceof Object){
 				if(source.get("git").attribute instanceof Array){
@@ -1593,43 +1627,19 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						
 						feature.setProperties(setProp);
 						addPropModal.close();
+						
+						// ----- ThreeJS Object Create --------
+						map.createObjectByCoord(that.selectedSource.get("git").geometry, 
+								feature.getGeometry().getCoordinates(), feature.getGeometry().getExtent(), feature.getId());
 					});
 					addPropModal.modalHead.remove();
-				}
-			}
-			
-			if (!!source) {
-				var l = source.getFeatureById(source.get("git").treeID + ".new0")
-				
-				if (!l) {
-					var fid = source.get("git").treeID + ".new0";
-					feature.setId(fid);
-					that.featureRecord.create(layer, feature);
-				} else {
-					var count = 1;
-					while(source.getFeatureById(source.get("git").treeID + ".new" + count) !== null){
-						count++;
+					
+					if(source.get("git").attribute.length === 0){
+						// ----- ThreeJS Object Create --------
+						map.createObjectByCoord(that.selectedSource.get("git").geometry, 
+								feature.getGeometry().getCoordinates(), feature.getGeometry().getExtent(), feature.getId());
 					}
-					var fid = source.get("git").treeID + ".new" + count;
-					feature.setId(fid);
-					that.featureRecord.create(layer, feature);
 				}
-
-				gb.undo.pushAction({
-					undo: function(data){
-						data.layer.getSource().removeFeature(data.feature);
-						data.that.featureRecord.deleteFeatureCreated(data.layer.get("id"), data.feature.getId());
-					},
-					redo: function(data){
-						data.layer.getSource().addFeature(data.feature);
-						data.that.featureRecord.create(data.layer, data.feature);
-					},
-					data: {
-						that: that,
-						layer: layer,
-						feature: feature
-					}
-				});
 			}
 		});
 		this.deactiveIntrct_([ "select", "dragbox", "move", "modify", "rotate" ]);
@@ -1743,8 +1753,14 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 			for (var i = 0; i < features.getLength(); i++) {
 				that.featureRecord.update(selectSource.get("git").tempLayer, features.item(i));
 				featureList.push(features.item(i));
+				
+				var extent = features.item(i).getGeometry().getExtent();
+				var x = extent[0] + (extent[2] - extent[0]) / 2;
+				var y = extent[1] + (extent[3] - extent[1]) / 2;
+				// ThreeJS move
+				that.mapObj.moveObject3Dfrom2D([x,y], features.item(i).getId());
 			}
-
+			
 			gb.undo.pushAction({
 				undo: function(data){
 					var deltaX = data.lastCoord[0] - data.newCoord[0];
@@ -1755,6 +1771,9 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						geom.translate(deltaX, deltaY);
 						data.features[i].setGeometry(geom);
 						data.that.featureRecord.update(data.layer, data.features[i]);
+						
+						// ThreeJS move
+						that.mapObj.moveObject3Dfrom2D([deltaX, deltaY], data.features[i].getId());
 					}
 				},
 				redo: function(data){
@@ -1766,6 +1785,9 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						geom.translate(deltaX, deltaY);
 						data.features[i].setGeometry(geom);
 						data.that.featureRecord.update(data.layer, data.features[i]);
+						
+						// ThreeJS move
+						that.mapObj.moveObject3Dfrom2D([deltaX, deltaY], data.features[i].getId());
 					}
 				},
 				data: {
@@ -1855,6 +1877,9 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			}
 			
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
+			
+			// ThreeJS vertex modify
+			that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(), feature.getId());
 
 			gb.undo.pushAction({
 				undo: function(data){
@@ -1862,12 +1887,18 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					geom.setCoordinates(data.lastCoord);
 					data.feature.setGeometry(geom);
 					data.that.featureRecord.update(data.layer, data.feature);
+					
+					// ThreeJS vertex modify
+					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId());
 				},
 				redo: function(data){
 					var geom = data.feature.getGeometry();
 					geom.setCoordinates(data.newCoord);
 					data.feature.setGeometry(geom);
 					data.that.featureRecord.update(data.layer, data.feature);
+					
+					// ThreeJS vertex modify
+					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId());
 				},
 				data: {
 					that: that,
@@ -1944,8 +1975,11 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 					id: features.item(i).getId(),
 					coord: features.item(i).getGeometry().getCoordinates()
 				});
+				
+				// ThreeJS vertex modify
+				that.mapObj.modify3DVertices(features.item(i).getGeometry().getCoordinates(), features.item(i).getId());
 			}
-
+			
 			gb.undo.pushAction({
 				undo: function(data){
 					console.log("modify undo");
@@ -1957,6 +1991,9 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								geom.setCoordinates(data.lastCoord[j].coord);
 								data.features[i].setGeometry(geom);
 								data.that.featureRecord.update(data.layer, data.features[i]);
+								
+								// ThreeJS vertex modify
+								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId());
 								break;
 							}
 						}
@@ -1972,6 +2009,9 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								geom.setCoordinates(data.newCoord[j].coord);
 								data.features[i].setGeometry(geom);
 								data.that.featureRecord.update(data.layer, data.features[i]);
+								
+								// ThreeJS vertex modify
+								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId());
 								break;
 							}
 						}

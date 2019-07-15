@@ -180,13 +180,9 @@
 								<span class="Text">Visible</span>
 								<input class="Checkbox" type="checkbox">
 							</div>
-							<!-- <div class="gb-object-row">
-								<span class="Text">Render Order</span>
-								<input class="form-control" style="flex: 1;">
-							</div> -->
 							<div class="gb-object-row" data-key="userData">
 								<span class="Text">User data</span>
-								<textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea>
+								<!-- <textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea> -->
 							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrStyle">

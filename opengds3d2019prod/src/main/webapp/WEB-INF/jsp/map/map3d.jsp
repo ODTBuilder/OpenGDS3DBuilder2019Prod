@@ -307,7 +307,7 @@ html, body {
 			// EditTool 활성화
 			var epan = new gb3d.edit.EditingTool2D({
 				targetElement : gbMap.getLowerDiv()[0],
-				map : gbMap.getUpperMap(),
+				map : map,
 				featureRecord : frecord,
 				otree : otree,
 				wfsURL : urlList.getWFSFeature + urlList.token,
@@ -327,6 +327,38 @@ html, body {
 				e.preventDefault();
 				epan.editToolToggle();
 				epan3d.toggleTool();
+			});
+			
+			// feature list
+			var featureList = new gb.layer.FeatureList({
+				map : gbMap.getUpperMap(),
+				targetElement : gbMap.getLowerDiv()[0],
+				title : "All Feature List",
+				toggleTarget : "#feature-toggle-btn",
+				wfstURL : urlList.wfst + urlList.token,
+				locale : locale || "en",
+				layerInfoURL : urlList.getLayerInfo + urlList.token,
+				getFeatureURL : urlList.getWFSFeature + urlList.token,
+				isDisplay : false
+			});
+			
+			otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
+				var treeid = data.selected[0];
+				var layer = data.instance.get_LayerById(treeid);
+
+				if (!layer) {
+					return;
+				}
+
+				if (layer instanceof ol.layer.Group) {
+					return;
+				}
+
+				if (featureList.footerTag.css("display") === "none") {
+					return;
+				} else {
+					featureList.updateFeatureList(layer);
+				}
 			});
 			
 			// 검수 수행 Modal 생성

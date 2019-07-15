@@ -62,7 +62,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	}
 	
 	function transformRender(){
-		that.map.renderThreeObj(that.map);
+		that.map.renderThreeObj();
 	}
 	
 	// transform 컨트롤 선언
@@ -128,11 +128,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.updateAttributeTab(object);
 		}
 	}
+	
 	// ============ Event ==============
 	eventDiv.on("click", onDocumentMouseClick);
 	
 	$(document).on("keydown", function(e){
-		console.log(e);
 		if(e.ctrlKey){
 			// Ctrl key 입력 시 기본 3차원 렌더링 함수를 비활성화하고 ThreeJS DIV의 마우스 이벤트를 활성화시킨다.
 			cancelAnimationFrame(that.map.requestFrame);
@@ -149,7 +149,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 				break;
 			case 87: // W
 				that.threeTransformControls.setMode( "translate" );
-				break;w
+				break;
 			case 69: // E
 				that.threeTransformControls.setMode( "rotate" );
 				break;
@@ -180,16 +180,35 @@ gb3d.edit.EditingTool3D = function(obj) {
 	});
 	
 	$(document).on("keyup", function(e){
-		console.log(e);
 		if(e.which === 17){
 			// Ctrl key up 이벤트 발생 시 TransformControl와 ThreeJS DIV의 마우스 이벤트를 비활성화하고 기본 3차원 렌더링 함수를 다시 활성화한다.
 			if(pickedObject){
-				that.threeTransformControls.detach( pickedObject );
-				pickedObject = undefined;
+//				that.threeTransformControls.detach( pickedObject );
+//				that.updateAttributeTab(undefined);
+//				pickedObject = undefined;
 			}
 			// 기본 3차원 렌더링 함수 실행
 			that.map.loop_();
 			threeEventDiv.css("pointer-events", "none");
+		}
+	});
+	
+	$(document).on("keypress", "#attrAttr input", function(e){
+		if(e.keyCode == 13){
+			var parent = $(this).parent();
+			var inputs = parent.find("input");
+			
+			if(!pickedObject){
+				return;
+			}
+			
+			if(inputs.length === 0){
+				pickedObject[parent.data("key")] = $(inputs[0]).val();
+			} else if(inputs.length === 3){
+				pickedObject[parent.data("key")].x = $(inputs[0]).val();
+				pickedObject[parent.data("key")].y = $(inputs[1]).val();
+				pickedObject[parent.data("key")].z = $(inputs[2]).val();
+			}
 		}
 	});
 	
@@ -208,6 +227,17 @@ gb3d.edit.EditingTool3D = function(obj) {
 			pickedObject[parent.data("key")].y = $(inputs[1]).val();
 			pickedObject[parent.data("key")].z = $(inputs[2]).val();
 		}
+	});
+	
+	$(document).on("change", "#attrAttr input", function(e){
+		var parent = $(this).parent();
+		var inputs = parent.find("input");
+		
+		if(!pickedObject){
+			return;
+		}
+		
+		pickedObject[parent.data("key")] = $(inputs[0]).prop("checked");
 	});
 }
 gb3d.edit.EditingTool3D.prototype = Object.create(gb3d.edit.EditingToolBase.prototype);
