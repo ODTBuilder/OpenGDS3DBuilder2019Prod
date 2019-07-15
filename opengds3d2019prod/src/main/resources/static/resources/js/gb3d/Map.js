@@ -153,11 +153,11 @@ gb3d.Map = function(obj) {
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 
-//	this.camera = new gb3d.Camera({
-//		"cesiumCamera" : this.cesiumViewer.camera,
-//		"threeCamera" : this.threeCamera,
-//		"olMap" : this.gbMap.getUpperMap()
-//	});
+	this.camera = new gb3d.Camera({
+		"cesiumCamera" : this.cesiumViewer.camera,
+		"threeCamera" : this.threeCamera,
+		"olMap" : this.gbMap.getUpperMap()
+	});
 	
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){

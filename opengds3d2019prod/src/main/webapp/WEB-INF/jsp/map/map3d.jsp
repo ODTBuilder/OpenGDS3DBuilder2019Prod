@@ -176,12 +176,10 @@ html, body {
 
 		var map = new gb3d.Map({
 			"target2d" : $(".area-2d")[0],
-			"target3d" : $(".area-3d")[0],
-			"initPosition" : [ 127.100912, 37.401746 ]
+			"target3d" : $(".area-3d")[0]
+// 			"initPosition" : [ 127.100912, 37.401746 ]
 		});
 		var gbMap = map.getGbMap();
-
-		// 		gbMap.setSize($(".area-2d").width(), $(".area-2d").height());
 
 		var crs = new gb.crs.BaseCRS({
 			"locale" : locale !== "" ? locale : "en",
