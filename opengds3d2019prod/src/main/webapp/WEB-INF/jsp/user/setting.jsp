@@ -418,6 +418,8 @@ input.radio:checked+label::before {
 					layerDef.clearStructure();
 					layerDef.updateStructure();
 					gitrnd.alert("warning", " <spring:message code="lang.initLaOptionChng" />");
+					optionDef.clearStructure();
+					gitrnd.alert("warning", " <spring:message code="lang.alertValidateItemReset" />");
 				}
 				optionDef.setQACategory(this.value);
 			});
@@ -429,6 +431,8 @@ input.radio:checked+label::before {
 						layerDef.clearStructure();
 						layerDef.updateStructure();
 						gitrnd.alert("warning", " <spring:message code="lang.initLaOptionChng" />");
+						optionDef.clearStructure();
+						gitrnd.alert("warning", " <spring:message code="lang.alertValidateItemReset" />");
 					}
 					optionDef.setQAVersion(this.value);
 				}

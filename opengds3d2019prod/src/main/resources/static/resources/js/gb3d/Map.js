@@ -126,7 +126,7 @@ gb3d.Map = function(obj) {
 	// 지도에 표시할 객체 배열
 	this.threeObjects = [];
 
-	// three 생성자 옵션
+	// three camera 생성자 옵션
 	var fov = 45;
 	var width = window.innerWidth;
 	var height = window.innerHeight;
@@ -173,6 +173,12 @@ gb3d.Map = function(obj) {
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 
+	this.camera = new gb3d.Camera({
+		"cesiumCamera" : this.cesiumViewer.camera,
+		"threeCamera" : this.threeCamera,
+		"olMap" : this.gbMap.getUpperMap()
+	});
+	
 	// 렌더링을 위한 루프 함수
 	function loop() {
 		requestAnimationFrame(loop);
@@ -373,4 +379,14 @@ gb3d.Map.prototype.setThreeObjects = function(objects) {
  */
 gb3d.Map.prototype.getThreeRenderer = function() {
 	return this.threeRenderer;
+};
+
+/**
+ * gb3d camera 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getCamera
+ * @return {gb3d.Camera} gb3d camera 객체
+ */
+gb3d.Map.prototype.getCamera = function() {
+	return this.camera;
 };

@@ -239,3 +239,13 @@ gb.Map.prototype.setSize = function(width, height) {
 gb.Map.prototype.updateSize = function() {
 	this.setSize($(this.bind).width(), $(this.bind).height());
 };
+
+/**
+ * 두 지도가 공유하는 ol.View 객체를 반환한다.
+ * 
+ * @method gb.Map#getView
+ * @return {ol.View} ol.View 객체
+ */
+gb.Map.prototype.getView = function() {
+	return this.view;
+};
