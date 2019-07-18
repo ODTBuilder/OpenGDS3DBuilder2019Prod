@@ -22,13 +22,13 @@ gb3d.Camera = function(obj) {
 	this.cesiumCamera = options.cesiumCamera instanceof Cesium.Camera ? options.cesiumCamera : undefined;
 	this.threeCamera = options.threeCamera instanceof THREE.Camera ? options.threeCamera : undefined;
 	this.olMap = options.olMap instanceof ol.Map ? options.olMap : undefined;
-	this.olView = options.olView instanceof ol.View ? options.olView : options.olMap instanceof ol.Map ? options.olMap.getView() : undefined;
-	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
-
-	if (!this.cesiumCamera || !this.threeCamera || !this.olMap || !this.olView) {
+	if (!this.cesiumCamera || !this.threeCamera || !this.olMap) {
 		console.error("constructor parameter not provided");
 		return;
 	}
+	this.olView = this.olMap.getView();
+	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
+	
 
 	this.camFeature;
 	this.camGeom;

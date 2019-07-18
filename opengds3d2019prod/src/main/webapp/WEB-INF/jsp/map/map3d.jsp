@@ -174,20 +174,29 @@ html, body {
 			geoserverFileUpload : "geoserver/upload.do"
 		}
 
-		var map = new gb3d.Map({
-			"target2d" : $(".area-2d")[0],
-			"target3d" : $(".area-3d")[0]
-// 			"initPosition" : [ 127.100912, 37.401746 ]
+		var gbMap = new gb.Map({
+			"target" : $(".area-2d")[0],
+			"upperMap" : {
+				"controls" : [],
+				"layers" : []
+			},
+			"lowerMap" : {
+				"controls" : [],
+				"layers" : []
+			}
 		});
-		var gbMap = map.getGbMap();
-
-		var crs = new gb.crs.BaseCRS({
-			"locale" : locale !== "" ? locale : "en",
+			
+		var baseCRS =  new gb.crs.BaseCRS({
+			"locale" :  locale !== "" ? locale : "en",
 			"message" : $(".epsg-now")[0],
-			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
+			"maps" : [ this.gbMap.getUpperMap(), this.gbMap.getLowerMap() ],
 			"epsg" : "4326"
 		});
-		crs.close();
+		
+		var gb3dMap = new gb3d.Map({
+			"gbMap" : gbMap,
+			"target" : $(".area-3d")[0]
+		});
 		
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
@@ -206,7 +215,7 @@ html, body {
 					material : Cesium.Color.RED.withAlpha(1)
 				}
 			};
-			var Polygon = map.getCesiumViewer().entities.add(entity);
+			var Polygon = gb3dMap.getCesiumViewer().entities.add(entity);
 
 			// Three.js Objects
 			// Lathe geometry
@@ -305,7 +314,7 @@ html, body {
 			// EditTool 활성화
 			var epan = new gb3d.edit.EditingTool2D({
 				targetElement : gbMap.getLowerDiv()[0],
-				map : map,
+				map : gb3dMap,
 				featureRecord : frecord,
 				otree : otree,
 				wfsURL : urlList.getWFSFeature + urlList.token,
@@ -316,7 +325,7 @@ html, body {
 			
 			var epan3d = new gb3d.edit.EditingTool3D({
 				targetElement : $(".area-3d")[0],
-				map: map,
+				map: gb3dMap,
 				isDisplay: false,
 				locale : locale || "en"
 			});
@@ -414,8 +423,9 @@ html, body {
 				gitrnd.resize();
 			});
 			
-			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
-			gbMap.getLowerMap().getView().setZoom(15);
+// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
+// 			gbMap.getLowerMap().getView().setZoom(15);
+
 		});
 
 		$(window).on("beforeunload", function() {
