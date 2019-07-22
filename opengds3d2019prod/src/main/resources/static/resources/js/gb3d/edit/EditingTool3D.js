@@ -205,9 +205,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if(inputs.length === 0){
 				pickedObject[parent.data("key")] = $(inputs[0]).val();
 			} else if(inputs.length === 3){
-				pickedObject[parent.data("key")].x = $(inputs[0]).val();
-				pickedObject[parent.data("key")].y = $(inputs[1]).val();
-				pickedObject[parent.data("key")].z = $(inputs[2]).val();
+				pickedObject[parent.data("key")].x = parseFloat($(inputs[0]).val());
+				pickedObject[parent.data("key")].y = parseFloat($(inputs[1]).val());
+				pickedObject[parent.data("key")].z = parseFloat($(inputs[2]).val());
 			}
 		}
 	});
@@ -223,9 +223,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if(inputs.length === 0){
 			pickedObject[parent.data("key")] = $(inputs[0]).val();
 		} else if(inputs.length === 3){
-			pickedObject[parent.data("key")].x = $(inputs[0]).val();
-			pickedObject[parent.data("key")].y = $(inputs[1]).val();
-			pickedObject[parent.data("key")].z = $(inputs[2]).val();
+			pickedObject[parent.data("key")].x = parseFloat($(inputs[0]).val());
+			pickedObject[parent.data("key")].y = parseFloat($(inputs[1]).val());
+			pickedObject[parent.data("key")].z = parseFloat($(inputs[2]).val());
 		}
 	});
 	

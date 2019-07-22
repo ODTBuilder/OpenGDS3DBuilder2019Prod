@@ -1445,15 +1445,23 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				}
-
+				
 				gb.undo.pushAction({
 					undo: function(data){
 						data.layer.getSource().removeFeature(data.feature);
 						data.that.featureRecord.deleteFeatureCreated(data.layer.get("id"), data.feature.getId());
+						
+						// ThreeJS object hide
+						var threeObject = that.mapObj.getThreeObjectById(data.feature.getId());
+						threeObject.getObject()["visible"] = false;
 					},
 					redo: function(data){
 						data.layer.getSource().addFeature(data.feature);
 						data.that.featureRecord.create(data.layer, data.feature);
+						
+						// ThreeJS object show
+						var threeObject = that.mapObj.getThreeObjectById(data.feature.getId());
+						threeObject.getObject()["visible"] = true;
 					},
 					data: {
 						that: that,
@@ -1773,7 +1781,10 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						data.that.featureRecord.update(data.layer, data.features[i]);
 						
 						// ThreeJS move
-						that.mapObj.moveObject3Dfrom2D([deltaX, deltaY], data.features[i].getId());
+						var ext = geom.getExtent();
+						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
+						var centerY = ext[1] + (ext[3] - ext[1]) / 2;
+						that.mapObj.moveObject3Dfrom2D([centerX, centerY], data.features[i].getId());
 					}
 				},
 				redo: function(data){
@@ -1787,7 +1798,10 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						data.that.featureRecord.update(data.layer, data.features[i]);
 						
 						// ThreeJS move
-						that.mapObj.moveObject3Dfrom2D([deltaX, deltaY], data.features[i].getId());
+						var ext = geom.getExtent();
+						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
+						var centerY = ext[1] + (ext[3] - ext[1]) / 2;
+						that.mapObj.moveObject3Dfrom2D([centerX, centerY], data.features[i].getId());
 					}
 				},
 				data: {
@@ -1879,7 +1893,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
 			
 			// ThreeJS vertex modify
-			that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(), feature.getId());
+			that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(), feature.getId(), feature.getGeometry().getExtent());
 
 			gb.undo.pushAction({
 				undo: function(data){
@@ -1889,7 +1903,8 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					data.that.featureRecord.update(data.layer, data.feature);
 					
 					// ThreeJS vertex modify
-					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId());
+					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId(),
+							data.feature.getGeometry().getExtent());
 				},
 				redo: function(data){
 					var geom = data.feature.getGeometry();
@@ -1898,7 +1913,8 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					data.that.featureRecord.update(data.layer, data.feature);
 					
 					// ThreeJS vertex modify
-					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId());
+					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(), data.feature.getId(), 
+							data.feature.getGeometry().getExtent());
 				},
 				data: {
 					that: that,
@@ -1977,7 +1993,8 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 				});
 				
 				// ThreeJS vertex modify
-				that.mapObj.modify3DVertices(features.item(i).getGeometry().getCoordinates(), features.item(i).getId());
+				that.mapObj.modify3DVertices(features.item(i).getGeometry().getCoordinates(), features.item(i).getId(), 
+						features.item(i).getGeometry().getExtent());
 			}
 			
 			gb.undo.pushAction({
@@ -1993,7 +2010,8 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								data.that.featureRecord.update(data.layer, data.features[i]);
 								
 								// ThreeJS vertex modify
-								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId());
+								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId(), 
+										data.features[i].getGeometry().getExtent());
 								break;
 							}
 						}
@@ -2011,7 +2029,8 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								data.that.featureRecord.update(data.layer, data.features[i]);
 								
 								// ThreeJS vertex modify
-								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId());
+								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(), data.features[i].getId(), 
+										data.features[i].getGeometry().getExtent());
 								break;
 							}
 						}
@@ -2125,6 +2144,10 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 						features.item(i).setStyle(style);
 					}
 					that.featureRecord.remove(selectSource.get("git").tempLayer, features.item(i));
+					
+					// ThreeJS object hide
+					var threeObject = that.mapObj.getThreeObjectById(features.item(i).getId());
+					threeObject.getObject()["visible"] = false;
 				}
 
 				gb.undo.pushAction({
@@ -2139,6 +2162,10 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 								feature.setStyle(data.defaultStyle);
 							}
 							data.that.featureRecord.deleteFeatureRemoved(data.source.get("git").tempLayer.get("id"), data.features[i].getId());
+							
+							// ThreeJS object show
+							var threeObject = that.mapObj.getThreeObjectById(data.features[i].getId());
+							threeObject.getObject()["visible"] = true;
 						}
 					},
 					redo: function(data){
@@ -2152,6 +2179,10 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 								feature.setStyle(data.removeStyle);
 							}
 							data.that.featureRecord.remove(data.source.get("git").tempLayer, data.features[i]);
+							
+							// ThreeJS object hide
+							var threeObject = that.mapObj.getThreeObjectById(data.features[i].getId());
+							threeObject.getObject()["visible"] = false;
 						}
 					},
 					data: {
