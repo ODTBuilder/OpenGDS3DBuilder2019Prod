@@ -185,11 +185,17 @@ html, body {
 				"layers" : []
 			}
 		});
-			
+		
+		var gbBaseMap = new gb.style.BaseMap({
+			"map" : gbMap.getLowerMap(),
+			"defaultBaseMap" : "osm",
+			"locale" : locale !== "" ? locale : "en"
+		});
+		
 		var baseCRS =  new gb.crs.BaseCRS({
 			"locale" :  locale !== "" ? locale : "en",
 			"message" : $(".epsg-now")[0],
-			"maps" : [ this.gbMap.getUpperMap(), this.gbMap.getLowerMap() ],
+			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
 			"epsg" : "4326"
 		});
 		
@@ -198,11 +204,7 @@ html, body {
 			"target" : $(".area-3d")[0]
 		});
 		
-		var gbBaseMap = new gb.style.BaseMap({
-			"map" : gbMap.getLowerMap(),
-			"defaultBaseMap" : "osm",
-			"locale" : locale !== "" ? locale : "en"
-		});
+		var gbCam = gb3dMap.getCamera();
 		
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];

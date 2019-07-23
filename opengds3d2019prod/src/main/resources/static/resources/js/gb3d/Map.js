@@ -61,9 +61,10 @@ gb3d.Map = function(obj) {
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
 //		useDefaultRenderLoop : false,
+		scene3DOnly: true,
 		selectionIndicator : false,
 		homeButton : false,
-		sceneModePicker : true,
+		sceneModePicker : false,
 		infoBox : false,
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
@@ -97,6 +98,7 @@ gb3d.Map = function(obj) {
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
 	this.maxCRS = [ 180.0, 90.0 ];
+	
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
@@ -128,7 +130,7 @@ gb3d.Map = function(obj) {
 	// three js scene 객체
 	this.threeScene = new THREE.Scene();
 	// 그리드 추가
-	this.threeScene.add(new THREE.GridHelper());
+	this.threeScene.add(new THREE.GridHelper(100, 10));
 	// three 카메라 선언
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
