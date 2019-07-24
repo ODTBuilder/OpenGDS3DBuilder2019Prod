@@ -82,6 +82,15 @@ public class ShpToObjImpl {
 		}
 	}
 	
+	/**
+	 * 높이 고정값
+	 * @author SG.LEE
+	 * @param file
+	 * @param filter
+	 * @param defVal
+	 * @param outputPath
+	 * @throws Exception
+	 */
 	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) throws Exception{
 		hType = EnShpToObjHeightType.DEFAULT;
 		this.file = file;
@@ -89,6 +98,16 @@ public class ShpToObjImpl {
 		this.outputPath = outputPath;
 	}
 	
+	/**
+	 * 높이 min ~ max 사이 랜던값
+	 * @author SG.LEE
+	 * @param file
+	 * @param filter
+	 * @param minVal
+	 * @param maxVal
+	 * @param outputPath
+	 * @throws Exception
+	 */
 	public ShpToObjImpl(File file, Filter filter, double minVal, double maxVal, String outputPath) throws Exception{
 		hType = EnShpToObjHeightType.RANDOM;
 		this.file = file;
@@ -98,6 +117,14 @@ public class ShpToObjImpl {
 		this.maxVal = maxVal;
 	}
 	
+	/**
+	 * 높이 컬럼값 지정
+	 * @author SG.LEE
+	 * @param file
+	 * @param filter
+	 * @param attribute
+	 * @param outputPath
+	 */
 	public ShpToObjImpl(File file, Filter filter, String attribute, String outputPath) {
 		hType = EnShpToObjHeightType.FIX;
 		this.file = file;
