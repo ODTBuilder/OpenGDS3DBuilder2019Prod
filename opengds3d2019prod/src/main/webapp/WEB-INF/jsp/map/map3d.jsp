@@ -201,7 +201,8 @@ html, body {
 		
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-			"target" : $(".area-3d")[0]
+			"target" : $(".area-3d")[0],
+			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
 		});
 		
 		var gbCam = gb3dMap.getCamera();

@@ -27,7 +27,7 @@ gb3d.Map = function(obj) {
 	};
 
 	// 2d 지도 영역 엘리먼트
-//	this.target2d = undefined;
+// this.target2d = undefined;
 	// 3d 지도 영역 엘리먼트
 	this.target = undefined;
 	// cesium 영역 엘리먼트
@@ -60,7 +60,7 @@ gb3d.Map = function(obj) {
 	}
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
-//		useDefaultRenderLoop : false,
+// useDefaultRenderLoop : false,
 		scene3DOnly: true,
 		selectionIndicator : false,
 		homeButton : false,
@@ -95,26 +95,47 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
+	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
+	this.cesiumViewer.scene.primitives.add(tileset);
+	this.cesiumViewer.zoomTo(tileset);
+	
+	var longitude = -2.1480545852753163;
+	var latitude = 0.7688240036937101;
+	var range = 0.000002;
+	var duration = 4.0;
+
+//	var entity = this.cesiumViewer.entities.add({
+//	    position : Cesium.Cartesian3.fromRadians(longitude, latitude),
+//	    model : {
+//	        uri : options.testTiles
+//	    }
+//	});
+//	this.cesiumViewer.scene.primitives.add(entity);
+//	this.cesiumViewer.zoomTo(entity);
+	
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
 	this.maxCRS = [ 180.0, 90.0 ];
-	
+
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
 	// 초기 위치
-	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : this.center; 
+// this.initPosition = Array.isArray(options.initPosition) ?
+// Cesium.Cartesian3.fromDegrees(options.initPosition[0],
+// options.initPosition[1] - 1, 200000) : this.center;
+	this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087, 200000);
 
 	// cesium 카메라를 지도 중심으로 이동
-	this.cesiumViewer.camera.flyTo({
-		destination : this.initPosition,
-		orientation : {
-			heading : Cesium.Math.toRadians(0),
-			pitch : Cesium.Math.toRadians(-60),
-			roll : Cesium.Math.toRadians(0)
-		},
-		duration: 3
-	});
+//	this.cesiumViewer.camera.flyTo({
+//		destination : this.initPosition,
+//		orientation : {
+//			heading : Cesium.Math.toRadians(0),
+//			pitch : Cesium.Math.toRadians(-60),
+//			roll : Cesium.Math.toRadians(0)
+//		},
+//		duration: 3
+//	});
 
 	// 지도에 표시할 객체 배열
 	this.threeObjects = [];
@@ -148,7 +169,7 @@ gb3d.Map = function(obj) {
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
-//		that.renderCesium();
+// that.renderCesium();
 		that.renderThreeObj();
 	};
 	// 렌더링 시작
@@ -311,7 +332,7 @@ gb3d.Map.prototype.getThreeTransformControls = function() {
  * @method gb3d.Map#renderCesium
  */
 gb3d.Map.prototype.renderCesium = function(){
-//	var that = this;
+// var that = this;
 	this.getCesiumViewer().render();
 	// cesium.viewer.scene.screenSpaceCameraController.enableInputs = false;
 }
@@ -354,7 +375,7 @@ gb3d.Map.prototype.renderThreeObj = function(){
 			objs[i].getObject().position.copy(center);
 			objs[i].getObject().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		}
-//		objs[i].getObject().up.copy(latDir);
+// objs[i].getObject().up.copy(latDir);
 	}
 
 	// Clone Cesium Camera projection position so the
@@ -391,22 +412,22 @@ gb3d.Map.prototype.renderThreeObj = function(){
  * 
  * @method gb3d.Map#render
  */
-//gb3d.Map.prototype.render = function(){
-//// var that = this;
-//that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
-//}
+// gb3d.Map.prototype.render = function(){
+// // var that = this;
+// that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
+// }
 
 /**
  * 렌더링 함수를 반복한다
  * 
  * @method gb3d.Map#loop
  */
-//gb3d.Map.prototype.loop = function(){
-//var that = this;
-//requestAnimationFrame(that.loop);
-//that.renderCesium();
-//that.renderThreeObj();
-//}
+// gb3d.Map.prototype.loop = function(){
+// var that = this;
+// requestAnimationFrame(that.loop);
+// that.renderCesium();
+// that.renderThreeObj();
+// }
 
 /**
  * three transform controls 객체를 반환한다.
@@ -665,7 +686,7 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(center, id){
 			e.upModCount();
 			e.setCenter(centerCoord);
 			position = e.getObject().position;
-//			cart.z = position.z;
+// cart.z = position.z;
 			position.copy(cart);
 		}
 	});
