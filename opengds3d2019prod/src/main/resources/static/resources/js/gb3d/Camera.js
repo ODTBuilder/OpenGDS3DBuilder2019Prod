@@ -52,7 +52,8 @@ gb3d.Camera = function(obj) {
 				"z-index" : 2,
 				"width" : "64px",
 				"height" : "64px",
-				"cursor" : "move"
+				"cursor" : "move",
+				"opacity" : 0.6
 			})[0];
 
 	this.sector = $("<img>")
@@ -63,7 +64,8 @@ gb3d.Camera = function(obj) {
 				"z-index" : 1,
 				"width" : "120px",
 				"height" : "120px",
-				"cursor" : "pointer"
+				"cursor" : "pointer",
+				"opacity" : 0.2
 			})[0];
 
 	// this.sector = $("<div>")[0];
@@ -139,6 +141,44 @@ gb3d.Camera = function(obj) {
 		event.preventDefault();
 	});
 
+	$(this.icon).hover(function() {
+		$(that.icon).css({
+			"opacity" : 1
+		});
+		$(that.sector).css({
+			"opacity" : 1
+		});
+	}, function() {
+		$(that.icon).css({
+			"opacity" : 0.6
+		});
+		$(that.sector).css({
+			"opacity" : 0.2
+		});
+	});
+
+	this.isHover = false;
+	
+	$(this.sector).hover(function() {
+		that.isHover = true;
+		$(that.icon).css({
+			"opacity" : 1
+		});
+		$(that.sector).css({
+			"opacity" : 1
+		});
+	}, function() {
+		that.isHover = false;
+		if (!that.isCamMoving && !that.isCamRotating) {
+			$(that.icon).css({
+				"opacity" : 0.6
+			});
+			$(that.sector).css({
+				"opacity" : 0.2
+			});
+		}
+	});
+
 	this.isCamMoving = false;
 	this.isCamRotating = false;
 
@@ -194,9 +234,19 @@ gb3d.Camera = function(obj) {
 			that.getCamSectorOverlay().setPosition([ secPos[0] + distancex, secPos[1] + distancey ]);
 			that.updateCesiumCameraPosition();
 			that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
-
+			
 			if (!wasCamDragging || !wasCamDown) {
 				// error
+			}
+		}
+		if (!that.isHover) {
+			if (!that.isCamMoving && !that.isCamRotating) {
+				$(that.icon).css({
+					"opacity" : 0.6
+				});
+				$(that.sector).css({
+					"opacity" : 0.2
+				});
 			}
 		}
 	});
@@ -265,6 +315,16 @@ gb3d.Camera = function(obj) {
 			// origin
 			s_rad += that.last_angle;
 			that.target_wp.data("last_angle", s_rad);
+		}
+		if (!that.isHover) {
+			if (!that.isCamMoving && !that.isCamRotating) {
+				$(that.icon).css({
+					"opacity" : 0.6
+				});
+				$(that.sector).css({
+					"opacity" : 0.2
+				});
+			}
 		}
 	});
 }
