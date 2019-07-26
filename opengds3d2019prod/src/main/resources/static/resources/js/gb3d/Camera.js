@@ -134,58 +134,137 @@ gb3d.Camera = function(obj) {
 	$(this.sector).on('dragstart', function(event) {
 		event.preventDefault();
 	});
-	
+
 	$(this.icon).on('dragstart', function(event) {
 		event.preventDefault();
 	});
-	
+
+	this.isCamMoving = false;
+	this.isCamRotating = false;
+
 	this.prevCursorCoord = [];
 	this.isCamDragging = false;
 	this.isCamDown = false;
 	$(this.icon).mousedown(function() {
+		that.isCamMoving = true;
+		that.isCamRotating = false;
+
 		that.isCamDragging = false;
 		that.isCamDown = true;
 		console.log(that.getCamIconOverlay().getPosition());
 		console.log(that.cursorCoord);
-		that.prevCursorCoord = [that.cursorCoord[0], that.cursorCoord[1]];
-	}).mousemove(function() {
-		if (that.isCamDown) {
+		that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
+	});
+	$(document).mousemove(function() {
+		if (that.isCamDown && that.isCamMoving) {
 			that.isCamDragging = true;
 			console.log(that.getCamIconOverlay().getPosition());
 			console.log(that.cursorCoord);
-			
+
 			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
 			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
-			
+
 			var camPos = that.getCamIconOverlay().getPosition();
 			var secPos = that.getCamSectorOverlay().getPosition();
-			
-			that.getCamIconOverlay().setPosition([camPos[0] + distancex, camPos[1] + distancey]);
-			that.getCamSectorOverlay().setPosition([secPos[0] + distancex, secPos[1] + distancey]);
+
+			that.getCamIconOverlay().setPosition([ camPos[0] + distancex, camPos[1] + distancey ]);
+			that.getCamSectorOverlay().setPosition([ secPos[0] + distancex, secPos[1] + distancey ]);
 			that.updateCesiumCameraPosition();
-			that.prevCursorCoord = [that.cursorCoord[0], that.cursorCoord[1]];
+			that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
 		}
 	}).mouseup(function() {
-		var wasCamDragging = that.isCamDragging;
-		var wasCamDown = that.isCamDown;
-		that.isCamDragging = false;
-		that.isCamDown = false;
-		console.log(that.getCamIconOverlay().getPosition());
-		console.log(that.cursorCoord);
-		
-		var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
-		var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
-		
-		var camPos = that.getCamIconOverlay().getPosition();
-		var secPos = that.getCamSectorOverlay().getPosition();
-		
-		that.getCamIconOverlay().setPosition([camPos[0] + distancex, camPos[1] + distancey]);
-		that.getCamSectorOverlay().setPosition([secPos[0] + distancex, secPos[1] + distancey]);
-		that.updateCesiumCameraPosition();
-		that.prevCursorCoord = [that.cursorCoord[0], that.cursorCoord[1]];
-		
-		if (!wasCamDragging || !wasCamDown) {
-			// error
+		if (that.isCamMoving) {
+			that.isCamMoving = false;
+			that.isCamRotating = false;
+
+			var wasCamDragging = that.isCamDragging;
+			var wasCamDown = that.isCamDown;
+			that.isCamDragging = false;
+			that.isCamDown = false;
+			console.log(that.getCamIconOverlay().getPosition());
+			console.log(that.cursorCoord);
+
+			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
+			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
+
+			var camPos = that.getCamIconOverlay().getPosition();
+			var secPos = that.getCamSectorOverlay().getPosition();
+
+			that.getCamIconOverlay().setPosition([ camPos[0] + distancex, camPos[1] + distancey ]);
+			that.getCamSectorOverlay().setPosition([ secPos[0] + distancex, secPos[1] + distancey ]);
+			that.updateCesiumCameraPosition();
+			that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
+
+			if (!wasCamDragging || !wasCamDown) {
+				// error
+			}
+		}
+	});
+
+	this.rdragging = false, this.target_wp, this.o_x, this.o_y, this.h_x, this.h_y, this.last_angle;
+	$(this.sector).mousedown(function(e) {
+		that.isCamMoving = false;
+		that.isCamRotating = true;
+
+		that.h_x = e.pageX;
+		that.h_y = e.pageY; // clicked point
+		e.preventDefault();
+		e.stopPropagation();
+		that.rdragging = true;
+		that.target_wp = $(that.sector);
+		if (!that.target_wp.data("origin"))
+			that.target_wp.data("origin", {
+				left : that.target_wp.offset().left,
+				top : that.target_wp.offset().top
+			});
+		that.o_x = that.target_wp.data("origin").left;
+		that.o_y = that.target_wp.data("origin").top; // origin point
+
+		that.last_angle = that.target_wp.data("last_angle") || 0;
+	})
+
+	$(document).mousemove(function(e) {
+		if (that.rdragging && that.isCamRotating) {
+			var s_x = e.pageX, s_y = e.pageY; // start rotate point
+			if (s_x !== that.o_x && s_y !== that.o_y) { // start rotate
+				var s_rad = Math.atan2(s_y - that.o_y, s_x - that.o_x); // current
+				// to
+				// origin
+				s_rad -= Math.atan2(that.h_y - that.o_y, that.h_x - that.o_x); // handle
+				// to
+				// origin
+				s_rad += that.last_angle; // relative to the last one
+				var degree = (s_rad * (360 / (2 * Math.PI)));
+				that.target_wp.css('-moz-transform', 'rotate(' + degree + 'deg)');
+				that.target_wp.css('-moz-transform-origin', '50% 50%');
+				that.target_wp.css('-webkit-transform', 'rotate(' + degree + 'deg)');
+				that.target_wp.css('-webkit-transform-origin', '50% 50%');
+				that.target_wp.css('-o-transform', 'rotate(' + degree + 'deg)');
+				that.target_wp.css('-o-transform-origin', '50% 50%');
+				that.target_wp.css('-ms-transform', 'rotate(' + degree + 'deg)');
+				that.target_wp.css('-ms-transform-origin', '50% 50%');
+				that.updateCesiumCameraPosition(degree);
+			}
+		}
+	}); // end mousemove
+
+	$(document).mouseup(function(e) {
+		if (that.isCamRotating) {
+			that.isCamMoving = false;
+			that.isCamRotating = false;
+
+			that.rdragging = false;
+			var s_x = e.pageX, s_y = e.pageY;
+
+			// Saves the last angle for future iterations
+			var s_rad = Math.atan2(s_y - that.o_y, s_x - that.o_x); // current
+			// to
+			// origin
+			s_rad -= Math.atan2(that.h_y - that.o_y, that.h_x - that.o_x); // handle
+			// to
+			// origin
+			s_rad += that.last_angle;
+			that.target_wp.data("last_angle", s_rad);
 		}
 	});
 }
@@ -288,31 +367,33 @@ gb3d.Camera.prototype.updateCamCartigraphicPosition = function() {
 
 	this.getCamSectorOverlay().setPosition(coord);
 	this.getCamIconOverlay().setPosition(coord);
-	
+
 	var degree = Cesium.Math.toDegrees(this.getCesiumCamera().heading);
-	$(this.getCamSectorImage()).css("transform", "rotate("+degree+"deg)");
-//	this.getCamSectorOverlay().setRotation(degree);
+	$(this.getCamSectorImage()).css("transform", "rotate(" + degree + "deg)");
+	// this.getCamSectorOverlay().setRotation(degree);
 };
 
 /**
  * cesium camera의 3차원 지도상 위치를 업데이트 한다.
  * 
  * @method gb3d.Map#updateCesiumCameraPosition
+ * @param {number}
+ *            heading - 카메라 각도 degree
  */
-gb3d.Camera.prototype.updateCesiumCameraPosition = function() {
+gb3d.Camera.prototype.updateCesiumCameraPosition = function(heading) {
 	var camPos = this.getCamIconOverlay().getPosition();
-//	var camCart = Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1]);
+	// var camCart = Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1]);
 	var ccam = this.getCesiumCamera();
 	console.log(ccam.positionWC);
 	console.log(ccam.positionCartographic);
 	var carto = ccam.positionCartographic;
 	ccam.flyTo({
-	    destination : Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1], carto["height"]),
-	    duration: 0,
-	    orientation : {
-	    	heading: ccam.heading,
-	    	pitch: ccam.pitch,
-	    	roll: ccam.roll
-	    }
+		destination : Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1], carto["height"]),
+		duration : 0,
+		orientation : {
+			heading : heading ? Cesium.Math.toRadians(heading) : ccam.heading,
+			pitch : ccam.pitch,
+			roll : ccam.roll
+		}
 	});
 };

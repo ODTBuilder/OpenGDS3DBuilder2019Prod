@@ -99,20 +99,6 @@ gb3d.Map = function(obj) {
 	this.cesiumViewer.scene.primitives.add(tileset);
 	this.cesiumViewer.zoomTo(tileset);
 	
-	var longitude = -2.1480545852753163;
-	var latitude = 0.7688240036937101;
-	var range = 0.000002;
-	var duration = 4.0;
-
-//	var entity = this.cesiumViewer.entities.add({
-//	    position : Cesium.Cartesian3.fromRadians(longitude, latitude),
-//	    model : {
-//	        uri : options.testTiles
-//	    }
-//	});
-//	this.cesiumViewer.scene.primitives.add(entity);
-//	this.cesiumViewer.zoomTo(entity);
-	
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
 	this.maxCRS = [ 180.0, 90.0 ];
