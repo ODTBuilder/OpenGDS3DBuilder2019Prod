@@ -131,8 +131,7 @@ html, body {
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
 				</a></li>
 				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
-							code="lang.edit" />
-				</a></li>
+							code="lang.edit" /> </a></li>
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
 				</a></li>
@@ -185,28 +184,32 @@ html, body {
 				"layers" : []
 			}
 		});
-		
+
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
 		});
-		
-		var baseCRS =  new gb.crs.BaseCRS({
-			"locale" :  locale !== "" ? locale : "en",
+
+		var baseCRS = new gb.crs.BaseCRS({
+			"locale" : locale !== "" ? locale : "en",
 			"message" : $(".epsg-now")[0],
 			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
 			"epsg" : "4326"
 		});
-		
+
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
 			"target" : $(".area-3d")[0],
 			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
 		});
-		
+
 		var gbCam = gb3dMap.getCamera();
-		
+
+		var uploadB3DM = new gb3d.io.B3DMManager({
+			"locale" : locale !== "" ? locale : "en"
+		});
+
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];
 			var maxCRS = [ 179, 89 ];
@@ -325,11 +328,11 @@ html, body {
 				locale : locale || "en",
 				isEditing : gb.module.isEditing
 			});
-			
+
 			var epan3d = new gb3d.edit.EditingTool3D({
 				targetElement : $(".area-3d")[0],
-				map: gb3dMap,
-				isDisplay: false,
+				map : gb3dMap,
+				isDisplay : false,
 				locale : locale || "en"
 			});
 
@@ -338,7 +341,7 @@ html, body {
 				epan.editToolToggle();
 				epan3d.toggleTool();
 			});
-			
+
 			// feature list
 			var featureList = new gb.layer.FeatureList({
 				map : gbMap.getUpperMap(),
@@ -351,7 +354,7 @@ html, body {
 				getFeatureURL : urlList.getWFSFeature + urlList.token,
 				isDisplay : false
 			});
-			
+
 			otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
 				var treeid = data.selected[0];
 				var layer = data.instance.get_LayerById(treeid);
@@ -370,7 +373,7 @@ html, body {
 					featureList.updateFeatureList(layer);
 				}
 			});
-			
+
 			// 검수 수행 Modal 생성
 			var validation = new gb.validation.Validation({
 				"autoOpen" : false,
@@ -402,7 +405,7 @@ html, body {
 						conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
 						$(".builderContent").css("height", conHeight);
 					}
-					
+
 					//현재 보이는 브라우저 내부 영역의 너비
 					var winWidth = $(window).innerWidth();
 					//컨텐츠 (지도) 영역의 너비 지정
@@ -421,13 +424,13 @@ html, body {
 				}
 			}
 			gitrnd.resize();
-			
+
 			$(window).resize(function() {
 				gitrnd.resize();
 			});
-			
-// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
-// 			gbMap.getLowerMap().getView().setZoom(15);
+
+			// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
+			// 			gbMap.getLowerMap().getView().setZoom(15);
 
 		});
 
