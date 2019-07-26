@@ -142,6 +142,7 @@ gb3d.Camera = function(obj) {
 	});
 
 	$(this.icon).hover(function() {
+		that.isHover = true;
 		$(that.icon).css({
 			"opacity" : 1
 		});
@@ -149,6 +150,7 @@ gb3d.Camera = function(obj) {
 			"opacity" : 1
 		});
 	}, function() {
+		that.isHover = false;
 		$(that.icon).css({
 			"opacity" : 0.6
 		});
@@ -158,7 +160,7 @@ gb3d.Camera = function(obj) {
 	});
 
 	this.isHover = false;
-	
+
 	$(this.sector).hover(function() {
 		that.isHover = true;
 		$(that.icon).css({
@@ -234,7 +236,7 @@ gb3d.Camera = function(obj) {
 			that.getCamSectorOverlay().setPosition([ secPos[0] + distancex, secPos[1] + distancey ]);
 			that.updateCesiumCameraPosition();
 			that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
-			
+
 			if (!wasCamDragging || !wasCamDown) {
 				// error
 			}
