@@ -365,8 +365,8 @@ gb3d.Map.prototype.renderThreeObj = function(){
 
 		// configure entity position and orientation
 		if(!objs[i].getModCount()){
-			objs[i].getObject().position.copy(center);
-			objs[i].getObject().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			//objs[i].getObject().position.copy(center);
+			//objs[i].getObject().lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		}
 //		objs[i].getObject().up.copy(latDir);
 	}
@@ -486,11 +486,12 @@ gb3d.Map.prototype.addThreeObject = function(object){
  * @param {Array.<Number> | Array.<Array.<Number>>} arr - Polygon or Point feature coordinates
  * @param {Array.<Number>} extent - Extent
  */
-gb3d.Map.prototype.createObjectByCoord = function(type, arr, extent, attr){
+gb3d.Map.prototype.createObjectByCoord = function(type, feature){
 	this.objectAttr.type = type;
-	this.objectAttr.coordinate = arr;
-	this.objectAttr.extent = extent;
-	this.objectAttr.attr = attr;
+	this.objectAttr.coordinate = feature.getGeometry().getCoordinates(true);
+	this.objectAttr.extent = feature.getGeometry().getExtent();
+	this.objectAttr.attr = feature.getId();
+	this.objectAttr.feature = feature;
 	
 	switch(type){
 	case "Point":
@@ -521,7 +522,9 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 		type = option.type || "box",
 		width = option.width || 40,
 		height = option.height || 40,
-		depth = option.depth || 40;
+		depth = option.depth || 40,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 	
 	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
 	geometry.vertices.forEach(function(vert, v){
@@ -533,7 +536,9 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	});
 	
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-	latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
+	latheMesh.position.copy(centerCart);
+	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	this.getThreeScene().add(latheMesh);
 	
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -570,11 +575,11 @@ gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 		if(coord[i][0] instanceof Array){
 			for(var j = 0; j < coord[i].length; j++){
 				cart = Cesium.Cartesian3.fromDegrees(coord[i][j][0], coord[i][j][1]);
-				curve.points.push(new THREE.Vector3(cart.x, cart.y, 0));
+				curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
 			}
 		} else {
 			cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
-			curve.points.push(new THREE.Vector3(cart.x, cart.y, 0));
+			curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
 		}
 	}
 	
@@ -586,19 +591,20 @@ gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 	shape = new THREE.Shape(points);
 	
 	geometry = new THREE.ExtrudeBufferGeometry(shape, {
-		steps: 200,
+		steps: 100,
 		bevelEnabled: false,
 		extrudePath: curve
 	});
 	
-	geometry.translate(-centerCart.x, -centerCart.y, 0);
+	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 	
 	var doubleSideMaterial = new THREE.MeshNormalMaterial({
 		side : THREE.DoubleSide
 	});
 	
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-	latheMesh.scale.set(1, 1, 1);
+	//latheMesh.scale.set(1, 1, 1);
+	latheMesh.position.copy(centerCart);
 	this.getThreeScene().add(latheMesh);
 	
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -618,51 +624,72 @@ gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var coord = arr,
-		points = [],
 		geometry,
 		shape,
 		cart,
+		result,
 		obj3d,
-		depth = option.depth || 50,
+		depth = option.depth ? parseFloat(option.depth) : 50.0,
 		x = extent[0] + (extent[2] - extent[0]) / 2,
 		y = extent[1] + (extent[3] - extent[1]) / 2,
-		centerCart = Cesium.Cartesian3.fromDegrees(x, y);
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 	
-	for(var i = 0; i < coord[0].length; i++){
-		if(coord[0][i][0] instanceof Array){
-			for(var j = 0; j < coord[0][i].length - 1; j++){
-				cart = Cesium.Cartesian3.fromDegrees(coord[0][i][j][0], coord[0][i][j][1]);
-				points.push(new THREE.Vector2(cart.x, cart.y));
-			}
-		} else {
-			if(i == coord[0].length - 1){
-				break;
-			}
-			cart = Cesium.Cartesian3.fromDegrees(coord[0][i][0], coord[0][i][1]);
-			points.push(new THREE.Vector2(cart.x, cart.y));
-		}
+//	for(var i = 0; i < coord[0].length; i++){
+//		if(coord[0][i][0] instanceof Array){
+//			for(var j = 0; j < coord[0][i].length - 1; j++){
+//				cart = Cesium.Cartesian3.fromDegrees(coord[0][i][j][0], coord[0][i][j][1]);
+//				points.push(new THREE.Vector2(cart.x, cart.y));
+//			}
+//		} else {
+//			if(i == coord[0].length - 1){
+//				break;
+//			}
+//			cart = Cesium.Cartesian3.fromDegrees(coord[0][i][0], coord[0][i][1]);
+//			points.push(new THREE.Vector2(cart.x, cart.y));
+//		}
+//	}
+//	
+//	shape = new THREE.Shape(points);
+//	geometry = new THREE.ExtrudeGeometry(shape, {
+//		depth: depth,
+//		steps: 1,
+//		material: 0,
+//		extrudeMaterial: 1,
+//		bevelEnabled: false
+//	});
+	
+	if(this.objectAttr.type === "MultiPolygon"){
+		result = gb3d.Map.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
+	} else if(this.objectAttr.type === "Polygon"){
+		result = gb3d.Map.getPolygonVertexAndFaceFromDegrees(coord[0], depth);
+	} else {
+		return;
 	}
 	
-	shape = new THREE.Shape(points);
-	geometry = new THREE.ExtrudeGeometry(shape, {
-		depth: depth,
-		steps: 1,
-		material: 0,
-		extrudeMaterial: 1,
-		bevelEnabled: false
-	});
+	geometry = new THREE.Geometry();
+	geometry.vertices = result.points;
+	geometry.faces = result.faces;
+	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 	
-	geometry.translate(-centerCart.x, -centerCart.y, 0);
+	// compute Normals
+//	geometry.computeVertexNormals();
+	
+	// compute face Normals
+	geometry.computeFaceNormals();
 	
 	var doubleSideMaterial = new THREE.MeshNormalMaterial({
 		side : THREE.DoubleSide
 	});
 	
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-	latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
+	latheMesh.position.copy(centerCart);
+//	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	this.getThreeScene().add(latheMesh);
 	
 	// userData 저장(THREE.Object3D 객체 속성)
+	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
 	
 	obj3d = new gb3d.object.ThreeObject({
@@ -674,6 +701,81 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	
 	this.addThreeObject(obj3d);
 	return obj3d;
+}
+
+gb3d.Map.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
+	var coord = arr,
+		points = [],
+		faceBottom = [],
+		faceTop = [],
+		faceSide = [],
+		faces = [],
+		coordLength = coord.length - 1,
+		cart,
+		depth = depth;
+	
+	// 3차원 객체 밑면 vertex 계산
+	for(var i = 0; i < coordLength; i++){
+		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
+		points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
+	}
+	
+	faceBottom = THREE.ShapeUtils.triangulateShape(points, []);
+	
+	for(var i = 0; i < faceBottom.length; i++){
+		faceTop.push([faceBottom[i][0] + coordLength, faceBottom[i][1] + coordLength, faceBottom[i][2] + coordLength]);
+	}
+	
+	// 3차원 객체 윗면 vertex 계산
+	var a, b, u, v, w, s;
+	for(var i = 0; i < coordLength; i++){
+		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
+		
+		if(i !== 0){
+	//		faceSide.push([i + coordLength, i - 1 + coordLength, i - 1]);
+	//		faceSide.push([i - 1, i, i + coordLength]);
+			
+			faceSide.push([i - 1, i - 1 + coordLength, i]);
+			faceSide.push([i - 1 + coordLength, i + coordLength, i]);
+		}
+		
+		if(i === 0){
+			a = Cesium.Cartesian3.fromDegrees(coord[i+1][0], coord[i+1][1]);
+			b = Cesium.Cartesian3.fromDegrees(coord[coordLength - 1][0], coord[coordLength - 1][1]);
+			
+			a.x = a.x - cart.x;
+			a.y = a.y - cart.y;
+			a.z = a.z - cart.z;
+			b.x = b.x - cart.x;
+			b.y = b.y - cart.y;
+			b.z = b.z - cart.z;
+			
+			u = -a.z*b.y + a.y*b.z;
+			v = a.z*b.x - a.x*b.z;
+			w = -a.y*b.x + a.x*b.y;
+			
+			s = Math.sqrt(Math.pow(u, 2) + Math.pow(v, 2) + Math.pow(w, 2));
+		}
+		
+		points.push(new THREE.Vector3(cart.x + (u/s)*depth, cart.y + (v/s)*depth, cart.z + (w/s)*depth));
+	}
+	
+	for(var i = 0; i < faceBottom.length; i++){
+		faces.push(new THREE.Face3(faceBottom[i][0], faceBottom[i][1], faceBottom[i][2]));
+	}
+	
+	for(var i = 0; i < faceTop.length; i++){
+		faces.push(new THREE.Face3(faceTop[i][0], faceTop[i][1], faceTop[i][2]));
+	}
+	
+	for(var i = 0; i < faceSide.length; i++){
+		faces.push(new THREE.Face3(faceSide[i][0], faceSide[i][1], faceSide[i][2]));
+	}
+	
+	return {
+		points: points,
+		faces: faces
+	}
 }
 
 gb3d.Map.prototype.getThreeObjectById = function(id){
@@ -717,6 +819,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		points = [],
 		threeObject,
 		object = undefined,
+		result,
 		geometry,
 		shape,
 		cart;
@@ -733,30 +836,27 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		return;
 	}
 	
-	var opt = geometry.parameters.options;
+	var opt = object.userData;
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
 	
-	if(geometry instanceof THREE.ExtrudeGeometry){
-		for(var i = 0; i < coord[0].length; i++){
-			if(coord[0][i][0] instanceof Array){
-				for(var j = 0; j < coord[0][i].length - 1; j++){
-					cart = Cesium.Cartesian3.fromDegrees(coord[0][i][j][0], coord[0][i][j][1]);
-					points.push(new THREE.Vector2(cart.x, cart.y));
-				}
-			} else {
-				if(i == coord[0].length - 1){
-					break;
-				}
-				cart = Cesium.Cartesian3.fromDegrees(coord[0][i][0], coord[0][i][1]);
-				points.push(new THREE.Vector2(cart.x, cart.y));
-			}
+	if(geometry instanceof THREE.Geometry){
+		if(opt.type === "MultiPolygon"){
+			result = gb3d.Map.getPolygonVertexAndFaceFromDegrees(coord[0][0], opt.depth);
+		} else if(opt.type === "Polygon"){
+			result = gb3d.Map.getPolygonVertexAndFaceFromDegrees(coord[0], opt.depth);
+		} else {
+			return;
 		}
 		
-		shape = new THREE.Shape(points);
-		geometry = new THREE.ExtrudeGeometry(shape, opt);
-		geometry.translate(-centerCart.x, -centerCart.y, 0);
+		geometry = new THREE.Geometry();
+		geometry.vertices = result.points;
+		geometry.faces = result.faces;
+		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 		object.geometry = geometry;
+		
+		// compute face Normals
+		geometry.computeFaceNormals();
 	} else if(geometry instanceof THREE.ExtrudeBufferGeometry){
 		var curve = new THREE.CatmullRomCurve3();
 		for(var i = 0; i < coord.length; i++){
@@ -794,7 +894,8 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	threeObject.upModCount();
 	threeObject.setCenter(center);
 	
-	cart = Cesium.Cartesian3.fromDegrees(coord[0], coord[1]);
+//	cart = Cesium.Cartesian3.fromDegrees(coord[0], coord[1]);
 	var position = threeObject.getObject().position;
-	position.copy(cart);
+	position.copy(centerCart);
 };
+

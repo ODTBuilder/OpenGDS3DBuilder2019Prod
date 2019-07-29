@@ -176,8 +176,8 @@ html, body {
 
 		var map = new gb3d.Map({
 			"target2d" : $(".area-2d")[0],
-			"target3d" : $(".area-3d")[0]
-// 			"initPosition" : [ 127.100912, 37.401746 ]
+			"target3d" : $(".area-3d")[0],
+ 			"initPosition" : [ 127.100912, 37.401746 ]
 		});
 		var gbMap = map.getGbMap();
 
@@ -202,7 +202,7 @@ html, body {
 			var entity = {
 				name : 'Polygon',
 				polygon : {
-					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1], ]),
+					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1]]),
 					material : Cesium.Color.RED.withAlpha(1)
 				}
 			};

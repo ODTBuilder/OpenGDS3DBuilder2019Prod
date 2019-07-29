@@ -1637,15 +1637,13 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						addPropModal.close();
 						
 						// ----- ThreeJS Object Create --------
-						map.createObjectByCoord(that.selectedSource.get("git").geometry, 
-								feature.getGeometry().getCoordinates(), feature.getGeometry().getExtent(), feature.getId());
+						map.createObjectByCoord(that.selectedSource.get("git").geometry, feature);
 					});
 					addPropModal.modalHead.remove();
 					
 					if(source.get("git").attribute.length === 0){
 						// ----- ThreeJS Object Create --------
-						map.createObjectByCoord(that.selectedSource.get("git").geometry, 
-								feature.getGeometry().getCoordinates(), feature.getGeometry().getExtent(), feature.getId());
+						map.createObjectByCoord(that.selectedSource.get("git").geometry, feature);
 					}
 				}
 			}
