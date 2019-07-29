@@ -121,7 +121,7 @@ html, body {
 				</a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li>
-						<li><a href="#"><spring:message code="lang.importZip"></spring:message></a></li>
+						<li><a href="#" id="importB3dmBtn"><spring:message code="lang.importZip"></spring:message></a></li>
 						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li>
 					</ul></li>
 				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
@@ -210,6 +210,10 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
+		$("#importB3dmBtn").click(function(){
+			uploadB3DM.open();
+		});
+		
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];
 			var maxCRS = [ 179, 89 ];
@@ -462,6 +466,7 @@ html, body {
 			$(this).parent().remove();
 
 		});
+		
 	</script>
 </body>
 </html>
