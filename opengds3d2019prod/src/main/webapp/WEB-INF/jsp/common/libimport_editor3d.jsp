@@ -162,3 +162,4 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
