@@ -146,9 +146,10 @@ html, body {
 		<!-- 		<span class="navbar-left gb-footer-span"><span class="gb-scale-line-area" style="margin-right: 118px;"></span></span> -->
 		<span class="navbar-left gb-footer-span"><i class="fas fa-globe"></i>&nbsp;<a href="#"
 			class="epsg-now btn-link"></a></span> <span id="feature-toggle-btn" class="navbar-left gb-footer-span"><i
-			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span> <span
-			id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span
-			class="btn-link"><spring:message code="lang.command" /></span></span> <span class="navbar-left gb-footer-span"> <i
+			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span> 
+<!-- 			<span id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span -->
+<%-- 			class="btn-link"><spring:message code="lang.command" /></span></span>  --%>
+			<span class="navbar-left gb-footer-span"> <i
 			class="fas fa-map-marked-alt"></i>&nbsp;<span>&nbsp;</span><span class="mouse-position btn-link"
 			style="display: inline-block;"></span></span> <span class="text-muted navbar-right gb-footer-span"><span
 			class="help-message"></span></span>
@@ -185,6 +186,10 @@ html, body {
 			}
 		});
 
+		var mousePosition = new gb.map.MousePosition({
+			map : gbMap.getUpperMap()
+		});
+		
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
@@ -210,60 +215,9 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
-		$("#importB3dmBtn").click(function(){
+		$("#importB3dmBtn").click(function() {
 			uploadB3DM.open();
 		});
-		
-		function init3DObject() {
-			var minCRS = [ -180, -89 ];
-			var maxCRS = [ 179, 89 ];
-			// Cesium entity
-			var entity = {
-				name : 'Polygon',
-				polygon : {
-					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1]]),
-					material : Cesium.Color.RED.withAlpha(1)
-				}
-			};
-			var Polygon = gb3dMap.getCesiumViewer().entities.add(entity);
-
-			// Three.js Objects
-			// Lathe geometry
-			var doubleSideMaterial = new THREE.MeshNormalMaterial({
-				side : THREE.DoubleSide
-			});
-			var segments = 10;
-			var points = [];
-			for (var i = 0; i < segments; i++) {
-				points.push(new THREE.Vector2(Math.sin(i * 0.2) * segments + 5, (i - 5) * 2));
-			}
-			var geometry = new THREE.LatheGeometry(points);
-			var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-			latheMesh.scale.set(1000, 1000, 1000); // scale object to be visible at 
-			// planet scale
-			// 아마 z값은 스케일의 10배?
-			latheMesh.position.z += 10000; // translate "up" in Three.js space
-			// so the "bottom" of the mesh is
-			// the handle
-			latheMesh.rotation.x = Math.PI / 2;
-			// rotate mesh for Cesium's Y-up
-			// system
-			var latheMeshYup = new THREE.Group();
-			latheMeshYup.add(latheMesh);
-			//map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
-			// Three.js scene manually
-			// three.control.attach(latheMeshYup);
-
-			var obj3d = new gb3d.object.ThreeObject({
-				"object" : latheMeshYup,
-				"center" : [ 127.100912, 37.401746 ]
-			});
-
-			//map.addThreeObject(obj3d);
-
-		}
-
-		init3DObject();
 
 		$(document).ready(function() {
 
@@ -285,7 +239,7 @@ html, body {
 				"locale" : locale !== "" ? locale : "en"
 			});
 
-			otree = new gb.tree.OpenLayers({
+			otree = new gb3d.tree.OpenLayers({
 				"locale" : locale || "en",
 				"append" : $(".builderLayerClientPanel")[0],
 				"map" : gbMap.getUpperMap(),
@@ -297,7 +251,7 @@ html, body {
 				}
 			});
 
-			var gtree = new gb.tree.GeoServer({
+			var gtree = new gb3d.tree.GeoServer({
 				"locale" : locale !== "" ? locale : "en",
 				"height" : "300px",
 				"append" : $(".builderLayerGeoServerPanel")[0],
@@ -466,7 +420,6 @@ html, body {
 			$(this).parent().remove();
 
 		});
-		
 	</script>
 </body>
 </html>
