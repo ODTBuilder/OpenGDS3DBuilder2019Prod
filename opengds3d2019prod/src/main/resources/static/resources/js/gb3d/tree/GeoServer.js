@@ -63,7 +63,7 @@ gb3d.tree.GeoServer = function(obj) {
 	this.deleteGeoServerURL = url.deleteGeoServer ? url.deleteGeoServer : undefined;
 	this.deleteGeoServerLayerURL = url.deleteGeoServerLayer ? url.deleteGeoServerLayer : undefined;
 	this.geoserverInfoURL = url.geoserverInfo ? url.geoserverInfo : undefined;
-	
+
 	this.getTreeURL = url.getTree ? url.getTree : undefined;
 	this.getMapWMS = url.getMapWMS ? url.getMapWMS : undefined;
 	this.getWFSFeature = url.getWFSFeature ? url.getWFSFeature : undefined;
@@ -545,7 +545,7 @@ gb3d.tree.GeoServer = function(obj) {
 									}
 							}
 							totalObj["info"] = infoObj;
-							
+
 							/*
 							 * var setObj = { "separator_before" : false, "icon" :
 							 * "fas fa-cog", "separator_after" : false,
@@ -674,7 +674,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(layer);
-										
+
 										for (var i = 0; i < store.length; i++) {
 											var storeObj =  inst.get_node(store[i]);
 											var parent = storeObj.parent;
@@ -684,7 +684,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(store);
-										
+
 										var sortNodes = work.concat(store).concat(layer);
 										console.log(sortNodes);
 										var loadOrder = [];
@@ -756,7 +756,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(layer);
-										
+
 										for (var i = 0; i < store.length; i++) {
 											var storeObj =  inst.get_node(store[i]);
 											var parent = storeObj.parent;
@@ -766,7 +766,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(store);
-										
+
 										var sortNodes = work.concat(store).concat(layer);
 										console.log(sortNodes);
 										var loadOrder = [];
@@ -838,7 +838,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(layer);
-										
+
 										for (var i = 0; i < store.length; i++) {
 											var storeObj =  inst.get_node(store[i]);
 											var parent = storeObj.parent;
@@ -848,7 +848,7 @@ gb3d.tree.GeoServer = function(obj) {
 											}
 										}
 										console.log(store);
-										
+
 										var sortNodes = work.concat(store).concat(layer);
 										console.log(sortNodes);
 										var loadOrder = [];
@@ -1603,7 +1603,7 @@ gb3d.tree.GeoServer = function(obj) {
 									"action" : function(data) {
 										var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 										var arr, workspace = [];
-										
+
 										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
 										// Edit Tool 활성화 상태시 실행 중지
 										if(isEdit instanceof Object){
@@ -1612,7 +1612,7 @@ gb3d.tree.GeoServer = function(obj) {
 												return
 											}
 										}
-										
+
 										if (inst.is_selected(obj)) {
 											arr = inst.get_node(obj.parents[obj.parents.length - 2]).children;
 											for (var i = 0; i < arr.length; i++) {
@@ -1684,13 +1684,13 @@ gb3d.tree.GeoServer = function(obj) {
 	if (!!this.properties) {
 		this.properties.setRefer(this.jstree);
 	}
-	
+
 	$(document).on("click", "#geoserverAddConfirm", function(e){
 		var name,
-			url,
-			id,
-			pass;
-		
+		url,
+		id,
+		pass;
+
 		$(".gb-geoserver-add-input").each(function(index){
 			if($(this).hasClass("geoserver-name")){
 				name = $(this).val();
@@ -1702,7 +1702,7 @@ gb3d.tree.GeoServer = function(obj) {
 				pass = $(this).val();
 			}
 		});
-		
+
 		that.addGeoServer(name, url, id, pass);
 	});
 };
@@ -1898,22 +1898,22 @@ gb3d.tree.GeoServer.prototype.openAddGeoServer = function() {
 
 	var gBody = $("<form>").addClass("gb-geoserver-add-table").append(gNameArea).append(gURLArea).append(gIDArea).append(gPassArea);
 
-// var addGeoServerModal = new gb.modal.ModalBase({
-// "title" : that.translation["addgeoserver"][that.locale],
-// "width" : 540,
-// "height" : 400,
-// "autoOpen" : true,
-// "body" : gBody,
-// "footer" : modalFooter
-// });
-// $(closeBtn).click(function() {
-// addGeoServerModal.close();
-// });
-// $(okBtn).click(function() {
-// that.addGeoServer($(gNameInput).val(), $(gURLInput).val(), $(gIDInput).val(),
-// $(gPassInput).val(), addGeoServerModal);
-// });
-	that.addGeoserverModal.modal("show");
+	var addGeoServerModal = new gb.modal.ModalBase({
+		"title" : that.translation["addgeoserver"][that.locale],
+		"width" : 540,
+		"height" : 400,
+		"autoOpen" : true,
+		"body" : gBody,
+		"footer" : modalFooter
+	});
+	$(closeBtn).click(function() {
+		addGeoServerModal.close();
+	});
+	$(okBtn).click(function() {
+		that.addGeoServer($(gNameInput).val(), $(gURLInput).val(), $(gIDInput).val(),
+				$(gPassInput).val(), addGeoServerModal);
+	});
+// that.addGeoserverModal.modal("show");
 };
 
 /**
@@ -1931,7 +1931,7 @@ gb3d.tree.GeoServer.prototype.openAddGeoServer = function() {
  * @param {gb.modal.ModalBase}
  *            modal - 완료 후 창을 닫을 모달 객체
  */
-gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password) {
+gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, modal) {
 	var that = this;
 	console.log("add geoserver");
 	console.log(name);
@@ -1958,7 +1958,7 @@ gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password) {
 		},
 		success : function(data,textStatus,jqXHR) {
 			console.log(data);
-			that.addGeoserverModal.modal("hide");
+			modal.close();
 			if (data === true) {
 				that.refreshList();
 			}

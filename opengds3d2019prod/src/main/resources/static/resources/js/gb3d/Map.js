@@ -95,6 +95,8 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
+	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+	
 	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
 	this.cesiumViewer.scene.primitives.add(tileset);
 	this.cesiumViewer.zoomTo(tileset);

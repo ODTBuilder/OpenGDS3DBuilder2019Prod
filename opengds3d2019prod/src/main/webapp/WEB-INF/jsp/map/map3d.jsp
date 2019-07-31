@@ -132,6 +132,9 @@ html, body {
 				</a></li>
 				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
 							code="lang.edit" /> </a></li>
+				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
+						<spring:message code="lang.baseMap" />
+				</a></li>
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
 				</a></li>
@@ -146,13 +149,12 @@ html, body {
 		<!-- 		<span class="navbar-left gb-footer-span"><span class="gb-scale-line-area" style="margin-right: 118px;"></span></span> -->
 		<span class="navbar-left gb-footer-span"><i class="fas fa-globe"></i>&nbsp;<a href="#"
 			class="epsg-now btn-link"></a></span> <span id="feature-toggle-btn" class="navbar-left gb-footer-span"><i
-			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span> 
-<!-- 			<span id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span -->
-<%-- 			class="btn-link"><spring:message code="lang.command" /></span></span>  --%>
-			<span class="navbar-left gb-footer-span"> <i
-			class="fas fa-map-marked-alt"></i>&nbsp;<span>&nbsp;</span><span class="mouse-position btn-link"
-			style="display: inline-block;"></span></span> <span class="text-muted navbar-right gb-footer-span"><span
-			class="help-message"></span></span>
+			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span>
+		<!-- 			<span id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span -->
+		<%-- 			class="btn-link"><spring:message code="lang.command" /></span></span>  --%>
+		<span class="navbar-left gb-footer-span"> <i class="fas fa-map-marked-alt"></i>&nbsp;<span>&nbsp;</span><span
+			class="mouse-position btn-link" style="display: inline-block;"></span></span> <span
+			class="text-muted navbar-right gb-footer-span"><span class="help-message"></span></span>
 	</nav>
 
 	<!-- modal area -->
@@ -160,6 +162,9 @@ html, body {
 	<jsp:include page="/WEB-INF/jsp/map/infoModal.jsp" />
 	<jsp:include page="/WEB-INF/jsp/map/objectModal.jsp" />
 	<script type="text/javascript">
+		$('#geoserverModal').on('shown.bs.modal', function() {
+			$(document).off('focusin.modal');
+		});
 		var locale = '<spring:message code="lang.localeCode" />';
 
 		var urlList = {
@@ -189,11 +194,15 @@ html, body {
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
-		
+
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
+		});
+
+		$("#changeBase").click(function() {
+			gbBaseMap.open();
 		});
 
 		var baseCRS = new gb.crs.BaseCRS({
