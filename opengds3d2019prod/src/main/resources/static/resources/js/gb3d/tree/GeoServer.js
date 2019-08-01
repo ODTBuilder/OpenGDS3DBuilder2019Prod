@@ -626,87 +626,87 @@ gb3d.tree.GeoServer = function(obj) {
 							}
 						}
 						// 3d임포트 zip과 함께
-						if (o.type === "point" || o.type === "multipoint"
-							|| o.type === "linestring" || o.type === "multilinestring" || o.type === "polygon"
-								|| o.type === "multipolygon") {
-							var importObj = {
-									"separator_before" : true,
-									"icon" : "fas fa-file-archive",
-									"separator_after" : true,
-									"label" : that.translation.importwz[that.locale],
-									"action" : function(data) {
-										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
-										// Edit Tool 활성화 상태시 실행 중지
-										if(isEdit instanceof Object){
-											if(isEdit.get()){
-												isEdit.alert();
-												return
-											}
-										}
-
-										var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
-										var nodes = inst.get_selected();
-
-										console.log(obj);
-										console.log(nodes);
-										var work = [];
-										var store = [];
-										var layer = [];
-										for (var i = 0; i < nodes.length; i++) {
-											var node = inst.get_node(nodes[i]);
-											if (node.type === "workspace") {
-												work.push(node.id);
-											} else if (node.type === "datastore") {
-												store.push(node.id);
-											} else if (node.type === "point" || node.type === "multipoint"
-												|| node.type === "linestring" || node.type === "multilinestring" || node.type === "polygon"
-													|| node.type === "multipolygon") {
-												layer.push(node.id);
-											}
-										}
-
-										for (var i = 0; i < layer.length; i++) {
-											var layerObj =  inst.get_node(layer[i]);
-											var parent = layerObj.parent;
-											if (store.indexOf(parent) !== -1) {
-												layer.splice(i, 1);
-												i--;
-											}
-										}
-										console.log(layer);
-
-										for (var i = 0; i < store.length; i++) {
-											var storeObj =  inst.get_node(store[i]);
-											var parent = storeObj.parent;
-											if (work.indexOf(parent) !== -1) {
-												store.splice(i, 1);
-												i--;
-											}
-										}
-										console.log(store);
-
-										var sortNodes = work.concat(store).concat(layer);
-										console.log(sortNodes);
-										var loadOrder = [];
-										var callback = function(id) {
-											console.log(that.getLoadingList());
-											var pnode = inst.get_node(id);
-											var duplication = false;
-											var isLast = false;
-											inst.recursive_node_load(pnode, that.map.getLayers(), duplication, isLast);
-										};
-										that.initLoadingList();
-										that.initLoadingNumber();
-										for (var i = 0; i < sortNodes.length; i++) {
-											var pnodeid = sortNodes[i];
-											console.log("선택한 노드:", pnodeid);
-											console.log(that.getLoadingList());
-											that.openNodeRecursive(i, inst.get_node(sortNodes[i]), pnodeid, callback, false);
-										}
-									}
-							};
-							totalObj["importzip"] = importObj;
-						}
+//						if (o.type === "point" || o.type === "multipoint"
+//							|| o.type === "linestring" || o.type === "multilinestring" || o.type === "polygon"
+//								|| o.type === "multipolygon") {
+//							var importObj = {
+//									"separator_before" : true,
+//									"icon" : "fas fa-file-archive",
+//									"separator_after" : true,
+//									"label" : that.translation.importwz[that.locale],
+//									"action" : function(data) {
+//										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
+//										// Edit Tool 활성화 상태시 실행 중지
+//										if(isEdit instanceof Object){
+//											if(isEdit.get()){
+//												isEdit.alert();
+//												return
+//											}
+//										}
+//
+//										var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
+//										var nodes = inst.get_selected();
+//
+//										console.log(obj);
+//										console.log(nodes);
+//										var work = [];
+//										var store = [];
+//										var layer = [];
+//										for (var i = 0; i < nodes.length; i++) {
+//											var node = inst.get_node(nodes[i]);
+//											if (node.type === "workspace") {
+//												work.push(node.id);
+//											} else if (node.type === "datastore") {
+//												store.push(node.id);
+//											} else if (node.type === "point" || node.type === "multipoint"
+//												|| node.type === "linestring" || node.type === "multilinestring" || node.type === "polygon"
+//													|| node.type === "multipolygon") {
+//												layer.push(node.id);
+//											}
+//										}
+//
+//										for (var i = 0; i < layer.length; i++) {
+//											var layerObj =  inst.get_node(layer[i]);
+//											var parent = layerObj.parent;
+//											if (store.indexOf(parent) !== -1) {
+//												layer.splice(i, 1);
+//												i--;
+//											}
+//										}
+//										console.log(layer);
+//
+//										for (var i = 0; i < store.length; i++) {
+//											var storeObj =  inst.get_node(store[i]);
+//											var parent = storeObj.parent;
+//											if (work.indexOf(parent) !== -1) {
+//												store.splice(i, 1);
+//												i--;
+//											}
+//										}
+//										console.log(store);
+//
+//										var sortNodes = work.concat(store).concat(layer);
+//										console.log(sortNodes);
+//										var loadOrder = [];
+//										var callback = function(id) {
+//											console.log(that.getLoadingList());
+//											var pnode = inst.get_node(id);
+//											var duplication = false;
+//											var isLast = false;
+//											inst.recursive_node_load(pnode, that.map.getLayers(), duplication, isLast);
+//										};
+//										that.initLoadingList();
+//										that.initLoadingNumber();
+//										for (var i = 0; i < sortNodes.length; i++) {
+//											var pnodeid = sortNodes[i];
+//											console.log("선택한 노드:", pnodeid);
+//											console.log(that.getLoadingList());
+//											that.openNodeRecursive(i, inst.get_node(sortNodes[i]), pnodeid, callback, false);
+//										}
+//									}
+//							};
+//							totalObj["importzip"] = importObj;
+//						}
 						// 3d임포트 as 3d
 						if (o.type === "point" || o.type === "multipoint"
 							|| o.type === "linestring" || o.type === "multilinestring" || o.type === "polygon"

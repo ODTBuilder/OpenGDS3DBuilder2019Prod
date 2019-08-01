@@ -628,10 +628,9 @@ gb3d.tree.OpenLayers = function(obj) {
 									.reference(data.reference), obj = inst
 									.get_node(data.reference);
 									var layer = inst.get_LayerById(obj.id);
-
 								}
 						};
-						
+
 						totalObj["import3dfile"] = {
 								"separator_before" : false,
 								"icon" : "fas fa-cube",
@@ -651,9 +650,13 @@ gb3d.tree.OpenLayers = function(obj) {
 									.get_node(data.reference);
 									var layer = inst.get_LayerById(obj.id);
 
+									var modal = new gb3d.io.importerThree({
+										"locale" : that.locale
+									});
+									modal.open();
 								}
 						};
-						
+
 						totalObj["zoom"] = {
 								"separator_before" : false,
 								"icon" : "fa fa-crosshairs",
@@ -935,18 +938,16 @@ gb3d.tree.OpenLayers = function(obj) {
 						 * "last")), "label" : "Create group", "action" :
 						 * function(data) { var inst = $.jstreeol3
 						 * .reference(data.reference), obj = inst
-						 * .get_node(data.reference); inst.create_group(obj,
-						 * {}, "first", function( new_node) {
-						 * setTimeout(function() { inst.edit(new_node); },
-						 * 0); }); } }, "create" : { "separator_before" :
-						 * false, "separator_after" : true, "_disabled" :
-						 * false, // (this.check("create_node", //
-						 * data.reference, {}, // "last")), "label" :
-						 * "Create", "action" : function(data) { var inst =
-						 * $.jstreeol3 .reference(data.reference), obj =
-						 * inst .get_node(data.reference);
-						 * inst.create_node(obj, {}, "last", function(
-						 * new_node) { setTimeout(function() {
+						 * .get_node(data.reference); inst.create_group(obj, {},
+						 * "first", function( new_node) { setTimeout(function() {
+						 * inst.edit(new_node); }, 0); }); } }, "create" : {
+						 * "separator_before" : false, "separator_after" : true,
+						 * "_disabled" : false, // (this.check("create_node", //
+						 * data.reference, {}, // "last")), "label" : "Create",
+						 * "action" : function(data) { var inst = $.jstreeol3
+						 * .reference(data.reference), obj = inst
+						 * .get_node(data.reference); inst.create_node(obj, {},
+						 * "last", function( new_node) { setTimeout(function() {
 						 * inst.edit(new_node); }, 0); }); } },
 						 */
 						// "rename" : {
@@ -1013,15 +1014,14 @@ gb3d.tree.OpenLayers = function(obj) {
 						// }
 						// },
 						/*
-						 * "properties" : { "separator_before" : false,
-						 * "icon" : "fa fa-info-circle", "separator_after" :
-						 * false, "_disabled" : false, //
-						 * (this.check("delete_node", // data.reference, //
-						 * this.get_parent(data.reference), // "")), "label" :
-						 * "Properties", "action" : function(data) { var
-						 * inst = $.jstreeol3 .reference(data.reference),
-						 * obj = inst .get_node(data.reference); if
-						 * (inst.is_selected(obj)) { //
+						 * "properties" : { "separator_before" : false, "icon" :
+						 * "fa fa-info-circle", "separator_after" : false,
+						 * "_disabled" : false, // (this.check("delete_node", //
+						 * data.reference, // this.get_parent(data.reference), //
+						 * "")), "label" : "Properties", "action" :
+						 * function(data) { var inst = $.jstreeol3
+						 * .reference(data.reference), obj = inst
+						 * .get_node(data.reference); if (inst.is_selected(obj)) { //
 						 * inst.delete_node_layer(inst.get_selected()); var
 						 * layer = inst.get_LayerById(obj.id);
 						 * console.log(layer); } else { //

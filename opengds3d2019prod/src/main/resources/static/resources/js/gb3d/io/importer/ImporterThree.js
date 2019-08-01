@@ -28,13 +28,13 @@ gb3d.io.importerThree = function(obj) {
 			"ko" : "닫기",
 			"en" : "Close"
 		},
-		"upload" : {
-			"ko" : "업로드",
-			"en" : "Upload"
+		"import" : {
+			"ko" : "불러오기",
+			"en" : "Import"
 		},
 		"titlemsg" : {
-			"ko" : "3D 파일 업로드",
-			"en" : "Upload a 3D File"
+			"ko" : "3D 파일 불러오기",
+			"en" : "Import a 3D File"
 		},
 		"notice" : {
 			"ko" : "3D 파일을 업로드 해주세요. ex) *.obj..",
@@ -71,7 +71,7 @@ gb3d.io.importerThree = function(obj) {
 	var cancelBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-default").text(this.translation.close[this.locale]).click(function() {
 		that.close();
 	});
-	var uploadBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text(this.translation.upload[this.locale]).click(function() {
+	var uploadBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text(this.translation["import"][this.locale]).click(function() {
 //		that.upload();
 	});
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(uploadBtn).append(cancelBtn);
@@ -139,6 +139,7 @@ gb3d.io.importerThree.prototype.loadFile = function(file) {
 		break;
 
 	}
+	
 };
 
 /**
