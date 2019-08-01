@@ -374,6 +374,7 @@ gb.crs.BaseCRS.prototype.applyProjection = function(code, name, proj4def, bbox, 
 		var fromLonLat = ol.proj.getTransform('EPSG:4326', newProj);
 
 		// very approximate calculation of projection extent
+//		var extent = ol.extent.applyTransform([ bbox[1], bbox[2], bbox[3], bbox[0] ], fromLonLat);
 		var extent = ol.extent.applyTransform([ bbox[1], bbox[2], bbox[3], bbox[0] ], fromLonLat);
 		newProj.setExtent(extent);
 		view = new ol.View({
@@ -402,7 +403,8 @@ gb.crs.BaseCRS.prototype.applyProjection = function(code, name, proj4def, bbox, 
 			}
 		}
 	}
-	view.fit(extent);
+//	view.fit(extent);
+	view.fit([126.89620971679686, 37.38702714443207, 127.16880798339842, 37.652758955955505]);
 	console.log(this.getEPSGCode());
 	if (typeof callback === "function") {
 		callback();

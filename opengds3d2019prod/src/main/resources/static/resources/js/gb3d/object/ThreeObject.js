@@ -30,7 +30,9 @@ gb3d.object.ThreeObject = function(obj) {
 	// extent point [a,b,c,d]
 	this.extent = options.extent;
 	
-	this.attrs = options.attrs;
+	this.type = options.type;
+	
+	this.feature = options.feature;
 	
 	this.modCount = 0;
 }
@@ -99,23 +101,43 @@ gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
 };
 
 /**
+ * Layer의 Type을 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getType
+ * @return {String} Layer type
+ */
+gb3d.object.ThreeObject.prototype.getType = function() {
+	return this.type;
+};
+
+/**
+ * Layer의 Type을 설정한다.
+ * 
+ * @method gb3d.object.ThreeObject#setType
+ * @param {String} type - Layer type
+ */
+gb3d.object.ThreeObject.prototype.setType = function(type) {
+	this.type = type;
+};
+
+/**
  * 사용자 정의 속성 목록을 반환한다.
  * 
- * @method gb3d.object.ThreeObject#getAttrs
- * @return {Array.<gb.layer.Attribute>} 사용자 정의 속성 목록
+ * @method gb3d.object.ThreeObject#getFeature
+ * @return {ol.Feature} Openlayers Feature
  */
-gb3d.object.ThreeObject.prototype.getAttrs = function() {
-	return this.attrs;
+gb3d.object.ThreeObject.prototype.getFeature = function() {
+	return this.feature;
 };
 
 /**
  * 사용자 정의 속성 목록을 설정한다.
  * 
- * @method gb3d.object.ThreeObject#setAttrs
- * @param {Array.<gb.layer.Attribute>} attrs - 사용자 정의 속성 목록
+ * @method gb3d.object.ThreeObject#setFeature
+ * @param {ol.Feature} feature - Openlayers Feature
  */
-gb3d.object.ThreeObject.prototype.setAttrs = function(attrs) {
-	this.attrs = attrs;
+gb3d.object.ThreeObject.prototype.setFeature = function(feature) {
+	this.feature = feature;
 };
 
 /**

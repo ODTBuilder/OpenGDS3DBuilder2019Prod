@@ -121,12 +121,9 @@
 <!-- gb.versioning.Feature -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/versioning/feature.js"></script>
 <!-- gb.edit -->
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/edithistory.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/undo.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/modifylayerprop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
 <!-- gb.interaction -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/overriding/olinteractiondraw.js"></script>
@@ -161,5 +158,10 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/math/Math.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
+
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>
