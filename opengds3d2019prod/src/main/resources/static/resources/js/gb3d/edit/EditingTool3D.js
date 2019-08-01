@@ -73,6 +73,24 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.threeTransformControls.addEventListener('dragging-changed', function(event){
 		that.updateAttributeTab(event.target.object);
 	});
+	
+	this.threeTransformControls.addEventListener('objectChange', function(e){
+		var object = e.target.object,
+			mode = that.threeTransformControls.getMode();
+		
+		switch(mode){
+			case "scale":
+				that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
+				break;
+			case "rotate":
+				break;
+			case "translate":
+				that.map.moveObject2Dfrom3D(object.position, object.uuid);
+				break;
+			default:
+		}
+	});
+	
 	// transform 컨트롤 Three Scene에 추가
 	this.map.threeScene.add(this.threeTransformControls);
 	this.threeTransformControls.setSpace("local");
@@ -151,10 +169,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 				that.threeTransformControls.setMode( "translate" );
 				break;
 			case 69: // E
-				that.threeTransformControls.setMode( "rotate" );
+				that.threeTransformControls.setMode( "scale" );
 				break;
 			case 82: // R
-				that.threeTransformControls.setMode( "scale" );
+				that.threeTransformControls.setMode( "rotate" );
 				break;
 			case 187:
 			case 107: // +, =, num+
@@ -197,6 +215,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if(e.keyCode == 13){
 			var parent = $(this).parent();
 			var inputs = parent.find("input");
+			var x, y, z;
 			
 			if(!pickedObject){
 				return;
@@ -205,9 +224,19 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if(inputs.length === 0){
 				pickedObject[parent.data("key")] = $(inputs[0]).val();
 			} else if(inputs.length === 3){
-				pickedObject[parent.data("key")].x = parseFloat($(inputs[0]).val());
-				pickedObject[parent.data("key")].y = parseFloat($(inputs[1]).val());
-				pickedObject[parent.data("key")].z = parseFloat($(inputs[2]).val());
+				x = $(inputs[0]).val();
+				y = $(inputs[1]).val();
+				z = $(inputs[2]).val();
+				
+				if(parent.data("key") === "scale"){
+					x = (x == 0 ? 1 : x);
+					y = (y == 0 ? 1 : y);
+					z = (z == 0 ? 1 : z);
+				}
+				
+				pickedObject[parent.data("key")].x = parseFloat(x);
+				pickedObject[parent.data("key")].y = parseFloat(y);
+				pickedObject[parent.data("key")].z = parseFloat(z);
 			}
 		}
 	});
@@ -215,6 +244,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	$(document).on("focusout", "#attrAttr input", function(e){
 		var parent = $(this).parent();
 		var inputs = parent.find("input");
+		var x, y, z;
 		
 		if(!pickedObject){
 			return;
@@ -223,9 +253,19 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if(inputs.length === 0){
 			pickedObject[parent.data("key")] = $(inputs[0]).val();
 		} else if(inputs.length === 3){
-			pickedObject[parent.data("key")].x = parseFloat($(inputs[0]).val());
-			pickedObject[parent.data("key")].y = parseFloat($(inputs[1]).val());
-			pickedObject[parent.data("key")].z = parseFloat($(inputs[2]).val());
+			x = $(inputs[0]).val();
+			y = $(inputs[1]).val();
+			z = $(inputs[2]).val();
+			
+			if(parent.data("key") === "scale"){
+				x = (x == 0 ? 1 : x);
+				y = (y == 0 ? 1 : y);
+				z = (z == 0 ? 1 : z);
+			}
+			
+			pickedObject[parent.data("key")].x = parseFloat(x);
+			pickedObject[parent.data("key")].y = parseFloat(y);
+			pickedObject[parent.data("key")].z = parseFloat(z);
 		}
 	});
 	

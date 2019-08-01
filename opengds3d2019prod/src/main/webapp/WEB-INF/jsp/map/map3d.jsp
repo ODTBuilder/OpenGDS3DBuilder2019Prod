@@ -395,10 +395,6 @@ html, body {
 			$(window).resize(function() {
 				gitrnd.resize();
 			});
-
-			// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
-			// 			gbMap.getLowerMap().getView().setZoom(15);
-
 		});
 
 		$(window).on("beforeunload", function() {
