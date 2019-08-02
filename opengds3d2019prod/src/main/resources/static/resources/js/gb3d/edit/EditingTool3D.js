@@ -59,6 +59,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.map = options.map ? options.map : undefined;
 	if(!(this.map instanceof gb3d.Map)){
 		console.error("gb3d.edit.EditingTool3D: 'map' is required option");
+	} else {
+		this.map.tools.edit3d = this;
 	}
 	
 	function transformRender(){
@@ -99,14 +101,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var threeEventDiv = $(".gb3d-map-three-area");
 	var raycaster = new THREE.Raycaster();
 	var mouse = new THREE.Vector2();
-	var pickedObject = undefined,
+	this.pickedObject_ = undefined,
 		pickedObjectColor = undefined;
 	
 	function onDocumentMouseClick(event){
 		if(!that.getActiveTool()){
-			that.threeTransformControls.detach( pickedObject );
+			that.threeTransformControls.detach( that.pickedObject_ );
 			that.updateAttributeTab(undefined);
-			pickedObject = undefined;
+			that.pickedObject_ = undefined;
 			return;
 		}
 		
@@ -122,17 +124,18 @@ gb3d.edit.EditingTool3D = function(obj) {
 		raycaster.setFromCamera( mouse, that.map.threeCamera );
 		var intersects = raycaster.intersectObjects( that.map.threeScene.children );
 		
-		if(pickedObject){
+		if( that.pickedObject_ ){
 			// 이전에 선택된 객체 초기화
-			that.threeTransformControls.detach( pickedObject );
+			that.threeTransformControls.detach( that.pickedObject_ );
+			that.map.syncUnselect( that.pickedObject_.uuid );
 			that.updateAttributeTab(undefined);
-			pickedObject = undefined;
+			that.pickedObject_ = undefined;
 		}
 		
 		if ( intersects.length > 0 ) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
 			var object = intersects[ 0 ].object;
-			pickedObject = object;
+			that.pickedObject_ = object;
 			that.threeTransformControls.attach( object );
 			
 			that.map.getThreeObjects().forEach(function(e){
@@ -143,7 +146,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 				}
 			});
 			
+			that.map.syncSelect(object.uuid);
 			that.updateAttributeTab(object);
+			that.updateStyleTab(object);
 		}
 	}
 	
@@ -200,7 +205,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	$(document).on("keyup", function(e){
 		if(e.which === 17){
 			// Ctrl key up 이벤트 발생 시 TransformControl와 ThreeJS DIV의 마우스 이벤트를 비활성화하고 기본 3차원 렌더링 함수를 다시 활성화한다.
-			if(pickedObject){
+			if(that.pickedObject_){
 //				that.threeTransformControls.detach( pickedObject );
 //				that.updateAttributeTab(undefined);
 //				pickedObject = undefined;
@@ -214,74 +219,71 @@ gb3d.edit.EditingTool3D = function(obj) {
 	$(document).on("keypress", "#attrAttr input", function(e){
 		if(e.keyCode == 13){
 			var parent = $(this).parent();
-			var inputs = parent.find("input");
-			var x, y, z;
 			
-			if(!pickedObject){
-				return;
-			}
-			
-			if(inputs.length === 0){
-				pickedObject[parent.data("key")] = $(inputs[0]).val();
-			} else if(inputs.length === 3){
-				x = $(inputs[0]).val();
-				y = $(inputs[1]).val();
-				z = $(inputs[2]).val();
-				
-				if(parent.data("key") === "scale"){
-					x = (x == 0 ? 1 : x);
-					y = (y == 0 ? 1 : y);
-					z = (z == 0 ? 1 : z);
-				}
-				
-				pickedObject[parent.data("key")].x = parseFloat(x);
-				pickedObject[parent.data("key")].y = parseFloat(y);
-				pickedObject[parent.data("key")].z = parseFloat(z);
-			}
+			gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 		}
 	});
 	
 	$(document).on("focusout", "#attrAttr input", function(e){
 		var parent = $(this).parent();
-		var inputs = parent.find("input");
-		var x, y, z;
 		
-		if(!pickedObject){
-			return;
-		}
-		
-		if(inputs.length === 0){
-			pickedObject[parent.data("key")] = $(inputs[0]).val();
-		} else if(inputs.length === 3){
-			x = $(inputs[0]).val();
-			y = $(inputs[1]).val();
-			z = $(inputs[2]).val();
-			
-			if(parent.data("key") === "scale"){
-				x = (x == 0 ? 1 : x);
-				y = (y == 0 ? 1 : y);
-				z = (z == 0 ? 1 : z);
-			}
-			
-			pickedObject[parent.data("key")].x = parseFloat(x);
-			pickedObject[parent.data("key")].y = parseFloat(y);
-			pickedObject[parent.data("key")].z = parseFloat(z);
-		}
+		gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 	});
 	
 	$(document).on("change", "#attrAttr input", function(e){
 		var parent = $(this).parent();
 		var inputs = parent.find("input");
 		
-		if(!pickedObject){
+		if(!that.pickedObject_){
 			return;
 		}
 		
-		pickedObject[parent.data("key")] = $(inputs[0]).prop("checked");
+		that.pickedObject_[parent.data("key")] = $(inputs[0]).prop("checked");
 	});
 }
 gb3d.edit.EditingTool3D.prototype = Object.create(gb3d.edit.EditingToolBase.prototype);
 gb3d.edit.EditingTool3D.prototype.constructor = gb3d.edit.EditingTool3D;
+
+gb3d.edit.EditingTool3D.updateAttributeByInput = function( row, object ){
+	var row = row;
+	var pickedObject = object;
+	var inputs = row.find("input");
+	var x, y, z;
+	
+	if(!pickedObject){
+		return;
+	}
+	
+	if(inputs.length === 0){
+		pickedObject[row.data("key")] = $(inputs[0]).val();
+	} else if(inputs.length === 3){
+		x = $(inputs[0]).val();
+		y = $(inputs[1]).val();
+		z = $(inputs[2]).val();
+		
+		if(row.data("key") === "scale"){
+			x = (x == 0 ? 1 : x);
+			y = (y == 0 ? 1 : y);
+			z = (z == 0 ? 1 : z);
+		}
+		
+		pickedObject[row.data("key")].x = parseFloat(x);
+		pickedObject[row.data("key")].y = parseFloat(y);
+		pickedObject[row.data("key")].z = parseFloat(z);
+	}
+}
+
+gb3d.edit.EditingTool3D.updateStyleByInput = function( row, object ){
+	var row = row;
+	var pickedObject = object;
+	var input = row.find("input");
+	
+	if(!pickedObject){
+		return;
+	}
+	
+	
+}
 
 /**
  * EditingTool 작업표시줄을 삭제한다.
@@ -356,4 +358,38 @@ gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object){
 			break;
 		}
 	}
+}
+
+gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object){
+	var tab = $("#attrStyle");
+	var rows = tab.find(".gb-object-row");
+	var row, span, input;
+	
+	if(!(object instanceof THREE.Object3D)){
+		rows.each(function(){
+			$(this).find("input").val("");
+		});
+		return;
+	}
+	
+	var userData = object.userData;
+	
+	tab.empty();
+	for(var key in userData){
+		span = $("<span class='Text'>").text(key);
+		input = $("<input class='form-control' style='flex: 1;'>").val(userData[key]);
+		row = $("<div class='gb-object-row'>").append(span).append(input);
+		
+		tab.append(row);
+	}
+	
+	span = $("<span class='Text'>").text("Color");
+	input = $("<input id='styleColor' class='form-control' style='flex: 1;'>");
+	row = $("<div class='gb-object-row'>").append(span).append(input);
+	
+	tab.append(row);
+	input.spectrum({
+		color : "#fff",
+		showAlpha : true
+	});
 }

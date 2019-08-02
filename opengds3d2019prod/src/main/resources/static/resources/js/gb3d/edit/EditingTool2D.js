@@ -415,6 +415,11 @@ gb3d.edit.EditingTool2D = function(obj) {
 	var options = obj ? obj : {};
 	this.locale = options.locale || "en";
 	this.mapObj = options.map ? options.map : undefined;
+	if(!this.mapObj){
+		console.error("gb3d.edit.EditingTool3D: 'map'" + this.translation.requiredOption[this.locale]);
+	} else {
+		this.mapObj.tools.edit2d = this;
+	}
 	this.map = options.map ? options.map.getGbMap().getUpperMap() : undefined;
 	if(!this.map){
 		console.error("gb3d.edit.EditingTool2D: 'map'" + this.translation.requiredOption[this.locale]);
@@ -1069,6 +1074,11 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			})
 		}
 	});
+	
+	// ThreeJS Object unselect
+	this.interaction.select.getFeatures().on("remove", function(evt) {
+		that.mapObj.syncUnselect( evt.element.getId() );
+	});
 
 	this.interaction.select.getFeatures().on("change:length", function(evt) {
 		var vfeature = that.getVersioningFeature();
@@ -1188,6 +1198,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			var git = source.get("git");
 			var props = git.attribute || [];
 			var layer = source.get("git").tempLayer;
+			
+			// threeJS Object Select
+			that.mapObj.syncSelect(that.features.item(0).getId());
 			
 			if (1) {
 				for (var i = 0; i < props.length; i++) {
