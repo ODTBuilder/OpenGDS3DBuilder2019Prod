@@ -101,12 +101,11 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
-//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 	
-//	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
-//	this.cesiumViewer.scene.primitives.add(tileset);
-//	this.cesiumViewer.zoomTo(tileset);
->>>>>>> hochul
+// var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
+// this.cesiumViewer.scene.primitives.add(tileset);
+// this.cesiumViewer.zoomTo(tileset);
 
 	this.cesiumViewer.camera.flyTo({
 		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
@@ -850,10 +849,12 @@ gb3d.Map.prototype.syncSelect = function(id){
 			this.tools.edit3d.pickedObject_ = threeObject.getObject();
 			this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
 			this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
-//			this.cesiumViewer.camera.flyTo({
-//				destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0], threeObject.getCenter()[1], this.cesiumViewer.camera.positionCartographic.height),
-//				duration: 0
-//			});
+// this.cesiumViewer.camera.flyTo({
+// destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
+// threeObject.getCenter()[1],
+// this.cesiumViewer.camera.positionCartographic.height),
+// duration: 0
+// });
 		}
 	}
 }
