@@ -63,10 +63,10 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
 	for(var i = 0; i < coordLength; i++){
 		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
 		
-		if(i !== 0){
-	//		faceSide.push([i + coordLength, i - 1 + coordLength, i - 1]);
-	//		faceSide.push([i - 1, i, i + coordLength]);
-			
+		if(i === 0){
+			faceSide.push([coordLength - 1, 2*coordLength - 1, 0]);
+			faceSide.push([2*coordLength - 1, coordLength, 0]);
+		} else {
 			faceSide.push([i - 1, i - 1 + coordLength, i]);
 			faceSide.push([i - 1 + coordLength, i + coordLength, i]);
 		}

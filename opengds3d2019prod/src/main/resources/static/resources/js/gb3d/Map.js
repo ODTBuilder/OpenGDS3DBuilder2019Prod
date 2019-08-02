@@ -46,6 +46,9 @@ gb3d.Map = function(obj) {
 		console.error("gbMap must be set");
 		return;
 	}
+	
+	// Tools List
+	this.tools = {};
 
 	// 3d 지도 영역으로 설정할 부분이 div 객체인지 확인
 	if ($(options.target).is("div")) {
@@ -98,11 +101,12 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
-
-	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
-	this.cesiumViewer.scene.primitives.add(tileset);
-	this.cesiumViewer.zoomTo(tileset);
+//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+	
+//	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
+//	this.cesiumViewer.scene.primitives.add(tileset);
+//	this.cesiumViewer.zoomTo(tileset);
+>>>>>>> hochul
 
 	this.cesiumViewer.camera.flyTo({
 		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
@@ -835,12 +839,46 @@ gb3d.Map.prototype.syncSelect = function(id){
 		if(!threeObject){
 			return;
 		}
-
-
+		
+		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+			this.tools.edit2d.interaction.select.getFeatures().clear();
+			this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
+			this.gbMap.getView().fit( threeObject.getFeature().getGeometry() );
+		}
 	} else {
-
+		if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
+			this.tools.edit3d.pickedObject_ = threeObject.getObject();
+			this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
+			this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
+//			this.cesiumViewer.camera.flyTo({
+//				destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0], threeObject.getCenter()[1], this.cesiumViewer.camera.positionCartographic.height),
+//				duration: 0
+//			});
+		}
 	}
+}
 
+gb3d.Map.prototype.syncUnselect = function(id){
+	var id = id;
+	
+	var threeObject = this.getThreeObjectById(id);
+	
+	if(!threeObject){
+		threeObject = this.getThreeObjectByUuid(id);
+		if(!threeObject){
+			return;
+		}
+		
+		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+			this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
+		}
+	} else {
+		if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
+			this.tools.edit3d.pickedObject_ = threeObject.getObject();
+			this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
+			this.tools.edit3d.updateAttributeTab( undefined );
+		}
+	}
 }
 
 gb3d.Map.prototype.moveObject2Dfrom3D = function(center, uuid){
