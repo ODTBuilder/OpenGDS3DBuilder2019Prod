@@ -1000,13 +1000,21 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
 
+	var parser = new jsts.io.OL3Parser();
+	parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
+	var feature = this.objectAttr.feature;
+	var jstsGeom = parser.read(feature.getGeometry());
+	var buffered = jstsGeom.buffer(option["width"]/2);
+	var newGeom = parser.write(buffered);
+	coord = newGeom.getCoordinates(true);
+	
 	var a, b, cp;
 	if(geometry instanceof THREE.Geometry){
-		if(opt.type === "MultiPolygon"){
+		if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
 			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], opt.depth);
 			a = coord[0][0][0];
 			b = coord[0][0][1];
-		} else if(opt.type === "Polygon"){
+		} else if(opt.type === "Polygon" || opt.type === "LineString"){
 			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], opt.depth);
 			a = coord[0][0];
 			b = coord[0][1];
