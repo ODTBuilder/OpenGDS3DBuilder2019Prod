@@ -795,7 +795,8 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		"center" : [x, y],
 		"extent" : extent,
 		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
+		"feature" : this.objectAttr.feature,
+		"buffer" : option["width"]/2
 	});
 
 	this.addThreeObject(obj3d);
@@ -949,6 +950,16 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	case "Point":
 		break;
 	case "LineString":
+		var parser = new jsts.io.OL3Parser();
+		parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
+//		var feature = this.objectAttr.feature;
+		var feature = threeObject.getFeature();
+		var jstsGeom = parser.read(feature.getGeometry());
+		var buffered = jstsGeom.buffer(threeObject.getBuffer());
+		var newGeom = parser.write(buffered);
+		featureCoord = newGeom.getCoordinates(true);
+		a = featureCoord[0][0];
+		b = featureCoord[0][1];
 		break;
 	case "Polygon":
 		a = featureCoord[0][0];
@@ -1001,13 +1012,15 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
 
-	var parser = new jsts.io.OL3Parser();
-	parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
-	var feature = this.objectAttr.feature;
-	var jstsGeom = parser.read(feature.getGeometry());
-	var buffered = jstsGeom.buffer(option["width"]/2);
-	var newGeom = parser.write(buffered);
-	coord = newGeom.getCoordinates(true);
+	if (opt.type === "MultiLineString" || opt.type === "LineString") {
+		var parser = new jsts.io.OL3Parser();
+		parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
+		var feature = this.objectAttr.feature;
+		var jstsGeom = parser.read(feature.getGeometry());
+		var buffered = jstsGeom.buffer(threeObject.getBuffer());
+		var newGeom = parser.write(buffered);
+		coord = newGeom.getCoordinates(true);
+	}
 	
 	var a, b, cp;
 	if(geometry instanceof THREE.Geometry){
