@@ -9,7 +9,14 @@ if (!gb3d.Math)
 
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	var a, b, u, v, w, s, cart;
-		
+	var ca = {}, cb = {}, cw;
+	
+	ca.x = pointA[0] - standard[0];
+	ca.y = pointA[1] - standard[1];
+	cb.x = pointB[0] - standard[0];
+	cb.y = pointB[1] - standard[1];
+	cw = ca.x*cb.y - ca.y*cb.x;
+	
 	a = Cesium.Cartesian3.fromDegrees(pointA[0], pointA[1]);
 	b = Cesium.Cartesian3.fromDegrees(pointB[0], pointB[1]);
 	cart = Cesium.Cartesian3.fromDegrees(standard[0], standard[1]);
@@ -24,7 +31,13 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	u = -a.z*b.y + a.y*b.z;
 	v = a.z*b.x - a.x*b.z;
 	w = -a.y*b.x + a.x*b.y;
-
+	
+	if(cw < 0){
+		u = -u;
+		v = -v;
+		w = -w;
+	}
+	
 	s = Math.sqrt(Math.pow(u, 2) + Math.pow(v, 2) + Math.pow(w, 2));
 	
 	return {

@@ -92,7 +92,9 @@ gb3d.Map = function(obj) {
 		targetFrameRate : 60,
 		resolutionScale : 0.1,
 		orderIndependentTranslucency : true,
-		imageryProvider : undefined,
+		imageryProvider : Cesium.createOpenStreetMapImageryProvider({
+			url : 'https://a.tile.openstreetmap.org/'
+		}),
 		baseLayerPicker : true,
 		geocoder : false,
 		automaticallyTrackDataSourceClocks : false,
@@ -155,6 +157,9 @@ gb3d.Map = function(obj) {
 	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
 
+	this.threeLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+	this.threeScene.add(this.threeLight);
+	
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 	// 카메라 객체
@@ -556,6 +561,7 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	this.getThreeScene().add(latheMesh);
 
 	// userData 저장(THREE.Object3D 객체 속성)
+	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.width = width;
 	latheMesh.userData.height = height;
 	latheMesh.userData.depth = depth;
@@ -572,7 +578,7 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	return obj3d;
 }
 
-gb3d.Map.prototype.createLineObject = function(arr, extent, option){
+/*gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 	var coord = arr,
 	points = [],
 	geometry,
@@ -636,7 +642,7 @@ gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 
 	this.addThreeObject(obj3d);
 	return obj3d;
-}
+}*/
 
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var that = this;
@@ -696,8 +702,9 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
 
-	var doubleSideMaterial = new THREE.MeshNormalMaterial({
-		side : THREE.DoubleSide
+	var doubleSideMaterial = new THREE.MeshStandardMaterial({
+		side : THREE.DoubleSide,
+		emissive : 0x123456
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
@@ -791,7 +798,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
 
-	var doubleSideMaterial = new THREE.MeshNormalMaterial({
+	var doubleSideMaterial = new THREE.MeshStandardMaterial({
 		side : THREE.DoubleSide
 	});
 
@@ -859,7 +866,7 @@ gb3d.Map.prototype.syncSelect = function(id){
 		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
 			this.tools.edit2d.interaction.select.getFeatures().clear();
 			this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
-			this.gbMap.getView().fit( threeObject.getFeature().getGeometry() );
+//			this.gbMap.getView().fit( threeObject.getFeature().getGeometry() );
 		}
 	} else {
 		if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
@@ -1034,12 +1041,25 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		return;
 	}
 
+	if(coord.length === 0){
+		coord = threeObject.getFeature().getGeometry().getCoordinates(true);
+	}
+	
 	var opt = object.userData;
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
 
+	if (opt.type === "MultiPoint" || opt.type === "Point") {
+		geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
+		geometry.vertices.forEach(function(vert, v){
+			vert.z += opt.depth/2;
+		});
+		object.geometry = geometry;
+		return;
+	}
+	
 	if (opt.type === "MultiLineString" || opt.type === "LineString") {
-		var feature = this.objectAttr.feature.clone();
+		var feature = threeObject.getFeature().clone();
 		if (feature.getGeometry() instanceof ol.geom.LineString) {
 			var beforeGeomTest = feature.getGeometry().clone();
 			console.log(beforeGeomTest.getCoordinates().length);
@@ -1064,11 +1084,11 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var a, b, cp;
 	if(geometry instanceof THREE.Geometry){
 		if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], opt.depth);
+			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], parseFloat(opt.depth));
 			a = coord[0][0][0];
 			b = coord[0][0][1];
 		} else if(opt.type === "Polygon" || opt.type === "LineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], opt.depth);
+			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], parseFloat(opt.depth));
 			a = coord[0][0];
 			b = coord[0][1];
 		} else {
@@ -1083,38 +1103,6 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 
 		// compute face Normals
 		geometry.computeFaceNormals();
-	} else if(geometry instanceof THREE.ExtrudeBufferGeometry){
-// var curve = new THREE.CatmullRomCurve3();
-// for(var i = 0; i < coord.length; i++){
-// if(coord[i][0] instanceof Array){
-// for(var j = 0; j < coord[i].length; j++){
-// cart = Cesium.Cartesian3.fromDegrees(coord[i][j][0], coord[i][j][1]);
-// curve.points.push(new THREE.Vector3(cart.x, cart.y, 0));
-// }
-// } else {
-// cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
-// curve.points.push(new THREE.Vector3(cart.x, cart.y, 0));
-// }
-// }
-
-// var width = object.userData.width;
-// var depth = object.userData.depth;
-
-// points.push(new THREE.Vector2(0, -width/2));
-// points.push(new THREE.Vector2(0, +width/2));
-// points.push(new THREE.Vector2(-depth, +width/2));
-// points.push(new THREE.Vector2(-depth, -width/2));
-
-// shape = new THREE.Shape(points);
-
-// geometry = new THREE.ExtrudeBufferGeometry(shape, {
-// steps: 200,
-// bevelEnabled: false,
-// extrudePath: curve
-// });
-
-// geometry.translate(-centerCart.x, -centerCart.y, 0);
-// object.geometry = geometry;
 	}
 
 	cp = gb3d.Math.crossProductFromDegrees(a, b, center);
@@ -1122,6 +1110,6 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 
 	// threeObject 수정 횟수 증가, Center 값 재설정
 	threeObject.upModCount();
-	threeObject.setCenter(center);
+//	threeObject.setCenter(center);
 };
 
