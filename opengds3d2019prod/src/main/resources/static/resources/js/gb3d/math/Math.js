@@ -24,7 +24,7 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	u = -a.z*b.y + a.y*b.z;
 	v = a.z*b.x - a.x*b.z;
 	w = -a.y*b.x + a.x*b.y;
-	
+
 	s = Math.sqrt(Math.pow(u, 2) + Math.pow(v, 2) + Math.pow(w, 2));
 	
 	return {

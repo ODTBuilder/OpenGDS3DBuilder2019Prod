@@ -39,6 +39,8 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.css">
 <!-- jsts -->
 <script src="${pageContext.request.contextPath}/resources/js/jsts/jsts.js"></script>
+<!-- turf -->
+<script src="${pageContext.request.contextPath}/resources/js/turf/turf.min.js"></script>
 <%-- jsTree--%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jsTree/jstree.js"></script>
 <link rel="stylesheet" type="text/css"

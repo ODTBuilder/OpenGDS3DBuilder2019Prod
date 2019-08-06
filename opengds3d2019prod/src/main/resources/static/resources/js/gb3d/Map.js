@@ -639,6 +639,7 @@ gb3d.Map.prototype.createLineObject = function(arr, extent, option){
 }
 
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
+	var that = this;
 	var coord = arr,
 	geometry,
 	shape,
@@ -674,7 +675,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 // extrudeMaterial: 1,
 // bevelEnabled: false
 // });
-
+	
 	if(this.objectAttr.type === "MultiPolygon"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
 	} else if(this.objectAttr.type === "Polygon"){
@@ -736,6 +737,7 @@ gb3d.Map.prototype.getThreeObjectById = function(id){
 }
 
 gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
+	var that = this;
 	var coord = arr,
 	geometry,
 	shape,
@@ -748,13 +750,27 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 			centerCart = Cesium.Cartesian3.fromDegrees(x, y),
 			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
-	var parser = new jsts.io.OL3Parser();
-	parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
-	var feature = this.objectAttr.feature;
-	var jstsGeom = parser.read(feature.getGeometry());
-	var buffered = jstsGeom.buffer(option["width"]/2);
-	var newGeom = parser.write(buffered);
-	coord = newGeom.getCoordinates(true);
+	var feature = this.objectAttr.feature.clone();
+	if (feature.getGeometry() instanceof ol.geom.LineString) {
+		var beforeGeomTest = feature.getGeometry().clone();
+		console.log(beforeGeomTest.getCoordinates().length);
+		var beforeCoord = beforeGeomTest.getCoordinates();
+
+		var tline = turf.lineString(beforeCoord);
+
+		var tbuffered = turf.buffer(tline, option["width"]/2, {units : "meters"});
+		console.log(tbuffered);
+		var gjson = new ol.format.GeoJSON();
+		var bfeature = gjson.readFeature(tbuffered);
+
+		coord = bfeature.getGeometry().getCoordinates(true);
+		console.log(bfeature.getGeometry().getType());
+		console.log(coord);
+		
+	} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+		
+	}
+	
 	if(this.objectAttr.type === "MultiLineString"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
 	} else if(this.objectAttr.type === "LineString"){
@@ -950,14 +966,24 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	case "Point":
 		break;
 	case "LineString":
-		var parser = new jsts.io.OL3Parser();
-		parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
-//		var feature = this.objectAttr.feature;
-		var feature = threeObject.getFeature();
-		var jstsGeom = parser.read(feature.getGeometry());
-		var buffered = jstsGeom.buffer(threeObject.getBuffer());
-		var newGeom = parser.write(buffered);
-		featureCoord = newGeom.getCoordinates(true);
+		var feature = this.objectAttr.feature.clone();
+		if (feature.getGeometry() instanceof ol.geom.LineString) {
+			var beforeGeomTest = feature.getGeometry().clone();
+			console.log(beforeGeomTest.getCoordinates().length);
+			var beforeCoord = beforeGeomTest.getCoordinates();
+
+			var tline = turf.lineString(beforeCoord);
+
+			var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units : "meters"});
+			console.log(tbuffered);
+			var gjson = new ol.format.GeoJSON();
+			var bfeature = gjson.readFeature(tbuffered);
+
+			featureCoord = bfeature.getGeometry().getCoordinates(true);
+		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+			
+		}
+		
 		a = featureCoord[0][0];
 		b = featureCoord[0][1];
 		break;
@@ -1013,13 +1039,26 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
 
 	if (opt.type === "MultiLineString" || opt.type === "LineString") {
-		var parser = new jsts.io.OL3Parser();
-		parser.inject(ol.geom.Point, ol.geom.LineString , ol.geom.LinearRing, ol.geom.Polygon, ol.geom.MultiPoint, ol.geom.MultiLineString, ol.geom.MultiPolygon);
-		var feature = this.objectAttr.feature;
-		var jstsGeom = parser.read(feature.getGeometry());
-		var buffered = jstsGeom.buffer(threeObject.getBuffer());
-		var newGeom = parser.write(buffered);
-		coord = newGeom.getCoordinates(true);
+		var feature = this.objectAttr.feature.clone();
+		if (feature.getGeometry() instanceof ol.geom.LineString) {
+			var beforeGeomTest = feature.getGeometry().clone();
+			console.log(beforeGeomTest.getCoordinates().length);
+			var beforeCoord = beforeGeomTest.getCoordinates();
+
+			var tline = turf.lineString(beforeCoord);
+
+			var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units : "meters"});
+			console.log(tbuffered);
+			var gjson = new ol.format.GeoJSON();
+			var bfeature = gjson.readFeature(tbuffered);
+
+			coord = bfeature.getGeometry().getCoordinates(true);
+			console.log(bfeature.getGeometry().getType());
+			console.log(coord);
+			
+		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+			
+		}
 	}
 	
 	var a, b, cp;
