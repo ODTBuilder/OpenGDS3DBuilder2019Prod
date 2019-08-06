@@ -403,11 +403,6 @@ html, body {
 			}
 		});
 
-		$("#styleColor").spectrum({
-			color : "#fff",
-			showAlpha : true
-		});
-
 		$("#textureEmissive").spectrum({
 			color : "#fff",
 			showAlpha : true

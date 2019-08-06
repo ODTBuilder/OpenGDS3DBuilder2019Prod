@@ -47,6 +47,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 				console.log("remove");
 			},
 			color: ""
+		},
+		{
+			content: "Attach",
+			icon: "fas fa-arrow-down fa-lg",
+			clickEvent: function(){
+				that.attachObjectToGround( that.pickedObject_ );
+			},
+			color: ""
 		}
 	];
 
@@ -108,6 +116,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if(!that.getActiveTool()){
 			that.threeTransformControls.detach( that.pickedObject_ );
 			that.updateAttributeTab(undefined);
+			that.updateStyleTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
 		}
@@ -129,6 +138,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.threeTransformControls.detach( that.pickedObject_ );
 			that.map.syncUnselect( that.pickedObject_.uuid );
 			that.updateAttributeTab(undefined);
+			that.updateStyleTab(undefined);
 			that.pickedObject_ = undefined;
 		}
 		
@@ -230,6 +240,20 @@ gb3d.edit.EditingTool3D = function(obj) {
 		gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 	});
 	
+	$(document).on("keypress", "#attrStyle input", function(e){
+		if(e.keyCode == 13){
+			var parent = $(this).parent();
+			
+			gb3d.edit.EditingTool3D.updateStyleByInput( parent, that );
+		}
+	});
+	
+	$(document).on("focusout", "#attrStyle input", function(e){
+		var parent = $(this).parent();
+		
+		gb3d.edit.EditingTool3D.updateStyleByInput( parent, that);
+	});
+	
 	$(document).on("change", "#attrAttr input", function(e){
 		var parent = $(this).parent();
 		var inputs = parent.find("input");
@@ -273,16 +297,30 @@ gb3d.edit.EditingTool3D.updateAttributeByInput = function( row, object ){
 	}
 }
 
-gb3d.edit.EditingTool3D.updateStyleByInput = function( row, object ){
+gb3d.edit.EditingTool3D.updateStyleByInput = function( row, obj ){
+	if(!obj){
+		return;
+	}
+	
 	var row = row;
-	var pickedObject = object;
+	var pickedObject = obj? obj.pickedObject_ : undefined;
 	var input = row.find("input");
 	
 	if(!pickedObject){
 		return;
 	}
 	
+	var threeObject = obj.map.getThreeObjectByUuid(pickedObject.uuid);
+	if(!threeObject){
+		return;
+	}
 	
+	if(!row.data("key")){
+		return;
+	}
+	
+	pickedObject.userData[row.data("key")] = $(input[0]).val();
+	obj.map.modify3DVertices([], threeObject.getFeature().getId(), threeObject.getFeature().getGeometry().getExtent());
 }
 
 /**
@@ -379,17 +417,38 @@ gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object){
 		span = $("<span class='Text'>").text(key);
 		input = $("<input class='form-control' style='flex: 1;'>").val(userData[key]);
 		row = $("<div class='gb-object-row'>").append(span).append(input);
-		
+		row.data("key", key);
 		tab.append(row);
+		
+		if(key == "type"){
+			input.attr("disabled", true);
+		}
 	}
 	
 	span = $("<span class='Text'>").text("Color");
 	input = $("<input id='styleColor' class='form-control' style='flex: 1;'>");
 	row = $("<div class='gb-object-row'>").append(span).append(input);
+	row.data("key", "color");
 	
 	tab.append(row);
 	input.spectrum({
 		color : "#fff",
 		showAlpha : true
 	});
+}
+
+gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object){
+	if(!object){
+		return;
+	}
+	
+	var obj = object,
+		threeObject = this.map.getThreeObjectByUuid(obj.uuid),
+		extent = threeObject.getExtent(),
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+	
+	obj.position.copy(centerCart);
 }
