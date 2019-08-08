@@ -643,19 +643,18 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-	console.log(result);
 	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
 
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.DoubleSide,
-		emissive : 0x123456
+		side : THREE.DoubleSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
 	latheMesh.position.copy(centerCart);
+	this.getThreeScene().add(latheMesh);
 
 	// 원점을 바라보도록 설정한다
 	latheMesh.lookAt(new THREE.Vector3(0,0,0));
@@ -871,6 +870,7 @@ gb3d.Map.prototype.syncUnselect = function(id){
 			this.tools.edit3d.pickedObject_ = threeObject.getObject();
 			this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
 			this.tools.edit3d.updateAttributeTab( undefined );
+			this.tools.edit3d.updateStyleTab( undefined );
 		}
 	}
 }

@@ -70,6 +70,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 	} else {
 		this.map.tools.edit3d = this;
 	}
+	this.materialOptions = options.materialOptions || [
+		"metalness", "roughness", "emissive", 
+		"skinning", "wireframe", "flatShading", 
+		"emissiveMap", "opacity", "alphaTest"];
 	
 	function transformRender(){
 		that.map.renderThreeObj();
@@ -117,6 +121,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.threeTransformControls.detach( that.pickedObject_ );
 			that.updateAttributeTab(undefined);
 			that.updateStyleTab(undefined);
+			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
 		}
@@ -139,6 +144,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.map.syncUnselect( that.pickedObject_.uuid );
 			that.updateAttributeTab(undefined);
 			that.updateStyleTab(undefined);
+			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 		}
 		
@@ -159,6 +165,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.map.syncSelect(object.uuid);
 			that.updateAttributeTab(object);
 			that.updateStyleTab(object);
+			that.updateMaterialTab(object);
 		}
 	}
 	
@@ -263,6 +270,34 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 		
 		that.pickedObject_[parent.data("key")] = $(inputs[0]).prop("checked");
+	});
+	
+	$(document).on("change.spectrum", "#styleColor", function(e, color){
+		var rgb = color.toPercentageRgb();
+		var r = parseFloat(rgb.r)/100.0;
+		var g = parseFloat(rgb.g)/100.0;
+		var b = parseFloat(rgb.b)/100.0;
+		
+		if(!that.pickedObject_){
+			return;
+		}
+		
+		var material = that.pickedObject_.material;
+		material.color.setRGB(r, g, b);
+	});
+	
+	$(document).on("change.spectrum", "#textureEmissive", function(e, color){
+		var rgb = color.toPercentageRgb();
+		var r = parseFloat(rgb.r)/100.0;
+		var g = parseFloat(rgb.g)/100.0;
+		var b = parseFloat(rgb.b)/100.0;
+		
+		if(!that.pickedObject_){
+			return;
+		}
+		
+		var material = that.pickedObject_.material;
+		material.emissive.setRGB(r, g, b);
 	});
 }
 gb3d.edit.EditingTool3D.prototype = Object.create(gb3d.edit.EditingToolBase.prototype);
@@ -399,18 +434,18 @@ gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object){
 }
 
 gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object){
+	var that = this;
 	var tab = $("#attrStyle");
 	var rows = tab.find(".gb-object-row");
 	var row, span, input;
 	
 	if(!(object instanceof THREE.Object3D)){
-		rows.each(function(){
-			$(this).find("input").val("");
-		});
+		tab.empty();
 		return;
 	}
 	
 	var userData = object.userData;
+	var material = object.material;
 	
 	tab.empty();
 	for(var key in userData){
@@ -432,9 +467,49 @@ gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object){
 	
 	tab.append(row);
 	input.spectrum({
-		color : "#fff",
-		showAlpha : true
+		color : "#" + material.color.getHexString()
 	});
+}
+
+gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object){
+	var that = this;
+	var tab = $("#attrMaterial");
+	var rows = tab.find(".gb-object-row");
+	var row, span, input;
+	
+	if(!(object instanceof THREE.Object3D)){
+		tab.empty();
+		return;
+	}
+	
+	var material = object.material;
+	var opts = this.materialOptions;
+	var val;
+	
+	tab.empty();
+	for(var i = 0; i < opts.length; i++){
+		val = material[opts[i]];
+		if(val instanceof THREE.Color){
+			span = $("<span class='Text'>").text(opts[i]);
+			input = $("<input id='textureEmissive' class='form-control' style='flex: 1;'>");
+		} else if(typeof val === "boolean"){
+			span = $("<span class='Text'>").text(opts[i]);
+			input = $("<input class='Checkbox' type='checkbox'>").prop("checked", val);
+		} else if(typeof val === "number"){
+			span = $("<span class='Text'>").text(opts[i]);
+			input = $("<input class='form-control' style='flex: 1;'>").val(val);
+		}
+		
+		row = $("<div class='gb-object-row'>").append(span).append(input);
+		row.data("key", opts[i]);
+		tab.append(row);
+		
+		if(val instanceof THREE.Color){
+			input.spectrum({
+				color : "#" + val.getHexString()
+			});
+		}
+	}
 }
 
 gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object){
