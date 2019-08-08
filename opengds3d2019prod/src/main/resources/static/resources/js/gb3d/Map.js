@@ -690,9 +690,16 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		return;
 	}
 
+	var points = [], faces = [];
+	for(var i = 0; i < result.points.length; i++){
+		points.push(result.points[i].clone());
+	}
+	for(var i = 0; i < result.faces.length; i++){
+		faces.push(result.faces[i].clone());
+	}
 	geometry = new THREE.Geometry();
-	geometry.vertices = result.points;
-	geometry.faces = result.faces;
+	geometry.vertices = points;
+	geometry.faces = faces;
 	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
@@ -703,15 +710,13 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry.computeBoundingSphere();
 
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.DoubleSide,
-		emissive : 0x123456
+		side : THREE.DoubleSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
 // latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
-// latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y,
-// centerHigh.z));
+//	latheMesh.lookAt(new THREE.Vector3(0, 0, 1));
 	this.getThreeScene().add(latheMesh);
 
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -902,6 +907,7 @@ gb3d.Map.prototype.syncUnselect = function(id){
 			this.tools.edit3d.pickedObject_ = threeObject.getObject();
 			this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
 			this.tools.edit3d.updateAttributeTab( undefined );
+			this.tools.edit3d.updateStyleTab( undefined );
 		}
 	}
 }
