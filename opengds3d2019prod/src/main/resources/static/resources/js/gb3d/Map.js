@@ -30,7 +30,7 @@ gb3d.Map = function(obj) {
 	};
 
 	// 2d 지도 영역 엘리먼트
-// this.target2d = undefined;
+//	this.target2d = undefined;
 	// 3d 지도 영역 엘리먼트
 	this.target = undefined;
 	// cesium 영역 엘리먼트
@@ -46,7 +46,7 @@ gb3d.Map = function(obj) {
 		console.error("gbMap must be set");
 		return;
 	}
-	
+
 	// Tools List
 	this.tools = {};
 
@@ -66,7 +66,7 @@ gb3d.Map = function(obj) {
 	}
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
-// useDefaultRenderLoop : false,
+//		useDefaultRenderLoop : false,
 		scene3DOnly: true,
 		selectionIndicator : false,
 		homeButton : false,
@@ -103,11 +103,11 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
-	
-// var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
-// this.cesiumViewer.scene.primitives.add(tileset);
-// this.cesiumViewer.zoomTo(tileset);
+//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+
+//	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
+//	this.cesiumViewer.scene.primitives.add(tileset);
+//	this.cesiumViewer.zoomTo(tileset);
 
 	this.cesiumViewer.camera.flyTo({
 		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
@@ -121,21 +121,21 @@ gb3d.Map = function(obj) {
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
 	// 초기 위치
-// this.initPosition = Array.isArray(options.initPosition) ?
-// Cesium.Cartesian3.fromDegrees(options.initPosition[0],
-// options.initPosition[1] - 1, 200000) : this.center;
+//	this.initPosition = Array.isArray(options.initPosition) ?
+//	Cesium.Cartesian3.fromDegrees(options.initPosition[0],
+//	options.initPosition[1] - 1, 200000) : this.center;
 	this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087, 200000);
 
 	// cesium 카메라를 지도 중심으로 이동
-// this.cesiumViewer.camera.flyTo({
-// destination : this.initPosition,
-// orientation : {
-// heading : Cesium.Math.toRadians(0),
-// pitch : Cesium.Math.toRadians(-60),
-// roll : Cesium.Math.toRadians(0)
-// },
-// duration: 3
-// });
+//	this.cesiumViewer.camera.flyTo({
+//	destination : this.initPosition,
+//	orientation : {
+//	heading : Cesium.Math.toRadians(0),
+//	pitch : Cesium.Math.toRadians(-60),
+//	roll : Cesium.Math.toRadians(0)
+//	},
+//	duration: 3
+//	});
 
 	// 지도에 표시할 객체 배열
 	this.threeObjects = [];
@@ -151,7 +151,7 @@ gb3d.Map = function(obj) {
 	// three js scene 객체
 	this.threeScene = new THREE.Scene();
 	// 그리드 추가
-	this.threeScene.add(new THREE.GridHelper(100, 10));
+	this.threeScene.add(new THREE.GridHelper(10000000, 10));
 	// three 카메라 선언
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
@@ -159,7 +159,7 @@ gb3d.Map = function(obj) {
 
 	this.threeLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 	this.threeScene.add(this.threeLight);
-	
+
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 	// 카메라 객체
@@ -172,7 +172,7 @@ gb3d.Map = function(obj) {
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
-// that.renderCesium();
+//		that.renderCesium();
 		that.renderThreeObj();
 	};
 	// 렌더링 시작
@@ -242,10 +242,10 @@ gb3d.Map = function(obj) {
 		});
 
 		// ***** 입력값 유효성 검사 필요 *****
-// that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
-// opt);
-// that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
-// opt);
+//		that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
+//		opt);
+//		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
+//		opt);
 		that.createLineStringObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
 		$("#lineObjectCreateModal").modal("hide");
@@ -339,7 +339,7 @@ gb3d.Map.prototype.getThreeTransformControls = function() {
  * @method gb3d.Map#renderCesium
  */
 gb3d.Map.prototype.renderCesium = function(){
-// var that = this;
+//	var that = this;
 	this.getCesiumViewer().render();
 	// cesium.viewer.scene.screenSpaceCameraController.enableInputs = false;
 }
@@ -383,7 +383,7 @@ gb3d.Map.prototype.renderThreeObj = function(){
 			// objs[i].getObject().lookAt(new THREE.Vector3(centerHigh.x,
 			// centerHigh.y, centerHigh.z));
 		}
-// objs[i].getObject().up.copy(latDir);
+//		objs[i].getObject().up.copy(latDir);
 	}
 
 	// Clone Cesium Camera projection position so the
@@ -420,22 +420,22 @@ gb3d.Map.prototype.renderThreeObj = function(){
  * 
  * @method gb3d.Map#render
  */
-// gb3d.Map.prototype.render = function(){
-// // var that = this;
-// that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
-// }
+//gb3d.Map.prototype.render = function(){
+////var that = this;
+//that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
+//}
 
 /**
  * 렌더링 함수를 반복한다
  * 
  * @method gb3d.Map#loop
  */
-// gb3d.Map.prototype.loop = function(){
-// var that = this;
-// requestAnimationFrame(that.loop);
-// that.renderCesium();
-// that.renderThreeObj();
-// }
+//gb3d.Map.prototype.loop = function(){
+//var that = this;
+//requestAnimationFrame(that.loop);
+//that.renderCesium();
+//that.renderThreeObj();
+//}
 
 /**
  * three transform controls 객체를 반환한다.
@@ -555,7 +555,7 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-// latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	this.getThreeScene().add(latheMesh);
@@ -578,71 +578,45 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	return obj3d;
 }
 
-/*gb3d.Map.prototype.createLineObject = function(arr, extent, option){
-	var coord = arr,
-	points = [],
-	geometry,
-	shape,
-	cart,
-	obj3d,
-	width = option.width || 50,
-	depth = option.depth || 50,
-	x = extent[0] + (extent[2] - extent[0]) / 2,
-	y = extent[1] + (extent[3] - extent[1]) / 2,
-	centerCart = Cesium.Cartesian3.fromDegrees(x, y);
-
-	var curve = new THREE.CatmullRomCurve3();
-	for(var i = 0; i < coord.length; i++){
-		if(coord[i][0] instanceof Array){
-			for(var j = 0; j < coord[i].length; j++){
-				cart = Cesium.Cartesian3.fromDegrees(coord[i][j][0], coord[i][j][1]);
-				curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
-			}
-		} else {
-			cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
-			curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
-		}
-	}
-
-	points.push(new THREE.Vector2(0, -width/2));
-	points.push(new THREE.Vector2(0, +width/2));
-	points.push(new THREE.Vector2(-depth, +width/2));
-	points.push(new THREE.Vector2(-depth, -width/2));
-
-	shape = new THREE.Shape(points);
-
-	geometry = new THREE.ExtrudeBufferGeometry(shape, {
-		steps: 100,
-		bevelEnabled: false,
-		extrudePath: curve
-	});
-
-	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
-
-	var doubleSideMaterial = new THREE.MeshNormalMaterial({
-		side : THREE.DoubleSide
-	});
-
-	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-	// latheMesh.scale.set(1, 1, 1);
-	latheMesh.position.copy(centerCart);
-	this.getThreeScene().add(latheMesh);
-
-	// userData 저장(THREE.Object3D 객체 속성)
-	latheMesh.userData.width = width;
-	latheMesh.userData.depth = depth;
-
-	obj3d = new gb3d.object.ThreeObject({
-		"object" : latheMesh,
-		"center" : [x, y],
-		"extent" : extent,
-		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
-	});
-
-	this.addThreeObject(obj3d);
-	return obj3d;
-}*/
+/*
+ * gb3d.Map.prototype.createLineObject = function(arr, extent, option){ var
+ * coord = arr, points = [], geometry, shape, cart, obj3d, width = option.width ||
+ * 50, depth = option.depth || 50, x = extent[0] + (extent[2] - extent[0]) / 2,
+ * y = extent[1] + (extent[3] - extent[1]) / 2, centerCart =
+ * Cesium.Cartesian3.fromDegrees(x, y);
+ * 
+ * var curve = new THREE.CatmullRomCurve3(); for(var i = 0; i < coord.length;
+ * i++){ if(coord[i][0] instanceof Array){ for(var j = 0; j < coord[i].length;
+ * j++){ cart = Cesium.Cartesian3.fromDegrees(coord[i][j][0], coord[i][j][1]);
+ * curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z)); } } else { cart =
+ * Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
+ * curve.points.push(new THREE.Vector3(cart.x, cart.y, cart.z)); } }
+ * 
+ * points.push(new THREE.Vector2(0, -width/2)); points.push(new THREE.Vector2(0,
+ * +width/2)); points.push(new THREE.Vector2(-depth, +width/2)); points.push(new
+ * THREE.Vector2(-depth, -width/2));
+ * 
+ * shape = new THREE.Shape(points);
+ * 
+ * geometry = new THREE.ExtrudeBufferGeometry(shape, { steps: 100, bevelEnabled:
+ * false, extrudePath: curve });
+ * 
+ * geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+ * 
+ * var doubleSideMaterial = new THREE.MeshNormalMaterial({ side :
+ * THREE.DoubleSide });
+ * 
+ * var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial); //
+ * latheMesh.scale.set(1, 1, 1); latheMesh.position.copy(centerCart);
+ * this.getThreeScene().add(latheMesh); // userData 저장(THREE.Object3D 객체 속성)
+ * latheMesh.userData.width = width; latheMesh.userData.depth = depth;
+ * 
+ * obj3d = new gb3d.object.ThreeObject({ "object" : latheMesh, "center" : [x,
+ * y], "extent" : extent, "type" : this.objectAttr.type, "feature" :
+ * this.objectAttr.feature });
+ * 
+ * this.addThreeObject(obj3d); return obj3d; }
+ */
 
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var that = this;
@@ -658,30 +632,6 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 			centerCart = Cesium.Cartesian3.fromDegrees(x, y),
 			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
-// for(var i = 0; i < coord[0].length; i++){
-// if(coord[0][i][0] instanceof Array){
-// for(var j = 0; j < coord[0][i].length - 1; j++){
-// cart = Cesium.Cartesian3.fromDegrees(coord[0][i][j][0], coord[0][i][j][1]);
-// points.push(new THREE.Vector2(cart.x, cart.y));
-// }
-// } else {
-// if(i == coord[0].length - 1){
-// break;
-// }
-// cart = Cesium.Cartesian3.fromDegrees(coord[0][i][0], coord[0][i][1]);
-// points.push(new THREE.Vector2(cart.x, cart.y));
-// }
-// }
-
-// shape = new THREE.Shape(points);
-// geometry = new THREE.ExtrudeGeometry(shape, {
-// depth: depth,
-// steps: 1,
-// material: 0,
-// extrudeMaterial: 1,
-// bevelEnabled: false
-// });
-	
 	if(this.objectAttr.type === "MultiPolygon"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
 	} else if(this.objectAttr.type === "Polygon"){
@@ -693,12 +643,9 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
+	console.log(result);
 	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
-	// compute Normals
-// geometry.computeVertexNormals();
-
-	// compute face Normals
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
 
@@ -708,12 +655,23 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-// latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
-// latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y,
-// centerHigh.z));
-	this.getThreeScene().add(latheMesh);
 
+	// 원점을 바라보도록 설정한다
+	latheMesh.lookAt(new THREE.Vector3(0,0,0));
+	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+	var quaternion = latheMesh.quaternion.clone();
+	// 쿼터니언각을 뒤집는다
+	quaternion.inverse();
+	// 모든 지오메트리 버텍스에
+	var vertices = latheMesh.geometry.vertices;
+	for (var i = 0; i < vertices.length; i++) {
+		var vertex = vertices[i];
+		// 뒤집은 쿼터니언각을 적용한다
+		vertex.applyQuaternion(quaternion);
+	}
+
+	this.getThreeScene().add(latheMesh);
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
@@ -773,11 +731,11 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		coord = bfeature.getGeometry().getCoordinates(true);
 		console.log(bfeature.getGeometry().getType());
 		console.log(coord);
-		
+
 	} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
-		
+
 	}
-	
+
 	if(this.objectAttr.type === "MultiLineString"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
 	} else if(this.objectAttr.type === "LineString"){
@@ -792,7 +750,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
-// geometry.computeVertexNormals();
+//	geometry.computeVertexNormals();
 
 	// compute face Normals
 	geometry.computeFaceNormals();
@@ -803,10 +761,21 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-// latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
-// latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y,
-// centerHigh.z));
+	// 원점을 바라보도록 설정한다
+	latheMesh.lookAt(new THREE.Vector3(0,0,0));
+	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+	var quaternion = latheMesh.quaternion.clone();
+	// 쿼터니언각을 뒤집는다
+	quaternion.inverse();
+	// 모든 지오메트리 버텍스에
+	var vertices = latheMesh.geometry.vertices;
+	for (var i = 0; i < vertices.length; i++) {
+		var vertex = vertices[i];
+		// 뒤집은 쿼터니언각을 적용한다
+		vertex.applyQuaternion(quaternion);
+	}
 	this.getThreeScene().add(latheMesh);
 
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -862,7 +831,7 @@ gb3d.Map.prototype.syncSelect = function(id){
 		if(!threeObject){
 			return;
 		}
-		
+
 		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
 			this.tools.edit2d.interaction.select.getFeatures().clear();
 			this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
@@ -873,27 +842,27 @@ gb3d.Map.prototype.syncSelect = function(id){
 			this.tools.edit3d.pickedObject_ = threeObject.getObject();
 			this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
 			this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
-// this.cesiumViewer.camera.flyTo({
-// destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
-// threeObject.getCenter()[1],
-// this.cesiumViewer.camera.positionCartographic.height),
-// duration: 0
-// });
+//			this.cesiumViewer.camera.flyTo({
+//			destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
+//			threeObject.getCenter()[1],
+//			this.cesiumViewer.camera.positionCartographic.height),
+//			duration: 0
+//			});
 		}
 	}
 }
 
 gb3d.Map.prototype.syncUnselect = function(id){
 	var id = id;
-	
+
 	var threeObject = this.getThreeObjectById(id);
-	
+
 	if(!threeObject){
 		threeObject = this.getThreeObjectByUuid(id);
 		if(!threeObject){
 			return;
 		}
-		
+
 		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
 			this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
 		}
@@ -946,7 +915,7 @@ gb3d.Map.prototype.modifyObject2Dfrom3D = function(vertices, uuid){
 		degrees.push([lon, lat]);
 	}
 	degrees.push(degrees[0]);
-// threeObject.getFeature().getGeometry().setCoordinates(degrees);
+//	threeObject.getFeature().getGeometry().setCoordinates(degrees);
 }
 
 gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
@@ -988,9 +957,9 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 
 			featureCoord = bfeature.getGeometry().getCoordinates(true);
 		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
-			
+
 		}
-		
+
 		a = featureCoord[0][0];
 		b = featureCoord[0][1];
 		break;
@@ -1044,7 +1013,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	if(coord.length === 0){
 		coord = threeObject.getFeature().getGeometry().getCoordinates(true);
 	}
-	
+
 	var opt = object.userData;
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
@@ -1057,7 +1026,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		object.geometry = geometry;
 		return;
 	}
-	
+
 	if (opt.type === "MultiLineString" || opt.type === "LineString") {
 		var feature = threeObject.getFeature().clone();
 		if (feature.getGeometry() instanceof ol.geom.LineString) {
@@ -1075,12 +1044,12 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 			coord = bfeature.getGeometry().getCoordinates(true);
 			console.log(bfeature.getGeometry().getType());
 			console.log(coord);
-			
+
 		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
-			
+
 		}
 	}
-	
+
 	var a, b, cp;
 	if(geometry instanceof THREE.Geometry){
 		if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
@@ -1099,17 +1068,34 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		geometry.vertices = result.points;
 		geometry.faces = result.faces;
 		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
-		object.geometry = geometry;
 
+		object.lookAt(new THREE.Vector3(0,0,0));
+		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+		var quaternion = object.quaternion.clone();
+		// 쿼터니언각을 뒤집는다
+		quaternion.inverse();
+		// 모든 지오메트리 버텍스에
+		var vertices = geometry.vertices;
+		for (var i = 0; i < vertices.length; i++) {
+			var vertex = vertices[i];
+			// 뒤집은 쿼터니언각을 적용한다
+			vertex.applyQuaternion(quaternion);
+		}
+
+		object.geometry = geometry;
 		// compute face Normals
 		geometry.computeFaceNormals();
 	}
 
 	cp = gb3d.Math.crossProductFromDegrees(a, b, center);
-	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-
+	
+//		position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
+//	var calcPos = new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y + (cp.v/cp.s), centerCart.z + (cp.w/cp.s));
+//	var nowPos = position.clone();
+	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y + (cp.v/cp.s), centerCart.z + (cp.w/cp.s)));
+//	position.setComponent(2, nowPos.z);
 	// threeObject 수정 횟수 증가, Center 값 재설정
 	threeObject.upModCount();
-//	threeObject.setCenter(center);
+	threeObject.setCenter(center);
 };
 

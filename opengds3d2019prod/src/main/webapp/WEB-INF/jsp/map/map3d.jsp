@@ -218,6 +218,13 @@ html, body {
 			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
 		});
 
+		var entity = gb3dMap.getCesiumViewer().entities.add({
+			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+			model : {
+				uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
+			}
+		});
+
 		var gbCam = gb3dMap.getCamera();
 
 		var uploadB3DM = new gb3d.io.B3DMManager({
