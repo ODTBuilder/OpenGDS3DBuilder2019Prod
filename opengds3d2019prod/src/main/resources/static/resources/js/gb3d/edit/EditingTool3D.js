@@ -247,6 +247,17 @@ gb3d.edit.EditingTool3D = function(obj) {
 		gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 	});
 	
+	$(document).on("change", "#attrAttr input", function(e){
+		var parent = $(this).parent();
+		var inputs = parent.find("input");
+		
+		if(!that.pickedObject_){
+			return;
+		}
+		
+		that.pickedObject_[parent.data("key")] = $(inputs[0]).prop("checked");
+	});
+	
 	$(document).on("keypress", "#attrStyle input", function(e){
 		if(e.keyCode == 13){
 			var parent = $(this).parent();
@@ -261,7 +272,21 @@ gb3d.edit.EditingTool3D = function(obj) {
 		gb3d.edit.EditingTool3D.updateStyleByInput( parent, that);
 	});
 	
-	$(document).on("change", "#attrAttr input", function(e){
+	$(document).on("keypress", "#attrMaterial input", function(e){
+		if(e.keyCode == 13){
+			var parent = $(this).parent();
+			
+			gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
+		}
+	});
+	
+	$(document).on("focusout", "#attrMaterial input", function(e){
+		var parent = $(this).parent();
+		
+		gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
+	});
+	
+	$(document).on("change", "#attrMaterial input", function(e){
 		var parent = $(this).parent();
 		var inputs = parent.find("input");
 		
@@ -269,7 +294,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			return;
 		}
 		
-		that.pickedObject_[parent.data("key")] = $(inputs[0]).prop("checked");
+		that.pickedObject_.material[parent.data("key")] = $(inputs[0]).prop("checked");
 	});
 	
 	$(document).on("change.spectrum", "#styleColor", function(e, color){
@@ -356,6 +381,31 @@ gb3d.edit.EditingTool3D.updateStyleByInput = function( row, obj ){
 	
 	pickedObject.userData[row.data("key")] = $(input[0]).val();
 	obj.map.modify3DVertices([], threeObject.getFeature().getId(), threeObject.getFeature().getGeometry().getExtent());
+}
+
+gb3d.edit.EditingTool3D.updateMaterialByInput = function( row, obj ){
+	if(!obj){
+		return;
+	}
+	
+	var row = row;
+	var pickedObject = obj? obj.pickedObject_ : undefined;
+	var input = row.find("input");
+	
+	if(!pickedObject){
+		return;
+	}
+	
+	var threeObject = obj.map.getThreeObjectByUuid(pickedObject.uuid);
+	if(!threeObject){
+		return;
+	}
+	
+	if(!row.data("key")){
+		return;
+	}
+	
+	pickedObject.material[row.data("key")] = parseFloat($(input[0]).val());
 }
 
 /**
