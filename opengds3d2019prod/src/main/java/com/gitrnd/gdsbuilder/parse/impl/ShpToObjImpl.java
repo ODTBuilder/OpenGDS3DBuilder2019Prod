@@ -96,6 +96,7 @@ public class ShpToObjImpl {
 		this.file = file;
 		this.filter = filter;
 		this.outputPath = outputPath;
+		this.defaultHeight = defVal;
 	}
 	
 	/**
@@ -291,14 +292,24 @@ public class ShpToObjImpl {
 		scaleFactor = 100 / boundingBox.getWidth(); // For a local CS with
 													// x-values between 0 and
 													// 100
+		
+		double globalMaxX = boundingBox.getMaxX();
+		double globalMaxY = boundingBox.getMaxY();
+		System.out.println("MinX,MinY " + globalMinX+"," + globalMinY);
+		System.out.println("MaxX,MaxY " + globalMaxX+","+globalMaxY);
+		
 	}
 
 	public Coordinate toLocalCoordinateSystem(Coordinate coordinate) {
-		return scaleCoordinateToLocalCoordinateSystem(translateCoordinateToLocalCoordinateSystem(coordinate));
+//		return scaleCoordinateToLocalCoordinateSystem(translateCoordinateToLocalCoordinateSystem(coordinate));
+		return translateCoordinateToLocalCoordinateSystem(coordinate);
 	}
 
 	public Coordinate translateCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
-		return new Coordinate(coordinate.x - globalMinX, coordinate.y - globalMinY, coordinate.z);
+//		return new Coordinate(coordinate.x - 14152291.11620959, coordinate.y - 4186947.107268023, coordinate.z);
+		return new Coordinate(coordinate.x - 14124146.02010919, coordinate.y - 4186947.107268023, coordinate.z);
+//		return new Coordinate(coordinate.x, coordinate.y, coordinate.z);
+//		return new Coordinate(coordinate.x - globalMinX, coordinate.y - globalMinY, coordinate.z);
 	}
 
 	public Coordinate scaleCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
