@@ -7,6 +7,28 @@ if (!gb3d)
 if (!gb3d.Math)
 	gb3d.Math = {};
 
+gb3d.Math.isParallel = function(pointA, pointB, standard){
+	var a, b, cart, va, vb, dot, result = false;
+	
+	a = Cesium.Cartesian3.fromDegrees(pointA[0], pointA[1]);
+	b = Cesium.Cartesian3.fromDegrees(pointB[0], pointB[1]);
+	cart = Cesium.Cartesian3.fromDegrees(standard[0], standard[1]);
+	
+	va = new THREE.Vector3(a.x - cart.x, a.y - cart.y, a.z - cart.z);
+	vb = new THREE.Vector3(b.x - cart.x, b.y - cart.y, b.z - cart.z);
+	
+	va.normalize();
+	vb.normalize();
+	
+	dot = parseFloat(va.dot(vb).toFixed(7));
+	
+	if(Math.abs(dot) == 1){
+		result = true;
+	}
+	
+	return result;
+}
+
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	var a, b, u, v, w, s, cart;
 	var ca = {}, cb = {}, cw;
@@ -73,6 +95,13 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
 	
 	// 3차원 객체 윗면 vertex 계산
 	var cp;
+	for(var i = 1; i < coordLength-1; i++){
+		if(!gb3d.Math.isParallel(coord[i+1], coord[i-1], coord[i])){
+			cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[i-1], coord[i]);
+			break;
+		}
+	}
+	
 	for(var i = 0; i < coordLength; i++){
 		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
 		
@@ -84,9 +113,9 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
 			faceSide.push([i - 1 + coordLength, i + coordLength, i]);
 		}
 		
-		if(i === 0){
-			cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1], coord[i]);
-		}
+//		if(i === 0){
+//			cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1], coord[i]);
+//		}
 		
 		points.push(new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth));
 	}

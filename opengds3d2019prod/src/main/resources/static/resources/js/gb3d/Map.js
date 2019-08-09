@@ -151,13 +151,13 @@ gb3d.Map = function(obj) {
 	// three js scene 객체
 	this.threeScene = new THREE.Scene();
 	// 그리드 추가
-	this.threeScene.add(new THREE.GridHelper(10000000, 10));
+	this.threeScene.add(new THREE.GridHelper());
 	// three 카메라 선언
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
 
-	this.threeLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+	this.threeLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
 	this.threeScene.add(this.threeLight);
 
 	// 영역에 three 추가
