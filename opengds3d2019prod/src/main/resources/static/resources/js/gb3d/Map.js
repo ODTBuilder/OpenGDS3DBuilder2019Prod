@@ -1088,11 +1088,13 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	}
 
 	cp = gb3d.Math.crossProductFromDegrees(a, b, center);
-	
-//		position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-//	var calcPos = new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y + (cp.v/cp.s), centerCart.z + (cp.w/cp.s));
+
+	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
+//	var calcPos = new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y +
+//	(cp.v/cp.s), centerCart.z + (cp.w/cp.s));
 //	var nowPos = position.clone();
-	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y + (cp.v/cp.s), centerCart.z + (cp.w/cp.s)));
+//	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s), centerCart.y +
+//	(cp.v/cp.s), centerCart.z + (cp.w/cp.s)));
 //	position.setComponent(2, nowPos.z);
 	// threeObject 수정 횟수 증가, Center 값 재설정
 	threeObject.upModCount();
