@@ -72,7 +72,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	}
 	this.materialOptions = options.materialOptions || [
 		"metalness", "roughness", "emissive", 
-		"skinning", "wireframe", "flatShading", 
+		"skinning", "wireframe", 
 		"emissiveMap", "opacity", "alphaTest"];
 	
 	function transformRender(){
@@ -235,27 +235,39 @@ gb3d.edit.EditingTool3D = function(obj) {
 	
 	$(document).on("keypress", "#attrAttr input", function(e){
 		if(e.keyCode == 13){
-			var parent = $(this).parent();
+			var input = $(this);
+			var parent = input.parent();
+			
+			if(input.prop("type") === "checkbox"){
+				return;
+			}
 			
 			gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 		}
 	});
 	
 	$(document).on("focusout", "#attrAttr input", function(e){
-		var parent = $(this).parent();
+		var input = $(this);
+		var parent = input.parent();
+		
+		if(input.prop("type") === "checkbox"){
+			return;
+		}
 		
 		gb3d.edit.EditingTool3D.updateAttributeByInput( parent, that.pickedObject_ );
 	});
 	
 	$(document).on("change", "#attrAttr input", function(e){
-		var parent = $(this).parent();
-		var inputs = parent.find("input");
+		var input = $(this);
+		var parent = input.parent();
 		
 		if(!that.pickedObject_){
 			return;
 		}
 		
-		that.pickedObject_[parent.data("key")] = $(inputs[0]).prop("checked");
+		if(input.prop("type") === "checkbox"){
+			that.pickedObject_[parent.data("key")] = input.prop("checked");
+		}
 	});
 	
 	$(document).on("keypress", "#attrStyle input", function(e){
@@ -274,27 +286,39 @@ gb3d.edit.EditingTool3D = function(obj) {
 	
 	$(document).on("keypress", "#attrMaterial input", function(e){
 		if(e.keyCode == 13){
-			var parent = $(this).parent();
+			var input = $(this);
+			var parent = input.parent();
+			
+			if(input.prop("type") === "checkbox"){
+				return;
+			}
 			
 			gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
 		}
 	});
 	
 	$(document).on("focusout", "#attrMaterial input", function(e){
-		var parent = $(this).parent();
+		var input = $(this);
+		var parent = input.parent();
+		
+		if(input.prop("type") === "checkbox"){
+			return;
+		}
 		
 		gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
 	});
 	
 	$(document).on("change", "#attrMaterial input", function(e){
-		var parent = $(this).parent();
-		var inputs = parent.find("input");
+		var input = $(this);
+		var parent = input.parent();
 		
 		if(!that.pickedObject_){
 			return;
 		}
 		
-		that.pickedObject_.material[parent.data("key")] = $(inputs[0]).prop("checked");
+		if(input.prop("type") === "checkbox"){
+			that.pickedObject_.material[parent.data("key")] = input.prop("checked");
+		}
 	});
 	
 	$(document).on("change.spectrum", "#styleColor", function(e, color){
@@ -548,6 +572,8 @@ gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object){
 		} else if(typeof val === "number"){
 			span = $("<span class='Text'>").text(opts[i]);
 			input = $("<input class='form-control' style='flex: 1;'>").val(val);
+		} else {
+			continue;
 		}
 		
 		row = $("<div class='gb-object-row'>").append(span).append(input);
@@ -572,8 +598,7 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object){
 		extent = threeObject.getExtent(),
 		x = extent[0] + (extent[2] - extent[0]) / 2,
 		y = extent[1] + (extent[3] - extent[1]) / 2,
-		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
-		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y);
 	
 	obj.position.copy(centerCart);
 }
