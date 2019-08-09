@@ -1,4 +1,4 @@
-package com.gitrnd.gdsbuilder.parse.impl;
+package com.gitrnd;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,27 +16,19 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeocentricCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.gitrnd.KongAlgo;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
 
 public class ShpToObjImpl {
 
@@ -173,7 +165,7 @@ public class ShpToObjImpl {
 					new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"))) {
 				writer.write("mtllib material.mtl\n");
 				try (FeatureIterator<SimpleFeature> features = buildingCollection.features()) {
-					// initTransformedCentroidCoordinate(buildingCollection);
+					initShapefileCoordinateSystemBoundaries(buildingCollection);
 					while (features.hasNext()) {
 						SimpleFeature feature = features.next();
 						writer.write(buildingFeatureToObjGroup(feature));
@@ -210,11 +202,6 @@ public class ShpToObjImpl {
 		multipolygon.normalize();
 		Coordinate[] coordinates = deleteInnerPoints(multipolygon.getCoordinates());
 
-		srcCRS = DefaultGeographicCRS.WGS84;
-		targetCRS = DefaultGeocentricCRS.CARTESIAN;
-		//targetCRS = CRS.decode("EPSG:3857");
-		transform = CRS.findMathTransform(srcCRS, targetCRS);
-
 		// 높이값 설정
 		double height = 0.0;
 
@@ -240,20 +227,10 @@ public class ShpToObjImpl {
 		String roofFace = "";
 		String wallFace = "";
 
-		// tmp set cent
-		Geometry geom = (Geometry) feature.getDefaultGeometry();
-		Geometry geomEn = geom.getEnvelope();
-		Point centroid = geomEn.getCentroid();
-		Coordinate centCoor = centroid.getCoordinate();
-		Coordinate centTrans = JTS.transform(centCoor, null, transform);
-		centTrans.z = 0.0;
 		// 바닥
 		List<Coordinate> coorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
-			Coordinate transCoor = JTS.transform(coordinates[i], null, transform);
-			transCoor.z = 0.0;
-			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
-					transCoor.z - centTrans.z);
+			Coordinate localCoor = toLocalCoordinateSystem(coordinates[i]);
 			coorList.add(i, localCoor);
 			result = result + coordinateToVertexdescription(localCoor);
 		}
@@ -271,13 +248,10 @@ public class ShpToObjImpl {
 			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
 			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
 		}
-
 		// 지붕
 		List<Coordinate> hCoorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
-			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
-			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
-					transCoor.z - centTrans.z);
+			Coordinate localCoor = toLocalCoordinateSystem(createLiftedCoordinate(coordinates[i], height));
 			hCoorList.add(i, localCoor);
 			result = result + coordinateToVertexdescription(localCoor);
 		}
@@ -345,37 +319,23 @@ public class ShpToObjImpl {
 		return (c1.x == c2.x && c1.y == c2.y && c1.z == c2.z);
 	}
 
-	public void initTransformedCentroidCoordinate(FeatureCollection collection) {
-
-		Envelope envelope = collection.getBounds();
-		Geometry geomEn = new GeometryFactory().toGeometry(envelope);
-		Point centroid = geomEn.getCentroid();
-		Coordinate centCoor = centroid.getCoordinate();
-		centCoor.z = defaultHeight;
-		try {
-			Coordinate transCent = JTS.transform(centroid.getCoordinate(), null, transform);
-			centerX = transCent.x;
-			centerY = transCent.y;
-		} catch (TransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public static void initShapefileCoordinateSystemBoundaries(FeatureCollection collection) {
+		BoundingBox boundingBox = collection.getBounds();
+		globalMinX = boundingBox.getMinX();
+		globalMinY = boundingBox.getMinY();
+		scaleFactor = 180 / boundingBox.getWidth(); // For a local CS with x-values between 0 and 100
 	}
 
-	public static Coordinate transformedCoordinate(Coordinate coordinate, double height) {
+	public static Coordinate toLocalCoordinateSystem(Coordinate coordinate) {
+		return scaleCoordinateToLocalCoordinateSystem(translateCoordinateToLocalCoordinateSystem(coordinate));
+	}
 
-		if (height != 0.0 || !String.valueOf(height).equals("NaN")) {
-			coordinate.z = height;
-		}
-		try {
-			Coordinate transCoor = JTS.transform(coordinate, null, transform);
-			double x = transCoor.x - centerX;
-			double y = transCoor.y - centerY;
-		} catch (TransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	public static Coordinate translateCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
+		return new Coordinate(coordinate.x - globalMinX, coordinate.y - globalMinY, coordinate.z);
+	}
+
+	public static Coordinate scaleCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
+		return new Coordinate(coordinate.x * scaleFactor, coordinate.y * scaleFactor, coordinate.z * scaleFactor);
 	}
 
 	public Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {

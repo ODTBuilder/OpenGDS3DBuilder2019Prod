@@ -174,29 +174,46 @@ html, body {
 			geoserverFileUpload : "geoserver/upload.do"
 		}
 
-		var map = new gb3d.Map({
-			"target2d" : $(".area-2d")[0],
-			"target3d" : $(".area-3d")[0],
-			"initPosition" : [ 127.100912, 37.401746 ]
+		var gbMap = new gb.Map({
+			"target" : $(".area-2d")[0],
+			"upperMap" : {
+				"controls" : [],
+				"layers" : []
+			},
+			"lowerMap" : {
+				"controls" : [],
+				"layers" : []
+			}
 		});
-		var gbMap = map.getGbMap();
-
-		// 		gbMap.setSize($(".area-2d").width(), $(".area-2d").height());
-
-		var crs = new gb.crs.BaseCRS({
-			"locale" : locale !== "" ? locale : "en",
-			"message" : $(".epsg-now")[0],
-			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
-			"epsg" : "4326"
-		});
-		crs.close();
-
+		
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
 		});
-
+		
+		var baseCRS =  new gb.crs.BaseCRS({
+			"locale" :  locale !== "" ? locale : "en",
+			"message" : $(".epsg-now")[0],
+			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
+			"epsg" : "4326"
+		});
+		
+		var gb3dMap = new gb3d.Map({
+			"gbMap" : gbMap,
+			"target" : $(".area-3d")[0],
+			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
+		});
+		
+        var entity = gb3dMap.getCesiumViewer().entities.add({
+			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+			model : {
+				uri : '${pageContext.request.contextPath}/resources/testtileset/4326_1.gltf'
+			}
+		});
+        
+		var gbCam = gb3dMap.getCamera();
+		  
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];
 			var maxCRS = [ 179, 89 ];
@@ -208,7 +225,7 @@ html, body {
 					material : Cesium.Color.RED.withAlpha(1)
 				}
 			};
-			var Polygon = map.getCesiumViewer().entities.add(entity);
+			var Polygon = gb3dMap.getCesiumViewer().entities.add(entity);
 
 			// Three.js Objects
 			// Lathe geometry
@@ -305,9 +322,9 @@ html, body {
 			});
 
 			// EditTool 활성화
-			var epan = new gb.edit.EditingTool2D({
+			var epan = new gb3d.edit.EditingTool2D({
 				targetElement : gbMap.getLowerDiv()[0],
-				map : gbMap.getUpperMap(),
+				map : gb3dMap,
 				featureRecord : frecord,
 				otree : otree,
 				wfsURL : urlList.getWFSFeature + urlList.token,
@@ -316,8 +333,9 @@ html, body {
 				isEditing : gb.module.isEditing
 			});
 			
-			var epan3d = new gb.edit.EditingTool3D({
+			var epan3d = new gb3d.edit.EditingTool3D({
 				targetElement : $(".area-3d")[0],
+				map: gb3dMap,
 				isDisplay: false,
 				locale : locale || "en"
 			});
@@ -326,6 +344,38 @@ html, body {
 				e.preventDefault();
 				epan.editToolToggle();
 				epan3d.toggleTool();
+			});
+			
+			// feature list
+			var featureList = new gb.layer.FeatureList({
+				map : gbMap.getUpperMap(),
+				targetElement : gbMap.getLowerDiv()[0],
+				title : "All Feature List",
+				toggleTarget : "#feature-toggle-btn",
+				wfstURL : urlList.wfst + urlList.token,
+				locale : locale || "en",
+				layerInfoURL : urlList.getLayerInfo + urlList.token,
+				getFeatureURL : urlList.getWFSFeature + urlList.token,
+				isDisplay : false
+			});
+			
+			otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
+				var treeid = data.selected[0];
+				var layer = data.instance.get_LayerById(treeid);
+
+				if (!layer) {
+					return;
+				}
+
+				if (layer instanceof ol.layer.Group) {
+					return;
+				}
+
+				if (featureList.footerTag.css("display") === "none") {
+					return;
+				} else {
+					featureList.updateFeatureList(layer);
+				}
 			});
 			
 			// 검수 수행 Modal 생성
@@ -350,20 +400,20 @@ html, body {
 					var winHeight = $(window).innerHeight();
 					var builderHeaderHeight = $(".builderHeader").outerHeight(true);
 
-					if (builderHeaderHeight != 41) {
-						return;
-					}
+					var conHeight;
 					//컨텐츠 영역의 높이 지정
-					var conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
+					if (builderHeaderHeight != 41) {
+						conHeight = $(".builderContent").outerHeight();
+						$(".builderContent").css("height", "86%");
+					} else {
+						conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
+						$(".builderContent").css("height", conHeight);
+					}
+					
 					//현재 보이는 브라우저 내부 영역의 너비
 					var winWidth = $(window).innerWidth();
 					//컨텐츠 (지도) 영역의 너비 지정
-					//.builderLayer -> 사이드바
 					var mapWidth = ($(".area-2d").parent().innerWidth());
-					//사이드바의 높이 지정
-					$(".builderLayer").outerHeight(conHeight);
-					//편집영역의 높이 지정
-					$(".builderContent").outerHeight(conHeight);
 					//컨텐츠 영역의 너비 지정
 					$(".area-2d").outerHeight(conHeight);
 					$(".area-3d").outerHeight(conHeight);
@@ -382,6 +432,10 @@ html, body {
 			$(window).resize(function() {
 				gitrnd.resize();
 			});
+			
+// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
+// 			gbMap.getLowerMap().getView().setZoom(15);
+
 		});
 
 		$(window).on("beforeunload", function() {

@@ -239,3 +239,45 @@ gb.Map.prototype.setSize = function(width, height) {
 gb.Map.prototype.updateSize = function() {
 	this.setSize($(this.bind).width(), $(this.bind).height());
 };
+
+/**
+ * 두 지도가 공유하는 ol.View 객체를 반환한다.
+ * 
+ * @method gb.Map#getView
+ * @return {ol.View} ol.View 객체
+ */
+gb.Map.prototype.getView = function() {
+	var tempView;
+	if (this.getUpperMap().getView() === this.getLowerMap().getView()) {
+		this.view = this.getUpperMap().getView();
+		tempView = this.view;
+	}
+	return tempView;
+};
+
+/**
+ * 두 지도가 공유하는 ol.View 객체를 설정한다.
+ * 
+ * @method gb.Map#setView
+ * @return {ol.View} ol.View 객체
+ */
+gb.Map.prototype.setView = function(view) {
+	this.view = view;
+	this.getUpperMap().setView(this.view);
+	this.getLowerMap().setView(this.view);
+};
+
+/**
+ * 두 지도가 공유하는 Div 엘리먼트를 반환한다.
+ * 
+ * @method gb.Map#getTarget
+ * @return {HTMLElement} Div 엘리먼트
+ */
+gb.Map.prototype.getView = function() {
+	var tempView;
+	if (this.getUpperMap().getView() === this.getLowerMap().getView()) {
+		this.view = this.getUpperMap().getView();
+		tempView = this.view;
+	}
+	return tempView;
+};
