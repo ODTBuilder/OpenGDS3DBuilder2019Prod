@@ -202,11 +202,18 @@ html, body {
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
 			"target" : $(".area-3d")[0],
-			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
+			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
 		});
 		
+        var entity = gb3dMap.getCesiumViewer().entities.add({
+			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+			model : {
+				uri : '${pageContext.request.contextPath}/resources/testtileset/4326_1.gltf'
+			}
+		});
+        
 		var gbCam = gb3dMap.getCamera();
-		
+		  
 		function init3DObject() {
 			var minCRS = [ -180, -89 ];
 			var maxCRS = [ 179, 89 ];
