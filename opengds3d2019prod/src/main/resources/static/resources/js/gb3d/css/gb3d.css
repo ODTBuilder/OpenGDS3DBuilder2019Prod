@@ -1,3 +1,21 @@
+.gb3d-modal-to3d-row {
+	padding: 5px;
+}
+
+.gb3d-modal-to3d-label {
+	display: inline-block;
+	width: 20%;
+}
+
+.gb3d-modal-to3d-value {
+	display: inline-block;
+	width: 80%;
+}
+
+.gb3d-modal-to3d-label-texture {
+	vertical-align: top;
+}
+
 .gb3d-camera-icon {
 	max-width: 256px;
 	max-height: 256px;
