@@ -7,7 +7,8 @@ if (!gb3d)
 if (!gb3d.io)
 	gb3d.io = {};
 /**
- * @classdesc B3DMManager 객체를 정의한다.
+ * @classdesc B3DMManager 객체를 정의한다. 압축된 B3DM 파일을 서버로 전송한다. 전송한 B3DM을 렌더링한다. 편집을
+ *            위해변환된 GLB파일을 불러온다.
  * 
  * @class gb3d.io.B3DMManager
  * @memberof gb3d.io
@@ -49,7 +50,7 @@ gb3d.io.B3DMManager = function(obj) {
 	};
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
-	this.uploadURL = options.url ? options.url : undefined;
+	this.url = options.url ? options.url : undefined;
 
 	obj.width = 368;
 	obj.autoOpen = false;
@@ -124,7 +125,7 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 			// that.resultTable(data.layers);
 			// that.callback();
 		},
-		error : function(jqXHR, textStatus, errorThrown){
+		error : function(jqXHR, textStatus, errorThrown) {
 			that.printMessage(that.translation.err[that.locale]);
 		}
 	});
@@ -133,7 +134,7 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 /**
  * 스피너를 보여준다.
  * 
- * @method gb.versioning.Repository#showSpinner
+ * @method gb3d.io.B3DMManager#showSpinner
  * @param {boolean}
  *            show - 스피너 표시 유무
  * @param {gb.modal.ModalBase}
@@ -151,13 +152,13 @@ gb3d.io.B3DMManager.prototype.showSpinner = function(show, modal) {
 };
 
 /**
- * 선택한 파일을 업로드한다.
+ * 업로드할 주소를 반환한다.
  * 
  * @method gb3d.io.B3DMManager#getUploadURL
  * @return {String} 업로드 URL
  */
 gb3d.io.B3DMManager.prototype.getUploadURL = function() {
-	return this.uploadURL;
+	return this.url;
 };
 
 /**

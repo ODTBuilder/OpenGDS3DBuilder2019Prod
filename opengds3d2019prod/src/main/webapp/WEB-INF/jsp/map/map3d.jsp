@@ -228,7 +228,8 @@ html, body {
 		var gbCam = gb3dMap.getCamera();
 
 		var uploadB3DM = new gb3d.io.B3DMManager({
-			"locale" : locale !== "" ? locale : "en"
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
 		});
 
 		$("#importB3dmBtn").click(function() {
@@ -267,17 +268,37 @@ html, body {
 				}
 			});
 
+			var uploadSHP = new gb.geoserver.UploadSHP({
+				"url" : urlList.geoserverFileUpload + urlList.token,
+				"locale" : locale !== "" ? locale : "en"
+			});
+
+			var simple3d = new gb3d.io.Simple3DManager({
+				"url" : undefined,
+				"locale" : locale !== "" ? locale : "en",
+				"gb3dMap" : gb3dMap
+			});
+
+			var multiobj = new gb3d.io.MultiOBJManager({
+				"test" : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json",
+				"url" : undefined,
+				"locale" : locale !== "" ? locale : "en",
+				"gb3dMap" : gb3dMap
+			});
 			var gtree = new gb3d.tree.GeoServer({
 				"locale" : locale !== "" ? locale : "en",
 				"height" : "300px",
 				"append" : $(".builderLayerGeoServerPanel")[0],
 				"clientTree" : otree.getJSTree(),
 				"map" : gbMap.getUpperMap(),
+// 			"gb3dMap" : gb3dMap,
 				"properties" : new gb.edit.ModifyLayerProperties({
 					"token" : urlList.token,
 					"locale" : locale !== "" ? locale : "en"
 				}),
-				//"uploadSHP" : uploadSHP,
+				"uploadSHP" : uploadSHP,
+				"simple3DManager" : simple3d,
+				"multiOBJManager" : multiobj,
 				"url" : {
 					"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
 					"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
