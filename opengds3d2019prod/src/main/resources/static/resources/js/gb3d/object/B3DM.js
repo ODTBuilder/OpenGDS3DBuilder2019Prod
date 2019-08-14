@@ -17,5 +17,14 @@ if (!gb3d.object)
  * @author SOYIJUN
  */
 gb3d.object.B3DM = function(obj) {
+	var options = obj;
+	this.layer = options.layer ? options.layer : undefined;
+	this.tile = options.tile;
 	
+	// extent point [a,b,c,d]
+	this.extent = options.extent;
+
+	this.feature = options.feature;
+
+	this.modCount = 0;
 };

@@ -701,7 +701,7 @@ if (!gb.validation)
 					"icon" : "fas fa-circle gb-fa-xxs"
 				}
 			},
-			"plugins" : [ "contextmenu", "dnd", "search", "state", "types", "wholerow" ]
+			"plugins" : [ "contextmenu", "dnd", "search", "state", "types" ]
 		});
 
 		this.workingTree = treeContent.jstree(true);

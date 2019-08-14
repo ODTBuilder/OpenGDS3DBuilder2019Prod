@@ -69,7 +69,7 @@ gb.modal.ModalBase = function(obj) {
 		"width" : typeof this.width === "number" ? this.width+"px" : this.width,
 				"height" : typeof this.height === "number" ? this.height+"px" : this.height,
 						"position" : "absolute",
-						"z-Index" : "1041"
+						"z-Index" : "999"
 	}).append(this.modalHead).append(this.modalBody).append(this.modalFooter);
 	/**
 	 * @private
@@ -183,10 +183,22 @@ gb.modal.ModalBase.prototype.close = function() {
  * @method gb.modal.ModalBase#refreshPosition
  */
 gb.modal.ModalBase.prototype.refreshPosition = function() {
+	var maskHeight = $(document).height();  
+	var maskWidth = $(window).width();
+	
+	var dialogTop =  (maskHeight) - (this.getHeight()*3);  
+	var dialogLeft = (maskWidth/2) - (this.getWidth()/2);
+	
 	$(this.modal).css({
-		"top" : ($(window).innerHeight() / 2) - (this.getHeight()/2+50) + "px",
-		"left" : ($(window).innerWidth() / 2) - (this.getWidth()/2) + "px"
+		"top" : 0,
+		"left" : dialogLeft,
+		"position" : "fixed",
+		"margin" : "50px auto"
 	});
+// $(this.modal).css({
+// "top" : ($(window).innerHeight() / 2) - (this.getHeight()/2+50) + "px",
+// "left" : ($(window).innerWidth() / 2) - (this.getWidth()/2) + "px"
+// });
 };
 /**
  * 너비를 설정한다.
@@ -259,10 +271,27 @@ gb.modal.ModalBase.prototype.getHeight = function() {
  * @return {number} 최고 z-index
  */
 gb.modal.ModalBase.prototype.getMaxZIndex = function() {
-	var maxZ = Math.max.apply(null,$.map($('body > div.gb-modal'), function(e,n){
+	var maxZ = Math.max.apply(null,$.map($('body > div'), function(e,n){
 		if($(e).css('position')=='absolute'){
 			return parseInt($(e).css('z-index'))||1 ;
 		}
 	}));
 	return maxZ;
+};
+
+/**
+ * 스피너를 보여준다.
+ * 
+ * @method gb.modal.ModalBase#showSpinner
+ * @param {boolean}
+ *            show - 스피너 표시 유무
+ */
+gb.modal.ModalBase.prototype.showSpinner = function(show) {
+	if (show) {
+		var spinnerArea = $("<div>").append($("<i>").addClass("fas fa-spinner fa-spin fa-5x")).addClass("gb-spinner-wrap").addClass(
+				"gb-spinner-body").addClass("gb-spinner-position");
+		$(this.getModal()).append(spinnerArea);
+	} else {
+		$(this.getModal()).find(".gb-spinner-wrap").remove();
+	}
 };

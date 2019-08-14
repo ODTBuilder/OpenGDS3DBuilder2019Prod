@@ -179,64 +179,63 @@ html, body {
 			geoserverFileUpload : "geoserver/upload.do"
 		}
 
-		var gbMap = new gb.Map({
-			"target" : $(".area-2d")[0],
-			"upperMap" : {
-				"controls" : [],
-				"layers" : []
-			},
-			"lowerMap" : {
-				"controls" : [],
-				"layers" : []
-			}
-		});
-
-		var mousePosition = new gb.map.MousePosition({
-			map : gbMap.getUpperMap()
-		});
-
-		var gbBaseMap = new gb.style.BaseMap({
-			"map" : gbMap.getLowerMap(),
-			"defaultBaseMap" : "osm",
-			"locale" : locale !== "" ? locale : "en"
-		});
-
-		$("#changeBase").click(function() {
-			gbBaseMap.open();
-		});
-
-		var baseCRS = new gb.crs.BaseCRS({
-			"locale" : locale !== "" ? locale : "en",
-			"message" : $(".epsg-now")[0],
-			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
-			"epsg" : "4326"
-		});
-
-		var gb3dMap = new gb3d.Map({
-			"gbMap" : gbMap,
-			"target" : $(".area-3d")[0],
-			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
-		});
-
-		var entity = gb3dMap.getCesiumViewer().entities.add({
-			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
-			model : {
-				uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
-			}
-		});
-
-		var gbCam = gb3dMap.getCamera();
-
-		var uploadB3DM = new gb3d.io.B3DMManager({
-			"locale" : locale !== "" ? locale : "en",
-			"gb3dMap" : gb3dMap
-		});
-
-		$("#importB3dmBtn").click(function() {
-			uploadB3DM.open();
-		});
-
 		$(document).ready(function() {
+			var gbMap = new gb.Map({
+				"target" : $(".area-2d")[0],
+				"upperMap" : {
+					"controls" : [],
+					"layers" : []
+				},
+				"lowerMap" : {
+					"controls" : [],
+					"layers" : []
+				}
+			});
+
+			var mousePosition = new gb.map.MousePosition({
+				map : gbMap.getUpperMap()
+			});
+
+			var gbBaseMap = new gb.style.BaseMap({
+				"map" : gbMap.getLowerMap(),
+				"defaultBaseMap" : "osm",
+				"locale" : locale !== "" ? locale : "en"
+			});
+
+			$("#changeBase").click(function() {
+				gbBaseMap.open();
+			});
+
+			var baseCRS = new gb.crs.BaseCRS({
+				"locale" : locale !== "" ? locale : "en",
+				"message" : $(".epsg-now")[0],
+				"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
+				"epsg" : "4326"
+			});
+
+			var gb3dMap = new gb3d.Map({
+				"gbMap" : gbMap,
+				"target" : $(".area-3d")[0],
+				"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
+			});
+
+			var entity = gb3dMap.getCesiumViewer().entities.add({
+				position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+				model : {
+					uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
+				}
+			});
+
+			var gbCam = gb3dMap.getCamera();
+
+			var uploadB3DM = new gb3d.io.B3DMManager({
+				"locale" : locale !== "" ? locale : "en",
+				"gb3dMap" : gb3dMap
+			});
+
+			$("#importB3dmBtn").click(function() {
+				uploadB3DM.open();
+			});
 
 			var frecord = new gb.edit.FeatureRecord({
 				//id : "feature_id",
@@ -285,13 +284,14 @@ html, body {
 				"locale" : locale !== "" ? locale : "en",
 				"gb3dMap" : gb3dMap
 			});
+
 			var gtree = new gb3d.tree.GeoServer({
 				"locale" : locale !== "" ? locale : "en",
 				"height" : "300px",
 				"append" : $(".builderLayerGeoServerPanel")[0],
 				"clientTree" : otree.getJSTree(),
 				"map" : gbMap.getUpperMap(),
-// 			"gb3dMap" : gb3dMap,
+				// 			"gb3dMap" : gb3dMap,
 				"properties" : new gb.edit.ModifyLayerProperties({
 					"token" : urlList.token,
 					"locale" : locale !== "" ? locale : "en"
