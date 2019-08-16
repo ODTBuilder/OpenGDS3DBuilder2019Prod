@@ -11,13 +11,13 @@ if (!gb3d.io.importer)
 /**
  * @classdesc importerThree 객체를 정의한다.
  * 
- * @class gb3d.io.importerThree
+ * @class gb3d.io.ImporterThree
  * @memberof gb3d.io
  * @param {Object}
  *            obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
-gb3d.io.importerThree = function(obj) {
+gb3d.io.ImporterThree = function(obj) {
 	var that = this;
 	/**
 	 * @private
@@ -52,7 +52,7 @@ gb3d.io.importerThree = function(obj) {
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
 	this.uploadURL = options.url ? options.url : undefined;
-
+	this.decoder = options.decoder ? options.decoder : undefined;
 	obj.width = 368;
 	obj.autoOpen = false;
 	obj.title = this.translation.titlemsg[this.locale];
@@ -72,13 +72,14 @@ gb3d.io.importerThree = function(obj) {
 		that.close();
 	});
 	var uploadBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text(this.translation["import"][this.locale]).click(function() {
-//		that.upload();
+		// that.upload();
+		that.loadFile($(that.inputFile)[0].files[0]);
 	});
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(uploadBtn).append(cancelBtn);
 	$(footer).append(buttonArea);
 };
-gb3d.io.importerThree.prototype = Object.create(gb.modal.ModalBase.prototype);
-gb3d.io.importerThree.prototype.constructor = gb3d.io.importerThree;
+gb3d.io.ImporterThree.prototype = Object.create(gb.modal.ModalBase.prototype);
+gb3d.io.ImporterThree.prototype.constructor = gb3d.io.ImporterThree;
 
 /**
  * 파일을 읽는다.
@@ -89,17 +90,19 @@ gb3d.io.importerThree.prototype.constructor = gb3d.io.importerThree;
  * @param {gb.modal.ModalBase}
  *            modal - 스피너를 표시할 모달 객체
  */
-gb3d.io.importerThree.prototype.loadFile = function(file) {
+gb3d.io.ImporterThree.prototype.loadFile = function(file) {
+	var that = this;
 	var filename = file.name;
 	var extension = filename.split('.').pop().toLowerCase();
 
 	var reader = new FileReader();
 	reader.addEventListener('progress', function(event) {
 
-		var size = '(' + Math.floor(event.total / 1000).format() + ' KB)';
-		var progress = Math.floor((event.loaded / event.total) * 100) + '%';
+//		var size = '(' + Math.floor(event.total / 1000).format() + ' KB)';
+//		var progress = Math.floor((event.loaded / event.total) * 100) + '%';
 
-		console.log('Loading', filename, size, progress);
+//		console.log('Loading', filename, size, progress);
+		console.log(event);
 
 	});
 
@@ -121,6 +124,31 @@ gb3d.io.importerThree.prototype.loadFile = function(file) {
 
 		break;
 
+	case 'glb':
+
+		reader.addEventListener('load', function(event) {
+
+			var contents = event.target.result;
+
+			THREE.DRACOLoader.setDecoderPath(that.decoder);
+
+			var loader = new THREE.GLTFLoader();
+			loader.setDRACOLoader(new THREE.DRACOLoader());
+			loader.parse(contents, '', function(result) {
+
+				var scene = result.scene;
+				scene.name = filename;
+
+				editor.addAnimation(scene, result.animations);
+				editor.execute(new AddObjectCommand(editor, scene));
+
+			});
+
+		}, false);
+		reader.readAsArrayBuffer(file);
+
+		break;
+
 	case 'zip':
 
 		reader.addEventListener('load', function(event) {
@@ -139,7 +167,7 @@ gb3d.io.importerThree.prototype.loadFile = function(file) {
 		break;
 
 	}
-	
+
 };
 
 /**
@@ -151,7 +179,7 @@ gb3d.io.importerThree.prototype.loadFile = function(file) {
  * @param {gb.modal.ModalBase}
  *            modal - 스피너를 표시할 모달 객체
  */
-gb3d.io.importerThree.prototype.showSpinner = function(show, modal) {
+gb3d.io.ImporterThree.prototype.showSpinner = function(show, modal) {
 	if (show) {
 		var spinnerArea = $("<div>").append($("<i>").addClass("fas fa-spinner fa-spin fa-5x")).addClass("gb-spinner-wrap").addClass("gb-spinner-body").css({
 			"padding-top" : "50px"
@@ -165,21 +193,21 @@ gb3d.io.importerThree.prototype.showSpinner = function(show, modal) {
 /**
  * 선택한 파일을 업로드한다.
  * 
- * @method gb3d.io.importerThree#getUploadURL
+ * @method gb3d.io.ImporterThree#getUploadURL
  * @return {String} 업로드 URL
  */
-gb3d.io.importerThree.prototype.getUploadURL = function() {
+gb3d.io.ImporterThree.prototype.getUploadURL = function() {
 	return this.uploadURL;
 };
 
 /**
  * 업로드 메세지를 출력한다.
  * 
- * @method gb3d.io.importerThree#printMessage
+ * @method gb3d.io.ImporterThree#printMessage
  * @param {String}
  *            msg - 표시할 메세지
  */
-gb3d.io.importerThree.prototype.printMessage = function(msg) {
+gb3d.io.ImporterThree.prototype.printMessage = function(msg) {
 	$(this.complete).empty();
 	$(this.complete).text(msg);
 };

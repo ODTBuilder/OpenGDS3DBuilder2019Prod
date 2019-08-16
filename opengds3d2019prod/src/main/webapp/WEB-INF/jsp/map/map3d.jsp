@@ -179,212 +179,218 @@ html, body {
 			geoserverFileUpload : "geoserver/upload.do"
 		}
 
-		$(document).ready(function() {
-			var gbMap = new gb.Map({
-				"target" : $(".area-2d")[0],
-				"upperMap" : {
-					"controls" : [],
-					"layers" : []
-				},
-				"lowerMap" : {
-					"controls" : [],
-					"layers" : []
-				}
-			});
+		var gbMap = new gb.Map({
+			"target" : $(".area-2d")[0],
+			"upperMap" : {
+				"controls" : [],
+				"layers" : []
+			},
+			"lowerMap" : {
+				"controls" : [],
+				"layers" : []
+			}
+		});
 
-			var mousePosition = new gb.map.MousePosition({
-				map : gbMap.getUpperMap()
-			});
+		var mousePosition = new gb.map.MousePosition({
+			map : gbMap.getUpperMap()
+		});
 
-			var gbBaseMap = new gb.style.BaseMap({
-				"map" : gbMap.getLowerMap(),
-				"defaultBaseMap" : "osm",
-				"locale" : locale !== "" ? locale : "en"
-			});
+		var gbBaseMap = new gb.style.BaseMap({
+			"map" : gbMap.getLowerMap(),
+			"defaultBaseMap" : "osm",
+			"locale" : locale !== "" ? locale : "en"
+		});
 
-			$("#changeBase").click(function() {
-				gbBaseMap.open();
-			});
+		$("#changeBase").click(function() {
+			gbBaseMap.open();
+		});
 
-			var baseCRS = new gb.crs.BaseCRS({
-				"locale" : locale !== "" ? locale : "en",
-				"message" : $(".epsg-now")[0],
-				"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
-				"epsg" : "4326"
-			});
+		var baseCRS = new gb.crs.BaseCRS({
+			"locale" : locale !== "" ? locale : "en",
+			"message" : $(".epsg-now")[0],
+			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
+			"epsg" : "4326"
+		});
 
-			var gb3dMap = new gb3d.Map({
-				"gbMap" : gbMap,
-				"target" : $(".area-3d")[0],
-				"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
-			});
+		var gb3dMap = new gb3d.Map({
+			"gbMap" : gbMap,
+			"target" : $(".area-3d")[0],
+			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
+		});
 
-			var entity = gb3dMap.getCesiumViewer().entities.add({
-				position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
-				model : {
-					uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
-				}
-			});
+		var entity = gb3dMap.getCesiumViewer().entities.add({
+			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+			model : {
+				uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
+			}
+		});
 
-			var gbCam = gb3dMap.getCamera();
+		var gbCam = gb3dMap.getCamera();
 
-			var uploadB3DM = new gb3d.io.B3DMManager({
-				"locale" : locale !== "" ? locale : "en",
-				"gb3dMap" : gb3dMap
-			});
+		var uploadB3DM = new gb3d.io.B3DMManager({
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
 
-			$("#importB3dmBtn").click(function() {
-				uploadB3DM.open();
-			});
+		$("#importB3dmBtn").click(function() {
+			uploadB3DM.open();
+		});
 
-			var frecord = new gb.edit.FeatureRecord({
-				//id : "feature_id",
-				locale : locale,
-				wfstURL : urlList.wfst + urlList.token,
-				layerInfoURL : urlList.getLayerInfo + urlList.token
-			});
+		var frecord = new gb.edit.FeatureRecord({
+			//id : "feature_id",
+			locale : locale,
+			wfstURL : urlList.wfst + urlList.token,
+			layerInfoURL : urlList.getLayerInfo + urlList.token
+		});
 
-			var uploadjson = new gb.geoserver.UploadGeoJSON({
-				"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
-				"epsg" : function() {
-					return crs.getEPSGCode();
-				},
-				"geoserverTree" : function() {
-					return gtree;
-				},
-				"locale" : locale !== "" ? locale : "en"
-			});
+		var uploadjson = new gb.geoserver.UploadGeoJSON({
+			"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
+			"epsg" : function() {
+				return crs.getEPSGCode();
+			},
+			"geoserverTree" : function() {
+				return gtree;
+			},
+			"locale" : locale !== "" ? locale : "en"
+		});
 
-			otree = new gb3d.tree.OpenLayers({
-				"locale" : locale || "en",
-				"append" : $(".builderLayerClientPanel")[0],
-				"map" : gbMap.getUpperMap(),
-				"frecord" : frecord,
-				"uploadJSON" : uploadjson,
+		otree = new gb3d.tree.OpenLayers({
+			"locale" : locale || "en",
+			"append" : $(".builderLayerClientPanel")[0],
+			"map" : gbMap.getUpperMap(),
+			"frecord" : frecord,
+			"uploadJSON" : uploadjson,
+			"token" : urlList.token,
+			"url" : {
+				"getLegend" : urlList.getLegend + urlList.token
+			}
+		});
+
+		var uploadSHP = new gb.geoserver.UploadSHP({
+			"url" : urlList.geoserverFileUpload + urlList.token,
+			"locale" : locale !== "" ? locale : "en"
+		});
+
+		var simple3d = new gb3d.io.Simple3DManager({
+			"url" : undefined,
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
+
+		var multiobj = new gb3d.io.MultiOBJManager({
+			"test" : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json",
+			"url" : undefined,
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
+
+		var importThree = new gb3d.io.ImporterThree({
+			"locale" : locale !== "" ? locale : "en",
+			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/",
+			"gb3dMap" : gb3dMap
+		});
+
+		var gtree = new gb3d.tree.GeoServer({
+			"locale" : locale !== "" ? locale : "en",
+			"height" : "300px",
+			"append" : $(".builderLayerGeoServerPanel")[0],
+			"clientTree" : otree.getJSTree(),
+			"map" : gbMap.getUpperMap(),
+			// 			"gb3dMap" : gb3dMap,
+			"properties" : new gb.edit.ModifyLayerProperties({
 				"token" : urlList.token,
-				"url" : {
-					"getLegend" : urlList.getLegend + urlList.token
-				}
-			});
-
-			var uploadSHP = new gb.geoserver.UploadSHP({
-				"url" : urlList.geoserverFileUpload + urlList.token,
 				"locale" : locale !== "" ? locale : "en"
-			});
+			}),
+			"uploadSHP" : uploadSHP,
+			"simple3DManager" : simple3d,
+			"multiOBJManager" : multiobj,
+			"url" : {
+				"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"deleteGeoServer" : "geoserver/removeGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"deleteGeoServerLayer" : "geoserver/geoserverRemoveLayers.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"getMapWMS" : urlList.getMapWMS + urlList.token,
+				"getLayerInfo" : urlList.getLayerInfo + urlList.token,
+				"getWFSFeature" : urlList.getWFSFeature + urlList.token,
+				"switchGeoGigBranch" : "geoserver/updateGeogigGsStore.do?${_csrf.parameterName}=${_csrf.token}",
+				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
+			}
+		});
 
-			var simple3d = new gb3d.io.Simple3DManager({
-				"url" : undefined,
-				"locale" : locale !== "" ? locale : "en",
-				"gb3dMap" : gb3dMap
-			});
+		// EditTool 활성화
+		var epan = new gb3d.edit.EditingTool2D({
+			targetElement : gbMap.getLowerDiv()[0],
+			map : gb3dMap,
+			featureRecord : frecord,
+			otree : otree,
+			wfsURL : urlList.getWFSFeature + urlList.token,
+			layerInfo : urlList.getLayerInfo + urlList.token,
+			locale : locale || "en",
+			isEditing : gb.module.isEditing
+		});
 
-			var multiobj = new gb3d.io.MultiOBJManager({
-				"test" : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json",
-				"url" : undefined,
-				"locale" : locale !== "" ? locale : "en",
-				"gb3dMap" : gb3dMap
-			});
+		var epan3d = new gb3d.edit.EditingTool3D({
+			targetElement : $(".area-3d")[0],
+			map : gb3dMap,
+			isDisplay : false,
+			locale : locale || "en"
+		});
 
-			var gtree = new gb3d.tree.GeoServer({
-				"locale" : locale !== "" ? locale : "en",
-				"height" : "300px",
-				"append" : $(".builderLayerGeoServerPanel")[0],
-				"clientTree" : otree.getJSTree(),
-				"map" : gbMap.getUpperMap(),
-				// 			"gb3dMap" : gb3dMap,
-				"properties" : new gb.edit.ModifyLayerProperties({
-					"token" : urlList.token,
-					"locale" : locale !== "" ? locale : "en"
-				}),
-				"uploadSHP" : uploadSHP,
-				"simple3DManager" : simple3d,
-				"multiOBJManager" : multiobj,
-				"url" : {
-					"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"deleteGeoServer" : "geoserver/removeGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"deleteGeoServerLayer" : "geoserver/geoserverRemoveLayers.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"getMapWMS" : urlList.getMapWMS + urlList.token,
-					"getLayerInfo" : urlList.getLayerInfo + urlList.token,
-					"getWFSFeature" : urlList.getWFSFeature + urlList.token,
-					"switchGeoGigBranch" : "geoserver/updateGeogigGsStore.do?${_csrf.parameterName}=${_csrf.token}",
-					"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
-				}
-			});
+		$("#editTool").click(function(e) {
+			e.preventDefault();
+			epan.editToolToggle();
+			epan3d.toggleTool();
+		});
 
-			// EditTool 활성화
-			var epan = new gb3d.edit.EditingTool2D({
-				targetElement : gbMap.getLowerDiv()[0],
-				map : gb3dMap,
-				featureRecord : frecord,
-				otree : otree,
-				wfsURL : urlList.getWFSFeature + urlList.token,
-				layerInfo : urlList.getLayerInfo + urlList.token,
-				locale : locale || "en",
-				isEditing : gb.module.isEditing
-			});
+		// feature list
+		var featureList = new gb.layer.FeatureList({
+			map : gbMap.getUpperMap(),
+			targetElement : gbMap.getLowerDiv()[0],
+			title : "All Feature List",
+			toggleTarget : "#feature-toggle-btn",
+			wfstURL : urlList.wfst + urlList.token,
+			locale : locale || "en",
+			layerInfoURL : urlList.getLayerInfo + urlList.token,
+			getFeatureURL : urlList.getWFSFeature + urlList.token,
+			isDisplay : false
+		});
 
-			var epan3d = new gb3d.edit.EditingTool3D({
-				targetElement : $(".area-3d")[0],
-				map : gb3dMap,
-				isDisplay : false,
-				locale : locale || "en"
-			});
+		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
+			var treeid = data.selected[0];
+			var layer = data.instance.get_LayerById(treeid);
 
-			$("#editTool").click(function(e) {
-				e.preventDefault();
-				epan.editToolToggle();
-				epan3d.toggleTool();
-			});
+			if (!layer) {
+				return;
+			}
 
-			// feature list
-			var featureList = new gb.layer.FeatureList({
-				map : gbMap.getUpperMap(),
-				targetElement : gbMap.getLowerDiv()[0],
-				title : "All Feature List",
-				toggleTarget : "#feature-toggle-btn",
-				wfstURL : urlList.wfst + urlList.token,
-				locale : locale || "en",
-				layerInfoURL : urlList.getLayerInfo + urlList.token,
-				getFeatureURL : urlList.getWFSFeature + urlList.token,
-				isDisplay : false
-			});
+			if (layer instanceof ol.layer.Group) {
+				return;
+			}
 
-			otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
-				var treeid = data.selected[0];
-				var layer = data.instance.get_LayerById(treeid);
+			if (featureList.footerTag.css("display") === "none") {
+				return;
+			} else {
+				featureList.updateFeatureList(layer);
+			}
+		});
 
-				if (!layer) {
-					return;
-				}
+		// 검수 수행 Modal 생성
+		var validation = new gb.validation.Validation({
+			"autoOpen" : false,
+			"locale" : locale,
+			"title" : "<spring:message code='lang.validation' />",
+			"url" : {
+				"token" : urlList.token,
+				"requestValidate" : urlList.requestValidate
+			},
+			"isEditing" : gb.module.isEditing
+		});
 
-				if (layer instanceof ol.layer.Group) {
-					return;
-				}
+		$("#validation").click(function() {
+			validation.open();
+		});
 
-				if (featureList.footerTag.css("display") === "none") {
-					return;
-				} else {
-					featureList.updateFeatureList(layer);
-				}
-			});
-
-			// 검수 수행 Modal 생성
-			var validation = new gb.validation.Validation({
-				"autoOpen" : false,
-				"locale" : locale,
-				"title" : "<spring:message code='lang.validation' />",
-				"url" : {
-					"token" : urlList.token,
-					"requestValidate" : urlList.requestValidate
-				},
-				"isEditing" : gb.module.isEditing
-			});
-
-			$("#validation").click(function() {
-				validation.open();
-			});
-
+		$(document).ready(function() {
 			var gitrnd = {
 				resize : function() {
 					//현재 보이는 브라우저 내부 영역의 높이

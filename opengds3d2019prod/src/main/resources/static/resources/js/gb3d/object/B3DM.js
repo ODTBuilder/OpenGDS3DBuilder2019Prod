@@ -19,12 +19,13 @@ if (!gb3d.object)
 gb3d.object.B3DM = function(obj) {
 	var options = obj;
 	this.layer = options.layer ? options.layer : undefined;
+	this.tileId = options.tileId ? options.tileId : undefined;
 	this.tile = options.tile;
-	
+
 	// extent point [a,b,c,d]
-	this.extent = options.extent;
+	// this.extent = options.extent;
 
-	this.feature = options.feature;
+	// this.features = options.features;
 
-	this.modCount = 0;
+	// this.modCount = 0;
 };

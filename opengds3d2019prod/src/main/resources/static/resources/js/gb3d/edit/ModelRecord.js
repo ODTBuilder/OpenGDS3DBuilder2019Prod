@@ -35,7 +35,7 @@ gb3d.edit.ModelRecord = function(obj) {
 	 * 새로 생성된 객체들을 담은 변수
 	 * 
 	 * @private
-	 * @type {Object.<string, ol.Feature>}
+	 * @type {Object.<string, gb3d.object.ThreeObject>}
 	 */
 	this.created = {};
 
@@ -43,7 +43,7 @@ gb3d.edit.ModelRecord = function(obj) {
 	 * 편집된 객체들을 담은 변수
 	 * 
 	 * @private
-	 * @type {Object.<string, ol.Feature>}
+	 * @type {Object.<string, gb3d.object.ThreeObject>}
 	 */
 	this.modified = {};
 
@@ -51,7 +51,7 @@ gb3d.edit.ModelRecord = function(obj) {
 	 * 삭제된 객체들을 담은 변수
 	 * 
 	 * @private
-	 * @type {Object.<string, ol.Feature>}
+	 * @type {Object.<string, gb3d.object.ThreeObject>}
 	 */
 	this.removed = {};
 
@@ -60,37 +60,37 @@ gb3d.edit.ModelRecord = function(obj) {
 };
 
 /**
- * 임시보관 중인 새로운 feature들을 반환한다.
+ * 임시보관 중인 새로운 Model들을 반환한다.
  * 
  * @method gb3d.edit.ModelRecord#getCreated
  * @function
- * @return {Object.<string, ol.Feature>}
+ * @return {Object.<string, gb3d.object.ThreeObject>}
  */
 gb3d.edit.ModelRecord.prototype.getCreated = function() {
 	return this.created;
 };
 /**
- * 임시보관 중인 변경한 feature들을 반환한다.
+ * 임시보관 중인 변경한 Model들을 반환한다.
  * 
  * @method gb3d.edit.ModelRecord#getModified
  * @function
- * @return {Object.<string, ol.Feature>}
+ * @return {Object.<string, gb3d.object.ThreeObject>}
  */
 gb3d.edit.ModelRecord.prototype.getModified = function() {
 	return this.modified;
 };
 /**
- * 임시보관 중인 삭제한 feature들을 반환한다.
+ * 임시보관 중인 삭제한 Model들을 반환한다.
  * 
  * @method gb3d.edit.ModelRecord#getRemoved
  * @function
- * @return {Object.<string, ol.Feature>}
+ * @return {Object.<string, gb3d.object.ThreeObject>}
  */
 gb3d.edit.ModelRecord.prototype.getRemoved = function() {
 	return this.removed;
 };
 /**
- * 임시보관 중인 feature의 목록을 삭제한다.
+ * 임시보관 중인 Model의 목록을 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#clearAll
  * @function
@@ -101,7 +101,7 @@ gb3d.edit.ModelRecord.prototype.clearAll = function() {
 	this.removed = {};
 };
 /**
- * 임시보관 중인 새로운 feature의 목록을 삭제한다.
+ * 임시보관 중인 새로운 Model의 목록을 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#clearCreated
  * @function
@@ -110,7 +110,7 @@ gb3d.edit.ModelRecord.prototype.clearCreated = function() {
 	this.created = {};
 };
 /**
- * 임시보관 중인 변경한 feature의 목록을 삭제한다.
+ * 임시보관 중인 변경한 Model의 목록을 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#clearModified
  * @function
@@ -119,7 +119,7 @@ gb3d.edit.ModelRecord.prototype.clearModified = function() {
 	this.modified = {};
 };
 /**
- * 임시보관 중인 삭제한 feature의 목록을 삭제한다.
+ * 임시보관 중인 삭제한 Model의 목록을 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#clearRemoved
  * @function
@@ -180,17 +180,17 @@ gb3d.edit.ModelRecord.prototype.isEditing = function(layer) {
 	return result;
 };
 /**
- * 해당 feature가 삭제되었는지 임시보관 목록에서 조회한다.
+ * 해당 Model가 삭제되었는지 임시보관 목록에서 조회한다.
  * 
  * @method gb3d.edit.ModelRecord#isRemoved
  * @function
  * @param {ol.layer.Base}
  *            layer - 편집이력(삭제)에서 확인할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력(삭제)에서 확인할 feature 객체
- * @return {Boolean} 해당 feature의 편집이력(삭제) 존재 여부
+ * @param {gb3d.object.ThreeObject}
+ *            model - 편집이력(삭제)에서 확인할 Model 객체
+ * @return {Boolean} 해당 Model의 편집이력(삭제) 존재 여부
  */
-gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, feature) {
+gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, model) {
 	var isRemoved = false;
 	var lid;
 	if (layer instanceof ol.layer.Base) {
@@ -199,23 +199,23 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, feature) {
 		lid = layer;
 	}
 	if (this.removed.hasOwnProperty(lid)) {
-		if (this.removed[layer.get("id")].hasOwnProperty(this.id ? feature.get(this.id) : feature.getId())) {
+		if (this.removed[layer.get("id")].hasOwnProperty(this.id ? model.get(this.id) : model.getId())) {
 			isRemoved = true;
 		}
 	}
 	return isRemoved;
 };
 /**
- * 새로 그린 feature를 편집이력에 임시저장한다.
+ * 새로 그린 model를 편집이력에 임시저장한다.
  * 
  * @method gb3d.edit.ModelRecord#create
  * @function
  * @param {ol.layer.Base}
  *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {gb3d.object.ThreeObject}
+ *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.create = function(layer, feature) {
+gb3d.edit.ModelRecord.prototype.create = function(layer, model) {
 	var id = layer.get("id");
 
 	if (!id) {
@@ -230,19 +230,19 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, feature) {
 		this.created[id] = {};
 		this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.created[id]);
 	}
-	this.created[id][feature.getId()] = feature;
+	this.created[id][model.getId()] = model;
 }
 /**
- * 삭제한 feature를 편집이력에 임시저장한다.
+ * 삭제한 model를 편집이력에 임시저장한다.
  * 
  * @method gb3d.edit.ModelRecord#remove
  * @function
  * @param {ol.layer.Base}
  *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {gb3d.object.ThreeObject}
+ *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.remove = function(layer, feature) {
+gb3d.edit.ModelRecord.prototype.remove = function(layer, model) {
 	var id = layer.get("id");
 
 	if (!id) {
@@ -257,19 +257,19 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, feature) {
 		this.removed[id] = {};
 		this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.removed[id]);
 	}
-	if (feature.getId().search(".new") !== -1) {
+	if (model.getId().search(".new") !== -1) {
 		var keys = Object.keys(this.created[id]);
 		for (var i = 0; i < keys.length; i++) {
-			if (this.created[id][keys[i]].getId() === feature.getId()) {
+			if (this.created[id][keys[i]].getId() === model.getId()) {
 				delete this.created[id][keys[i]];
 				break;
 			}
 		}
 	} else {
-		this.removed[id][this.id ? feature.get(this.id) : feature.getId()] = feature;
+		this.removed[id][this.id ? model.get(this.id) : model.getId()] = model;
 		if (this.modified.hasOwnProperty(id)) {
-			if (this.modified[id].hasOwnProperty(this.id ? feature.get(this.id) : feature.getId())) {
-				delete this.modified[id][this.id ? feature.get(this.id) : feature.getId()];
+			if (this.modified[id].hasOwnProperty(this.id ? model.get(this.id) : model.getId())) {
+				delete this.modified[id][this.id ? model.get(this.id) : model.getId()];
 			}
 		}
 	}
@@ -294,16 +294,16 @@ gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
 	}
 }
 /**
- * 변경한 feature를 편집이력에 임시저장한다.
+ * 변경한 model를 편집이력에 임시저장한다.
  * 
  * @method gb3d.edit.ModelRecord#update
  * @function
  * @param {ol.layer.Base}
  *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {gb3d.object.ThreeObject}
+ *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.update = function(layer, feature) {
+gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 	var id = layer.get("id");
 
 	if (!id) {
@@ -317,17 +317,17 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, feature) {
 	if (!this.modified) {
 		this.modified = {};
 	}
-	if (!feature.getId()) {
+	if (!model.getId()) {
 		return;
 	}
-	if (feature.getId().search(".new") !== -1) {
-		this.created[id][feature.getId()] = feature;
+	if (model.getId().search(".new") !== -1) {
+		this.created[id][model.getId()] = model;
 	} else {
 		if (!this.modified[id]) {
 			this.modified[id] = {};
 			this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.modified[id]);
 		}
-		this.modified[id][this.id ? feature.get(this.id) : feature.getId()] = feature;
+		this.modified[id][this.id ? model.get(this.id) : model.getId()] = model;
 	}
 }
 
@@ -355,10 +355,10 @@ gb3d.edit.ModelRecord.prototype.getStructure = function() {
 			if (!obj[cLayers[j]].hasOwnProperty("created")) {
 				obj[cLayers[j]]["created"] = {};
 			}
-			if (!obj[cLayers[j]]["created"].hasOwnProperty("features")) {
-				obj[cLayers[j]]["created"]["features"] = [];
+			if (!obj[cLayers[j]]["created"].hasOwnProperty("models")) {
+				obj[cLayers[j]]["created"]["models"] = [];
 			}
-			obj[cLayers[j]]["created"]["features"].push(format.writeFeature(this.created[cLayers[j]][names[k]]));
+			obj[cLayers[j]]["created"]["models"].push(format.writeFeature(this.created[cLayers[j]][names[k]]));
 		}
 	}
 
@@ -376,14 +376,14 @@ gb3d.edit.ModelRecord.prototype.getStructure = function() {
 			if (!obj[mLayers[j]].hasOwnProperty("modified")) {
 				obj[mLayers[j]]["modified"] = {};
 			}
-			if (!obj[mLayers[j]]["modified"].hasOwnProperty("features")) {
-				obj[mLayers[j]]["modified"]["features"] = [];
+			if (!obj[mLayers[j]]["modified"].hasOwnProperty("models")) {
+				obj[mLayers[j]]["modified"]["models"] = [];
 			}
 			var clone = this.modified[mLayers[j]][names[k]].clone();
 			if (this.id) {
 				clone.setId(this.modified[mLayers[j]][names[k]].get(this.id));
 			}
-			obj[mLayers[j]]["modified"]["features"].push(format.writeFeature(clone));
+			obj[mLayers[j]]["modified"]["models"].push(format.writeFeature(clone));
 		}
 	}
 
@@ -443,10 +443,10 @@ gb3d.edit.ModelRecord.prototype.getPartStructure = function(bringLayer) {
 			if (!obj[bringC[j]].hasOwnProperty("created")) {
 				obj[bringC[j]]["created"] = {};
 			}
-			if (!obj[bringC[j]]["created"].hasOwnProperty("features")) {
-				obj[bringC[j]]["created"]["features"] = [];
+			if (!obj[bringC[j]]["created"].hasOwnProperty("models")) {
+				obj[bringC[j]]["created"]["models"] = [];
 			}
-			obj[bringC[j]]["created"]["features"].push(format.writeFeature(this.created[bringC[j]][names[k]]));
+			obj[bringC[j]]["created"]["models"].push(format.writeFeature(this.created[bringC[j]][names[k]]));
 		}
 	}
 
@@ -470,14 +470,14 @@ gb3d.edit.ModelRecord.prototype.getPartStructure = function(bringLayer) {
 			if (!obj[bringM[j]].hasOwnProperty("modified")) {
 				obj[bringM[j]]["modified"] = {};
 			}
-			if (!obj[bringM[j]]["modified"].hasOwnProperty("features")) {
-				obj[bringM[j]]["modified"]["features"] = [];
+			if (!obj[bringM[j]]["modified"].hasOwnProperty("models")) {
+				obj[bringM[j]]["modified"]["models"] = [];
 			}
 			var clone = this.modified[bringM[j]][names[k]].clone();
 			if (this.id) {
 				clone.setId(this.modified[bringM[j]][names[k]].get(this.id));
 			}
-			obj[bringM[j]]["modified"]["features"].push(format.writeFeature(clone));
+			obj[bringM[j]]["modified"]["models"].push(format.writeFeature(clone));
 		}
 	}
 
@@ -507,67 +507,70 @@ gb3d.edit.ModelRecord.prototype.getPartStructure = function(bringLayer) {
 	return obj;
 }
 /**
- * 새로 생성된 Feature를 생성목록에서 삭제하고 삭제된 Feature를 반환한다.
+ * 새로 생성된 Model를 생성목록에서 삭제하고 삭제된 Model를 반환한다.
  * 
- * @method gb3d.edit.ModelRecord#deleteFeatureCreated
+ * @method gb3d.edit.ModelRecord#deleteModelCreated
  * @function
  * @param {String}
  *            layerId - Layer ID
  * @param {String}
- *            featureId - Feature ID
- * @return {ol.Feature} 생성 임시 저장 목록에서 삭제된 ol.Feature 객체
+ *            modelId - Model ID
+ * @return {gb3d.object.ThreeObject} 생성 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
+ *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteFeatureCreated = function(layerId, featureId) {
-	var feature = undefined;
+gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, modelId) {
+	var model = undefined;
 	if (!!this.created[layerId]) {
-		if (this.created[layerId][featureId] instanceof ol.Feature) {
-			feature = this.created[layerId][featureId];
-			delete this.created[layerId][featureId];
+		if (this.created[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+			model = this.created[layerId][modelId];
+			delete this.created[layerId][modelId];
 		}
 	}
-	return feature;
+	return model;
 };
 /**
- * 편집된 Feature를 편집목록에서 삭제하고 삭제된 Feature를 반환한다.
+ * 편집된 Model를 편집목록에서 삭제하고 삭제된 Model를 반환한다.
  * 
- * @method gb3d.edit.ModelRecord#deleteFeatureModified
+ * @method gb3d.edit.ModelRecord#deleteModelModified
  * @function
  * @param {String}
  *            layerId - Layer ID
  * @param {String}
- *            featureId - Feature ID
- * @return {ol.Feature} 편집 임시 저장 목록에서 삭제된 ol.Feature 객체
+ *            modelId - Model ID
+ * @return {gb3d.object.ThreeObject} 편집 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
+ *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteFeatureModified = function(layerId, featureId) {
-	var feature = undefined;
+gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, modelId) {
+	var model = undefined;
 	if (!!this.modified[layerId]) {
-		if (this.modified[layerId][featureId] instanceof ol.Feature) {
-			feature = this.modified[layerId][featureId];
-			delete this.modified[layerId][featureId];
+		if (this.modified[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+			model = this.modified[layerId][modelId];
+			delete this.modified[layerId][modelId];
 		}
 	}
-	return feature;
+	return model;
 };
 /**
- * 삭제된 Feature를 삭제 목록에서 삭제하고 삭제된 Feature를 반환한다.
+ * 삭제된 Model를 삭제 목록에서 삭제하고 삭제된 Model를 반환한다.
  * 
- * @method gb3d.edit.ModelRecord#deleteFeatureRemoved
+ * @method gb3d.edit.ModelRecord#deleteModelRemoved
  * @function
  * @param {String}
  *            layerId - Layer ID
  * @param {String}
- *            featureId - Feature ID
- * @return {ol.Feature} 삭제 임시 저장 목록에서 삭제된 ol.Feature 객체
+ *            modelId - Model ID
+ * @return {gb3d.object.ThreeObject} 삭제 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
+ *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteFeatureRemoved = function(layerId, featureId) {
-	var feature = undefined;
+gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) {
+	var model = undefined;
 	if (!!this.removed[layerId]) {
-		if (this.removed[layerId][featureId] instanceof ol.Feature) {
-			feature = this.removed[layerId][featureId];
-			delete this.removed[layerId][featureId];
+		if (this.removed[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+			model = this.removed[layerId][modelId];
+			delete this.removed[layerId][modelId];
 		}
 	}
-	return feature;
+	return model;
 };
 /**
  * Geoserver Layer에 대한 변경사항을 저장 요청하는 창을 생성한다. 변경사항 무시를 선택하면 변경사항 이전으로 되돌린다.

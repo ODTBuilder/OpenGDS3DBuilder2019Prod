@@ -36,6 +36,8 @@ gb3d.object.ThreeObject = function(obj) {
 
 	this.buffer = this.type === "LineString" || this.type === "MultiLineString" ? options.buffer ? options.buffer : undefined : undefined;
 
+	this.tileId = options.tileId ? options.tileId : undefined;
+
 	this.modCount = 0;
 }
 
