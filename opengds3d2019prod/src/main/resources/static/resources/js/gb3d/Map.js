@@ -103,6 +103,8 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
+	// 3D Tileset 객체
+	this.tiles = [];
 // this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 // var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
