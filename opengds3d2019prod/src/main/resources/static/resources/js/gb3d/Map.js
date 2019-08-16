@@ -1098,3 +1098,18 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	threeObject.setCenter(center);
 };
 
+/**
+ * Object 생성을 위한 사전작업 수행 함수. Feature 정보를 저장하고 Feature type에 따른 모달을 생성한다.
+ * 
+ * @method gb3d.Map#addTileset
+ * @param {gb3d.object.Tileset}
+ *            tileset - 타일셋 객체
+ */
+gb3d.Map.prototype.addTileset = function(tileset){
+	if (tileset instanceof gb3d.object.Tileset) {
+		var ctile = tileset.getCesiumTileset();
+	} else {
+		console.error("parameter must be gb3d.object.Tileset");
+		return
+	}
+}

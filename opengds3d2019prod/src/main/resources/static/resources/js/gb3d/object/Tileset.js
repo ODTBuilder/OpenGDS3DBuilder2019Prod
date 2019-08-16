@@ -20,10 +20,33 @@ gb3d.object.Tileset = function(obj) {
 	var options = obj;
 	this.layer = options.layer ? options.layer : undefined;
 	this.tileId = options.tileId ? options.tileId : undefined;
-	this.tile = options.tileset instanceof Cesium.Cesium3DTileset ? options.tileset : undefined;
+	this.cesiumTile = options.cesiumTileset instanceof Cesium.Cesium3DTileset ? options.cesiumTileset : undefined;
 
+	if (!this.layer || !this.tileId || !this.cesiumTile) {
+		console.error("constructor parameter should not be empty");
+	}
 	// extent point [a,b,c,d]
 	// this.extent = options.extent;
 	// this.features = options.features;
 	// this.modCount = 0;
 };
+/**
+ * 레이어를 설정한다.
+ * 
+ * @method gb3d.Map#setLayer
+ * @param {ol.layer.Layer}
+ *            layer - 대응하는 2D 레이어 객체
+ */
+gb3d.object.Tileset.prototype.setLayer = function(layer) {
+	this.layer = layer;
+}
+
+/**
+ * 레이어를 반환한다.
+ * 
+ * @method gb3d.Map#getLayer
+ * @return {ol.layer.Layer} 대응하는 2D 레이어 객체
+ */
+gb3d.object.Tileset.prototype.getLayer = function() {
+	return this.layer;
+}
