@@ -177,7 +177,7 @@ gb3d.Map = function(obj) {
 	};
 	// 렌더링 시작
 	this.loop_();
-
+	
 	// =============== Event =====================
 	$("#editTool3D").click(function(e) {
 		e.preventDefault();
@@ -488,6 +488,9 @@ gb3d.Map.prototype.getCamera = function() {
 gb3d.Map.prototype.addThreeObject = function(object){
 	if(object instanceof gb3d.object.ThreeObject){
 		this.threeObjects.push(object);
+		
+		// Three Object add event
+		this.threeScene.dispatchEvent({type: "addObject", object: object});
 	} else {
 		console.error("Three object must be gb3d.object.ThreeObject type");
 	}
@@ -816,8 +819,70 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 			threeObject = e;
 		}
 	});
-
+	
 	return threeObject;
+}
+
+gb3d.Map.prototype.selectThree = function(uuid){
+	var threeObject = this.getThreeObjectByUuid(uuid);
+	if(!threeObject){
+		return false;
+	}
+	
+	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
+		this.tools.edit3d.pickedObject_ = threeObject.getObject();
+		this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
+		this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
+		return threeObject;
+	} else {
+		return false;
+	}
+}
+
+gb3d.Map.prototype.selectFeature = function(id){
+	var threeObject = this.getThreeObjectById(id);
+	if(!threeObject){
+		return false;
+	}
+	
+	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+		this.tools.edit2d.interaction.select.getFeatures().clear();
+		this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
+		return threeObject;
+	} else {
+		return false;
+	}
+}
+
+gb3d.Map.prototype.unselectThree = function(uuid){
+	var threeObject = this.getThreeObjectByUuid(uuid);
+	if(!threeObject){
+		return false;
+	}
+	
+	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
+		this.tools.edit3d.pickedObject_ = threeObject.getObject();
+		this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
+		this.tools.edit3d.updateAttributeTab( undefined );
+		this.tools.edit3d.updateStyleTab( undefined );
+		return threeObject;
+	} else {
+		return false;
+	}
+}
+
+gb3d.Map.prototype.unselectFeature = function(id){
+	var threeObject = this.getThreeObjectById(id);
+	if(!threeObject){
+		return false;
+	}
+	
+	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+		this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
+		return threeObject;
+	} else {
+		return false;
+	}
 }
 
 gb3d.Map.prototype.syncSelect = function(id){
@@ -830,24 +895,16 @@ gb3d.Map.prototype.syncSelect = function(id){
 		if(!threeObject){
 			return;
 		}
-
-		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
-			this.tools.edit2d.interaction.select.getFeatures().clear();
-			this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
-// this.gbMap.getView().fit( threeObject.getFeature().getGeometry() );
-		}
+		
+		this.selectFeature(threeObject.getFeature().getId());
 	} else {
-		if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
-			this.tools.edit3d.pickedObject_ = threeObject.getObject();
-			this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
-			this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
+		this.selectThree(threeObject.getObject().uuid);
 // this.cesiumViewer.camera.flyTo({
 // destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
 // threeObject.getCenter()[1],
 // this.cesiumViewer.camera.positionCartographic.height),
 // duration: 0
 // });
-		}
 	}
 }
 
@@ -861,17 +918,10 @@ gb3d.Map.prototype.syncUnselect = function(id){
 		if(!threeObject){
 			return;
 		}
-
-		if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
-			this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
-		}
+		
+		this.unselectFeature(threeObject.getFeature().getId());
 	} else {
-		if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
-			this.tools.edit3d.pickedObject_ = threeObject.getObject();
-			this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
-			this.tools.edit3d.updateAttributeTab( undefined );
-			this.tools.edit3d.updateStyleTab( undefined );
-		}
+		this.unselectThree(threeObject.getObject().uuid);
 	}
 }
 

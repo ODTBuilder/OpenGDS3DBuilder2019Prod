@@ -291,6 +291,11 @@ html, body {
 				}
 			});
 
+			var threeTree = new gb3d.tree.Three({
+				"target" : "#attrObject",
+				"map" : gb3dMap
+			});
+			
 			// EditTool 활성화
 			var epan = new gb3d.edit.EditingTool2D({
 				targetElement : gbMap.getLowerDiv()[0],

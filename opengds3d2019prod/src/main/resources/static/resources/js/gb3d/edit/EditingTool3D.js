@@ -72,7 +72,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	}
 	this.materialOptions = options.materialOptions || [
 		"metalness", "roughness", "emissive", 
-		"skinning", "wireframe", 
+		"skinning", "wireframe", "map", "normalMap",
 		"emissiveMap", "opacity", "alphaTest"];
 	
 	function transformRender(){
@@ -103,6 +103,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 				break;
 			default:
 		}
+		
+		that.map.getThreeObjects().forEach(function(e){
+			if(e.getObject().uuid === object.uuid){
+				// 선택된 객체의 수정횟수를 증가시킨다.
+				e.upModCount();
+			}
+		});
 	});
 	
 	// transform 컨트롤 Three Scene에 추가
@@ -153,14 +160,6 @@ gb3d.edit.EditingTool3D = function(obj) {
 			var object = intersects[ 0 ].object;
 			that.pickedObject_ = object;
 			that.threeTransformControls.attach( object );
-			
-			that.map.getThreeObjects().forEach(function(e){
-				console.log(object);
-				if(e.getObject().uuid === object.uuid){
-					// 선택된 객체의 수정횟수를 증가시킨다.
-					e.upModCount();
-				}
-			});
 			
 			that.map.syncSelect(object.uuid);
 			that.updateAttributeTab(object);
@@ -549,7 +548,7 @@ gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object){
 	var that = this;
 	var tab = $("#attrMaterial");
 	var rows = tab.find(".gb-object-row");
-	var row, span, input;
+	var row, span, input, texture;
 	
 	if(!(object instanceof THREE.Object3D)){
 		tab.empty();
@@ -563,20 +562,29 @@ gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object){
 	tab.empty();
 	for(var i = 0; i < opts.length; i++){
 		val = material[opts[i]];
+		span = undefined;
+		input = undefined;
+		texture = undefined;
+		
+		span = $("<span class='Text'>").text(opts[i]);
 		if(val instanceof THREE.Color){
-			span = $("<span class='Text'>").text(opts[i]);
 			input = $("<input id='textureEmissive' class='form-control' style='flex: 1;'>");
 		} else if(typeof val === "boolean"){
-			span = $("<span class='Text'>").text(opts[i]);
 			input = $("<input class='Checkbox' type='checkbox'>").prop("checked", val);
 		} else if(typeof val === "number"){
-			span = $("<span class='Text'>").text(opts[i]);
 			input = $("<input class='form-control' style='flex: 1;'>").val(val);
+		} else if(opts[i].match(/map/gi) !== null){
+			texture = new gb3d.UI.Texture( object, opts[i] );
 		} else {
 			continue;
 		}
 		
-		row = $("<div class='gb-object-row'>").append(span).append(input);
+		if(texture !== undefined){
+			row = $("<div class='gb-object-row'>").append(span).append(texture.span);
+		} else {
+			row = $("<div class='gb-object-row'>").append(span).append(input);
+		}
+		
 		row.data("key", opts[i]);
 		tab.append(row);
 		

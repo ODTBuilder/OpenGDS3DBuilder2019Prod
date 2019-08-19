@@ -157,11 +157,21 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/TransformControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/DragControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/renderers/Projector.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/GLTFExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/ColladaExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/OBJExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/draco_encoder.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/DracoExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/PLYExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/STLExporter.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/UI.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/math/Math.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/jsTree-three/jstree.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Three.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/GeoServer.js"></script>
