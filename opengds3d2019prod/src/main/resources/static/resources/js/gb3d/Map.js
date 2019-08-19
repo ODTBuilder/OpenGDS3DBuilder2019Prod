@@ -104,16 +104,16 @@ gb3d.Map = function(obj) {
 	});
 
 	// 3D Tileset 객체
-	this.tiles = [];
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+	this.tiles = {};
 
+// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 // var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
 // this.cesiumViewer.scene.primitives.add(tileset);
 // this.cesiumViewer.zoomTo(tileset);
 
-	this.cesiumViewer.camera.flyTo({
-		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
-	});
+//	this.cesiumViewer.camera.flyTo({
+//		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
+//	});
 
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
@@ -1107,9 +1107,59 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
  */
 gb3d.Map.prototype.addTileset = function(tileset){
 	if (tileset instanceof gb3d.object.Tileset) {
+		var layer = tileset.getLayer();
+		var layerid;
+		if (layer instanceof ol.layer.Base) {
+			layerid = layer.get("id");
+		} else if (typeof layer === "string") {
+			layerid = layer;
+		}
+		if (!this.getTileset()) {
+			this.setTileset({});
+		}
+		if (!this.getTileset()[layerid]) {
+			this.getTileset()[layerid] = [];
+		}
+		this.getTileset()[layerid].push(tileset);
 		var ctile = tileset.getCesiumTileset();
+		this.getCesiumViewer().scene.primitives.add(ctile);
+		this.getCesiumViewer().zoomTo(ctile);
 	} else {
 		console.error("parameter must be gb3d.object.Tileset");
 		return
 	}
+}
+
+/**
+ * 타일셋 객체 묶음을 반환한다.
+ * 
+ * @method gb3d.Map#getTileset
+ * @return {Object} 타일 객체 묶음
+ */
+gb3d.Map.prototype.getTileset = function(){
+	return this.tiles;
+}
+
+
+/**
+ * 타일셋 객체 묶음을 반환한다.
+ * 
+ * @method gb3d.Map#getTileset
+ * @param {String}
+ *            lid - 레이어 id
+ * @return {Array.<gb3d.object.Tileset>} 타일셋 객체 묶음
+ */
+gb3d.Map.prototype.getTilesetByLayer = function(lid){
+	return this.tiles[lid];
+}
+
+/**
+ * 타일셋 객체 묶음을 설정한다.
+ * 
+ * @method gb3d.Map#setTileset
+ * @param {Object}
+ *            tiles - 타일 객체 묶음
+ */
+gb3d.Map.prototype.setTileset = function(tiles){
+	this.tiles = tiles;
 }

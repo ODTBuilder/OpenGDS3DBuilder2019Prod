@@ -214,10 +214,20 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-			"target" : $(".area-3d")[0],
-			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
+			"target" : $(".area-3d")[0]
+		// 			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
 		});
 
+		var tiles = new gb3d.object.Tileset({
+			"layer" : "testLayer",
+			"tileId" : "testLayerTile1",
+			"cesiumTileset" : new Cesium.Cesium3DTileset({
+				url : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json"
+			})
+		});
+
+		gb3dMap.addTileset(tiles);
+		
 		var entity = gb3dMap.getCesiumViewer().entities.add({
 			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
 			model : {

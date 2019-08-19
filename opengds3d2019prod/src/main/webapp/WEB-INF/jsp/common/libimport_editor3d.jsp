@@ -166,6 +166,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/math/Math.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/object/Tileset.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/Simple3DManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/MultiOBJManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
