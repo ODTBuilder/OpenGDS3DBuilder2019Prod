@@ -29,15 +29,6 @@
 					</ul>
 					<div class="tab-content gb-attribute-item">
 						<div role="tabpanel" class="tab-pane active" id="attrObject">
-							<div class="gb-article" style="margin: 0px; height: 100%; display: flex; flex-direction: column;">
-								<div class="gb-article-head">
-									<div>
-										<p class="gb-openlayers-title">Now editing</p>
-									</div>
-								</div>
-								<div class="gb-article-body jstreeol3 jstreeol3-1" style="overflow-y: auto; flex: 1 1 0%;">
-								</div>
-							</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrLayer">
 							<div class="builderLayerClientPanel"></div>

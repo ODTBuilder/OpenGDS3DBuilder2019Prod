@@ -293,6 +293,11 @@ html, body {
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap
 		});
+		
+		var threeTree = new gb3d.tree.Three({
+			"target" : "#attrObject",
+			"map" : gb3dMap
+		});
 
 		var importThree = new gb3d.io.ImporterThree({
 			"locale" : locale !== "" ? locale : "en",
