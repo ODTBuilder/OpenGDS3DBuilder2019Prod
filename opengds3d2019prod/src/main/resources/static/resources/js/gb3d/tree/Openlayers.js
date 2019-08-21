@@ -650,7 +650,7 @@ gb3d.tree.OpenLayers = function(obj) {
 									.get_node(data.reference);
 									var layer = inst.get_LayerById(obj.id);
 
-									var modal = new gb3d.io.importerThree({
+									var modal = new gb3d.io.ImporterThree({
 										"locale" : that.locale
 									});
 									modal.open();

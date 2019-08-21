@@ -103,17 +103,29 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
+	// 초기 위치
+	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
+	if (this.initPosition.length === 2) {
+		this.initPosition.push(15000);
+	}
+// Cesium.Cartesian3.fromDegrees(options.initPosition[0],
+// options.initPosition[1] - 1, 200000) : this.center;
+// this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087,
+// 200000);
+
+
+	// cesium 카메라를 지도 중심으로 이동
+//	this.cesiumViewer.camera.flyTo({
+//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0], this.initPosition[1], this.initPosition[2])
+// orientation : {
+// heading : Cesium.Math.toRadians(0),
+// pitch : Cesium.Math.toRadians(-60),
+// roll : Cesium.Math.toRadians(0)
+// }
+//	});
+	
 	// 3D Tileset 객체
 	this.tiles = {};
-
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
-// var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
-// this.cesiumViewer.scene.primitives.add(tileset);
-// this.cesiumViewer.zoomTo(tileset);
-
-//	this.cesiumViewer.camera.flyTo({
-//		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
-//	});
 
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
@@ -121,23 +133,6 @@ gb3d.Map = function(obj) {
 
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
-
-	// 초기 위치
-// this.initPosition = Array.isArray(options.initPosition) ?
-// Cesium.Cartesian3.fromDegrees(options.initPosition[0],
-// options.initPosition[1] - 1, 200000) : this.center;
-	this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087, 200000);
-
-	// cesium 카메라를 지도 중심으로 이동
-// this.cesiumViewer.camera.flyTo({
-// destination : this.initPosition,
-// orientation : {
-// heading : Cesium.Math.toRadians(0),
-// pitch : Cesium.Math.toRadians(-60),
-// roll : Cesium.Math.toRadians(0)
-// },
-// duration: 3
-// });
 
 	// 지도에 표시할 객체 배열
 	this.threeObjects = [];
@@ -170,7 +165,7 @@ gb3d.Map = function(obj) {
 		"threeCamera" : this.threeCamera,
 		"olMap" : this.gbMap.getUpperMap()
 	});
-
+    
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
@@ -179,7 +174,7 @@ gb3d.Map = function(obj) {
 	};
 	// 렌더링 시작
 	this.loop_();
-	
+
 	// =============== Event =====================
 	$("#editTool3D").click(function(e) {
 		e.preventDefault();
@@ -490,7 +485,7 @@ gb3d.Map.prototype.getCamera = function() {
 gb3d.Map.prototype.addThreeObject = function(object){
 	if(object instanceof gb3d.object.ThreeObject){
 		this.threeObjects.push(object);
-		
+
 		// Three Object add event
 		this.threeScene.dispatchEvent({type: "addObject", object: object});
 	} else {
@@ -821,7 +816,7 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 			threeObject = e;
 		}
 	});
-	
+
 	return threeObject;
 }
 
@@ -830,7 +825,7 @@ gb3d.Map.prototype.selectThree = function(uuid){
 	if(!threeObject){
 		return false;
 	}
-	
+
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = threeObject.getObject();
 		this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
@@ -846,7 +841,7 @@ gb3d.Map.prototype.selectFeature = function(id){
 	if(!threeObject){
 		return false;
 	}
-	
+
 	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
 		this.tools.edit2d.interaction.select.getFeatures().clear();
 		this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
@@ -861,7 +856,7 @@ gb3d.Map.prototype.unselectThree = function(uuid){
 	if(!threeObject){
 		return false;
 	}
-	
+
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = threeObject.getObject();
 		this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
@@ -878,7 +873,7 @@ gb3d.Map.prototype.unselectFeature = function(id){
 	if(!threeObject){
 		return false;
 	}
-	
+
 	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
 		this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
 		return threeObject;
@@ -897,7 +892,7 @@ gb3d.Map.prototype.syncSelect = function(id){
 		if(!threeObject){
 			return;
 		}
-		
+
 		this.selectFeature(threeObject.getFeature().getId());
 	} else {
 		this.selectThree(threeObject.getObject().uuid);
@@ -920,7 +915,7 @@ gb3d.Map.prototype.syncUnselect = function(id){
 		if(!threeObject){
 			return;
 		}
-		
+
 		this.unselectFeature(threeObject.getFeature().getId());
 	} else {
 		this.unselectThree(threeObject.getObject().uuid);
