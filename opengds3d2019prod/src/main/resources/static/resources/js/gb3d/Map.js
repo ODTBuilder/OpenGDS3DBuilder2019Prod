@@ -103,6 +103,8 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED
 	});
 
+	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+	
 	// 초기 위치
 	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
 	if (this.initPosition.length === 2) {
@@ -115,15 +117,16 @@ gb3d.Map = function(obj) {
 
 
 	// cesium 카메라를 지도 중심으로 이동
-//	this.cesiumViewer.camera.flyTo({
-//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0], this.initPosition[1], this.initPosition[2])
+// this.cesiumViewer.camera.flyTo({
+// destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+// this.initPosition[1], this.initPosition[2])
 // orientation : {
 // heading : Cesium.Math.toRadians(0),
 // pitch : Cesium.Math.toRadians(-60),
 // roll : Cesium.Math.toRadians(0)
 // }
-//	});
-	
+// });
+
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -165,7 +168,7 @@ gb3d.Map = function(obj) {
 		"threeCamera" : this.threeCamera,
 		"olMap" : this.gbMap.getUpperMap()
 	});
-    
+
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
@@ -655,7 +658,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
 	latheMesh.position.copy(centerCart);
 	this.getThreeScene().add(latheMesh);
-
+	console.log(latheMesh.quaternion);
 	// 원점을 바라보도록 설정한다
 	latheMesh.lookAt(new THREE.Vector3(0,0,0));
 	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
@@ -1169,6 +1172,20 @@ gb3d.Map.prototype.addTileset = function(tileset){
 		var ctile = tileset.getCesiumTileset();
 		this.getCesiumViewer().scene.primitives.add(ctile);
 		this.getCesiumViewer().zoomTo(ctile);
+
+		
+// var primitives = this.getCesiumViewer().scene.primitives;
+// primitives.add(new Cesium.DebugModelMatrixPrimitive({
+// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
+// length : 10000000.0,
+// width : 10.0
+// }));
+
+// ctile.modelMatrix = new Cesium.DebugModelMatrixPrimitive({
+// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
+// length : 10000000.0,
+// width : 10.0
+// })
 	} else {
 		console.error("parameter must be gb3d.object.Tileset");
 		return
