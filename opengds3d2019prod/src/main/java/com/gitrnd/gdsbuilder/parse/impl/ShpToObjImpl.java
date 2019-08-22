@@ -246,17 +246,20 @@ public class ShpToObjImpl {
 		Point centroid = geomEn.getCentroid();
 		Coordinate centCoor = centroid.getCoordinate();
 		Coordinate centTrans = JTS.transform(centCoor, null, transform);
-		centTrans.z = 0.0;
+//		centTrans.z = 0.0;
 		// 바닥
 		List<Coordinate> coorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
 			Coordinate transCoor = JTS.transform(coordinates[i], null, transform);
-			transCoor.z = 0.0;
+//			transCoor.z = 0.0;
 			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
 					transCoor.z - centTrans.z);
 			coorList.add(i, localCoor);
 			result = result + coordinateToVertexdescription(localCoor);
 		}
+/*		for (int i = 0; i < coordinates.length; i++) {
+			result = result + new String("vn 0 0 1\n");
+		}*/
 		KongAlgo ka = new KongAlgo(coorList);
 		ka.runKong(); // actual algo call
 		List<Map<String, Object>> mapList = ka.getIndexList();
@@ -273,7 +276,7 @@ public class ShpToObjImpl {
 		}
 
 		// 지붕
-		List<Coordinate> hCoorList = new ArrayList<Coordinate>();
+		/*List<Coordinate> hCoorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
 			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
 			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
@@ -316,8 +319,9 @@ public class ShpToObjImpl {
 			wallFace = wallFace + "f " + tthrIdx + " " + tsecIdx + " " + tfirIdx + "\n";
 			wallFace = wallFace + "f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n";
 		}
-		vIdx += coorList.size();
 		vIdx += hCoorList.size();
+		*/
+		vIdx += coorList.size();
 		return result + roofFace + wallFace;
 	}
 

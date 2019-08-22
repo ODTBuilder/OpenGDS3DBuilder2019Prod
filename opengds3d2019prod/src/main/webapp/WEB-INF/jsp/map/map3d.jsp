@@ -206,9 +206,9 @@ html, body {
 		});
 		
         var entity = gb3dMap.getCesiumViewer().entities.add({
-			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
+			position : Cesium.Cartesian3.fromRadians(2.208193658851, 0.584761465585),
 			model : {
-				uri : '${pageContext.request.contextPath}/resources/testtileset/4326_1.gltf'
+				uri : '${pageContext.request.contextPath}/resources/testtileset/24.gltf'
 			}
 		});
         
