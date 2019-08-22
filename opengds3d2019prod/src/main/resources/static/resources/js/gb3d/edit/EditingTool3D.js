@@ -92,6 +92,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 		var object = e.target.object,
 			mode = that.threeTransformControls.getMode();
 		
+		if(object.geometry instanceof THREE.BufferGeometry){
+			return;
+		}
+		
 		switch(mode){
 			case "scale":
 				that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
@@ -142,8 +146,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 		mouse.x = ( event.offsetX / eventDiv[0].clientWidth ) * 2 - 1;
 		mouse.y = ( event.offsetY / eventDiv[0].clientHeight ) * -2 + 1;
 		
+		var interObjs = [];
+		var objects = that.map.getThreeObjects();
+		for(var i = 0; i < objects.length; i++){
+			interObjs.push(objects[i].getObject());
+		}
 		raycaster.setFromCamera( mouse, that.map.threeCamera );
-		var intersects = raycaster.intersectObjects( that.map.threeScene.children );
+		var intersects = raycaster.intersectObjects( interObjs, true );
 		
 		if( that.pickedObject_ ){
 			// 이전에 선택된 객체 초기화

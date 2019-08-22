@@ -267,6 +267,7 @@ html, body {
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
+			"gb3dMap" : gb3dMap,
 			"map" : gbMap.getUpperMap(),
 			"frecord" : frecord,
 			"uploadJSON" : uploadjson,
@@ -301,8 +302,7 @@ html, body {
 
 		var importThree = new gb3d.io.ImporterThree({
 			"locale" : locale !== "" ? locale : "en",
-			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/",
-			"gb3dMap" : gb3dMap
+			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/"
 		});
 
 		var gtree = new gb3d.tree.GeoServer({

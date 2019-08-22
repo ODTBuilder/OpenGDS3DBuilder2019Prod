@@ -85,7 +85,10 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								var result = exporter.parse( threeObject.getObject() );
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								object.matrixWorld.setPosition(0, 0, 0);
+								var result = exporter.parse( object );
 								downloadString( result, id + '.obj' );
 							}
 						},

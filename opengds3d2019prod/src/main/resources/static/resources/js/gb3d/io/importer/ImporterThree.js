@@ -53,12 +53,19 @@ gb3d.io.ImporterThree = function(obj) {
 	this.locale = options.locale ? options.locale : "en";
 	this.uploadURL = options.url ? options.url : undefined;
 	this.decoder = options.decoder ? options.decoder : undefined;
+	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
+	this.gb2dMap = this.gb3dMap ? this.gb3dMap.getGbMap() : undefined;
+	this.layer = options.layer ? options.layer : undefined;
+	
 	obj.width = 368;
 	obj.autoOpen = false;
 	obj.title = this.translation.titlemsg[this.locale];
 	// obj.keep = true;
 	gb.modal.ModalBase.call(this, obj);
 
+	// 3D file object
+	this.object = undefined;
+	
 	var body = this.getModalBody();
 	var notice = $("<div>").text(this.translation.notice[this.locale]);
 	this.inputFile = $("<input>").attr({
@@ -117,8 +124,10 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 			var object = new THREE.OBJLoader().parse(contents);
 			object.name = filename;
 
-			editor.execute(new AddObjectCommand(editor, object));
-
+//			editor.execute(new AddObjectCommand(editor, object));
+			that.object = object;
+			that.activeDraw();
+			that.close();
 		}, false);
 		reader.readAsText(file);
 
@@ -139,8 +148,8 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 				var scene = result.scene;
 				scene.name = filename;
 
-				editor.addAnimation(scene, result.animations);
-				editor.execute(new AddObjectCommand(editor, scene));
+//				editor.addAnimation(scene, result.animations);
+//				editor.execute(new AddObjectCommand(editor, scene));
 
 			});
 
@@ -169,6 +178,73 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 	}
 
 };
+
+/**
+ * Point 그리기 Interaction을 활성화한다.
+ * 
+ * @method gb3d.io.ImporterThree.prototype#activeDraw
+ */
+gb3d.io.ImporterThree.prototype.activeDraw = function() {
+	var that = this;
+	var layer = this.layer;
+	var source = layer.getSource();
+	var draw = new ol.interaction.Draw({
+		source: source,
+		type: "Point"
+	});
+	
+	that.gb2dMap.getUpperMap().addInteraction(draw);
+
+	draw.on("drawend", function(evt) {
+		var feature = evt.feature;
+		var geometry = feature.getGeometry();
+		var coordinates = geometry.getCoordinates();
+		var mesh = that.object.children[0];
+		var obj3d = new gb3d.object.ThreeObject({
+			"object" : mesh,
+			"center" : coordinates,
+			"extent" : geometry.getExtent(),
+			"type" : that.layer.get("git").geometry,
+			"feature" : feature
+		});
+		var centerHigh = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1],1);
+		var position = mesh.position;
+		var cart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]);
+		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
+//		mesh.lookAt(new THREE.Vector3(1,0,0));
+		mesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+//		var quaternion = mesh.quaternion.clone();
+//		// 쿼터니언각을 뒤집는다
+//		quaternion.inverse();
+//		// 모든 지오메트리 버텍스에
+//		var points = [];
+//		var normalPoints = [];
+//		var vertices = mesh.geometry.attributes.position.array;
+//		for (var i = 0; i < vertices.length; i = i + 3) {
+//			var vertex = new THREE.Vector3(vertices[i], vertices[i+1], vertices[i+2]);
+//			var vertexNormal = new THREE.Vector3(vertices[i], vertices[i+1], vertices[i+2]).normalize();
+//			// 뒤집은 쿼터니언각을 적용한다
+//			vertex.applyQuaternion(quaternion);
+//			vertexNormal.applyQuaternion(quaternion);
+//			points.push(vertex.x);
+//			points.push(vertex.y);
+//			points.push(vertex.z);
+//			normalPoints.push(vertexNormal.x);
+//			normalPoints.push(vertexNormal.y);
+//			normalPoints.push(vertexNormal.z);
+//		}
+//		
+//		var newVertices = new Float32Array(points);
+//		var newNormalVertices = new Float32Array(normalPoints);
+//		mesh.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( newVertices, 3 ) );
+//		mesh.geometry.addAttribute( 'normal', new THREE.BufferAttribute( newNormalVertices, 3 ) );
+		
+		that.gb3dMap.getThreeScene().add(mesh);
+		that.gb3dMap.addThreeObject(obj3d);
+		that.gb2dMap.getUpperMap().removeInteraction(draw);
+	});
+}
 
 /**
  * 스피너를 보여준다.

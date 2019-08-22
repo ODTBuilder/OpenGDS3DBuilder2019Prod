@@ -158,6 +158,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/DragControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/renderers/Projector.js"></script>
 <!-- three loaders -->
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/OBJLoader.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/loaders/DRACOLoader.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/loaders/GLTFLoader.js"></script>
 <!-- three exporters -->
@@ -183,7 +184,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/GeoServer.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Openlayers.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/importer/importerThree.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>

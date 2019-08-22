@@ -70,7 +70,7 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	}
 }
 
-gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
+gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	var coord = arr,
 		points = [],
 		faceBottom = [],
@@ -79,12 +79,17 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
 		faces = [],
 		coordLength = coord.length - 1,
 		cart,
+		vect,
+		centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]),
+		centerVec = new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z),
 		depth = depth;
 	
 	// 3차원 객체 밑면 vertex 계산
 	for(var i = 0; i < coordLength; i++){
 		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
-		points.push(new THREE.Vector3(cart.x, cart.y, cart.z));
+		vect = new THREE.Vector3(cart.x, cart.y, cart.z);
+		vect.sub(centerVec);
+		points.push(vect);
 	}
 	
 	faceBottom = THREE.ShapeUtils.triangulateShape(points, []);
@@ -117,7 +122,9 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, depth){
 //			cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1], coord[i]);
 //		}
 		
-		points.push(new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth));
+		vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
+		vect.sub(centerVec);
+		points.push(vect);
 	}
 	
 	for(var i = 0; i < faceBottom.length; i++){

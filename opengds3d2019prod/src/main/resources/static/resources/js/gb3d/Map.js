@@ -111,9 +111,9 @@ gb3d.Map = function(obj) {
 // this.cesiumViewer.scene.primitives.add(tileset);
 // this.cesiumViewer.zoomTo(tileset);
 
-//	this.cesiumViewer.camera.flyTo({
-//		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
-//	});
+	this.cesiumViewer.camera.flyTo({
+		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
+	});
 
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
@@ -126,7 +126,7 @@ gb3d.Map = function(obj) {
 // this.initPosition = Array.isArray(options.initPosition) ?
 // Cesium.Cartesian3.fromDegrees(options.initPosition[0],
 // options.initPosition[1] - 1, 200000) : this.center;
-	this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087, 200000);
+//	this.initPosition = Cesium.Cartesian3.fromDegrees(131.86972500, 37.23948087, 200000);
 
 	// cesium 카메라를 지도 중심으로 이동
 // this.cesiumViewer.camera.flyTo({
@@ -638,9 +638,9 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
 	if(this.objectAttr.type === "MultiPolygon"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
 	} else if(this.objectAttr.type === "Polygon"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], depth);
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], [x, y], depth);
 	} else {
 		return;
 	}
@@ -648,7 +648,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
@@ -741,9 +741,9 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	}
 
 	if(this.objectAttr.type === "MultiLineString"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], depth);
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
 	} else if(this.objectAttr.type === "LineString"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], depth);
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], [x, y], depth);
 	} else {
 		return;
 	}
@@ -751,7 +751,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
 // geometry.computeVertexNormals();
@@ -848,6 +848,9 @@ gb3d.Map.prototype.selectFeature = function(id){
 	}
 	
 	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+		if(!this.tools.edit2d.interaction.select){
+			return false;
+		}
 		this.tools.edit2d.interaction.select.getFeatures().clear();
 		this.tools.edit2d.interaction.select.getFeatures().push( threeObject.getFeature() );
 		return threeObject;
@@ -880,6 +883,9 @@ gb3d.Map.prototype.unselectFeature = function(id){
 	}
 	
 	if(this.tools.edit2d instanceof gb3d.edit.EditingTool2D){
+		if(!this.tools.edit2d.interaction.select){
+			return false;
+		}
 		this.tools.edit2d.interaction.select.getFeatures().remove( threeObject.getFeature() );
 		return threeObject;
 	} else {
@@ -1105,11 +1111,11 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var a, b, cp;
 	if(geometry instanceof THREE.Geometry){
 		if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], parseFloat(opt.depth));
+			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
 			a = coord[0][0][0];
 			b = coord[0][0][1];
 		} else if(opt.type === "Polygon" || opt.type === "LineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], parseFloat(opt.depth));
+			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
 			a = coord[0][0];
 			b = coord[0][1];
 		} else {
@@ -1119,7 +1125,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		geometry = new THREE.Geometry();
 		geometry.vertices = result.points;
 		geometry.faces = result.faces;
-		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+//		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 		object.lookAt(new THREE.Vector3(0,0,0));
 		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다

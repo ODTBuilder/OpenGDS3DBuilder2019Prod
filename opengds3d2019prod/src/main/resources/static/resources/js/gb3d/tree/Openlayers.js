@@ -474,6 +474,7 @@ gb3d.tree.OpenLayers = function(obj) {
 
 	var options = obj ? obj : {};
 	this.append = options.append ? options.append : undefined;
+	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
 	this.map = options.map instanceof ol.Map ? options.map : undefined;
 	if(this.map === undefined){
 		console.error("gb3d.tree.OpenLayers: 'map' is a required field.");
@@ -650,8 +651,10 @@ gb3d.tree.OpenLayers = function(obj) {
 									.get_node(data.reference);
 									var layer = inst.get_LayerById(obj.id);
 
-									var modal = new gb3d.io.importerThree({
-										"locale" : that.locale
+									var modal = new gb3d.io.ImporterThree({
+										"locale" : that.locale,
+										"gb3dMap" : that.gb3dMap,
+										"layer" : layer
 									});
 									modal.open();
 								}
