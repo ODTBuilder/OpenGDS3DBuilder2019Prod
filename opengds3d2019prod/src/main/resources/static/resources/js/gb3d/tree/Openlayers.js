@@ -654,7 +654,8 @@ gb3d.tree.OpenLayers = function(obj) {
 									var modal = new gb3d.io.ImporterThree({
 										"locale" : that.locale,
 										"gb3dMap" : that.gb3dMap,
-										"layer" : layer
+										"layer" : layer,
+										"locale" : that.locale
 									});
 									modal.open();
 								}

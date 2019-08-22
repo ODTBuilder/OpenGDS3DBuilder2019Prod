@@ -36,7 +36,10 @@ gb3d.object.ThreeObject = function(obj) {
 
 	this.buffer = this.type === "LineString" || this.type === "MultiLineString" ? options.buffer ? options.buffer : undefined : undefined;
 
+	// 소속된 타일 식별자
 	this.tileId = options.tileId ? options.tileId : undefined;
+	// 소속된 2D 레이어 또는 식별자
+	this.layer = options.layer ? options.layer : undefined;
 
 	this.modCount = 0;
 }

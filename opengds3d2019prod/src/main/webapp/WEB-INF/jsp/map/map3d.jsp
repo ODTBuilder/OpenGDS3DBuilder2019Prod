@@ -214,26 +214,22 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-			"target" : $(".area-3d")[0]
-		// 			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json"
+			"target" : $(".area-3d")[0],
+			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
 
 		var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
 			"cesiumTileset" : new Cesium.Cesium3DTileset({
-				url : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json"
+				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json",
+				debugShowBoundingVolume : true,
+				debugShowContentBoundingVolume : true,
+				debugShowViewerRequestVolume : true,
+				debugShowGeometricError : true
 			})
 		});
-
 		gb3dMap.addTileset(tiles);
-		
-		var entity = gb3dMap.getCesiumViewer().entities.add({
-			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
-			model : {
-				uri : '${pageContext.request.contextPath}/resources/testtileset/test.gltf'
-			}
-		});
 
 		var gbCam = gb3dMap.getCamera();
 
@@ -294,7 +290,7 @@ html, body {
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap
 		});
-		
+
 		var threeTree = new gb3d.tree.Three({
 			"target" : "#attrObject",
 			"map" : gb3dMap
