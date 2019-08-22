@@ -29,9 +29,18 @@ gb3d.object.ThreeObject = function(obj) {
 	this.center = options.center;
 	// extent point [a,b,c,d]
 	this.extent = options.extent;
-	
-	this.attrs = options.attrs;
-	
+
+	this.type = options.type;
+
+	this.feature = options.feature;
+
+	this.buffer = this.type === "LineString" || this.type === "MultiLineString" ? options.buffer ? options.buffer : undefined : undefined;
+
+	// 소속된 타일 식별자
+	this.tileId = options.tileId ? options.tileId : undefined;
+	// 소속된 2D 레이어 또는 식별자
+	this.layer = options.layer ? options.layer : undefined;
+
 	this.modCount = 0;
 }
 
@@ -99,23 +108,66 @@ gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
 };
 
 /**
+ * Layer의 Type을 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getType
+ * @return {String} Layer type
+ */
+gb3d.object.ThreeObject.prototype.getType = function() {
+	return this.type;
+};
+
+/**
+ * Layer의 Type을 설정한다.
+ * 
+ * @method gb3d.object.ThreeObject#setType
+ * @param {String}
+ *            type - Layer type
+ */
+gb3d.object.ThreeObject.prototype.setType = function(type) {
+	this.type = type;
+};
+
+/**
  * 사용자 정의 속성 목록을 반환한다.
  * 
- * @method gb3d.object.ThreeObject#getAttrs
- * @return {Array.<gb.layer.Attribute>} 사용자 정의 속성 목록
+ * @method gb3d.object.ThreeObject#getFeature
+ * @return {ol.Feature} Openlayers Feature
  */
-gb3d.object.ThreeObject.prototype.getAttrs = function() {
-	return this.attrs;
+gb3d.object.ThreeObject.prototype.getFeature = function() {
+	return this.feature;
 };
 
 /**
  * 사용자 정의 속성 목록을 설정한다.
  * 
- * @method gb3d.object.ThreeObject#setAttrs
- * @param {Array.<gb.layer.Attribute>} attrs - 사용자 정의 속성 목록
+ * @method gb3d.object.ThreeObject#setFeature
+ * @param {ol.Feature}
+ *            feature - Openlayers Feature
  */
-gb3d.object.ThreeObject.prototype.setAttrs = function(attrs) {
-	this.attrs = attrs;
+gb3d.object.ThreeObject.prototype.setFeature = function(feature) {
+	this.feature = feature;
+};
+
+/**
+ * 사용자 정의 속성 목록을 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getFeature
+ * @return {number} Openlayers Feature
+ */
+gb3d.object.ThreeObject.prototype.getBuffer = function() {
+	return this.buffer;
+};
+
+/**
+ * 사용자 정의 속성 목록을 설정한다.
+ * 
+ * @method gb3d.object.ThreeObject#setFeature
+ * @param {number}
+ *            buffer - buffer value
+ */
+gb3d.object.ThreeObject.prototype.setBuffer = function(buffer) {
+	this.buffer = buffer;
 };
 
 /**
@@ -135,4 +187,3 @@ gb3d.object.ThreeObject.prototype.upModCount = function() {
 gb3d.object.ThreeObject.prototype.getModCount = function() {
 	return this.modCount;
 };
-

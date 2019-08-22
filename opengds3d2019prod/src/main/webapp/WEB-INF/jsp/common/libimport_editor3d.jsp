@@ -37,7 +37,10 @@
 <%-- <script src="${pageContext.request.contextPath}/resources/js/ol3/ol-debug.js"></script> --%>
 <script src="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.js"></script>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.css">
-
+<!-- jsts -->
+<script src="${pageContext.request.contextPath}/resources/js/jsts/jsts.js"></script>
+<!-- turf -->
+<script src="${pageContext.request.contextPath}/resources/js/turf/turf.min.js"></script>
 <%-- jsTree--%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jsTree/jstree.js"></script>
 <link rel="stylesheet" type="text/css"
@@ -121,12 +124,9 @@
 <!-- gb.versioning.Feature -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/versioning/feature.js"></script>
 <!-- gb.edit -->
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/edithistory.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/undo.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/modifylayerprop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
 <!-- gb.interaction -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/overriding/olinteractiondraw.js"></script>
@@ -157,8 +157,34 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/TransformControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/DragControls.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/renderers/Projector.js"></script>
+<!-- three loaders -->
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/OBJLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/DRACOLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/GLTFLoader.js"></script>
+<!-- three exporters -->
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/GLTFExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/ColladaExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/OBJExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/draco_encoder.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/DracoExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/PLYExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/STLExporter.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/UI.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/math/Math.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/jsTree-three/jstree.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Three.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/object/ThreeObject.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/object/Tileset.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/Simple3DManager.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/MultiOBJManager.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/GeoServer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Openlayers.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool2D.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingTool3D.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/importer/ImporterThree.js"></script>

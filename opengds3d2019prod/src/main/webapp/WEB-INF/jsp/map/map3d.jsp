@@ -121,7 +121,7 @@ html, body {
 				</a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li>
-						<li><a href="#"><spring:message code="lang.importZip"></spring:message></a></li>
+						<li><a href="#" id="importB3dmBtn"><spring:message code="lang.importZip"></spring:message></a></li>
 						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li>
 					</ul></li>
 				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
@@ -131,7 +131,9 @@ html, body {
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
 				</a></li>
 				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
-							code="lang.edit" />
+							code="lang.edit" /> </a></li>
+				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
+						<spring:message code="lang.baseMap" />
 				</a></li>
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
 						style="color: #344762;"></i> <spring:message code="lang.validation" />
@@ -147,12 +149,12 @@ html, body {
 		<!-- 		<span class="navbar-left gb-footer-span"><span class="gb-scale-line-area" style="margin-right: 118px;"></span></span> -->
 		<span class="navbar-left gb-footer-span"><i class="fas fa-globe"></i>&nbsp;<a href="#"
 			class="epsg-now btn-link"></a></span> <span id="feature-toggle-btn" class="navbar-left gb-footer-span"><i
-			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span> <span
-			id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span
-			class="btn-link"><spring:message code="lang.command" /></span></span> <span class="navbar-left gb-footer-span"> <i
-			class="fas fa-map-marked-alt"></i>&nbsp;<span>&nbsp;</span><span class="mouse-position btn-link"
-			style="display: inline-block;"></span></span> <span class="text-muted navbar-right gb-footer-span"><span
-			class="help-message"></span></span>
+			class="fas fa-th"></i>&nbsp;<span class="btn-link"><spring:message code="lang.featureList" /></span></span>
+		<!-- 			<span id="cmd-toggle-btn" class="navbar-left gb-footer-span"><i class="fas fa-terminal"></i>&nbsp;<span -->
+		<%-- 			class="btn-link"><spring:message code="lang.command" /></span></span>  --%>
+		<span class="navbar-left gb-footer-span"> <i class="fas fa-map-marked-alt"></i>&nbsp;<span>&nbsp;</span><span
+			class="mouse-position btn-link" style="display: inline-block;"></span></span> <span
+			class="text-muted navbar-right gb-footer-span"><span class="help-message"></span></span>
 	</nav>
 
 	<!-- modal area -->
@@ -160,6 +162,9 @@ html, body {
 	<jsp:include page="/WEB-INF/jsp/map/infoModal.jsp" />
 	<jsp:include page="/WEB-INF/jsp/map/objectModal.jsp" />
 	<script type="text/javascript">
+		$('#geoserverModal').on('shown.bs.modal', function() {
+			$(document).off('focusin.modal');
+		});
 		var locale = '<spring:message code="lang.localeCode" />';
 
 		var urlList = {
@@ -185,215 +190,218 @@ html, body {
 				"layers" : []
 			}
 		});
-		
+
+		var mousePosition = new gb.map.MousePosition({
+			map : gbMap.getUpperMap()
+		});
+
 		var gbBaseMap = new gb.style.BaseMap({
 			"map" : gbMap.getLowerMap(),
 			"defaultBaseMap" : "osm",
 			"locale" : locale !== "" ? locale : "en"
 		});
-		
-		var baseCRS =  new gb.crs.BaseCRS({
-			"locale" :  locale !== "" ? locale : "en",
+
+		$("#changeBase").click(function() {
+			gbBaseMap.open();
+		});
+
+		var baseCRS = new gb.crs.BaseCRS({
+			"locale" : locale !== "" ? locale : "en",
 			"message" : $(".epsg-now")[0],
 			"maps" : [ gbMap.getUpperMap(), gbMap.getLowerMap() ],
 			"epsg" : "4326"
 		});
-		
+
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
 			"target" : $(".area-3d")[0],
-			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
+			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
-		
-        var entity = gb3dMap.getCesiumViewer().entities.add({
-			position : Cesium.Cartesian3.fromRadians(2.208193658851, 0.584761465585),
-			model : {
-				uri : '${pageContext.request.contextPath}/resources/testtileset/24.gltf'
-			}
+
+		var tiles = new gb3d.object.Tileset({
+			"layer" : "testLayer",
+			"tileId" : "testLayerTile1",
+			"cesiumTileset" : new Cesium.Cesium3DTileset({
+				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json",
+				debugShowBoundingVolume : true,
+				debugShowContentBoundingVolume : true,
+				debugShowViewerRequestVolume : true,
+				debugShowGeometricError : true
+			})
 		});
-        
+		gb3dMap.addTileset(tiles);
+
 		var gbCam = gb3dMap.getCamera();
-		  
-		function init3DObject() {
-			var minCRS = [ -180, -89 ];
-			var maxCRS = [ 179, 89 ];
-			// Cesium entity
-			var entity = {
-				name : 'Polygon',
-				polygon : {
-					hierarchy : Cesium.Cartesian3.fromDegreesArray([ minCRS[0], minCRS[1], maxCRS[0], minCRS[1], maxCRS[0], maxCRS[1], minCRS[0], maxCRS[1], ]),
-					material : Cesium.Color.RED.withAlpha(1)
-				}
-			};
-			var Polygon = gb3dMap.getCesiumViewer().entities.add(entity);
 
-			// Three.js Objects
-			// Lathe geometry
-			var doubleSideMaterial = new THREE.MeshNormalMaterial({
-				side : THREE.DoubleSide
-			});
-			var segments = 10;
-			var points = [];
-			for (var i = 0; i < segments; i++) {
-				points.push(new THREE.Vector2(Math.sin(i * 0.2) * segments + 5, (i - 5) * 2));
+		var uploadB3DM = new gb3d.io.B3DMManager({
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
+
+		$("#importB3dmBtn").click(function() {
+			uploadB3DM.open();
+		});
+
+		var frecord = new gb.edit.FeatureRecord({
+			//id : "feature_id",
+			locale : locale,
+			wfstURL : urlList.wfst + urlList.token,
+			layerInfoURL : urlList.getLayerInfo + urlList.token
+		});
+
+		var uploadjson = new gb.geoserver.UploadGeoJSON({
+			"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
+			"epsg" : function() {
+				return crs.getEPSGCode();
+			},
+			"geoserverTree" : function() {
+				return gtree;
+			},
+			"locale" : locale !== "" ? locale : "en"
+		});
+
+		otree = new gb3d.tree.OpenLayers({
+			"locale" : locale || "en",
+			"append" : $(".builderLayerClientPanel")[0],
+			"gb3dMap" : gb3dMap,
+			"map" : gbMap.getUpperMap(),
+			"frecord" : frecord,
+			"uploadJSON" : uploadjson,
+			"token" : urlList.token,
+			"url" : {
+				"getLegend" : urlList.getLegend + urlList.token
 			}
-			var geometry = new THREE.LatheGeometry(points);
-			var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-			latheMesh.scale.set(1000, 1000, 1000); // scale object to be visible at 
-			// planet scale
-			// 아마 z값은 스케일의 10배?
-			latheMesh.position.z += 10000; // translate "up" in Three.js space
-			// so the "bottom" of the mesh is
-			// the handle
-			latheMesh.rotation.x = Math.PI / 2;
-			// rotate mesh for Cesium's Y-up
-			// system
-			var latheMeshYup = new THREE.Group();
-			latheMeshYup.add(latheMesh);
-			//map.getThreeScene().add(latheMeshYup); // don’t forget to add it to the
-			// Three.js scene manually
-			// three.control.attach(latheMeshYup);
+		});
 
-			var obj3d = new gb3d.object.ThreeObject({
-				"object" : latheMeshYup,
-				"center" : [ 127.100912, 37.401746 ]
-			});
+		var uploadSHP = new gb.geoserver.UploadSHP({
+			"url" : urlList.geoserverFileUpload + urlList.token,
+			"locale" : locale !== "" ? locale : "en"
+		});
 
-			//map.addThreeObject(obj3d);
+		var simple3d = new gb3d.io.Simple3DManager({
+			"url" : undefined,
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
 
-		}
+		var multiobj = new gb3d.io.MultiOBJManager({
+			"test" : "${pageContext.request.contextPath}/resources/testtileset/TilesetWithRequestVolume/tileset.json",
+			"url" : undefined,
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap
+		});
 
-		init3DObject();
+		var threeTree = new gb3d.tree.Three({
+			"target" : "#attrObject",
+			"map" : gb3dMap
+		});
+
+		var importThree = new gb3d.io.ImporterThree({
+			"locale" : locale !== "" ? locale : "en",
+			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/"
+		});
+
+		var gtree = new gb3d.tree.GeoServer({
+			"locale" : locale !== "" ? locale : "en",
+			"height" : "300px",
+			"append" : $(".builderLayerGeoServerPanel")[0],
+			"clientTree" : otree.getJSTree(),
+			"map" : gbMap.getUpperMap(),
+			// 			"gb3dMap" : gb3dMap,
+			"properties" : new gb.edit.ModifyLayerProperties({
+				"token" : urlList.token,
+				"locale" : locale !== "" ? locale : "en"
+			}),
+			"uploadSHP" : uploadSHP,
+			"simple3DManager" : simple3d,
+			"multiOBJManager" : multiobj,
+			"url" : {
+				"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"deleteGeoServer" : "geoserver/removeGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"deleteGeoServerLayer" : "geoserver/geoserverRemoveLayers.ajax?${_csrf.parameterName}=${_csrf.token}",
+				"getMapWMS" : urlList.getMapWMS + urlList.token,
+				"getLayerInfo" : urlList.getLayerInfo + urlList.token,
+				"getWFSFeature" : urlList.getWFSFeature + urlList.token,
+				"switchGeoGigBranch" : "geoserver/updateGeogigGsStore.do?${_csrf.parameterName}=${_csrf.token}",
+				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
+			}
+		});
+
+		// EditTool 활성화
+		var epan = new gb3d.edit.EditingTool2D({
+			targetElement : gbMap.getLowerDiv()[0],
+			map : gb3dMap,
+			featureRecord : frecord,
+			otree : otree,
+			wfsURL : urlList.getWFSFeature + urlList.token,
+			layerInfo : urlList.getLayerInfo + urlList.token,
+			locale : locale || "en",
+			isEditing : gb.module.isEditing
+		});
+
+		var epan3d = new gb3d.edit.EditingTool3D({
+			targetElement : $(".area-3d")[0],
+			map : gb3dMap,
+			isDisplay : false,
+			locale : locale || "en"
+		});
+
+		$("#editTool").click(function(e) {
+			e.preventDefault();
+			epan.editToolToggle();
+			epan3d.toggleTool();
+		});
+
+		// feature list
+		var featureList = new gb.layer.FeatureList({
+			map : gbMap.getUpperMap(),
+			targetElement : gbMap.getLowerDiv()[0],
+			title : "All Feature List",
+			toggleTarget : "#feature-toggle-btn",
+			wfstURL : urlList.wfst + urlList.token,
+			locale : locale || "en",
+			layerInfoURL : urlList.getLayerInfo + urlList.token,
+			getFeatureURL : urlList.getWFSFeature + urlList.token,
+			isDisplay : false
+		});
+
+		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
+			var treeid = data.selected[0];
+			var layer = data.instance.get_LayerById(treeid);
+
+			if (!layer) {
+				return;
+			}
+
+			if (layer instanceof ol.layer.Group) {
+				return;
+			}
+
+			if (featureList.footerTag.css("display") === "none") {
+				return;
+			} else {
+				featureList.updateFeatureList(layer);
+			}
+		});
+
+		// 검수 수행 Modal 생성
+		var validation = new gb.validation.Validation({
+			"autoOpen" : false,
+			"locale" : locale,
+			"title" : "<spring:message code='lang.validation' />",
+			"url" : {
+				"token" : urlList.token,
+				"requestValidate" : urlList.requestValidate
+			},
+			"isEditing" : gb.module.isEditing
+		});
+
+		$("#validation").click(function() {
+			validation.open();
+		});
 
 		$(document).ready(function() {
-
-			var frecord = new gb.edit.FeatureRecord({
-				//id : "feature_id",
-				locale : locale,
-				wfstURL : urlList.wfst + urlList.token,
-				layerInfoURL : urlList.getLayerInfo + urlList.token
-			});
-
-			var uploadjson = new gb.geoserver.UploadGeoJSON({
-				"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
-				"epsg" : function() {
-					return crs.getEPSGCode();
-				},
-				"geoserverTree" : function() {
-					return gtree;
-				},
-				"locale" : locale !== "" ? locale : "en"
-			});
-
-			otree = new gb.tree.OpenLayers({
-				"locale" : locale || "en",
-				"append" : $(".builderLayerClientPanel")[0],
-				"map" : gbMap.getUpperMap(),
-				"frecord" : frecord,
-				"uploadJSON" : uploadjson,
-				"token" : urlList.token,
-				"url" : {
-					"getLegend" : urlList.getLegend + urlList.token
-				}
-			});
-
-			var gtree = new gb.tree.GeoServer({
-				"locale" : locale !== "" ? locale : "en",
-				"height" : "300px",
-				"append" : $(".builderLayerGeoServerPanel")[0],
-				"clientTree" : otree.getJSTree(),
-				"map" : gbMap.getUpperMap(),
-				"properties" : new gb.edit.ModifyLayerProperties({
-					"token" : urlList.token,
-					"locale" : locale !== "" ? locale : "en"
-				}),
-				//"uploadSHP" : uploadSHP,
-				"url" : {
-					"getTree" : "geoserver/getGeolayerCollectionTree.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"addGeoServer" : "geoserver/addGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"deleteGeoServer" : "geoserver/removeGeoserver.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"deleteGeoServerLayer" : "geoserver/geoserverRemoveLayers.ajax?${_csrf.parameterName}=${_csrf.token}",
-					"getMapWMS" : urlList.getMapWMS + urlList.token,
-					"getLayerInfo" : urlList.getLayerInfo + urlList.token,
-					"getWFSFeature" : urlList.getWFSFeature + urlList.token,
-					"switchGeoGigBranch" : "geoserver/updateGeogigGsStore.do?${_csrf.parameterName}=${_csrf.token}",
-					"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
-				}
-			});
-
-			// EditTool 활성화
-			var epan = new gb3d.edit.EditingTool2D({
-				targetElement : gbMap.getLowerDiv()[0],
-				map : gb3dMap,
-				featureRecord : frecord,
-				otree : otree,
-				wfsURL : urlList.getWFSFeature + urlList.token,
-				layerInfo : urlList.getLayerInfo + urlList.token,
-				locale : locale || "en",
-				isEditing : gb.module.isEditing
-			});
-			
-			var epan3d = new gb3d.edit.EditingTool3D({
-				targetElement : $(".area-3d")[0],
-				map: gb3dMap,
-				isDisplay: false,
-				locale : locale || "en"
-			});
-
-			$("#editTool").click(function(e) {
-				e.preventDefault();
-				epan.editToolToggle();
-				epan3d.toggleTool();
-			});
-			
-			// feature list
-			var featureList = new gb.layer.FeatureList({
-				map : gbMap.getUpperMap(),
-				targetElement : gbMap.getLowerDiv()[0],
-				title : "All Feature List",
-				toggleTarget : "#feature-toggle-btn",
-				wfstURL : urlList.wfst + urlList.token,
-				locale : locale || "en",
-				layerInfoURL : urlList.getLayerInfo + urlList.token,
-				getFeatureURL : urlList.getWFSFeature + urlList.token,
-				isDisplay : false
-			});
-			
-			otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
-				var treeid = data.selected[0];
-				var layer = data.instance.get_LayerById(treeid);
-
-				if (!layer) {
-					return;
-				}
-
-				if (layer instanceof ol.layer.Group) {
-					return;
-				}
-
-				if (featureList.footerTag.css("display") === "none") {
-					return;
-				} else {
-					featureList.updateFeatureList(layer);
-				}
-			});
-			
-			// 검수 수행 Modal 생성
-			var validation = new gb.validation.Validation({
-				"autoOpen" : false,
-				"locale" : locale,
-				"title" : "<spring:message code='lang.validation' />",
-				"url" : {
-					"token" : urlList.token,
-					"requestValidate" : urlList.requestValidate
-				},
-				"isEditing" : gb.module.isEditing
-			});
-
-			$("#validation").click(function() {
-				validation.open();
-			});
-
 			var gitrnd = {
 				resize : function() {
 					//현재 보이는 브라우저 내부 영역의 높이
@@ -409,7 +417,7 @@ html, body {
 						conHeight = winHeight - ($(".mainHeader").outerHeight(true) + $(".builderHeader").outerHeight(true) + $(".builderFooter").outerHeight(true));
 						$(".builderContent").css("height", conHeight);
 					}
-					
+
 					//현재 보이는 브라우저 내부 영역의 너비
 					var winWidth = $(window).innerWidth();
 					//컨텐츠 (지도) 영역의 너비 지정
@@ -428,25 +436,16 @@ html, body {
 				}
 			}
 			gitrnd.resize();
-			
+
 			$(window).resize(function() {
 				gitrnd.resize();
 			});
-			
-// 			gbMap.getLowerMap().getView().setCenter([ 127.0287, 37.5420 ]);
-// 			gbMap.getLowerMap().getView().setZoom(15);
-
 		});
 
 		$(window).on("beforeunload", function() {
 			if (frecord.isEditing()) {
 				return "이 페이지를 벗어나면 작성된 내용은 저장되지 않습니다.";
 			}
-		});
-
-		$("#styleColor").spectrum({
-			color : "#fff",
-			showAlpha : true
 		});
 
 		$("#textureEmissive").spectrum({
