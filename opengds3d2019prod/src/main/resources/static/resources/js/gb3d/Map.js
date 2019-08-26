@@ -111,9 +111,10 @@ gb3d.Map = function(obj) {
 // this.cesiumViewer.scene.primitives.add(tileset);
 // this.cesiumViewer.zoomTo(tileset);
 
-	this.cesiumViewer.camera.flyTo({
-		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
-	});
+// this.cesiumViewer.camera.flyTo({
+// destination: Cesium.Cartesian3.fromDegrees(127.03250885009764,
+// 37.51989305019379, 15000.0)
+// });
 
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
@@ -122,6 +123,7 @@ gb3d.Map = function(obj) {
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
+// this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
 	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 	// 초기 위치
@@ -663,7 +665,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
@@ -766,7 +768,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
 // geometry.computeVertexNormals();
@@ -1140,7 +1142,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		geometry = new THREE.Geometry();
 		geometry.vertices = result.points;
 		geometry.faces = result.faces;
-//		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 		object.lookAt(new THREE.Vector3(0,0,0));
 		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
@@ -1177,6 +1179,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
  *            tileset - 타일셋 객체
  */
 gb3d.Map.prototype.addTileset = function(tileset){
+	var that = this;
 	if (tileset instanceof gb3d.object.Tileset) {
 		var layer = tileset.getLayer();
 		var layerid;
@@ -1193,22 +1196,36 @@ gb3d.Map.prototype.addTileset = function(tileset){
 		}
 		this.getTileset()[layerid].push(tileset);
 		var ctile = tileset.getCesiumTileset();
-		this.getCesiumViewer().scene.primitives.add(ctile);
+		var city = this.getCesiumViewer().scene.primitives.add(ctile);
 		this.getCesiumViewer().zoomTo(ctile);
 
-		
-// var primitives = this.getCesiumViewer().scene.primitives;
-// primitives.add(new Cesium.DebugModelMatrixPrimitive({
-// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
-// length : 10000000.0,
-// width : 10.0
-// }));
-
-// ctile.modelMatrix = new Cesium.DebugModelMatrixPrimitive({
-// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
-// length : 10000000.0,
-// width : 10.0
-// })
+		var heightOffset = 0;
+		city.readyPromise.then(function(tileset) {
+			// Position tileset
+		    var boundingSphere = tileset.boundingSphere;
+		    var cartographic = Cesium.Cartographic.fromCartesian(boundingSphere.center);
+		    var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, 0.0);
+		    var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, heightOffset);
+		    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
+//		    var a = new Cesium.Matrix4(-0.8008475916633861,
+//		    		-0.598868211651741,
+//		    		0,
+//		    		0,
+//		    		0.34470782939780004,
+//		    		-0.4609669199828516,
+//		    		0.817732236758085,
+//		    		0,
+//		    		-0.4897138422372923,
+//		    		0.6548788924332262,
+//		    		0.5755988090385694,
+//		    		0,
+//		    		-3126931.5775260823,
+//		    		4181547.0823724694,
+//		    		3650722.123363726,
+//		    		1);
+//		    tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);
+//		    tileset.modelMatrix = a;
+		});
 	} else {
 		console.error("parameter must be gb3d.object.Tileset");
 		return
