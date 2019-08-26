@@ -5,47 +5,73 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
+import com.gitrnd.KongAlgo;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Quaterniond;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class ShpToObjImpl {
-	
+
 	private double defaultHeight = 5;
-	private double globalMinX;
-	private double globalMinY;
-	private double scaleFactor;
-	
+
+	public static double globalMinX;
+	public static double globalMinY;
+	public static double scaleFactor;
+
 	private double minVal;
 	private double maxVal;
+
+	public static double centerX;
+	public static double centerY;
+
+	public static CoordinateReferenceSystem srcCRS;
+	public static CoordinateReferenceSystem targetCRS;
+	public static MathTransform transform;
+
 	private String attribute;
-	
+
 	private String outputPath;
 	private File file;
 	private Filter filter;
-	
+
+	private int vIdx = 0;
+
 	EnShpToObjHeightType hType = null;
-	
+
 	/**
 	 * Shp 출력 타입
+	 * 
 	 * @author SG.LEE
 	 */
 	public enum EnShpToObjHeightType {
@@ -59,6 +85,7 @@ public class ShpToObjImpl {
 
 		/**
 		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
+		 * 
 		 * @author SG.LEE
 		 * @param type type명
 		 * @return {@link EnTreeType}
@@ -81,9 +108,10 @@ public class ShpToObjImpl {
 			this.type = type;
 		}
 	}
-	
+
 	/**
 	 * 높이 고정값
+	 * 
 	 * @author SG.LEE
 	 * @param file
 	 * @param filter
@@ -91,15 +119,17 @@ public class ShpToObjImpl {
 	 * @param outputPath
 	 * @throws Exception
 	 */
-	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) throws Exception{
+	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) throws Exception {
 		hType = EnShpToObjHeightType.DEFAULT;
 		this.file = file;
 		this.filter = filter;
 		this.outputPath = outputPath;
+		this.defaultHeight = defVal;
 	}
-	
+
 	/**
 	 * 높이 min ~ max 사이 랜던값
+	 * 
 	 * @author SG.LEE
 	 * @param file
 	 * @param filter
@@ -108,7 +138,7 @@ public class ShpToObjImpl {
 	 * @param outputPath
 	 * @throws Exception
 	 */
-	public ShpToObjImpl(File file, Filter filter, double minVal, double maxVal, String outputPath) throws Exception{
+	public ShpToObjImpl(File file, Filter filter, double minVal, double maxVal, String outputPath) throws Exception {
 		hType = EnShpToObjHeightType.RANDOM;
 		this.file = file;
 		this.filter = filter;
@@ -116,9 +146,10 @@ public class ShpToObjImpl {
 		this.minVal = minVal;
 		this.maxVal = maxVal;
 	}
-	
+
 	/**
 	 * 높이 컬럼값 지정
+	 * 
 	 * @author SG.LEE
 	 * @param file
 	 * @param filter
@@ -132,10 +163,10 @@ public class ShpToObjImpl {
 		this.outputPath = outputPath;
 		this.attribute = attribute;
 	}
-	
-	
+
 	public void exec() throws Exception {
-		FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection = getFeatureCollectionFromFileWithFilter(file, filter);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection = getFeatureCollectionFromFileWithFilter(
+				file, filter);
 
 		SimpleFeatureType featureType = buildingCollection.getSchema();
 		String geomType = featureType.getGeometryDescriptor().getType().getBinding().getName();
@@ -144,22 +175,19 @@ public class ShpToObjImpl {
 			try (BufferedWriter writer = new BufferedWriter(
 					new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"))) {
 				writer.write("mtllib material.mtl\n");
-
 				try (FeatureIterator<SimpleFeature> features = buildingCollection.features()) {
-					initShapefileCoordinateSystemBoundaries(buildingCollection);
+					// initTransformedCentroidCoordinate(buildingCollection);
 					while (features.hasNext()) {
 						SimpleFeature feature = features.next();
 						writer.write(buildingFeatureToObjGroup(feature));
 					}
 				}
-				// writer.write(groundBoundariesToObj(buildingCollection)); //바닥
 			}
-		}else{
+		} else {
 			throw new Exception("Polygon Type만 가능합니다.");
 		}
 	}
-	
-	
+
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionFromFileWithFilter(File file,
 			Filter filter) throws Exception {
 		if (!file.exists()) {
@@ -178,67 +206,137 @@ public class ShpToObjImpl {
 		return collection;
 	}
 
-	private String buildingFeatureToObjGroup(SimpleFeature feature) {
+	private String buildingFeatureToObjGroup(SimpleFeature feature) throws FactoryException, TransformException {
+
 		GeometryAttribute featureDefaultGeometryProperty = feature.getDefaultGeometryProperty();
 		MultiPolygon multipolygon = (MultiPolygon) featureDefaultGeometryProperty.getValue();
+		multipolygon.normalize();
 		Coordinate[] coordinates = deleteInnerPoints(multipolygon.getCoordinates());
 
-		Polygon poly = (Polygon) multipolygon.getGeometryN(0);
-		// Coordinate[] coords = poly.getExteriorRing().getCoordinates();
+		srcCRS = DefaultGeographicCRS.WGS84;
+		targetCRS = DefaultGeocentricCRS.CARTESIAN;
+		transform = CRS.findMathTransform(srcCRS, targetCRS);
 
-		// TODO: What if there is no _mean attribute available?
 		// 높이값 설정
 		double height = 0.0;
-		
-		if(this.hType == EnShpToObjHeightType.DEFAULT){
+
+		if (this.hType == EnShpToObjHeightType.DEFAULT) {
 			height = defaultHeight;
-		}else if(this.hType == EnShpToObjHeightType.FIX){
+		} else if (this.hType == EnShpToObjHeightType.FIX) {
 			try {
 				height = (double) feature.getAttribute(attribute);
 			} catch (Exception e) {
 				// TODO: handle exception
 				height = defaultHeight;
 			}
-		}else if(this.hType == EnShpToObjHeightType.RANDOM){
-			double rdNum = minVal + (int)(Math.random()*maxVal); 
+		} else if (this.hType == EnShpToObjHeightType.RANDOM) {
+			double rdNum = minVal + (int) (Math.random() * maxVal);
 			height = rdNum;
 		}
-		
+
 		if (height < 1) {
 			height = defaultHeight;
 		}
 
-		String result = "o " + feature.getID() + "\nusemtl Building_" + getRandomIntWithRange(1, 10) + "\n";
-		String roofFace = "f";
+		String result = "o " + feature.getID() + "\n";
+		String roofFace = "";
+		String wallFace = "";
 
-		int i;
-		for (i = 0; i < coordinates.length; i++) {
-			Coordinate c = coordinates[i];
-			result = result + coordinateToVertexdescription(toLocalCoordinateSystem(c))
-					+ coordinateToVertexdescription(toLocalCoordinateSystem(createLiftedCoordinate(c, height)));
-			// Create face between four previous created vertices (=wall)
-			if (i > 0) {
-				result = result + "f -1 -2 -4 -3 \n";
-			}
-			roofFace += " -" + (2 * i + 1); // -1 -3 ...
+		// tmp set cent
+		Geometry geom = (Geometry) feature.getDefaultGeometry();
+		Geometry geomEn = geom.getEnvelope();
+		Point centroid = geomEn.getCentroid();
+		Coordinate centCoor = centroid.getCoordinate();
+		centCoor.z = 0;
+		Coordinate centTrans = JTS.transform(centCoor, null, transform);
+
+		Vector3d de = new Vector3d(centTrans.x, centTrans.y, centTrans.z);
+
+		// 바닥
+		List<Coordinate> coorList = new ArrayList<Coordinate>();
+		for (int i = 0; i < coordinates.length; i++) {
+			Coordinate transCoor = JTS.transform(coordinates[i], null, transform);
+
+			Vector3d car = new Vector3d(transCoor.x, transCoor.y, transCoor.z);
+
+			System.out.println(car.angleTo(de));
+
+			double angle = -car.angleTo(de).inDegrees();
+			double radians = Math.toRadians(angle);
+
+			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
+					transCoor.z - centTrans.z);
+
+			// http://eirenehue.egloos.com/982268
+			double x = localCoor.x * Math.cos(radians) + localCoor.y * (-Math.sin(radians));
+			double y = localCoor.x * Math.sin(radians) + localCoor.y * Math.cos(radians);
+
+			localCoor.x = x;
+			localCoor.y = y;
+			coorList.add(i, localCoor);
+			result = result + coordinateToVertexdescription(localCoor);
 		}
-		// Add face between first and last two created vertices (=wall)
-		if (i >= 4) {
-			result = result + "f -1 -2 -" + (2 * i) + " -" + (2 * i - 1) + "\n";
-		}
-		result = result + roofFace + "\n";
-		return result;
-	}
-
-	public String roadFeatureToObjGroup(SimpleFeature feature) {
-		GeometryAttribute featureDefaultGeometryProperty = feature.getDefaultGeometryProperty();
-		MultiLineString multiLineString = (MultiLineString) featureDefaultGeometryProperty.getValue();
-		return null;
-	}
-
-
-	public Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {
-		return new Coordinate(coordinate.x, coordinate.y, height);
+//		KongAlgo ka = new KongAlgo(coorList);
+//		ka.runKong(); // actual algo call
+//		List<Map<String, Object>> mapList = ka.getIndexList();
+//		for (int m = 0; m < mapList.size(); m++) {
+//			Map<String, Object> map = mapList.get(m);
+//			Coordinate fir = (Coordinate) map.get("fir");
+//			Coordinate sec = (Coordinate) map.get("sec");
+//			Coordinate thr = (Coordinate) map.get("thr");
+//			int firIdx = vIdx + coorList.indexOf(fir) + 1;
+//			int secIdx = vIdx + coorList.indexOf(sec) + 1;
+//			int thrIdx = vIdx + coorList.indexOf(thr) + 1;
+//			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
+//			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
+//		}
+		// 지붕
+//		List<Coordinate> hCoorList = new ArrayList<Coordinate>();
+//		for (int i = 0; i < coordinates.length; i++) {
+//			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
+//			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
+//					transCoor.z - centTrans.z);
+//			hCoorList.add(i, localCoor);
+//			result = result + coordinateToVertexdescription(localCoor);
+//		}
+//		KongAlgo hKa = new KongAlgo(hCoorList);
+//		hKa.runKong(); // actual algo call
+//		int coorSize = coorList.size();
+//		List<Map<String, Object>> kMapList = hKa.getIndexList();
+//		for (int m = 0; m < kMapList.size(); m++) {
+//			Map<String, Object> map = kMapList.get(m);
+//			Coordinate fir = (Coordinate) map.get("fir");
+//			Coordinate sec = (Coordinate) map.get("sec");
+//			Coordinate thr = (Coordinate) map.get("thr");
+//			int firIdx = vIdx + coorSize + hCoorList.indexOf(fir) + 1;
+//			int secIdx = vIdx + coorSize + hCoorList.indexOf(sec) + 1;
+//			int thrIdx = vIdx + coorSize + hCoorList.indexOf(thr) + 1;
+//			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
+//			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
+//		}
+//		// 옆면
+//		for (int f = 0; f < coorSize; f++) {
+//			int tfirIdx = vIdx + f + 1;
+//			int tsecIdx = vIdx + f + 1 + coorSize;
+//			int tthrIdx = tsecIdx + 1;
+//
+//			if (tthrIdx > (vIdx + (coorSize * 2))) {
+//				tthrIdx = tthrIdx - coorSize;
+//			}
+//
+//			int bfirIdx = tfirIdx;
+//			int bsecIdx = tthrIdx;
+//			int bthrIdx = bsecIdx - coorSize;
+//
+//			wallFace = wallFace + "f " + tfirIdx + " " + tsecIdx + " " + tthrIdx + "\n";
+//			wallFace = wallFace + "f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n";
+//
+//			wallFace = wallFace + "f " + tthrIdx + " " + tsecIdx + " " + tfirIdx + "\n";
+//			wallFace = wallFace + "f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n";
+//		}
+		vIdx += coorList.size();
+//		vIdx += hCoorList.size();
+		return result + roofFace + wallFace;
 	}
 
 	public String coordinateToVertexdescription(Coordinate coordinate) {
@@ -248,8 +346,8 @@ public class ShpToObjImpl {
 	public Coordinate[] deleteInnerPoints(Coordinate[] coordinates) {
 		Coordinate startCoordinate = coordinates[0];
 		double z = startCoordinate.z;
-		if(String.valueOf(z).equals("NaN")){
-			startCoordinate.z=0.0;
+		if (String.valueOf(z).equals("NaN")) {
+			startCoordinate.z = 0.0;
 		}
 		int i = 1;
 		while (!equal3dCoordinates(startCoordinate, coordinates[i])) {
@@ -259,54 +357,46 @@ public class ShpToObjImpl {
 	}
 
 	public static boolean equal3dCoordinates(Coordinate c1, Coordinate c2) {
-		if(String.valueOf(c2.z).equals("NaN")){
-			c2.z=0.0;
+		if (String.valueOf(c2.z).equals("NaN")) {
+			c2.z = 0.0;
 		}
-		return (c1.x == c2.x && c1.y == c2.y&&c1.z == c2.z);
+		return (c1.x == c2.x && c1.y == c2.y && c1.z == c2.z);
 	}
 
-	public String groundBoundariesToObj(FeatureCollection collection) {
+	public void initTransformedCentroidCoordinate(FeatureCollection collection) {
 
-		BoundingBox boundingBox = collection.getBounds();
-		Coordinate localUpperLeftCorner = toLocalCoordinateSystem(
-				new Coordinate(boundingBox.getMinX(), boundingBox.getMaxY(), 0));
-		Coordinate localBottomLeftCorner = toLocalCoordinateSystem(
-				new Coordinate(boundingBox.getMinX(), boundingBox.getMinY(), 0));
-		Coordinate localUpperRightCorner = toLocalCoordinateSystem(
-				new Coordinate(boundingBox.getMaxX(), boundingBox.getMaxY(), 0));
-		Coordinate localBottomRightCorner = toLocalCoordinateSystem(
-				new Coordinate(boundingBox.getMaxX(), boundingBox.getMinY(), 0));
-		String result = "o ground" + "\nusemtl Terrain\n";
-		result = result + coordinateToVertexdescription(localUpperLeftCorner)
-				+ coordinateToVertexdescription(localBottomLeftCorner)
-				+ coordinateToVertexdescription(localUpperRightCorner)
-				+ coordinateToVertexdescription(localBottomRightCorner);
-		return result + "f -1 -2 -4 -3\n";
+		Envelope envelope = collection.getBounds();
+		Geometry geomEn = new GeometryFactory().toGeometry(envelope);
+		Point centroid = geomEn.getCentroid();
+		Coordinate centCoor = centroid.getCoordinate();
+		centCoor.z = defaultHeight;
+		try {
+			Coordinate transCent = JTS.transform(centroid.getCoordinate(), null, transform);
+			centerX = transCent.x;
+			centerY = transCent.y;
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public void initShapefileCoordinateSystemBoundaries(FeatureCollection collection) {
-		BoundingBox boundingBox = collection.getBounds();
-		globalMinX = boundingBox.getMinX();
-		globalMinY = boundingBox.getMinY();
-		scaleFactor = 100 / boundingBox.getWidth(); // For a local CS with
-													// x-values between 0 and
-													// 100
+	public static Coordinate transformedCoordinate(Coordinate coordinate, double height) {
+
+		if (height != 0.0 || !String.valueOf(height).equals("NaN")) {
+			coordinate.z = height;
+		}
+		try {
+			Coordinate transCoor = JTS.transform(coordinate, null, transform);
+			double x = transCoor.x - centerX;
+			double y = transCoor.y - centerY;
+		} catch (TransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public Coordinate toLocalCoordinateSystem(Coordinate coordinate) {
-		return scaleCoordinateToLocalCoordinateSystem(translateCoordinateToLocalCoordinateSystem(coordinate));
-	}
-
-	public Coordinate translateCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
-		return new Coordinate(coordinate.x - globalMinX, coordinate.y - globalMinY, coordinate.z);
-	}
-
-	public Coordinate scaleCoordinateToLocalCoordinateSystem(Coordinate coordinate) {
-		return new Coordinate(coordinate.x * scaleFactor, coordinate.y * scaleFactor, coordinate.z * scaleFactor);
-	}
-
-	public int getRandomIntWithRange(int lowerBound, int upperBound) {
-		Random generator = new Random();
-		return generator.nextInt(upperBound - lowerBound) + lowerBound + 1;
+	public Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {
+		return new Coordinate(coordinate.x, coordinate.y, height);
 	}
 }
