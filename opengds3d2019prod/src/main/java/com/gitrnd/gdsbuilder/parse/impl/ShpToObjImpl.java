@@ -31,6 +31,9 @@ import org.opengis.referencing.operation.TransformException;
 
 import com.gitrnd.KongAlgo;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Quaterniond;
+import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -212,7 +215,6 @@ public class ShpToObjImpl {
 
 		srcCRS = DefaultGeographicCRS.WGS84;
 		targetCRS = DefaultGeocentricCRS.CARTESIAN;
-		//targetCRS = CRS.decode("EPSG:3857");
 		transform = CRS.findMathTransform(srcCRS, targetCRS);
 
 		// 높이값 설정
@@ -245,79 +247,95 @@ public class ShpToObjImpl {
 		Geometry geomEn = geom.getEnvelope();
 		Point centroid = geomEn.getCentroid();
 		Coordinate centCoor = centroid.getCoordinate();
+		centCoor.z = 0;
 		Coordinate centTrans = JTS.transform(centCoor, null, transform);
-		centTrans.z = 0.0;
+
+		Vector3d de = new Vector3d(centTrans.x, centTrans.y, centTrans.z);
+
 		// 바닥
 		List<Coordinate> coorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
 			Coordinate transCoor = JTS.transform(coordinates[i], null, transform);
-			transCoor.z = 0.0;
+
+			Vector3d car = new Vector3d(transCoor.x, transCoor.y, transCoor.z);
+
+			System.out.println(car.angleTo(de));
+
+			double angle = -car.angleTo(de).inDegrees();
+			double radians = Math.toRadians(angle);
+
 			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
 					transCoor.z - centTrans.z);
+
+			// http://eirenehue.egloos.com/982268
+			double x = localCoor.x * Math.cos(radians) + localCoor.y * (-Math.sin(radians));
+			double y = localCoor.x * Math.sin(radians) + localCoor.y * Math.cos(radians);
+
+			localCoor.x = x;
+			localCoor.y = y;
 			coorList.add(i, localCoor);
 			result = result + coordinateToVertexdescription(localCoor);
 		}
-		KongAlgo ka = new KongAlgo(coorList);
-		ka.runKong(); // actual algo call
-		List<Map<String, Object>> mapList = ka.getIndexList();
-		for (int m = 0; m < mapList.size(); m++) {
-			Map<String, Object> map = mapList.get(m);
-			Coordinate fir = (Coordinate) map.get("fir");
-			Coordinate sec = (Coordinate) map.get("sec");
-			Coordinate thr = (Coordinate) map.get("thr");
-			int firIdx = vIdx + coorList.indexOf(fir) + 1;
-			int secIdx = vIdx + coorList.indexOf(sec) + 1;
-			int thrIdx = vIdx + coorList.indexOf(thr) + 1;
-			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
-			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
-		}
-
+//		KongAlgo ka = new KongAlgo(coorList);
+//		ka.runKong(); // actual algo call
+//		List<Map<String, Object>> mapList = ka.getIndexList();
+//		for (int m = 0; m < mapList.size(); m++) {
+//			Map<String, Object> map = mapList.get(m);
+//			Coordinate fir = (Coordinate) map.get("fir");
+//			Coordinate sec = (Coordinate) map.get("sec");
+//			Coordinate thr = (Coordinate) map.get("thr");
+//			int firIdx = vIdx + coorList.indexOf(fir) + 1;
+//			int secIdx = vIdx + coorList.indexOf(sec) + 1;
+//			int thrIdx = vIdx + coorList.indexOf(thr) + 1;
+//			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
+//			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
+//		}
 		// 지붕
-		List<Coordinate> hCoorList = new ArrayList<Coordinate>();
-		for (int i = 0; i < coordinates.length; i++) {
-			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
-			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
-					transCoor.z - centTrans.z);
-			hCoorList.add(i, localCoor);
-			result = result + coordinateToVertexdescription(localCoor);
-		}
-		KongAlgo hKa = new KongAlgo(hCoorList);
-		hKa.runKong(); // actual algo call
-		int coorSize = coorList.size();
-		List<Map<String, Object>> kMapList = hKa.getIndexList();
-		for (int m = 0; m < kMapList.size(); m++) {
-			Map<String, Object> map = kMapList.get(m);
-			Coordinate fir = (Coordinate) map.get("fir");
-			Coordinate sec = (Coordinate) map.get("sec");
-			Coordinate thr = (Coordinate) map.get("thr");
-			int firIdx = vIdx + coorSize + hCoorList.indexOf(fir) + 1;
-			int secIdx = vIdx + coorSize + hCoorList.indexOf(sec) + 1;
-			int thrIdx = vIdx + coorSize + hCoorList.indexOf(thr) + 1;
-			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
-			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
-		}
-		// 옆면
-		for (int f = 0; f < coorSize; f++) {
-			int tfirIdx = vIdx + f + 1;
-			int tsecIdx = vIdx + f + 1 + coorSize;
-			int tthrIdx = tsecIdx + 1;
-
-			if (tthrIdx > (vIdx + (coorSize * 2))) {
-				tthrIdx = tthrIdx - coorSize;
-			}
-
-			int bfirIdx = tfirIdx;
-			int bsecIdx = tthrIdx;
-			int bthrIdx = bsecIdx - coorSize;
-
-			wallFace = wallFace + "f " + tfirIdx + " " + tsecIdx + " " + tthrIdx + "\n";
-			wallFace = wallFace + "f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n";
-
-			wallFace = wallFace + "f " + tthrIdx + " " + tsecIdx + " " + tfirIdx + "\n";
-			wallFace = wallFace + "f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n";
-		}
+//		List<Coordinate> hCoorList = new ArrayList<Coordinate>();
+//		for (int i = 0; i < coordinates.length; i++) {
+//			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
+//			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
+//					transCoor.z - centTrans.z);
+//			hCoorList.add(i, localCoor);
+//			result = result + coordinateToVertexdescription(localCoor);
+//		}
+//		KongAlgo hKa = new KongAlgo(hCoorList);
+//		hKa.runKong(); // actual algo call
+//		int coorSize = coorList.size();
+//		List<Map<String, Object>> kMapList = hKa.getIndexList();
+//		for (int m = 0; m < kMapList.size(); m++) {
+//			Map<String, Object> map = kMapList.get(m);
+//			Coordinate fir = (Coordinate) map.get("fir");
+//			Coordinate sec = (Coordinate) map.get("sec");
+//			Coordinate thr = (Coordinate) map.get("thr");
+//			int firIdx = vIdx + coorSize + hCoorList.indexOf(fir) + 1;
+//			int secIdx = vIdx + coorSize + hCoorList.indexOf(sec) + 1;
+//			int thrIdx = vIdx + coorSize + hCoorList.indexOf(thr) + 1;
+//			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
+//			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
+//		}
+//		// 옆면
+//		for (int f = 0; f < coorSize; f++) {
+//			int tfirIdx = vIdx + f + 1;
+//			int tsecIdx = vIdx + f + 1 + coorSize;
+//			int tthrIdx = tsecIdx + 1;
+//
+//			if (tthrIdx > (vIdx + (coorSize * 2))) {
+//				tthrIdx = tthrIdx - coorSize;
+//			}
+//
+//			int bfirIdx = tfirIdx;
+//			int bsecIdx = tthrIdx;
+//			int bthrIdx = bsecIdx - coorSize;
+//
+//			wallFace = wallFace + "f " + tfirIdx + " " + tsecIdx + " " + tthrIdx + "\n";
+//			wallFace = wallFace + "f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n";
+//
+//			wallFace = wallFace + "f " + tthrIdx + " " + tsecIdx + " " + tfirIdx + "\n";
+//			wallFace = wallFace + "f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n";
+//		}
 		vIdx += coorList.size();
-		vIdx += hCoorList.size();
+//		vIdx += hCoorList.size();
 		return result + roofFace + wallFace;
 	}
 

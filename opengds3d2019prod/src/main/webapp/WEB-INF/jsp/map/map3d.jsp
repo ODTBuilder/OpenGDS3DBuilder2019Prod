@@ -202,13 +202,13 @@ html, body {
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
 			"target" : $(".area-3d")[0],
-			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
+			"testTiles" : "${pageContext.request.contextPath}/resources/testtileset/Instancedcarte_1/tileset.json"
 		});
 		
         var entity = gb3dMap.getCesiumViewer().entities.add({
 			position : Cesium.Cartesian3.fromRadians(2.2128834494403650801, 0.61333623957778860003),
 			model : {
-				uri : '${pageContext.request.contextPath}/resources/testtileset/4326_1.gltf'
+				uri : '${pageContext.request.contextPath}/resources/testtileset/qgis_3857_1.gltf'
 			}
 		});
         

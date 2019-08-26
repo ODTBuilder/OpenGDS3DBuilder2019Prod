@@ -323,7 +323,7 @@ public class ShpToObjImpl {
 		BoundingBox boundingBox = collection.getBounds();
 		globalMinX = boundingBox.getMinX();
 		globalMinY = boundingBox.getMinY();
-		scaleFactor = 180 / boundingBox.getWidth(); // For a local CS with x-values between 0 and 100
+		scaleFactor = 300 / boundingBox.getWidth(); // For a local CS with x-values between 0 and 100
 	}
 
 	public static Coordinate toLocalCoordinateSystem(Coordinate coordinate) {
