@@ -1,4 +1,4 @@
-package com.gitrnd;
+package com.gitrnd.gdsbuilder.create3d;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

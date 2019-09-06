@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.opengis.filter.Filter;
 
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl2;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
 
 public class App {
 
@@ -15,7 +15,7 @@ public class App {
 		Filter filter = Filter.INCLUDE;
 
 		try {
-			new ShpToObjImpl2(buildingFile, filter, 0.0005, "D:\\4326test\\carte_1.obj")
+			new ShpToObjImpl(buildingFile, filter, 0.0005, "D:\\4326test\\carte_1.obj")
 					.exec();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
