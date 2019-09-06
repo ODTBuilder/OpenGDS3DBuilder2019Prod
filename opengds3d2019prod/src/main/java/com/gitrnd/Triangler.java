@@ -1,28 +1,15 @@
 package com.gitrnd;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.geotools.geometry.jts.coordinatesequence.CoordinateSequences;
+import org.apache.commons.lang.ArrayUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Sunshine
- */
-public class KongAlgo {
-
+public class Triangler {
 	// private Vector<Point> points;
 	// private Vector<Point> nonconvexPoints;
 	private Vector<Triangle> triangles;
@@ -32,10 +19,12 @@ public class KongAlgo {
 
 	private List<Map<String, Object>> indexList;
 
+	private List<Integer> faceIndices;
+
 	// orientation of polygon - true = clockwise, false = counterclockwise
 	private boolean isCw;
 
-	public KongAlgo(List<Coordinate> coors) {
+	public Triangler(List<Coordinate> coors) {
 		// we have to copy the point vector as we modify it
 		this.coors = new ArrayList<>();
 		for (int i = 0; i < coors.size(); i++)
@@ -187,45 +176,60 @@ public class KongAlgo {
 	/*
 	 * The actual Kong's Triangulation Algorithm
 	 */
-	public void runKong() {
+	public void triangify() {
 		if (coors.size() < 3)
 			return;
 
 		triangles.clear();
-		int index = 1;
+		// int index = 1;
 		indexList = new ArrayList<>();
-		while (coors.size() > 3) {
-			int firIndex = getIndex(index, -1);
-			int secIndex = index;
-			int thrIndex = getIndex(index, 1);
 
-			Coordinate fir = coors.get(firIndex);
-			Coordinate sec = coors.get(secIndex);
-			Coordinate thr = coors.get(thrIndex);
-
-			if (isEar(fir, sec, thr)) {
-				// cut ear
-				// triangles.add(new Triangle(fir, sec, thr));
-				Map<String, Object> indexMap = new HashMap<String, Object>();
-				indexMap.put("fir", fir);
-				indexMap.put("sec", sec);
-				indexMap.put("thr", thr);
-				indexList.add(indexMap);
-				coors.remove(coors.get(index));
-				System.out.println("삭제된 객체의 인덱스:" + index);
-				index = getIndex(index, -1);
-			} else {
-				index = getIndex(index, 1);
-			}
+		List<Double> beforeEarcut = new ArrayList<>();
+		for (int i = 0; i < coors.size(); i++) {
+			beforeEarcut.add(coors.get(i).x);
+			beforeEarcut.add(coors.get(i).y);
 		}
-		// add last triangle
-		// triangles.add(new Triangle(coors.get(0), coors.get(1),
-		// coors.get(2)));
-		Map<String, Object> indexMap = new HashMap<String, Object>();
-		indexMap.put("fir", coors.get(0));
-		indexMap.put("sec", coors.get(1));
-		indexMap.put("thr", coors.get(2));
-		indexList.add(indexMap);
+		System.out.println(beforeEarcut);
+		Double[] capDData = beforeEarcut.toArray(new Double[beforeEarcut.size()]);
+		double[] data = ArrayUtils.toPrimitive(capDData);
+		List<Integer> triangleIndices = Earcut.earcut(data);
+		System.out.println(triangleIndices);
+		this.setFaceIndices(triangleIndices);
+		// for (int i = 0; i < data.length; i += 3) {
+		//
+		// }
+		// while (coors.size() > 3) {
+		// int firIndex = getIndex(index, -1);
+		// int secIndex = index;
+		// int thrIndex = getIndex(index, 1);
+		//
+		// Coordinate fir = coors.get(firIndex);
+		// Coordinate sec = coors.get(secIndex);
+		// Coordinate thr = coors.get(thrIndex);
+		//
+		// if (isEar(fir, sec, thr)) {
+		// // cut ear
+		// // triangles.add(new Triangle(fir, sec, thr));
+		// Map<String, Object> indexMap = new HashMap<String, Object>();
+		// indexMap.put("fir", fir);
+		// indexMap.put("sec", sec);
+		// indexMap.put("thr", thr);
+		// indexList.add(indexMap);
+		// coors.remove(coors.get(index));
+		// System.out.println("삭제된 객체의 인덱스:" + index);
+		// index = getIndex(index, -1);
+		// } else {
+		// index = getIndex(index, 1);
+		// }
+		// }
+		// // add last triangle
+		// // triangles.add(new Triangle(coors.get(0), coors.get(1),
+		// // coors.get(2)));
+		// Map<String, Object> indexMap = new HashMap<String, Object>();
+		// indexMap.put("fir", coors.get(0));
+		// indexMap.put("sec", coors.get(1));
+		// indexMap.put("thr", coors.get(2));
+		// indexList.add(indexMap);
 	}
 
 	public Vector<Triangle> getTriangles() {
@@ -266,6 +270,14 @@ public class KongAlgo {
 
 	public void setTriangles(Vector<Triangle> triangles) {
 		this.triangles = triangles;
+	}
+
+	public List<Integer> getFaceIndices() {
+		return faceIndices;
+	}
+
+	public void setFaceIndices(List<Integer> faceIndices) {
+		this.faceIndices = faceIndices;
 	}
 
 }

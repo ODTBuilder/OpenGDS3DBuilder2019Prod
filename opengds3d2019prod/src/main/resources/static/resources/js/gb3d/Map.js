@@ -107,7 +107,7 @@ gb3d.Map = function(obj) {
 	// 3D Tileset 객체
 	this.tiles = {};
 
-//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 //	var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
 //	this.cesiumViewer.scene.primitives.add(tileset);
 //	this.cesiumViewer.zoomTo(tileset);
@@ -125,7 +125,7 @@ gb3d.Map = function(obj) {
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
 //	this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
-	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 	// 초기 위치
 	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
