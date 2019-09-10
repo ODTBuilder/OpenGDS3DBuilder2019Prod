@@ -22,7 +22,7 @@ gb3d.Camera = function(obj) {
 	this.cesiumCamera = options.cesiumCamera instanceof Cesium.Camera ? options.cesiumCamera : undefined;
 	this.threeCamera = options.threeCamera instanceof THREE.Camera ? options.threeCamera : undefined;
 	this.olMap = options.olMap instanceof ol.Map ? options.olMap : undefined;
-    
+
 	// this.icon = optzions.icon ? options.icon : undefined;
 	// this.sector = options.sector ? options.sector : undefined;
 	if (!this.cesiumCamera || !this.threeCamera || !this.olMap) {
@@ -267,8 +267,8 @@ gb3d.Camera = function(obj) {
 		that.target_wp = $(that.sector);
 		if (!that.target_wp.data("origin"))
 			that.target_wp.data("origin", {
-				left : that.target_wp.offset().left,
-				top : that.target_wp.offset().top
+				left : that.target_wp.offset().left + 60,
+				top : that.target_wp.offset().top + 60
 			});
 		that.o_x = that.target_wp.data("origin").left;
 		that.o_y = that.target_wp.data("origin").top; // origin point

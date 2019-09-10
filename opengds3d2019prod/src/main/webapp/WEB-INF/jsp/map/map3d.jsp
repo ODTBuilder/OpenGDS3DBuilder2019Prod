@@ -226,19 +226,6 @@ html, body {
 			})
 		});
 		gb3dMap.addTileset(tiles);
-		
-// 		var tiles = new gb3d.object.Tileset({
-// 			"layer" : "testLayer",
-// 			"tileId" : "testLayerTile1",
-// 			"cesiumTileset" : new Cesium.Cesium3DTileset({
-// 				url : "${pageContext.request.contextPath}/resources/testtileset/Batchedresult/tileset.json",
-// 				debugShowBoundingVolume : true,
-// 				debugShowContentBoundingVolume : true,
-// 				debugShowViewerRequestVolume : true,
-// 				debugShowGeometricError : true
-// 			})
-// 		});
-// 		gb3dMap.addTileset(tiles);
 
 		var gbCam = gb3dMap.getCamera();
 
