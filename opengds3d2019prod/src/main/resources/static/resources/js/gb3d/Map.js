@@ -998,6 +998,8 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var a, b, cp;
 	switch(type){
 	case "Point":
+		a = featureCoord;
+		b = featureCoord;
 		break;
 	case "LineString":
 		var feature = this.objectAttr.feature.clone();

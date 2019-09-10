@@ -161,6 +161,10 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/loaders/OBJLoader.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/loaders/DRACOLoader.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/loaders/GLTFLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/deprecated/LegacyGLTFLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/TDSLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/ColladaLoader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/loaders/STLLoader.js"></script>
 <!-- three exporters -->
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/GLTFExporter.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/ColladaExporter.js"></script>

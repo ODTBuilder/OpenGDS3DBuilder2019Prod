@@ -87,7 +87,15 @@ gb3d.tree.Three = function(obj) {
 								
 								var object = threeObject.getObject().clone();
 								object.position.copy(new THREE.Vector3(0, 0, 0));
-								object.matrixWorld.setPosition(0, 0, 0);
+//								object.quaternion.copy(new THREE.Quaternion());
+//								object.rotation.copy(new THREE.Euler(0, 0, 0));
+//								object.matrixWorld.setPosition(0, 0, 0);
+//								if(object instanceof THREE.Group){
+//									for(var i = 0; i < object.children.length; i++){
+//										object.children[i].matrixWorld.setPosition(0, 0, 0);
+//									}
+//								}
+								resetMatrixWorld( object );
 								var result = exporter.parse( object );
 								downloadString( result, id + '.obj' );
 							}
@@ -107,8 +115,38 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								var result = exporter.parse( threeObject.getObject() );
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								var result = exporter.parse( object );
 								downloadString( result.data, id + '.dae' );
+							}
+						},
+						"glb" : {
+							"separator_before" : true,
+							"icon" : "fa fa-file-excel-o",
+							"separator_after" : false,
+							"label" : "GLB",
+							"action" : function(data) {
+								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
+								var exporter = new THREE.GLTFExporter();
+								var id = obj.id;
+								var threeObject = that.map.getThreeObjectByUuid( id );
+								
+								if(!threeObject){
+									return;
+								}
+								
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								exporter.parse( object, function( result ){
+									
+									downloadArrayBuffer( result, id + '.glb' );
+									
+								}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
 							}
 						},
 						"gltf" : {
@@ -126,7 +164,11 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								exporter.parse( threeObject.getObject(), function(result){
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								exporter.parse( object, function(result){
 									var output = JSON.stringify( result, null, 2 );
 									downloadString( output, id + '.gltf' );
 								} );
@@ -147,7 +189,11 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								var result = exporter.parse( threeObject.getObject().geometry );
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								var result = exporter.parse( object.geometry );
 								downloadString( result, id + '.drc' );
 							}
 						},
@@ -166,7 +212,11 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								var result = exporter.parse( threeObject.getObject() );
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								var result = exporter.parse( object );
 								downloadString( result, id + '.ply' );
 							}
 						},
@@ -185,7 +235,11 @@ gb3d.tree.Three = function(obj) {
 									return;
 								}
 								
-								var result = exporter.parse( threeObject.getObject() );
+								var object = threeObject.getObject().clone();
+								object.position.copy(new THREE.Vector3(0, 0, 0));
+								resetMatrixWorld( object );
+								
+								var result = exporter.parse( object );
 								downloadString( result, id + '.stl' );
 							}
 						}
@@ -283,5 +337,21 @@ gb3d.tree.Three = function(obj) {
 	
 	function downloadArrayBuffer( buffer, filename ) {
 		download( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+	}
+	
+	function resetMatrixWorld ( obj ) {
+		var object = obj;
+	
+		if(!object.geometry){
+			if(object.children instanceof Array){
+				for(var i = 0; i < object.children.length; i++){
+					// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때 재귀함수 요청
+					object.lookAt(0, 0, 0);
+					resetMatrixWorld(object.children[i]);
+				}
+			}
+		} else {
+			object.lookAt(0, 0, 0);
+		}
 	}
 }
