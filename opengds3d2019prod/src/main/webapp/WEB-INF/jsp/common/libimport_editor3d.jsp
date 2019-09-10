@@ -173,6 +173,10 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/DracoExporter.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/PLYExporter.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/STLExporter.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/shaders/CopyShader.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/postprocessing/ShaderPass.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/postprocessing/EffectComposer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/postprocessing/OutlinePass.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/UI.js"></script>

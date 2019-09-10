@@ -65,188 +65,6 @@ gb3d.edit.EditingTool3D = function(obj) {
 	} else {
 		this.map.tools.edit3d = this;
 	}
-	// ==============yijun===============
-	var cviewer = this.map.getCesiumViewer();
-	// HTML overlay for showing feature name on mouseover
-//	var nameOverlay = document.createElement('div');
-//	cviewer.container.appendChild(nameOverlay);
-//	nameOverlay.className = 'backdrop';
-//	nameOverlay.style.display = 'none';
-//	nameOverlay.style.position = 'absolute';
-//	nameOverlay.style.bottom = '0';
-//	nameOverlay.style.left = '0';
-//	nameOverlay.style['pointer-events'] = 'none';
-//	nameOverlay.style.padding = '4px';
-//	nameOverlay.style.backgroundColor = 'black';
-	
-	// Information about the currently selected feature
-	this.selected = {
-	    feature: undefined,
-	    originalColor: new Cesium.Color()
-	};
-
-	// An entity object which will hold info about the currently selected
-	// feature for infobox display
-	this.selectedEntity = new Cesium.Entity();
-
-	// Get default left click handler for when a feature is not picked on left
-	// click
-	var clickHandler = cviewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
-	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
-		// Silhouettes are supported
-		var silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-		silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
-		silhouetteBlue.uniforms.length = 0.01;
-		silhouetteBlue.selected = [];
-
-		var silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-		silhouetteGreen.uniforms.color = Cesium.Color.LIME;
-		silhouetteGreen.uniforms.length = 0.01;
-		silhouetteGreen.selected = [];
-
-		cviewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([ silhouetteBlue, silhouetteGreen ]));
-
-		// Silhouette a feature blue on hover.
-		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
-			// If a feature was previously highlighted, undo the highlight
-			silhouetteBlue.selected = [];
-
-			// Pick a new feature
-			var pickedFeature = cviewer.scene.pick(movement.endPosition);
-			if (!Cesium.defined(pickedFeature)) {
-//				nameOverlay.style.display = 'none';
-				return;
-			}
-
-			// A feature was picked, so show it's overlay content
-//			nameOverlay.style.display = 'block';
-//			nameOverlay.style.bottom = cviewer.canvas.clientHeight - movement.endPosition.y + 'px';
-//			nameOverlay.style.left = movement.endPosition.x + 'px';
-			var name = pickedFeature.getProperty('name');
-			if (!Cesium.defined(name)) {
-				name = pickedFeature.getProperty('id');
-			}
-//			nameOverlay.textContent = name;
-
-			// Highlight the feature if it's not already selected.
-			if (pickedFeature !== that.selected.feature) {
-				silhouetteBlue.selected = [ pickedFeature ];
-			}
-		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-		// Silhouette a feature on selection and show metadata in the InfoBox.
-		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
-			// If a feature was previously selected, undo the highlight
-			silhouetteGreen.selected = [];
-
-			// Pick a new feature
-			var pickedFeature = cviewer.scene.pick(movement.position);
-			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
-				return;
-			}
-
-			// Select the feature if it's not already selected
-			if (silhouetteGreen.selected[0] === pickedFeature) {
-				return;
-			}
-
-			// Save the selected feature's original color
-			var highlightedFeature = silhouetteBlue.selected[0];
-			if (pickedFeature === highlightedFeature) {
-				silhouetteBlue.selected = [];
-			}
-
-			// Highlight newly selected feature
-			silhouetteGreen.selected = [ pickedFeature ];
-
-			// Set feature infobox description
-//			var featureName = pickedFeature.getProperty('name');
-//			that.selectedEntity.name = featureName;
-//			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
-			cviewer.selectedEntity = that.selectedEntity;
-//			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>' + '<tr><th>BIN</th><td>' + pickedFeature.getProperty('BIN') + '</td></tr>' + '<tr><th>DOITT ID</th><td>'
-//					+ pickedFeature.getProperty('DOITT_ID') + '</td></tr>' + '<tr><th>SOURCE ID</th><td>' + pickedFeature.getProperty('SOURCE_ID') + '</td></tr>' + '</tbody></table>';
-		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-	} else {
-		// Silhouettes are not supported. Instead, change the feature color.
-
-		// Information about the currently highlighted feature
-		var highlighted = {
-			feature : undefined,
-			originalColor : new Cesium.Color()
-		};
-
-		// Color a feature yellow on hover.
-		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
-			// If a feature was previously highlighted, undo the highlight
-			if (Cesium.defined(highlighted.feature)) {
-				highlighted.feature.color = highlighted.originalColor;
-				highlighted.feature = undefined;
-			}
-			// Pick a new feature
-			var pickedFeature = viewer.scene.pick(movement.endPosition);
-			if (!Cesium.defined(pickedFeature)) {
-//				nameOverlay.style.display = 'none';
-				return;
-			}
-			// A feature was picked, so show it's overlay content
-//			nameOverlay.style.display = 'block';
-//			nameOverlay.style.bottom = viewer.canvas.clientHeight - movement.endPosition.y + 'px';
-//			nameOverlay.style.left = movement.endPosition.x + 'px';
-//			var name = pickedFeature.getProperty('name');
-//			if (!Cesium.defined(name)) {
-//				name = pickedFeature.getProperty('id');
-//			}
-//			nameOverlay.textContent = name;
-			// Highlight the feature if it's not already selected.
-			if (pickedFeature !== that.selected.feature) {
-				highlighted.feature = pickedFeature;
-				Cesium.Color.clone(pickedFeature.color, highlighted.originalColor);
-				pickedFeature.color = Cesium.Color.YELLOW;
-			}
-		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-
-		// Color a feature on selection and show metadata in the InfoBox.
-		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
-			// If a feature was previously selected, undo the highlight
-			if (Cesium.defined(that.selected.feature)) {
-				that.selected.feature.color = that.selected.originalColor;
-				that.selected.feature = undefined;
-			}
-			// Pick a new feature
-			var pickedFeature = cviewer.scene.pick(movement.position);
-			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
-				return;
-			}
-			// Select the feature if it's not already selected
-			if (that.selected.feature === pickedFeature) {
-				return;
-			}
-			that.selected.feature = pickedFeature;
-			// Save the selected feature's original color
-			if (pickedFeature === highlighted.feature) {
-				Cesium.Color.clone(highlighted.originalColor, that.selected.originalColor);
-				highlighted.feature = undefined;
-			} else {
-				Cesium.Color.clone(pickedFeature.color, that.selected.originalColor);
-			}
-			// Highlight newly selected feature
-			pickedFeature.color = Cesium.Color.LIME;
-			// Set feature infobox description
-			var featureName = pickedFeature.getProperty('name');
-			that.selectedEntity.name = featureName;
-			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
-			cviewer.selectedEntity = that.selectedEntity;
-			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>' + '<tr><th>BIN</th><td>' + pickedFeature.getProperty('BIN') + '</td></tr>' + '<tr><th>DOITT ID</th><td>'
-					+ pickedFeature.getProperty('DOITT_ID') + '</td></tr>' + '<tr><th>SOURCE ID</th><td>' + pickedFeature.getProperty('SOURCE_ID') + '</td></tr>' + '<tr><th>Longitude</th><td>'
-					+ pickedFeature.getProperty('longitude') + '</td></tr>' + '<tr><th>Latitude</th><td>' + pickedFeature.getProperty('latitude') + '</td></tr>' + '<tr><th>Height</th><td>'
-					+ pickedFeature.getProperty('height') + '</td></tr>' + '<tr><th>Terrain Height (Ellipsoid)</th><td>' + pickedFeature.getProperty('TerrainHeight') + '</td></tr>'
-					+ '</tbody></table>';
-		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-	}
-	// ==============yijun===============
 	
 	this.materialOptions = options.materialOptions || [ "metalness", "roughness", "emissive", "skinning", "wireframe", "map", "normalMap", "emissiveMap", "opacity", "alphaTest" ];
 
@@ -300,10 +118,6 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var mouse = new THREE.Vector2();
 	this.pickedObject_ = undefined, pickedObjectColor = undefined;
 
-	//===========yijun=============
-	this.hoverObject = undefined;
-	
-	//===========yijun=============
 	function onDocumentMouseClick(event) {
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
@@ -356,7 +170,255 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 	// ============ Event ==============
 	eventDiv.on("click", onDocumentMouseClick);
+	
+	// ==============yijun===============
+	this.highlightObject = {
+			"cesium" : {
+				"object" : undefined,
+				"distance" : undefined
+			},
+			"three" : {
+				"object" : undefined,
+				"distance" : undefined
+			}
+	};
+	
+	var cviewer = this.map.getCesiumViewer();
+	
+	// Information about the currently selected feature
+	this.selected = {
+	    feature: undefined,
+	    originalColor: new Cesium.Color()
+	};
 
+	// An entity object which will hold info about the currently selected
+	// feature for infobox display
+	this.selectedEntity = new Cesium.Entity();
+
+	// Get default left click handler for when a feature is not picked on left
+	// click
+	var clickHandler = cviewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
+		// Silhouettes are supported
+		var silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+		silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
+		silhouetteBlue.uniforms.length = 0.01;
+		silhouetteBlue.selected = [];
+
+		var silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+		silhouetteGreen.uniforms.color = Cesium.Color.LIME;
+		silhouetteGreen.uniforms.length = 0.01;
+		silhouetteGreen.selected = [];
+
+		cviewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([ silhouetteBlue, silhouetteGreen ]));
+
+		// Silhouette a feature blue on hover.
+		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
+			// 카메라의 위치
+			var camPos = that.map.getCamera().getCesiumCamera().positionWC;
+			// 화면상의 커서가 보는 객체상의 포인트
+			var point = that.map.getCesiumViewer().scene.pickPosition(movement.endPosition);
+			// 두 점의 거리
+			var distance = Cesium.Cartesian3.distance(camPos, point);
+// console.log("거리는: "+distance);
+			// If a feature was previously highlighted, undo the highlight
+			silhouetteBlue.selected = [];
+
+			// Pick a new feature
+			var pickedFeature = cviewer.scene.pick(movement.endPosition);
+			if (!Cesium.defined(pickedFeature)) {
+				that.highlightObject["cesium"]["object"] = undefined;
+				that.highlightObject["cesium"]["distance"] =  undefined;
+				return;
+			}
+			
+// var name = pickedFeature.getProperty('name');
+// if (!Cesium.defined(name)) {
+// name = pickedFeature.getProperty('id');
+// }
+
+			that.highlightObject["cesium"]["object"] = pickedFeature;
+			that.highlightObject["cesium"]["distance"] =  distance;
+			console.log("cesium 객체의 거리는: "+distance);
+			var isCloser = false;
+			if (!that.highlightObject["three"]["object"] || !that.highlightObject["three"]["distance"]) {
+				isCloser = true;
+			} else if (!!that.highlightObject["three"]["object"] && !isNaN(that.highlightObject["three"]["distance"]) ) {
+				if (that.highlightObject["cesium"]["distance"] <= that.highlightObject["three"]["distance"]) {
+					isCloser = true;
+				}
+			}
+			// Highlight the feature if it's not already selected.
+			if (isCloser && pickedFeature !== that.selected.feature) {
+				silhouetteBlue.selected = [ pickedFeature ];
+// that.highlightObject["three"]["object"] = undefined;
+// that.highlightObject["three"]["distance"] = undefined;
+			}
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+		// Silhouette a feature on selection and show metadata in the InfoBox.
+		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
+			console.log(movement);
+			// If a feature was previously selected, undo the highlight
+			silhouetteGreen.selected = [];
+
+			// Pick a new feature
+			var pickedFeature = cviewer.scene.pick(movement.position);
+			if (!Cesium.defined(pickedFeature)) {
+				clickHandler(movement);
+				return;
+			}
+
+			// Select the feature if it's not already selected
+			if (silhouetteGreen.selected[0] === pickedFeature) {
+				return;
+			}
+
+			// Save the selected feature's original color
+			var highlightedFeature = silhouetteBlue.selected[0];
+			if (pickedFeature === highlightedFeature) {
+				silhouetteBlue.selected = [];
+			}
+
+			// Highlight newly selected feature
+			silhouetteGreen.selected = [ pickedFeature ];
+
+			cviewer.selectedEntity = that.selectedEntity;
+		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	} else {
+		// Silhouettes are not supported. Instead, change the feature color.
+
+		// Information about the currently highlighted feature
+		var highlighted = {
+			feature : undefined,
+			originalColor : new Cesium.Color()
+		};
+
+		// Color a feature yellow on hover.
+		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
+			// 카메라의 위치
+			var camPos = that.map.getCamera().getCesiumCamera().positionWC;
+			// 화면상의 커서가 보는 객체상의 포인트
+			var point = that.map.getCesiumViewer().scene.pickPosition(movement.endPosition);
+			// 두 점의 거리
+			var distance = Cesium.Cartesian3.distance(camPos, point);
+			// If a feature was previously highlighted, undo the highlight
+			if (Cesium.defined(highlighted.feature)) {
+				highlighted.feature.color = highlighted.originalColor;
+				highlighted.feature = undefined;
+			}
+			// Pick a new feature
+			var pickedFeature = viewer.scene.pick(movement.endPosition);
+			if (!Cesium.defined(pickedFeature)) {
+				return;
+			}
+			
+			that.highlightObject["cesium"]["object"] = pickedFeature;
+			that.highlightObject["cesium"]["distance"] =  distance;
+			console.log("cesium 객체의 거리는: "+distance);
+			var isCloser = false;
+			if (!that.highlightObject["three"]["object"] || !that.highlightObject["three"]["distance"]) {
+				isCloser = true;
+			} else if (!!that.highlightObject["three"]["object"] && !isNaN(that.highlightObject["three"]["distance"]) ) {
+				if (that.highlightObject["cesium"]["distance"] <= that.highlightObject["three"]["distance"]) {
+					isCloser = true;
+				}
+			}
+			// Highlight the feature if it's not already selected.
+			if (isCloser && pickedFeature !== that.selected.feature) {
+				highlighted.feature = pickedFeature;
+				Cesium.Color.clone(pickedFeature.color, highlighted.originalColor);
+				pickedFeature.color = Cesium.Color.YELLOW;
+			}
+			
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+		// Color a feature on selection and show metadata in the InfoBox.
+		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
+			// If a feature was previously selected, undo the highlight
+			if (Cesium.defined(that.selected.feature)) {
+				that.selected.feature.color = that.selected.originalColor;
+				that.selected.feature = undefined;
+			}
+			// Pick a new feature
+			var pickedFeature = cviewer.scene.pick(movement.position);
+			if (!Cesium.defined(pickedFeature)) {
+				clickHandler(movement);
+				return;
+			}
+			// Select the feature if it's not already selected
+			if (that.selected.feature === pickedFeature) {
+				return;
+			}
+			that.selected.feature = pickedFeature;
+			// Save the selected feature's original color
+			if (pickedFeature === highlighted.feature) {
+				Cesium.Color.clone(highlighted.originalColor, that.selected.originalColor);
+				highlighted.feature = undefined;
+			} else {
+				Cesium.Color.clone(pickedFeature.color, that.selected.originalColor);
+			}
+			// Highlight newly selected feature
+			pickedFeature.color = Cesium.Color.LIME;
+			// Set feature infobox description
+			var featureName = pickedFeature.getProperty('name');
+			that.selectedEntity.name = featureName;
+			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
+			cviewer.selectedEntity = that.selectedEntity;
+			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>' + '<tr><th>BIN</th><td>' + pickedFeature.getProperty('BIN') + '</td></tr>' + '<tr><th>DOITT ID</th><td>'
+					+ pickedFeature.getProperty('DOITT_ID') + '</td></tr>' + '<tr><th>SOURCE ID</th><td>' + pickedFeature.getProperty('SOURCE_ID') + '</td></tr>' + '<tr><th>Longitude</th><td>'
+					+ pickedFeature.getProperty('longitude') + '</td></tr>' + '<tr><th>Latitude</th><td>' + pickedFeature.getProperty('latitude') + '</td></tr>' + '<tr><th>Height</th><td>'
+					+ pickedFeature.getProperty('height') + '</td></tr>' + '<tr><th>Terrain Height (Ellipsoid)</th><td>' + pickedFeature.getProperty('TerrainHeight') + '</td></tr>'
+					+ '</tbody></table>';
+		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	}
+	
+	function onDocumentMouseMove(event) {
+// if (!that.getActiveTool()) {
+// that.threeTransformControls.detach(that.pickedObject_);
+// that.updateAttributeTab(undefined);
+// that.updateStyleTab(undefined);
+// that.updateMaterialTab(undefined);
+// that.pickedObject_ = undefined;
+// return;
+// }
+
+		if (event.ctrlKey) {
+			return;
+		}
+
+// event.preventDefault();
+		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
+		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
+		mouse.y = (event.offsetY / eventDiv[0].clientHeight) * -2 + 1;
+
+		var interObjs = [];
+		var objects = that.map.getThreeObjects();
+		for (var i = 0; i < objects.length; i++) {
+			interObjs.push(objects[i].getObject());
+		}
+		raycaster.setFromCamera(mouse, that.map.threeCamera);
+		var intersects = raycaster.intersectObjects(interObjs, true);
+		var renderer = that.map.getThreeRenderer();
+		var composer = new THREE.EffectComposer( renderer );
+		var outpass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+		if (intersects.length > 0) {
+			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
+			var object = intersects[0];
+			that.highlightObject["three"]["object"] = object.object;
+			that.highlightObject["three"]["distance"] =  object.distance;
+			console.log("three 객체의 거리는: "+object.distance);
+// console.log(object);
+
+		} else {
+			that.highlightObject["three"]["object"] = undefined;
+			that.highlightObject["three"]["distance"] =  undefined;
+		}
+		
+	}
+	// =============yijun===============
+	eventDiv.on("mousemove", onDocumentMouseMove);
+	
 	$(document).on("keydown", function(e) {
 		if (e.ctrlKey) {
 			// Ctrl key 입력 시 기본 3차원 렌더링 함수를 비활성화하고 ThreeJS DIV의 마우스 이벤트를 활성화시킨다.

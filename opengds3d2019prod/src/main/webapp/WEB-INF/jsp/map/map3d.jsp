@@ -222,7 +222,7 @@ html, body {
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
 			"cesiumTileset" : new Cesium.Cesium3DTileset({
-				url : "${pageContext.request.contextPath}/resources/testtileset/4326_1/tileset.json"
+				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
 			})
 		});
 		gb3dMap.addTileset(tiles);
