@@ -92,12 +92,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 		var object = e.target.object,
 			mode = that.threeTransformControls.getMode();
 		
-		if(object.geometry instanceof THREE.BufferGeometry){
-			return;
-		}
-		
 		switch(mode){
 			case "scale":
+				if(object.geometry instanceof THREE.BufferGeometry || !object.geometry){
+					return;
+				}
 				that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
 				break;
 			case "rotate":
@@ -167,6 +166,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if ( intersects.length > 0 ) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
 			var object = intersects[ 0 ].object;
+			
+			if(object.parent instanceof THREE.Group){
+				that.pickedObject_ = object.parent;
+				object = object.parent;
+			}
+			
 			that.pickedObject_ = object;
 			that.threeTransformControls.attach( object );
 			
@@ -549,7 +554,7 @@ gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object){
 	
 	tab.append(row);
 	input.spectrum({
-		color : "#" + material.color.getHexString()
+		color : "#" + ( material ? material.color.getHexString() : "fff" )
 	});
 }
 
@@ -569,6 +574,11 @@ gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object){
 	var val;
 	
 	tab.empty();
+	
+	if(!material){
+		return;
+	}
+	
 	for(var i = 0; i < opts.length; i++){
 		val = material[opts[i]];
 		span = undefined;
