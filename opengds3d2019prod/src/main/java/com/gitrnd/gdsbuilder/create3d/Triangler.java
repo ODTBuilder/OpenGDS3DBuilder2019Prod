@@ -68,7 +68,6 @@ public class Triangler {
 			// note: cw means res/newres is <= 0
 			if ((res > 0 && isCw) || (res <= 0 && !isCw)) {
 				nonconvexCoors.add(tmp);
-				System.out.println("konkav point #" + (i + 1) + "  Coords: " + tmp.x + "/" + tmp.y);
 			}
 
 		}
@@ -114,9 +113,7 @@ public class Triangler {
 		// get orientation
 		double res = succPointOfIndex.x * v1.y - succPointOfIndex.y * v1.x + v1.x * prevPointOfIndex.y
 				- v1.y * prevPointOfIndex.x;
-
 		isCw = (res <= 0 ? true : false);
-		System.out.println("isCw : " + isCw);
 	}
 
 	/*
@@ -134,14 +131,32 @@ public class Triangler {
 		for (int i = 0; i < coors.size(); i++) {
 			beforeEarcut.add(coors.get(i).x);
 			beforeEarcut.add(coors.get(i).y);
+			beforeEarcut.add(coors.get(i).z);
 		}
-		System.out.println(beforeEarcut);
 		Double[] capDData = beforeEarcut.toArray(new Double[beforeEarcut.size()]);
 		double[] data = ArrayUtils.toPrimitive(capDData);
 		List<Integer> triangleIndices = Earcut.earcut(data);
-		System.out.println(triangleIndices);
 		this.setFaceIndices(triangleIndices);
+	}
 
+	public void triangify(List<Integer> holeList) {
+		if (coors.size() < 3)
+			return;
+		triangles.clear();
+		indexList = new ArrayList<>();
+		List<Double> beforeEarcut = new ArrayList<>();
+		for (int i = 0; i < coors.size(); i++) {
+			beforeEarcut.add(coors.get(i).x);
+			beforeEarcut.add(coors.get(i).y);
+		}
+		Double[] capDData = beforeEarcut.toArray(new Double[beforeEarcut.size()]);
+		double[] data = ArrayUtils.toPrimitive(capDData);
+
+		Integer[] holeIndices = holeList.toArray(new Integer[holeList.size()]);
+		int[] hole = ArrayUtils.toPrimitive(holeIndices);
+
+		List<Integer> triangleIndices = Earcut.earcut(data, hole, 2);
+		this.setFaceIndices(triangleIndices);
 	}
 
 	public Vector<Triangle> getTriangles() {

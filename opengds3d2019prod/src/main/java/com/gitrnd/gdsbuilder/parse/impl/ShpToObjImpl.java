@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,43 +17,32 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.gitrnd.gdsbuilder.create3d.Triangler;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class ShpToObjImpl {
 
 	private double defaultHeight = 5;
-
-	public static double globalMinX;
-	public static double globalMinY;
-	public static double scaleFactor;
+	private static BufferedWriter writer;
 
 	private double minVal;
 	private double maxVal;
 
-	public static double centerX;
-	public static double centerY;
-
-	public static CoordinateReferenceSystem srcCRS;
-	public static CoordinateReferenceSystem targetCRS;
-	public static MathTransform transform;
+	private static double centerX;
+	private static double centerY;
 
 	private String attribute;
 
@@ -60,6 +50,7 @@ public class ShpToObjImpl {
 	private File file;
 	private Filter filter;
 
+	private int vIdx = 0;
 	EnShpToObjHeightType hType = null;
 
 	/**
@@ -80,8 +71,7 @@ public class ShpToObjImpl {
 		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
 		 * 
 		 * @author SG.LEE
-		 * @param type
-		 *            type명
+		 * @param type type명
 		 * @return {@link EnTreeType}
 		 */
 		public static EnShpToObjHeightType getFromType(String type) {
@@ -166,14 +156,16 @@ public class ShpToObjImpl {
 		String geomType = featureType.getGeometryDescriptor().getType().getBinding().getName();
 
 		if (!geomType.equals("Polygon") || !geomType.equals("MultiPolygon")) {
+			Coordinate center = buildingCollection.getBounds().centre();
+			centerX = center.x;
+			centerY = center.y;
 			try (BufferedWriter writer = new BufferedWriter(
 					new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"))) {
-				writer.write("mtllib material.mtl\n");
+				ShpToObjImpl.writer = writer;
 				try (FeatureIterator<SimpleFeature> features = buildingCollection.features()) {
-					// initTransformedCentroidCoordinate(buildingCollection);
 					while (features.hasNext()) {
 						SimpleFeature feature = features.next();
-						writer.write(buildingFeatureToObjGroup(feature));
+						buildingFeatureToObjGroup(feature);
 					}
 				}
 			}
@@ -193,19 +185,14 @@ public class ShpToObjImpl {
 
 		DataStore dataStore = DataStoreFinder.getDataStore(map);
 		String typeName = dataStore.getTypeNames()[0];
-		System.out.println(typeName);
 
 		FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(typeName);
 		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(filter);
 		return collection;
 	}
 
-	private String buildingFeatureToObjGroup(SimpleFeature feature) throws FactoryException, TransformException {
-
-		GeometryAttribute featureDefaultGeometryProperty = feature.getDefaultGeometryProperty();
-		MultiPolygon multipolygon = (MultiPolygon) featureDefaultGeometryProperty.getValue();
-		multipolygon.normalize();
-		Coordinate[] coordinates = deleteInnerPoints(multipolygon.getCoordinates());
+	private void buildingFeatureToObjGroup(SimpleFeature feature)
+			throws FactoryException, TransformException, IOException {
 
 		// 높이값 설정
 		double height = 0.0;
@@ -228,58 +215,170 @@ public class ShpToObjImpl {
 			height = defaultHeight;
 		}
 
-		String result = "o " + feature.getID() + "\n";
-		String roofFace = "";
-		String wallFace = "";
-
-		// tmp set cent
-		Geometry geom = (Geometry) feature.getDefaultGeometry();
-		Geometry geomEn = geom.getEnvelope();
-		Point centroid = geomEn.getCentroid();
-		Coordinate centCoor = centroid.getCoordinate();
-		centCoor.z = 0.0;
-
-		// Coordinate lastAndFirst = null;
-		// 바닥
-		List<Coordinate> coorList = new ArrayList<Coordinate>();
-		for (int i = 0; i < coordinates.length; i++) {
-
-			GeodeticCalculator gc = new GeodeticCalculator();
-			gc.setStartingGeographicPoint(centCoor.x, coordinates[i].y);
-			System.out.println("시작점:" + centCoor.x + ", " + coordinates[i].y);
-			gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
-			System.out.println("도착점:" + coordinates[i].x + ", " + coordinates[i].y);
-			double xDistance = gc.getOrthodromicDistance();
-			if (centCoor.x > coordinates[i].x) {
-				xDistance = -xDistance;
+		GeometryAttribute featureDefaultGeometryProperty = feature.getDefaultGeometryProperty();
+		MultiPolygon multipolygon = (MultiPolygon) featureDefaultGeometryProperty.getValue();
+		int numGeom = multipolygon.getNumGeometries();
+		for (int g = 0; g < numGeom; g++) {
+			String featureID = "o " + feature.getID();
+			if (numGeom > 1) {
+				featureID += "_" + (g + 1);
+			} else {
+				featureID += "\n";
 			}
-			System.out.println("x거리는" + xDistance);
-			gc.setStartingGeographicPoint(coordinates[i].x, centCoor.y);
-			gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
-			double yDistance = gc.getOrthodromicDistance();
-			if (centCoor.y > coordinates[i].y) {
-				yDistance = -yDistance;
+			writer.write(featureID);
+
+			Geometry geom = multipolygon.getGeometryN(g);
+			geom.normalize();
+			Polygon pg = (Polygon) geom;
+			Coordinate[] coordinates = deleteInnerPoints(pg.getCoordinates());
+
+			// 바닥
+			List<Coordinate> coorList = new ArrayList<Coordinate>();
+			for (int i = 0; i < coordinates.length; i++) {
+				GeodeticCalculator gc = new GeodeticCalculator();
+				gc.setStartingGeographicPoint(centerX, coordinates[i].y);
+				gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
+				double xDistance = gc.getOrthodromicDistance();
+				if (centerX > coordinates[i].x) {
+					xDistance = -xDistance;
+				}
+				gc.setStartingGeographicPoint(coordinates[i].x, centerY);
+				gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
+				double yDistance = gc.getOrthodromicDistance();
+				if (centerY > coordinates[i].y) {
+					yDistance = -yDistance;
+				}
+				Coordinate localCoor = new Coordinate(xDistance, yDistance, 0);
+				coorList.add(localCoor);
+				// 버텍스 좌표를 obj 포맷으로 줄줄이 입력
+				writer.write(coordinateToVertexdescription(localCoor));
 			}
-			System.out.println(" y거리는" + yDistance);
+			// inner ring
+			List<Integer> holeList = new ArrayList<>();
+			int numRing = pg.getNumInteriorRing();
+			if (numRing > 0) {
+				for (int n = 0; n < numRing; n++) {
+					LineString ring = pg.getInteriorRingN(n);
+					Coordinate[] ringCoors = deleteInnerPoints(ring.getCoordinates());
+					for (int r = 0; r < ringCoors.length; r++) {
+						GeodeticCalculator gc = new GeodeticCalculator();
+						gc.setStartingGeographicPoint(centerX, ringCoors[r].y);
+						gc.setDestinationGeographicPoint(ringCoors[r].x, ringCoors[r].y);
+						double xDistance = gc.getOrthodromicDistance();
+						if (centerX > ringCoors[r].x) {
+							xDistance = -xDistance;
+						}
+						gc.setStartingGeographicPoint(ringCoors[r].x, centerY);
+						gc.setDestinationGeographicPoint(ringCoors[r].x, ringCoors[r].y);
+						double yDistance = gc.getOrthodromicDistance();
+						if (centerY > ringCoors[r].y) {
+							yDistance = -yDistance;
+						}
+						Coordinate localCoor = new Coordinate(xDistance, yDistance, 0);
+						coorList.add(localCoor);
+						if (r == 0) { // first idx
+							holeList.add(coorList.lastIndexOf(localCoor));
+						}
+						// 버텍스 좌표를 obj 포맷으로 줄줄이 입력
+						writer.write(coordinateToVertexdescription(localCoor));
+					}
+				}
+			}
+			Triangler tri = new Triangler(coorList);
+			tri.triangify(holeList); // actual algo call
+			List<Integer> faceIndice = tri.getFaceIndices();
+			for (int m = 0; m < faceIndice.size(); m += 3) {
+				int fFirIdx = vIdx + faceIndice.get(m) + 1;
+				int fSecIdx = vIdx + faceIndice.get(m + 1) + 1;
+				int fThrIdx = vIdx + faceIndice.get(m + 2) + 1;
+				// 바닥 face
+				writer.write("f " + fFirIdx + " " + fSecIdx + " " + fThrIdx + "\n");
+				writer.write("f " + fThrIdx + " " + fSecIdx + " " + fFirIdx + "\n");
+			}
+			// 천장
+			int s = coorList.size();
+			List<Coordinate> hCoorList = new ArrayList<>();
+			for (int i = 0; i < s; i++) {
+				Coordinate hCoor = createLiftedCoordinate(coorList.get(i), height);
+				hCoorList.add(hCoor);
+				writer.write(coordinateToVertexdescription(hCoor));
+			}
+			for (int m = 0; m < faceIndice.size(); m += 3) {
+				int fFirIdx = vIdx + s + faceIndice.get(m) + 1;
+				int fSecIdx = vIdx + s + faceIndice.get(m + 1) + 1;
+				int fThrIdx = vIdx + s + faceIndice.get(m + 2) + 1;
+				// 천장 face
+				writer.write("f " + fFirIdx + " " + fSecIdx + " " + fThrIdx + "\n");
+				writer.write("f " + fThrIdx + " " + fSecIdx + " " + fFirIdx + "\n");
+			}
+			// 옆면
+			holeList.add(s);
+			int hSize = holeList.size();
+			if (hSize > 0) {
+				// hole polygon
+				for (int h = 0; h < hSize; h++) {
+					if (h == 0) {
+						int polyIdx = holeList.get(h);
+						for (int f = 0; f < polyIdx; f++) {
+							int firIdx = vIdx + f + 1;
+							int secIdx = vIdx + f + 1 + s;
+							int thrIdx = secIdx + 1;
 
-			Coordinate localCoor = new Coordinate(xDistance, yDistance, 0);
+							if (thrIdx > (vIdx + polyIdx + s)) {
+								thrIdx = thrIdx - polyIdx;
+							}
+							int bfirIdx = firIdx;
+							int bsecIdx = thrIdx;
+							int bthrIdx = bsecIdx - s;
 
-			coorList.add(i, localCoor);
-			// 버텍스 좌표를 obj 포맷으로 줄줄이 입력
-			result = result + coordinateToVertexdescription(localCoor);
+							writer.write("f " + firIdx + " " + secIdx + " " + thrIdx + "\n");
+							writer.write("f " + thrIdx + " " + secIdx + " " + firIdx + "\n");
+							writer.write("f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n");
+							writer.write("f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n");
+						}
+					} else {
+						int hole1Idx = holeList.get(h - 1);
+						int hole2Idx = holeList.get(h);
+						for (int f = hole1Idx; f < hole2Idx; f++) {
+							int firIdx = vIdx + f + 1;
+							int secIdx = vIdx + f + 1 + s;
+							int thrIdx = secIdx + 1;
+							if (thrIdx > (vIdx + (hole2Idx) + s)) {
+								thrIdx = thrIdx - (hole2Idx - hole1Idx);
+							}
+							int bfirIdx = firIdx;
+							int bsecIdx = thrIdx;
+							int bthrIdx = bsecIdx - s;
+
+							writer.write("f " + firIdx + " " + secIdx + " " + thrIdx + "\n");
+							writer.write("f " + thrIdx + " " + secIdx + " " + firIdx + "\n");
+							writer.write("f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n");
+							writer.write("f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n");
+						}
+					}
+				}
+			} else {
+				// polygon
+				for (int f = 0; f < s; f++) {
+					int firIdx = vIdx + f + 1;
+					int secIdx = vIdx + f + 1 + s;
+					int thrIdx = secIdx + 1;
+					if (thrIdx > (vIdx + (s * 2))) {
+						thrIdx = thrIdx - s;
+					}
+					int bfirIdx = firIdx;
+					int bsecIdx = thrIdx;
+					int bthrIdx = bsecIdx - s;
+
+					writer.write("f " + firIdx + " " + secIdx + " " + thrIdx + "\n");
+					writer.write("f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n");
+					writer.write("f " + thrIdx + " " + secIdx + " " + firIdx + "\n");
+					writer.write("f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n");
+				}
+			}
+			vIdx += coorList.size();
+			vIdx += hCoorList.size();
 		}
-		System.out.println(coorList);
-		Triangler tri = new Triangler(coorList);
-		tri.triangify(); // actual algo call
-
-		List<Integer> faceIndice = tri.getFaceIndices();
-		for (int m = 0; m < faceIndice.size(); m += 3) {
-			roofFace = roofFace + "f " + (faceIndice.get(m) + 1) + " " + (faceIndice.get(m + 1) + 1) + " "
-					+ (faceIndice.get(m + 2) + 1) + "\n";
-
-		}
-
-		return result + roofFace + wallFace;
 	}
 
 	public String coordinateToVertexdescription(Coordinate coordinate) {
@@ -304,39 +403,6 @@ public class ShpToObjImpl {
 			c2.z = 0.0;
 		}
 		return (c1.x == c2.x && c1.y == c2.y && c1.z == c2.z);
-	}
-
-	public void initTransformedCentroidCoordinate(FeatureCollection collection) {
-
-		Envelope envelope = collection.getBounds();
-		Geometry geomEn = new GeometryFactory().toGeometry(envelope);
-		Point centroid = geomEn.getCentroid();
-		Coordinate centCoor = centroid.getCoordinate();
-		centCoor.z = defaultHeight;
-		try {
-			Coordinate transCent = JTS.transform(centroid.getCoordinate(), null, transform);
-			centerX = transCent.x;
-			centerY = transCent.y;
-		} catch (TransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public static Coordinate transformedCoordinate(Coordinate coordinate, double height) {
-
-		if (height != 0.0 || !String.valueOf(height).equals("NaN")) {
-			coordinate.z = height;
-		}
-		try {
-			Coordinate transCoor = JTS.transform(coordinate, null, transform);
-			double x = transCoor.x - centerX;
-			double y = transCoor.y - centerY;
-		} catch (TransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	public Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {
