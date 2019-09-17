@@ -195,7 +195,7 @@ html, body {
 				"layers" : []
 			}
 		});
-
+		
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
@@ -222,6 +222,11 @@ html, body {
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
+		
+		// ThreeJS Eidtor
+		var threeEditor = new Editor( gb3dMap.getThreeCamera(), gb3dMap.getThreeScene() );
+		var threeSidebar = new Sidebar( threeEditor );
+		document.body.appendChild( threeSidebar.dom );
 
 		var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",

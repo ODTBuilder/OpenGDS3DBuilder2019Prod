@@ -80,24 +80,32 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.threeTransformControls.addEventListener('dragging-changed', function(event) {
 		that.updateAttributeTab(event.target.object);
 	});
-
-	this.threeTransformControls.addEventListener('objectChange', function(e) {
-		var object = e.target.object, mode = that.threeTransformControls.getMode();
-
-		if (object.geometry instanceof THREE.BufferGeometry) {
-			return;
+	
+	this.threeTransformControls.addEventListener('objectChange', function(e){
+		var object = e.target.object,
+			mode = that.threeTransformControls.getMode();
+		
+		// ThreeJS 객체 Attribute 업데이트
+		if ( object !== undefined ) {
+			if ( threeEditor.helpers[ object.id ] !== undefined ) {
+				threeEditor.helpers[ object.id ].update();
+			}
+			threeEditor.signals.refreshSidebarObject3D.dispatch( object );
 		}
-
-		switch (mode) {
-		case "scale":
-			that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
-			break;
-		case "rotate":
-			break;
-		case "translate":
-			that.map.moveObject2Dfrom3D(object.position, object.uuid);
-			break;
-		default:
+		
+		switch(mode){
+			case "scale":
+				if(object.geometry instanceof THREE.BufferGeometry || !object.geometry){
+					return;
+				}
+				that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
+				break;
+			case "rotate":
+				break;
+			case "translate":
+				that.map.moveObject2Dfrom3D(object.position, object.uuid);
+				break;
+			default:
 		}
 
 		that.map.getThreeObjects().forEach(function(e) {
@@ -124,9 +132,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 	function onDocumentMouseClick(event) {
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
-			that.updateAttributeTab(undefined);
-			that.updateStyleTab(undefined);
-			that.updateMaterialTab(undefined);
+//			that.updateAttributeTab(undefined);
+//			that.updateStyleTab(undefined);
+//			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
 		}
@@ -160,11 +168,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 		// ===========yijun end==============
 		if (that.pickedObject_) {
 			// 이전에 선택된 객체 초기화
-			that.threeTransformControls.detach(that.pickedObject_);
-			that.map.syncUnselect(that.pickedObject_.uuid);
-			that.updateAttributeTab(undefined);
-			that.updateStyleTab(undefined);
-			that.updateMaterialTab(undefined);
+			that.threeTransformControls.detach( that.pickedObject_ );
+			that.map.syncUnselect( that.pickedObject_.uuid );
+//			that.updateAttributeTab(undefined);
+//			that.updateStyleTab(undefined);
+//			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 		}
 
@@ -182,9 +190,16 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.threeTransformControls.attach(object);
 
 			that.map.syncSelect(object.uuid);
-			that.updateAttributeTab(object);
-			that.updateStyleTab(object);
-			that.updateMaterialTab(object);
+//			that.updateAttributeTab(object);
+//			that.updateStyleTab(object);
+//			that.updateMaterialTab(object);
+			
+			if ( object.userData.object !== undefined ) {
+				// helper
+				threeEditor.select( object.userData.object );
+			} else {
+				threeEditor.select( object );
+			}
 			
 			silhouetteGreen.selected = [];
 		} else {
@@ -194,8 +209,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.selectedObject["three"]["object"] = undefined;
 			that.selectedObject["three"]["distance"] =  undefined;
 			clickOutlinePass.selectedObjects = [];
+			threeEditor.select( null );
 			// yijun end
 		}
+		
+
 	}
 
 	// ============ Event ==============
@@ -640,45 +658,45 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		gb3d.edit.EditingTool3D.updateStyleByInput(parent, that);
 	});
-
-	$(document).on("keypress", "#attrMaterial input", function(e) {
-		if (e.keyCode == 13) {
-			var input = $(this);
-			var parent = input.parent();
-
-			if (input.prop("type") === "checkbox") {
-				return;
-			}
-
-			gb3d.edit.EditingTool3D.updateMaterialByInput(parent, that);
-		}
-	});
-
-	$(document).on("focusout", "#attrMaterial input", function(e) {
-		var input = $(this);
-		var parent = input.parent();
-
-		if (input.prop("type") === "checkbox") {
-			return;
-		}
-
-		gb3d.edit.EditingTool3D.updateMaterialByInput(parent, that);
-	});
-
-	$(document).on("change", "#attrMaterial input", function(e) {
-		var input = $(this);
-		var parent = input.parent();
-
-		if (!that.pickedObject_) {
-			return;
-		}
-
-		if (input.prop("type") === "checkbox") {
-			that.pickedObject_.material[parent.data("key")] = input.prop("checked");
-		}
-	});
-
-	$(document).on("change.spectrum", "#styleColor", function(e, color) {
+	
+//	$(document).on("keypress", "#attrMaterial input", function(e){
+//		if(e.keyCode == 13){
+//			var input = $(this);
+//			var parent = input.parent();
+//			
+//			if(input.prop("type") === "checkbox"){
+//				return;
+//			}
+//			
+//			gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
+//		}
+//	});
+//	
+//	$(document).on("focusout", "#attrMaterial input", function(e){
+//		var input = $(this);
+//		var parent = input.parent();
+//		
+//		if(input.prop("type") === "checkbox"){
+//			return;
+//		}
+//		
+//		gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
+//	});
+//	
+//	$(document).on("change", "#attrMaterial input", function(e){
+//		var input = $(this);
+//		var parent = input.parent();
+//		
+//		if(!that.pickedObject_){
+//			return;
+//		}
+//		
+//		if(input.prop("type") === "checkbox"){
+//			that.pickedObject_.material[parent.data("key")] = input.prop("checked");
+//		}
+//	});
+	
+	$(document).on("change.spectrum", "#styleColor", function(e, color){
 		var rgb = color.toPercentageRgb();
 		var r = parseFloat(rgb.r) / 100.0;
 		var g = parseFloat(rgb.g) / 100.0;

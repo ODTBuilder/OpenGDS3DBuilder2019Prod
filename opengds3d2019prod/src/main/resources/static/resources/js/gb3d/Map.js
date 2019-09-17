@@ -843,11 +843,21 @@ gb3d.Map.prototype.selectThree = function(uuid){
 	if(!threeObject){
 		return false;
 	}
-
+	
+	var object = threeObject.getObject();
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
-		this.tools.edit3d.pickedObject_ = threeObject.getObject();
-		this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
-		this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
+		this.tools.edit3d.pickedObject_ = object;
+		this.tools.edit3d.threeTransformControls.attach( object );
+//		this.tools.edit3d.updateAttributeTab( object );
+//		this.tools.edit3d.updateStyleTab( object );
+		
+		if ( object.userData.object !== undefined ) {
+			// helper
+			threeEditor.select( object.userData.object );
+		} else {
+			threeEditor.select( object );
+		}
+		
 		return threeObject;
 	} else {
 		return false;
@@ -881,8 +891,9 @@ gb3d.Map.prototype.unselectThree = function(uuid){
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = threeObject.getObject();
 		this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
-		this.tools.edit3d.updateAttributeTab( undefined );
-		this.tools.edit3d.updateStyleTab( undefined );
+//		this.tools.edit3d.updateAttributeTab( undefined );
+//		this.tools.edit3d.updateStyleTab( undefined );
+		threeEditor.select( null );
 		return threeObject;
 	} else {
 		return false;
