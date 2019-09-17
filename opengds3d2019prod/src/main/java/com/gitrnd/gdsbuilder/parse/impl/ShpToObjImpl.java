@@ -17,9 +17,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeocentricCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.GeodeticCalculator;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -29,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.gitrnd.KongAlgo;
+import com.gitrnd.gdsbuilder.create3d.Triangler;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -62,8 +60,6 @@ public class ShpToObjImpl {
 	private File file;
 	private Filter filter;
 
-	private int vIdx = 0;
-
 	EnShpToObjHeightType hType = null;
 
 	/**
@@ -84,7 +80,8 @@ public class ShpToObjImpl {
 		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
 		 * 
 		 * @author SG.LEE
-		 * @param type type명
+		 * @param type
+		 *            type명
 		 * @return {@link EnTreeType}
 		 */
 		public static EnShpToObjHeightType getFromType(String type) {
@@ -210,11 +207,6 @@ public class ShpToObjImpl {
 		multipolygon.normalize();
 		Coordinate[] coordinates = deleteInnerPoints(multipolygon.getCoordinates());
 
-		srcCRS = DefaultGeographicCRS.WGS84;
-		targetCRS = DefaultGeocentricCRS.CARTESIAN;
-		//targetCRS = CRS.decode("EPSG:3857");
-		transform = CRS.findMathTransform(srcCRS, targetCRS);
-
 		// 높이값 설정
 		double height = 0.0;
 
@@ -245,83 +237,48 @@ public class ShpToObjImpl {
 		Geometry geomEn = geom.getEnvelope();
 		Point centroid = geomEn.getCentroid();
 		Coordinate centCoor = centroid.getCoordinate();
-		Coordinate centTrans = JTS.transform(centCoor, null, transform);
-//		centTrans.z = 0.0;
+		centCoor.z = 0.0;
+
+		// Coordinate lastAndFirst = null;
 		// 바닥
 		List<Coordinate> coorList = new ArrayList<Coordinate>();
 		for (int i = 0; i < coordinates.length; i++) {
-			Coordinate transCoor = JTS.transform(coordinates[i], null, transform);
-//			transCoor.z = 0.0;
-			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
-					transCoor.z - centTrans.z);
-			coorList.add(i, localCoor);
-			result = result + coordinateToVertexdescription(localCoor);
-		}
-/*		for (int i = 0; i < coordinates.length; i++) {
-			result = result + new String("vn 0 0 1\n");
-		}*/
-		KongAlgo ka = new KongAlgo(coorList);
-		ka.runKong(); // actual algo call
-		List<Map<String, Object>> mapList = ka.getIndexList();
-		for (int m = 0; m < mapList.size(); m++) {
-			Map<String, Object> map = mapList.get(m);
-			Coordinate fir = (Coordinate) map.get("fir");
-			Coordinate sec = (Coordinate) map.get("sec");
-			Coordinate thr = (Coordinate) map.get("thr");
-			int firIdx = vIdx + coorList.indexOf(fir) + 1;
-			int secIdx = vIdx + coorList.indexOf(sec) + 1;
-			int thrIdx = vIdx + coorList.indexOf(thr) + 1;
-			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
-			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
-		}
 
-		// 지붕
-		/*List<Coordinate> hCoorList = new ArrayList<Coordinate>();
-		for (int i = 0; i < coordinates.length; i++) {
-			Coordinate transCoor = JTS.transform(createLiftedCoordinate(coordinates[i], height), null, transform);
-			Coordinate localCoor = new Coordinate(transCoor.x - centTrans.x, transCoor.y - centTrans.y,
-					transCoor.z - centTrans.z);
-			hCoorList.add(i, localCoor);
-			result = result + coordinateToVertexdescription(localCoor);
-		}
-		KongAlgo hKa = new KongAlgo(hCoorList);
-		hKa.runKong(); // actual algo call
-		int coorSize = coorList.size();
-		List<Map<String, Object>> kMapList = hKa.getIndexList();
-		for (int m = 0; m < kMapList.size(); m++) {
-			Map<String, Object> map = kMapList.get(m);
-			Coordinate fir = (Coordinate) map.get("fir");
-			Coordinate sec = (Coordinate) map.get("sec");
-			Coordinate thr = (Coordinate) map.get("thr");
-			int firIdx = vIdx + coorSize + hCoorList.indexOf(fir) + 1;
-			int secIdx = vIdx + coorSize + hCoorList.indexOf(sec) + 1;
-			int thrIdx = vIdx + coorSize + hCoorList.indexOf(thr) + 1;
-			roofFace = roofFace + "f " + firIdx + " " + secIdx + " " + thrIdx + "\n";
-			roofFace = roofFace + "f " + thrIdx + " " + secIdx + " " + firIdx + "\n";
-		}
-		// 옆면
-		for (int f = 0; f < coorSize; f++) {
-			int tfirIdx = vIdx + f + 1;
-			int tsecIdx = vIdx + f + 1 + coorSize;
-			int tthrIdx = tsecIdx + 1;
-
-			if (tthrIdx > (vIdx + (coorSize * 2))) {
-				tthrIdx = tthrIdx - coorSize;
+			GeodeticCalculator gc = new GeodeticCalculator();
+			gc.setStartingGeographicPoint(centCoor.x, coordinates[i].y);
+			System.out.println("시작점:" + centCoor.x + ", " + coordinates[i].y);
+			gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
+			System.out.println("도착점:" + coordinates[i].x + ", " + coordinates[i].y);
+			double xDistance = gc.getOrthodromicDistance();
+			if (centCoor.x > coordinates[i].x) {
+				xDistance = -xDistance;
 			}
+			System.out.println("x거리는" + xDistance);
+			gc.setStartingGeographicPoint(coordinates[i].x, centCoor.y);
+			gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
+			double yDistance = gc.getOrthodromicDistance();
+			if (centCoor.y > coordinates[i].y) {
+				yDistance = -yDistance;
+			}
+			System.out.println(" y거리는" + yDistance);
 
-			int bfirIdx = tfirIdx;
-			int bsecIdx = tthrIdx;
-			int bthrIdx = bsecIdx - coorSize;
+			Coordinate localCoor = new Coordinate(xDistance, yDistance, 0);
 
-			wallFace = wallFace + "f " + tfirIdx + " " + tsecIdx + " " + tthrIdx + "\n";
-			wallFace = wallFace + "f " + bsecIdx + " " + bthrIdx + " " + bfirIdx + "\n";
-
-			wallFace = wallFace + "f " + tthrIdx + " " + tsecIdx + " " + tfirIdx + "\n";
-			wallFace = wallFace + "f " + bfirIdx + " " + bthrIdx + " " + bsecIdx + "\n";
+			coorList.add(i, localCoor);
+			// 버텍스 좌표를 obj 포맷으로 줄줄이 입력
+			result = result + coordinateToVertexdescription(localCoor);
 		}
-		vIdx += hCoorList.size();
-		*/
-		vIdx += coorList.size();
+		System.out.println(coorList);
+		Triangler tri = new Triangler(coorList);
+		tri.triangify(); // actual algo call
+
+		List<Integer> faceIndice = tri.getFaceIndices();
+		for (int m = 0; m < faceIndice.size(); m += 3) {
+			roofFace = roofFace + "f " + (faceIndice.get(m) + 1) + " " + (faceIndice.get(m + 1) + 1) + " "
+					+ (faceIndice.get(m + 2) + 1) + "\n";
+
+		}
+
 		return result + roofFace + wallFace;
 	}
 

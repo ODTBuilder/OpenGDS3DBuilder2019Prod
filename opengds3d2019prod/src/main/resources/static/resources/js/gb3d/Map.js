@@ -100,20 +100,11 @@ gb3d.Map = function(obj) {
 		automaticallyTrackDataSourceClocks : false,
 		dataSources : null,
 		clock : null,
-		terrainShadows : Cesium.ShadowMode.DISABLED
+		terrainShadows : Cesium.ShadowMode.DISABLED,
 	});
 
 	// 3D Tileset 객체
 	this.tiles = {};
-
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
-// var tileset = new Cesium.Cesium3DTileset({ url: options.testTiles });
-// this.cesiumViewer.scene.primitives.add(tileset);
-// this.cesiumViewer.zoomTo(tileset);
-
-	this.cesiumViewer.camera.flyTo({
-		destination: Cesium.Cartesian3.fromDegrees(127.03250885009764, 37.51989305019379, 15000.0)
-	});
 
 	// 좌표계 바운딩 박스
 	this.minCRS = [ -180.0, -90.0 ];
@@ -122,7 +113,8 @@ gb3d.Map = function(obj) {
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
-	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+// this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 	// 초기 위치
 	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
@@ -134,15 +126,10 @@ gb3d.Map = function(obj) {
 
 
 	// cesium 카메라를 지도 중심으로 이동
-// this.cesiumViewer.camera.flyTo({
-// destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-// this.initPosition[1], this.initPosition[2])
-// orientation : {
-// heading : Cesium.Math.toRadians(0),
-// pitch : Cesium.Math.toRadians(-60),
-// roll : Cesium.Math.toRadians(0)
-// }
-// });
+//	this.cesiumViewer.camera.flyTo({
+//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+//				this.initPosition[1], this.initPosition[2])
+//	});
 
 	// 3D Tileset 객체
 	this.tiles = {};
@@ -663,7 +650,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	geometry.computeFaceNormals();
 	geometry.computeBoundingSphere();
@@ -691,6 +678,7 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	}
 
 	this.getThreeScene().add(latheMesh);
+
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
@@ -766,7 +754,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
 // geometry.computeVertexNormals();
@@ -994,7 +982,6 @@ gb3d.Map.prototype.modifyObject2Dfrom3D = function(vertices, uuid){
 gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var featureId = id;
 	var featureCoord = coord;
-
 	var threeObject = this.getThreeObjectById(featureId);
 	if(!threeObject){
 		return;
@@ -1013,6 +1000,8 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var a, b, cp;
 	switch(type){
 	case "Point":
+		a = featureCoord;
+		b = featureCoord;
 		break;
 	case "LineString":
 		var feature = this.objectAttr.feature.clone();
@@ -1049,6 +1038,7 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);
+
 }
 
 gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
@@ -1140,7 +1130,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 		geometry = new THREE.Geometry();
 		geometry.vertices = result.points;
 		geometry.faces = result.faces;
-//		geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 		object.lookAt(new THREE.Vector3(0,0,0));
 		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
@@ -1177,6 +1167,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
  *            tileset - 타일셋 객체
  */
 gb3d.Map.prototype.addTileset = function(tileset){
+	var that = this;
 	if (tileset instanceof gb3d.object.Tileset) {
 		var layer = tileset.getLayer();
 		var layerid;
@@ -1193,22 +1184,19 @@ gb3d.Map.prototype.addTileset = function(tileset){
 		}
 		this.getTileset()[layerid].push(tileset);
 		var ctile = tileset.getCesiumTileset();
-		this.getCesiumViewer().scene.primitives.add(ctile);
-		this.getCesiumViewer().zoomTo(ctile);
+		var city = this.getCesiumViewer().scene.primitives.add(ctile);
+// this.getCesiumViewer().zoomTo(ctile);
 
-		
-// var primitives = this.getCesiumViewer().scene.primitives;
-// primitives.add(new Cesium.DebugModelMatrixPrimitive({
-// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
-// length : 10000000.0,
-// width : 10.0
-// }));
-
-// ctile.modelMatrix = new Cesium.DebugModelMatrixPrimitive({
-// modelMatrix : this.getCesiumViewer().scene.primitives.get(0).modelMatrix,
-// length : 10000000.0,
-// width : 10.0
-// })
+		var heightOffset = 0;
+		city.readyPromise.then(function(tileset) {
+			that.getCesiumViewer().zoomTo(tileset);
+			// 타일 추가 이벤트
+			var boundingSphere = tileset.boundingSphere;
+			var cartographic = Cesium.Cartographic.fromCartesian(boundingSphere.center);
+			var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, 0.0);
+			var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, heightOffset);
+			var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
+		});
 	} else {
 		console.error("parameter must be gb3d.object.Tileset");
 		return
