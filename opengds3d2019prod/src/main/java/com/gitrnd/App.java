@@ -9,19 +9,23 @@ import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
 public class App {
 
 	public static void main(String[] args) {
+
+//		List<Integer> triangles = Earcut.earcut(
+//				new double[] { 0, 0, 100, 0, 100, 100, 0, 100, 20, 20, 80, 20, 80, 80, 20, 80 }, new int[] { 4 }, 2);
+
 		// TODO Auto-generated method stub
-		File buildingFile = new File("D:\\4326test\\4326_1.shp");
+		File buildingFile = new File("D:\\node\\objTo3d-tiles-master\\bin\\0916\\shp\\buildings_1.shp");
 		// File buildingFile = new File("D:/test/clip/TL_building_clipped.shp");
 		Filter filter = Filter.INCLUDE;
 
 		try {
-			new ShpToObjImpl(buildingFile, filter, 0.0005, "D:\\4326test\\carte_1.obj")
-					.exec();
+			new ShpToObjImpl(buildingFile, filter, 50,
+					"D:\\node\\objTo3d-tiles-master\\bin\\0916\\buildings_1.obj").exec();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }
