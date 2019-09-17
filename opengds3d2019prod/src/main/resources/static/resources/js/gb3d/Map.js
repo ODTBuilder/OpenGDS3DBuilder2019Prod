@@ -125,11 +125,12 @@ gb3d.Map = function(obj) {
 // options.initPosition[1] - 1, 200000) : this.center;
 
 
+	this.gbMap.getView().setCenter([options.initPosition[0], options.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
-//	this.cesiumViewer.camera.flyTo({
-//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-//				this.initPosition[1], this.initPosition[2])
-//	});
+// this.cesiumViewer.camera.flyTo({
+// destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+// this.initPosition[1], this.initPosition[2])
+// });
 
 	// 3D Tileset 객체
 	this.tiles = {};
@@ -160,10 +161,15 @@ gb3d.Map = function(obj) {
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
-
-	this.threeLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-	this.threeScene.add(this.threeLight);
-
+// this.threeRenderer.shadowMap.enabled = true;
+	this.threeComposer = new THREE.EffectComposer(this.threeRenderer);
+	
+	this.ambientLight = new THREE.AmbientLight( 0x404040 );
+	this.threeScene.add(this.ambientLight);
+	this.sunLight = new THREE.PointLight();
+	this.sunLight.position.set( 0, 0, 0 );
+	this.threeScene.add(this.sunLight);
+	
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
 	// 카메라 객체
@@ -178,6 +184,9 @@ gb3d.Map = function(obj) {
 		that.requestFrame = requestAnimationFrame(that.loop_);
 // that.renderCesium();
 		that.renderThreeObj();
+		that.threeComposer.render();
+		var sunCart = Cesium.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame();
+		that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
 	};
 	// 렌더링 시작
 	this.loop_();
@@ -416,6 +425,7 @@ gb3d.Map.prototype.renderThreeObj = function(){
 	that.getThreeCamera().updateProjectionMatrix();
 
 	that.getThreeRenderer().setSize(width, height);
+	that.getThreeComposer().setSize(width, height);
 	that.getThreeRenderer().render(that.threeScene, that.threeCamera);
 }
 
@@ -1236,3 +1246,23 @@ gb3d.Map.prototype.getTilesetByLayer = function(lid){
 gb3d.Map.prototype.setTileset = function(tiles){
 	this.tiles = tiles;
 }
+
+/**
+ * three 컴포저 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getThreeComposer
+ * @return {THREE.EffectComposer}
+ */
+gb3d.Map.prototype.getThreeComposer = function(){
+	return this.threeComposer;
+};
+
+/**
+ * 바인딩 영역을 반환한다
+ * 
+ * @method gb3d.Map#getBindingElement
+ * @return {HTMLElement}
+ */
+gb3d.Map.prototype.getBindingElement = function(){
+	return this.bind3dElem;
+};

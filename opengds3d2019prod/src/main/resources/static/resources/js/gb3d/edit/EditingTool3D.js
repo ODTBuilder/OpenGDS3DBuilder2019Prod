@@ -65,7 +65,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	} else {
 		this.map.tools.edit3d = this;
 	}
-	
+
 	this.materialOptions = options.materialOptions || [ "metalness", "roughness", "emissive", "skinning", "wireframe", "map", "normalMap", "emissiveMap", "opacity", "alphaTest" ];
 
 	function transformRender() {
@@ -112,12 +112,15 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.map.threeScene.add(this.threeTransformControls);
 	this.threeTransformControls.setSpace("local");
 
-	var eventDiv = $(".gb3d-map-bind3d-area");
-	var threeEventDiv = $(".gb3d-map-three-area");
+	var eventDiv = $(this.map.getBindingElement());
+	var threeEventDiv = $(eventDiv).find(".gb3d-map-three-area");
 	var raycaster = new THREE.Raycaster();
 	var mouse = new THREE.Vector2();
 	this.pickedObject_ = undefined, pickedObjectColor = undefined;
-
+	// ==========yijun start==========
+	this.isDragging = false;
+	this.isDown = false;
+	// ==========yijun end==========
 	function onDocumentMouseClick(event) {
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
@@ -132,6 +135,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 			return;
 		}
 
+		if(that.isDragging){
+			that.isDragging = false;
+			that.isDown = false;
+			return;
+		}
 		event.preventDefault();
 		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
@@ -144,7 +152,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
-
+		// ===========yijun start==============
+		clickOutlinePass.edgeStrength = 4;
+		clickOutlinePass.edgeThickness = 1;
+		clickOutlinePass.visibleEdgeColor.set("#00FF00");
+		clickOutlinePass.hiddenEdgeColor.set("#00FF00");
+		// ===========yijun end==============
 		if (that.pickedObject_) {
 			// 이전에 선택된 객체 초기화
 			that.threeTransformControls.detach(that.pickedObject_);
@@ -159,19 +172,36 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
 			var object = intersects[0].object;
 			that.pickedObject_ = object;
+			// ==========yijun start===========
+			that.selectedObject["three"]["object"] = intersects[0].object;
+			that.selectedObject["three"]["distance"] =  intersects[0].distance;
+			console.log("three 객체의 거리는: "+intersects[0].distance);
+			hoverOutlinePass.selectedObjects = [];
+			clickOutlinePass.selectedObjects = [intersects[0].object];
+			// ==========yijun end===========
 			that.threeTransformControls.attach(object);
 
 			that.map.syncSelect(object.uuid);
 			that.updateAttributeTab(object);
 			that.updateStyleTab(object);
 			that.updateMaterialTab(object);
+			
+			silhouetteGreen.selected = [];
+		} else {
+			// yijun start
+			that.highlightObject["three"]["object"] = undefined;
+			that.highlightObject["three"]["distance"] =  undefined;
+			that.selectedObject["three"]["object"] = undefined;
+			that.selectedObject["three"]["distance"] =  undefined;
+			clickOutlinePass.selectedObjects = [];
+			// yijun end
 		}
 	}
 
 	// ============ Event ==============
 	eventDiv.on("click", onDocumentMouseClick);
 	
-	// ==============yijun===============
+	// ==============yijun start===============
 	this.highlightObject = {
 			"cesium" : {
 				"object" : undefined,
@@ -182,13 +212,29 @@ gb3d.edit.EditingTool3D = function(obj) {
 				"distance" : undefined
 			}
 	};
-	
+	this.selectedObject = {
+			"cesium" : {
+				"object" : undefined,
+				"distance" : undefined
+			},
+			"three" : {
+				"object" : undefined,
+				"distance" : undefined
+			}
+	};
+	// ==============yijun end===============
 	var cviewer = this.map.getCesiumViewer();
+
+	// threejs 객체 드래그 오프시 선택되는 문제가 있음 -> 마우스다운/ 무브 탐지 by yijun
+	cviewer.screenSpaceEventHandler.setInputAction(function onLeftDown(movement) {
+		that.isDragging = false;
+		that.isDown = true;	
+	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 	
 	// Information about the currently selected feature
 	this.selected = {
-	    feature: undefined,
-	    originalColor: new Cesium.Color()
+			feature: undefined,
+			originalColor: new Cesium.Color()
 	};
 
 	// An entity object which will hold info about the currently selected
@@ -214,6 +260,19 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		// Silhouette a feature blue on hover.
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
+			if (that.isDown) {
+				that.isDragging = true;				
+			}
+			
+			if (!that.getActiveTool()) {
+				that.threeTransformControls.detach(that.pickedObject_);
+				that.updateAttributeTab(undefined);
+				that.updateStyleTab(undefined);
+				that.updateMaterialTab(undefined);
+				that.pickedObject_ = undefined;
+				return;
+			}
+
 			// 카메라의 위치
 			var camPos = that.map.getCamera().getCesiumCamera().positionWC;
 			// 화면상의 커서가 보는 객체상의 포인트
@@ -231,7 +290,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 				that.highlightObject["cesium"]["distance"] =  undefined;
 				return;
 			}
-			
+
 // var name = pickedFeature.getProperty('name');
 // if (!Cesium.defined(name)) {
 // name = pickedFeature.getProperty('id');
@@ -258,7 +317,20 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		// Silhouette a feature on selection and show metadata in the InfoBox.
 		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
-			console.log(movement);
+// console.log(movement);
+			if (!that.getActiveTool()) {
+				that.threeTransformControls.detach(that.pickedObject_);
+				that.updateAttributeTab(undefined);
+				that.updateStyleTab(undefined);
+				that.updateMaterialTab(undefined);
+				that.pickedObject_ = undefined;
+				return;
+			}
+			
+			if (event.ctrlKey) {
+				return;
+			}
+			
 			// If a feature was previously selected, undo the highlight
 			silhouetteGreen.selected = [];
 
@@ -290,12 +362,21 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		// Information about the currently highlighted feature
 		var highlighted = {
-			feature : undefined,
-			originalColor : new Cesium.Color()
+				feature : undefined,
+				originalColor : new Cesium.Color()
 		};
 
 		// Color a feature yellow on hover.
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
+			if (!that.getActiveTool()) {
+				that.threeTransformControls.detach(that.pickedObject_);
+				that.updateAttributeTab(undefined);
+				that.updateStyleTab(undefined);
+				that.updateMaterialTab(undefined);
+				that.pickedObject_ = undefined;
+				return;
+			}
+			
 			// 카메라의 위치
 			var camPos = that.map.getCamera().getCesiumCamera().positionWC;
 			// 화면상의 커서가 보는 객체상의 포인트
@@ -312,7 +393,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (!Cesium.defined(pickedFeature)) {
 				return;
 			}
-			
+
 			that.highlightObject["cesium"]["object"] = pickedFeature;
 			that.highlightObject["cesium"]["distance"] =  distance;
 			console.log("cesium 객체의 거리는: "+distance);
@@ -330,11 +411,24 @@ gb3d.edit.EditingTool3D = function(obj) {
 				Cesium.Color.clone(pickedFeature.color, highlighted.originalColor);
 				pickedFeature.color = Cesium.Color.YELLOW;
 			}
-			
+
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
 		// Color a feature on selection and show metadata in the InfoBox.
 		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
+			if (!that.getActiveTool()) {
+				that.threeTransformControls.detach(that.pickedObject_);
+				that.updateAttributeTab(undefined);
+				that.updateStyleTab(undefined);
+				that.updateMaterialTab(undefined);
+				that.pickedObject_ = undefined;
+				return;
+			}
+			
+			if (event.ctrlKey) {
+				return;
+			}
+			
 			// If a feature was previously selected, undo the highlight
 			if (Cesium.defined(that.selected.feature)) {
 				that.selected.feature.color = that.selected.originalColor;
@@ -358,32 +452,30 @@ gb3d.edit.EditingTool3D = function(obj) {
 			} else {
 				Cesium.Color.clone(pickedFeature.color, that.selected.originalColor);
 			}
-			// Highlight newly selected feature
 			pickedFeature.color = Cesium.Color.LIME;
-			// Set feature infobox description
-			var featureName = pickedFeature.getProperty('name');
-			that.selectedEntity.name = featureName;
-			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
 			cviewer.selectedEntity = that.selectedEntity;
-			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>' + '<tr><th>BIN</th><td>' + pickedFeature.getProperty('BIN') + '</td></tr>' + '<tr><th>DOITT ID</th><td>'
-					+ pickedFeature.getProperty('DOITT_ID') + '</td></tr>' + '<tr><th>SOURCE ID</th><td>' + pickedFeature.getProperty('SOURCE_ID') + '</td></tr>' + '<tr><th>Longitude</th><td>'
-					+ pickedFeature.getProperty('longitude') + '</td></tr>' + '<tr><th>Latitude</th><td>' + pickedFeature.getProperty('latitude') + '</td></tr>' + '<tr><th>Height</th><td>'
-					+ pickedFeature.getProperty('height') + '</td></tr>' + '<tr><th>Terrain Height (Ellipsoid)</th><td>' + pickedFeature.getProperty('TerrainHeight') + '</td></tr>'
-					+ '</tbody></table>';
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	}
-	
-	function onDocumentMouseMove(event) {
-// if (!that.getActiveTool()) {
-// that.threeTransformControls.detach(that.pickedObject_);
-// that.updateAttributeTab(undefined);
-// that.updateStyleTab(undefined);
-// that.updateMaterialTab(undefined);
-// that.pickedObject_ = undefined;
-// return;
-// }
 
-		if (event.ctrlKey) {
+
+	var renderPass = new THREE.RenderPass(that.map.getThreeScene(), that.map.getThreeCamera());
+	that.map.getThreeComposer().addPass(renderPass);
+	var hoverOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+	that.map.getThreeComposer().addPass(hoverOutlinePass);
+	var clickOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+	that.map.getThreeComposer().addPass(clickOutlinePass);
+// var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+// effectFXAA.uniforms[ 'resolution' ].value.set( 1 / eventDiv[0].clientWidth, 1
+// / eventDiv[0].clientHeight );
+// that.map.getThreeComposer().addPass( effectFXAA );
+
+	var onDocumentMouseMove = function(event) {
+		if (!that.getActiveTool()) {
+			that.threeTransformControls.detach(that.pickedObject_);
+			that.updateAttributeTab(undefined);
+			that.updateStyleTab(undefined);
+			that.updateMaterialTab(undefined);
+			that.pickedObject_ = undefined;
 			return;
 		}
 
@@ -392,6 +484,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
 		mouse.y = (event.offsetY / eventDiv[0].clientHeight) * -2 + 1;
 
+		// ================yijun start=================
 		var interObjs = [];
 		var objects = that.map.getThreeObjects();
 		for (var i = 0; i < objects.length; i++) {
@@ -399,26 +492,41 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
-		var renderer = that.map.getThreeRenderer();
-		var composer = new THREE.EffectComposer( renderer );
-		var outpass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+		hoverOutlinePass.edgeStrength = 4;
+		hoverOutlinePass.edgeThickness = 1;
+		hoverOutlinePass.visibleEdgeColor.set("#0000ff");
+		hoverOutlinePass.hiddenEdgeColor.set("#0000ff");
+
 		if (intersects.length > 0) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
-			var object = intersects[0];
-			that.highlightObject["three"]["object"] = object.object;
-			that.highlightObject["three"]["distance"] =  object.distance;
-			console.log("three 객체의 거리는: "+object.distance);
-// console.log(object);
+			var selectedObject = intersects[0];
+			that.highlightObject["three"]["object"] = selectedObject.object;
+			that.highlightObject["three"]["distance"] =  selectedObject.distance;
+			console.log("three 객체의 거리는: "+selectedObject.distance);
+			var clicked = clickOutlinePass.selectedObjects;
+			if (that.selectedObject["three"]["object"]) {
+				if (that.selectedObject["three"]["object"].uuid === selectedObject.object.uuid) {
+					clickOutlinePass.selectedObjects = [];
+				} else {
+					clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
+				}	
+			}
+			hoverOutlinePass.selectedObjects = [selectedObject.object];
 
 		} else {
 			that.highlightObject["three"]["object"] = undefined;
 			that.highlightObject["three"]["distance"] =  undefined;
+			hoverOutlinePass.selectedObjects = [];
+			var clicked = clickOutlinePass.selectedObjects;
+			if (that.selectedObject["three"]["object"]) {
+				clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
+			}
 		}
-		
+
 	}
-	// =============yijun===============
+	// =============yijun end===============
 	eventDiv.on("mousemove", onDocumentMouseMove);
-	
+
 	$(document).on("keydown", function(e) {
 		if (e.ctrlKey) {
 			// Ctrl key 입력 시 기본 3차원 렌더링 함수를 비활성화하고 ThreeJS DIV의 마우스 이벤트를 활성화시킨다.
@@ -460,12 +568,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 		case 90: // Z
 			that.threeTransformControls.showZ = !that.threeTransformControls.showZ;
 			break;
-		e
-	case 32: // Spacebar
-		that.threeTransformControls.enabled = !that.threeTransformControls.enabled;
-		break;
-	}
-}	);
+			e
+		case 32: // Spacebar
+			that.threeTransformControls.enabled = !that.threeTransformControls.enabled;
+			break;
+		}
+	}	);
 
 	$(document).on("keyup", function(e) {
 		if (e.which === 17) {
@@ -727,13 +835,13 @@ gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object) {
 	}
 
 	var attrs = {
-		position : object.position,
-		scale : object.scale,
-		rotation : object.rotation,
-		userData : object.userData,
-		name : object.name,
-		uuid : object.uuid,
-		visible : object.visible
+			position : object.position,
+			scale : object.scale,
+			rotation : object.rotation,
+			userData : object.userData,
+			name : object.name,
+			uuid : object.uuid,
+			visible : object.visible
 	}
 
 	for (var i = 0; i < rows.length; i++) {
@@ -853,7 +961,7 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 	}
 
 	var obj = object, threeObject = this.map.getThreeObjectByUuid(obj.uuid), extent = threeObject.getExtent(), x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2, centerCart = Cesium.Cartesian3
-			.fromDegrees(x, y);
+	.fromDegrees(x, y);
 
 	obj.position.copy(centerCart);
 }

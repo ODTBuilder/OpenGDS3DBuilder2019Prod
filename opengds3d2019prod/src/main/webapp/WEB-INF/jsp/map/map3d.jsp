@@ -181,6 +181,11 @@ html, body {
 
 		var gbMap = new gb.Map({
 			"target" : $(".area-2d")[0],
+			"view" : new ol.View({
+				projection : 'EPSG:4326',
+				center : [ 0, 0 ],
+				zoom : 2
+			}),
 			"upperMap" : {
 				"controls" : [],
 				"layers" : []
