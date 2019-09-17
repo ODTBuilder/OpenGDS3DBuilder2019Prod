@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.referencing.GeodeticCalculator;
+import org.json.simple.JSONObject;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -159,6 +161,23 @@ public class ShpToObjImpl {
 			Coordinate center = buildingCollection.getBounds().centre();
 			centerX = center.x;
 			centerY = center.y;
+
+			JSONObject obj = new JSONObject();
+			obj.put("longitude", Math.toRadians(centerX));
+			obj.put("latitude", Math.toRadians(centerY));
+			obj.put("transHeight", 0);
+			obj.put("region", true);
+			obj.put("box", false);
+			obj.put("sphere", false);
+			obj.put("gltfUpAxis", "Z");
+
+			try (FileWriter file = new FileWriter(
+					"D:\\node\\objTo3d-tiles-master\\bin\\0916\\buildings_1_customTilesetOptions.json")) {
+				file.write(obj.toJSONString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			try (BufferedWriter writer = new BufferedWriter(
 					new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"))) {
 				ShpToObjImpl.writer = writer;
