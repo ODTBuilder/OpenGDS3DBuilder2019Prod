@@ -92,6 +92,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 		var object = e.target.object,
 			mode = that.threeTransformControls.getMode();
 		
+		// ThreeJS 객체 Attribute 업데이트
+		if ( object !== undefined ) {
+			if ( threeEditor.helpers[ object.id ] !== undefined ) {
+				threeEditor.helpers[ object.id ].update();
+			}
+			threeEditor.signals.refreshSidebarObject3D.dispatch( object );
+		}
+		
 		switch(mode){
 			case "scale":
 				if(object.geometry instanceof THREE.BufferGeometry || !object.geometry){
@@ -129,9 +137,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 	function onDocumentMouseClick(event){
 		if(!that.getActiveTool()){
 			that.threeTransformControls.detach( that.pickedObject_ );
-			that.updateAttributeTab(undefined);
-			that.updateStyleTab(undefined);
-			that.updateMaterialTab(undefined);
+//			that.updateAttributeTab(undefined);
+//			that.updateStyleTab(undefined);
+//			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
 		}
@@ -157,9 +165,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// 이전에 선택된 객체 초기화
 			that.threeTransformControls.detach( that.pickedObject_ );
 			that.map.syncUnselect( that.pickedObject_.uuid );
-			that.updateAttributeTab(undefined);
-			that.updateStyleTab(undefined);
-			that.updateMaterialTab(undefined);
+//			that.updateAttributeTab(undefined);
+//			that.updateStyleTab(undefined);
+//			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 		}
 		
@@ -176,10 +184,21 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.threeTransformControls.attach( object );
 			
 			that.map.syncSelect(object.uuid);
-			that.updateAttributeTab(object);
-			that.updateStyleTab(object);
-			that.updateMaterialTab(object);
+//			that.updateAttributeTab(object);
+//			that.updateStyleTab(object);
+//			that.updateMaterialTab(object);
+			
+			if ( object.userData.object !== undefined ) {
+				// helper
+				threeEditor.select( object.userData.object );
+			} else {
+				threeEditor.select( object );
+			}
+		} else {
+			threeEditor.select( null );
 		}
+		
+
 	}
 	
 	// ============ Event ==============
@@ -297,42 +316,42 @@ gb3d.edit.EditingTool3D = function(obj) {
 		gb3d.edit.EditingTool3D.updateStyleByInput( parent, that);
 	});
 	
-	$(document).on("keypress", "#attrMaterial input", function(e){
-		if(e.keyCode == 13){
-			var input = $(this);
-			var parent = input.parent();
-			
-			if(input.prop("type") === "checkbox"){
-				return;
-			}
-			
-			gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
-		}
-	});
-	
-	$(document).on("focusout", "#attrMaterial input", function(e){
-		var input = $(this);
-		var parent = input.parent();
-		
-		if(input.prop("type") === "checkbox"){
-			return;
-		}
-		
-		gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
-	});
-	
-	$(document).on("change", "#attrMaterial input", function(e){
-		var input = $(this);
-		var parent = input.parent();
-		
-		if(!that.pickedObject_){
-			return;
-		}
-		
-		if(input.prop("type") === "checkbox"){
-			that.pickedObject_.material[parent.data("key")] = input.prop("checked");
-		}
-	});
+//	$(document).on("keypress", "#attrMaterial input", function(e){
+//		if(e.keyCode == 13){
+//			var input = $(this);
+//			var parent = input.parent();
+//			
+//			if(input.prop("type") === "checkbox"){
+//				return;
+//			}
+//			
+//			gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
+//		}
+//	});
+//	
+//	$(document).on("focusout", "#attrMaterial input", function(e){
+//		var input = $(this);
+//		var parent = input.parent();
+//		
+//		if(input.prop("type") === "checkbox"){
+//			return;
+//		}
+//		
+//		gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
+//	});
+//	
+//	$(document).on("change", "#attrMaterial input", function(e){
+//		var input = $(this);
+//		var parent = input.parent();
+//		
+//		if(!that.pickedObject_){
+//			return;
+//		}
+//		
+//		if(input.prop("type") === "checkbox"){
+//			that.pickedObject_.material[parent.data("key")] = input.prop("checked");
+//		}
+//	});
 	
 	$(document).on("change.spectrum", "#styleColor", function(e, color){
 		var rgb = color.toPercentageRgb();

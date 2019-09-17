@@ -342,6 +342,10 @@ gb3d.tree.Three = function(obj) {
 	function resetMatrixWorld ( obj ) {
 		var object = obj;
 	
+//		if(object.userData.type){
+//			return;
+//		}
+		
 		if(!object.geometry){
 			if(object.children instanceof Array){
 				for(var i = 0; i < object.children.length; i++){

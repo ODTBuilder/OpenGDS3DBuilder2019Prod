@@ -173,6 +173,52 @@
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/DracoExporter.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/PLYExporter.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/exporters/STLExporter.js"></script>
+<!-- three command -->
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/Command.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetPositionCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetRotationCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetScaleCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetUuidCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetValueCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryValueCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialColorCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialMapCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialValueCommand.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialVectorCommand.js"></script>
+<!-- three UI -->
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/UIElement.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/UIThree.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/signals.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Config.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/History.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Strings.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Editor.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Properties.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Geometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Geometry.Geometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.BufferGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.Modifiers.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.BoxGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.CircleGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.CylinderGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.ExtrudeGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.OctahedronGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.PlaneGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.RingGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.SphereGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.ShapeGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.TetrahedronGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.TorusGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.TubeGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Sidebar.Geometry.LatheGeometry.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Object.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Material.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/UI.js"></script>
