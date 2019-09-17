@@ -284,9 +284,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 			
 			if (!that.getActiveTool()) {
 				that.threeTransformControls.detach(that.pickedObject_);
-				that.updateAttributeTab(undefined);
-				that.updateStyleTab(undefined);
-				that.updateMaterialTab(undefined);
+//				that.updateAttributeTab(undefined);
+//				that.updateStyleTab(undefined);
+//				that.updateMaterialTab(undefined);
 				that.pickedObject_ = undefined;
 				return;
 			}
@@ -338,9 +338,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 // console.log(movement);
 			if (!that.getActiveTool()) {
 				that.threeTransformControls.detach(that.pickedObject_);
-				that.updateAttributeTab(undefined);
-				that.updateStyleTab(undefined);
-				that.updateMaterialTab(undefined);
+//				that.updateAttributeTab(undefined);
+//				that.updateStyleTab(undefined);
+//				that.updateMaterialTab(undefined);
 				that.pickedObject_ = undefined;
 				return;
 			}
@@ -388,9 +388,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
 			if (!that.getActiveTool()) {
 				that.threeTransformControls.detach(that.pickedObject_);
-				that.updateAttributeTab(undefined);
-				that.updateStyleTab(undefined);
-				that.updateMaterialTab(undefined);
+//				that.updateAttributeTab(undefined);
+//				that.updateStyleTab(undefined);
+//				that.updateMaterialTab(undefined);
 				that.pickedObject_ = undefined;
 				return;
 			}
@@ -436,9 +436,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 		cviewer.screenSpaceEventHandler.setInputAction(function onLeftClick(movement) {
 			if (!that.getActiveTool()) {
 				that.threeTransformControls.detach(that.pickedObject_);
-				that.updateAttributeTab(undefined);
-				that.updateStyleTab(undefined);
-				that.updateMaterialTab(undefined);
+//				that.updateAttributeTab(undefined);
+//				that.updateStyleTab(undefined);
+//				that.updateMaterialTab(undefined);
 				that.pickedObject_ = undefined;
 				return;
 			}
@@ -490,9 +490,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var onDocumentMouseMove = function(event) {
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
-			that.updateAttributeTab(undefined);
-			that.updateStyleTab(undefined);
-			that.updateMaterialTab(undefined);
+//			that.updateAttributeTab(undefined);
+//			that.updateStyleTab(undefined);
+//			that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
 		}
