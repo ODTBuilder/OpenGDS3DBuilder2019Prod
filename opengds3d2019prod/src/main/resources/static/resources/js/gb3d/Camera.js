@@ -22,7 +22,6 @@ gb3d.Camera = function(obj) {
 	this.cesiumCamera = options.cesiumCamera instanceof Cesium.Camera ? options.cesiumCamera : undefined;
 	this.threeCamera = options.threeCamera instanceof THREE.Camera ? options.threeCamera : undefined;
 	this.olMap = options.olMap instanceof ol.Map ? options.olMap : undefined;
-
 	// this.icon = optzions.icon ? options.icon : undefined;
 	// this.sector = options.sector ? options.sector : undefined;
 	if (!this.cesiumCamera || !this.threeCamera || !this.olMap) {
@@ -41,7 +40,7 @@ gb3d.Camera = function(obj) {
 		});
 		this.cesiumCamera.moveEnd.addEventListener(function() {
 			that.updateCamCartigraphicPosition();
-			console.log(Cesium.Math.toDegrees(that.cesiumCamera.heading));
+			// console.log(Cesium.Math.toDegrees(that.cesiumCamera.heading));
 		});
 	}
 
@@ -91,6 +90,25 @@ gb3d.Camera = function(obj) {
 		stopEvent : true
 	});
 	this.olMap.addOverlay(this.sectOverlay);
+	var wheelEvt = function(e) {
+		var E = e.originalEvent;
+		delta = 0;
+		console.log(E);
+		if (E.detail) {
+			delta = E.detail * -40;
+		} else {
+			delta = E.wheelDelta;
+		}
+		console.log(delta);
+		if (delta === 120) {
+			that.olView.setZoom(that.olView.getZoom() + 1);
+			// todo zoomByDelta interaction
+		} else if (delta === -120) {
+			that.olView.setZoom(that.olView.getZoom() - 1);
+		}
+	};
+	$(this.icon).on('mousewheel DOMMouseScroll', wheelEvt);
+	$(this.sector).on('mousewheel DOMMouseScroll', wheelEvt);
 
 	this.camStyle = new ol.style.Style({
 		"image" : new ol.style.Icon({
@@ -194,15 +212,15 @@ gb3d.Camera = function(obj) {
 
 		that.isCamDragging = false;
 		that.isCamDown = true;
-		console.log(that.getCamIconOverlay().getPosition());
-		console.log(that.cursorCoord);
+		// console.log(that.getCamIconOverlay().getPosition());
+		// console.log(that.cursorCoord);
 		that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
 	});
 	$(document).mousemove(function() {
 		if (that.isCamDown && that.isCamMoving) {
 			that.isCamDragging = true;
-			console.log(that.getCamIconOverlay().getPosition());
-			console.log(that.cursorCoord);
+			// console.log(that.getCamIconOverlay().getPosition());
+			// console.log(that.cursorCoord);
 
 			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
 			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
@@ -224,8 +242,8 @@ gb3d.Camera = function(obj) {
 			var wasCamDown = that.isCamDown;
 			that.isCamDragging = false;
 			that.isCamDown = false;
-			console.log(that.getCamIconOverlay().getPosition());
-			console.log(that.cursorCoord);
+			// console.log(that.getCamIconOverlay().getPosition());
+			// console.log(that.cursorCoord);
 
 			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
 			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
@@ -265,14 +283,8 @@ gb3d.Camera = function(obj) {
 		e.stopPropagation();
 		that.rdragging = true;
 		that.target_wp = $(that.sector);
-		if (!that.target_wp.data("origin"))
-			that.target_wp.data("origin", {
-				left : that.target_wp.offset().left + 60,
-				top : that.target_wp.offset().top + 60
-			});
-		that.o_x = that.target_wp.data("origin").left;
-		that.o_y = that.target_wp.data("origin").top; // origin point
-
+		that.o_x = that.target_wp.offset().left + 60;
+		that.o_y = that.target_wp.offset().top + 60; // origin point
 		that.last_angle = that.target_wp.data("last_angle") || 0;
 	})
 
@@ -447,8 +459,8 @@ gb3d.Camera.prototype.updateCesiumCameraPosition = function(heading) {
 	var camPos = this.getCamIconOverlay().getPosition();
 	// var camCart = Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1]);
 	var ccam = this.getCesiumCamera();
-	console.log(ccam.positionWC);
-	console.log(ccam.positionCartographic);
+	// console.log(ccam.positionWC);
+	// console.log(ccam.positionCartographic);
 	var carto = ccam.positionCartographic;
 	ccam.flyTo({
 		destination : Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1], carto["height"]),
