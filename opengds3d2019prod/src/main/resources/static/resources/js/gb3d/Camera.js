@@ -44,6 +44,15 @@ gb3d.Camera = function(obj) {
 		});
 	}
 
+	this.wheelZoomIntr = undefined;
+	var intrs = this.olMap.getInteractions();
+	for (var i = 0; i < intrs.getLength(); i++) {
+		var intr = intrs.item(i);
+		if (intr instanceof ol.interaction.MouseWheelZoom) {
+			this.wheelZoomIntr = intr;
+			break;
+		}
+	}
 	this.icon = $("<img>")
 			.attr(
 					{
@@ -92,19 +101,22 @@ gb3d.Camera = function(obj) {
 	this.olMap.addOverlay(this.sectOverlay);
 	var wheelEvt = function(e) {
 		var E = e.originalEvent;
-		delta = 0;
-		console.log(E);
-		if (E.detail) {
-			delta = E.detail * -40;
-		} else {
-			delta = E.wheelDelta;
-		}
-		console.log(delta);
-		if (delta === 120) {
-			that.olView.setZoom(that.olView.getZoom() + 1);
-			// todo zoomByDelta interaction
-		} else if (delta === -120) {
-			that.olView.setZoom(that.olView.getZoom() - 1);
+//		delta = 0;
+//		console.log(E);
+//		if (E.detail) {
+//			delta = E.detail * -40;
+//		} else {
+//			delta = E.wheelDelta;
+//		}
+//		console.log(delta);
+//		if (delta === 120) {
+//		} else if (delta === -120) {
+//		}
+		// 마우스 이벤트 만들어서
+		var whevt = new ol.MapBrowserEvent("wheel", that.olMap, E);
+		// 휠줌인터렉션에 전달
+		if (that.wheelZoomIntr !== undefined) {
+			that.wheelZoomIntr.handleEvent(whevt);
 		}
 	};
 	$(this.icon).on('mousewheel DOMMouseScroll', wheelEvt);
