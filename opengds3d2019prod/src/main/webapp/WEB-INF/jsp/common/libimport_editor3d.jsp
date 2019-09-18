@@ -34,8 +34,8 @@
 <!-- proj4js -->
 <script src="${pageContext.request.contextPath}/resources/js/proj4js/dist/proj4-src.js"></script>
 <%-- 오픈 레이어스3 --%>
-<%-- <script src="${pageContext.request.contextPath}/resources/js/ol3/ol-debug.js"></script> --%>
-<script src="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/ol3/ol-debug.js"></script>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.js"></script> --%>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/ol3/5.3.0/ol.css">
 <!-- jsts -->
 <script src="${pageContext.request.contextPath}/resources/js/jsts/jsts.js"></script>
