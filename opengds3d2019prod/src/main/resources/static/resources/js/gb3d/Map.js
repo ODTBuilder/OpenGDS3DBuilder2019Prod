@@ -851,6 +851,8 @@ gb3d.Map.prototype.selectThree = function(uuid){
 //		this.tools.edit3d.updateAttributeTab( object );
 //		this.tools.edit3d.updateStyleTab( object );
 
+		this.tools.edit3d.applySelectedOutline(object);
+		
 		if ( object.userData.object !== undefined ) {
 			// helper
 			threeEditor.select( object.userData.object );
@@ -894,6 +896,7 @@ gb3d.Map.prototype.unselectThree = function(uuid){
 //		this.tools.edit3d.updateAttributeTab( undefined );
 //		this.tools.edit3d.updateStyleTab( undefined );
 		threeEditor.select( null );
+		this.tools.edit3d.removeSelectedOutline();
 		return threeObject;
 	} else {
 		return false;
