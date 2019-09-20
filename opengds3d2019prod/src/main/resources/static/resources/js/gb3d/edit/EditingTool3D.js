@@ -128,8 +128,16 @@ gb3d.edit.EditingTool3D = function(obj) {
 	// ==========yijun start==========
 	this.isDragging = false;
 	this.isDown = false;
+	console.log("최초선언됨 다운: "+that.isDown+", 드래그: "+that.isDragging);
 	// ==========yijun end==========
 	function onDocumentMouseClick(event) {
+//		that.isDown = false;
+		if(that.isDragging){
+			that.isDragging = false;
+			console.log("클릭이벤트 다운: "+that.isDown+", 드래그: "+that.isDragging);
+			return;
+		}
+		
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
 //			that.updateAttributeTab(undefined);
@@ -143,11 +151,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			return;
 		}
 
-		if(that.isDragging){
-			that.isDragging = false;
-			that.isDown = false;
-			return;
-		}
+
 		event.preventDefault();
 		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
@@ -177,7 +181,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.pickedObject_ = object;
 			that.selectedObject["three"]["object"] = intersects[0].object;
 			that.selectedObject["three"]["distance"] =  intersects[0].distance;
-			console.log("three 객체의 거리는: "+intersects[0].distance);
+//			console.log("three 객체의 거리는: "+intersects[0].distance);
 			that.applySelectedOutline(object);
 			
 			that.threeTransformControls.attach(object);
@@ -194,7 +198,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 				threeEditor.select( object );
 			}
 			
-			silhouetteGreen.selected = [];
+			that.silhouetteGreen.selected = [];
 		} else {
 			that.removeSelectedOutline();
 			threeEditor.select( null );
@@ -234,7 +238,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 	cviewer.screenSpaceEventHandler.setInputAction(function onLeftDown(movement) {
 		that.isDragging = false;
 		that.isDown = true;	
+		console.log("왼다운 다운: "+that.isDown+", 드래그: "+that.isDragging);
+		console.log(movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+	
+	cviewer.screenSpaceEventHandler.setInputAction(function onLeftUp(movement) {
+		that.isDown = false;
+		console.log("왼업 다운: "+that.isDown+", 드래그: "+that.isDragging);
+	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 	
 	// Information about the currently selected feature
 	this.selected = {
@@ -246,27 +257,30 @@ gb3d.edit.EditingTool3D = function(obj) {
 	// feature for infobox display
 	this.selectedEntity = new Cesium.Entity();
 
+	this.silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+	this.silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();	
 	// Get default left click handler for when a feature is not picked on left
 	// click
 	var clickHandler = cviewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
 		// Silhouettes are supported
-		var silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-		silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
-		silhouetteBlue.uniforms.length = 0.01;
-		silhouetteBlue.selected = [];
+		
+		that.silhouetteBlue.uniforms.color = Cesium.Color.BLUE;
+		that.silhouetteBlue.uniforms.length = 0.01;
+		that.silhouetteBlue.selected = [];
 
-		var silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
-		silhouetteGreen.uniforms.color = Cesium.Color.LIME;
-		silhouetteGreen.uniforms.length = 0.01;
-		silhouetteGreen.selected = [];
+		that.silhouetteGreen.uniforms.color = Cesium.Color.LIME;
+		that.silhouetteGreen.uniforms.length = 0.01;
+		that.silhouetteGreen.selected = [];
 
-		cviewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([ silhouetteBlue, silhouetteGreen ]));
+		cviewer.scene.postProcessStages.add(Cesium.PostProcessStageLibrary.createSilhouetteStage([ that.silhouetteBlue, that.silhouetteGreen ]));
 
 		// Silhouette a feature blue on hover.
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
 			if (that.isDown) {
-				that.isDragging = true;				
+				that.isDragging = true;
+				console.log("왼다운 인식 됨 커서이동중 다운: "+that.isDown+", 드래그: "+that.isDragging);
+				console.log(movement);
 			}
 			
 			if (!that.getActiveTool()) {
@@ -286,7 +300,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			var distance = Cesium.Cartesian3.distance(camPos, point);
 // console.log("거리는: "+distance);
 			// If a feature was previously highlighted, undo the highlight
-			silhouetteBlue.selected = [];
+			that.silhouetteBlue.selected = [];
 
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.endPosition);
@@ -303,7 +317,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			that.highlightObject["cesium"]["object"] = pickedFeature;
 			that.highlightObject["cesium"]["distance"] =  distance;
-			console.log("cesium 객체의 거리는: "+distance);
+//			console.log("cesium 객체의 거리는: "+distance);
 			var isCloser = false;
 			if (!that.highlightObject["three"]["object"] || !that.highlightObject["three"]["distance"]) {
 				isCloser = true;
@@ -314,7 +328,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 			// Highlight the feature if it's not already selected.
 			if (isCloser && pickedFeature !== that.selected.feature) {
-				silhouetteBlue.selected = [ pickedFeature ];
+				that.silhouetteBlue.selected = [ pickedFeature ];
 // that.highlightObject["three"]["object"] = undefined;
 // that.highlightObject["three"]["distance"] = undefined;
 			}
@@ -337,7 +351,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 			
 			// If a feature was previously selected, undo the highlight
-			silhouetteGreen.selected = [];
+			that.silhouetteGreen.selected = [];
 
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
@@ -347,18 +361,18 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 
 			// Select the feature if it's not already selected
-			if (silhouetteGreen.selected[0] === pickedFeature) {
+			if (that.silhouetteGreen.selected[0] === pickedFeature) {
 				return;
 			}
 
 			// Save the selected feature's original color
-			var highlightedFeature = silhouetteBlue.selected[0];
+			var highlightedFeature = that.silhouetteBlue.selected[0];
 			if (pickedFeature === highlightedFeature) {
-				silhouetteBlue.selected = [];
+				that.silhouetteBlue.selected = [];
 			}
 
 			// Highlight newly selected feature
-			silhouetteGreen.selected = [ pickedFeature ];
+			that.silhouetteGreen.selected = [ pickedFeature ];
 
 			cviewer.selectedEntity = that.selectedEntity;
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -401,7 +415,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			that.highlightObject["cesium"]["object"] = pickedFeature;
 			that.highlightObject["cesium"]["distance"] =  distance;
-			console.log("cesium 객체의 거리는: "+distance);
+//			console.log("cesium 객체의 거리는: "+distance);
 			var isCloser = false;
 			if (!that.highlightObject["three"]["object"] || !that.highlightObject["three"]["distance"]) {
 				isCloser = true;
@@ -511,7 +525,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			var selectedObject = intersects[0];
 			that.highlightObject["three"]["object"] = selectedObject.object;
 			that.highlightObject["three"]["distance"] =  selectedObject.distance;
-			console.log("three 객체의 거리는: "+selectedObject.distance);
+//			console.log("three 객체의 거리는: "+selectedObject.distance);
 			var clicked = that.clickOutlinePass.selectedObjects;
 			if (that.selectedObject["three"]["object"]) {
 				if (that.selectedObject["three"]["object"].uuid === selectedObject.object.uuid) {
@@ -976,16 +990,17 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 }
 
 /**
- * 선택된 객체에 아웃라인을 표시한다
+ * 선택된 three객체의 아웃라인을 표시한다
  */
 gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object){
 	that = this;
 	that.hoverOutlinePass.selectedObjects = [];
 	that.clickOutlinePass.selectedObjects = [object];
+	that.silhouetteGreen.selected = [];
 };
 
 /**
- * 선택 해제된 객체에 아웃라인을 삭제한다
+ * 선택 해제된 three객체의 아웃라인을 삭제한다
  */
 gb3d.edit.EditingTool3D.prototype.removeSelectedOutline = function(){
 	that = this;
