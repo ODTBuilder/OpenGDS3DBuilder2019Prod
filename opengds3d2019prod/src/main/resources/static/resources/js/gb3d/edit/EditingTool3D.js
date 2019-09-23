@@ -160,12 +160,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
-		// ===========yijun start==============
-		clickOutlinePass.edgeStrength = 4;
-		clickOutlinePass.edgeThickness = 1;
-		clickOutlinePass.visibleEdgeColor.set("#00FF00");
-		clickOutlinePass.hiddenEdgeColor.set("#00FF00");
-		// ===========yijun end==============
+		
 		if (that.pickedObject_) {
 			// 이전에 선택된 객체 초기화
 			that.threeTransformControls.detach( that.pickedObject_ );
@@ -180,13 +175,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
 			var object = intersects[0].object;
 			that.pickedObject_ = object;
-			// ==========yijun start===========
 			that.selectedObject["three"]["object"] = intersects[0].object;
 			that.selectedObject["three"]["distance"] =  intersects[0].distance;
 			console.log("three 객체의 거리는: "+intersects[0].distance);
-			hoverOutlinePass.selectedObjects = [];
-			clickOutlinePass.selectedObjects = [intersects[0].object];
-			// ==========yijun end===========
+			that.applySelectedOutline(object);
+			
 			that.threeTransformControls.attach(object);
 
 			that.map.syncSelect(object.uuid);
@@ -203,14 +196,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 			
 			silhouetteGreen.selected = [];
 		} else {
-			// yijun start
-			that.highlightObject["three"]["object"] = undefined;
-			that.highlightObject["three"]["distance"] =  undefined;
-			that.selectedObject["three"]["object"] = undefined;
-			that.selectedObject["three"]["distance"] =  undefined;
-			clickOutlinePass.selectedObjects = [];
+			that.removeSelectedOutline();
 			threeEditor.select( null );
-			// yijun end
 		}
 		
 
@@ -476,12 +463,20 @@ gb3d.edit.EditingTool3D = function(obj) {
 	}
 
 
-	var renderPass = new THREE.RenderPass(that.map.getThreeScene(), that.map.getThreeCamera());
-	that.map.getThreeComposer().addPass(renderPass);
-	var hoverOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
-	that.map.getThreeComposer().addPass(hoverOutlinePass);
-	var clickOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
-	that.map.getThreeComposer().addPass(clickOutlinePass);
+	this.renderPass = new THREE.RenderPass(that.map.getThreeScene(), that.map.getThreeCamera());
+	that.map.getThreeComposer().addPass(that.renderPass);
+	this.hoverOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+	that.hoverOutlinePass.edgeStrength = 4;
+	that.hoverOutlinePass.edgeThickness = 1;
+	that.hoverOutlinePass.visibleEdgeColor.set("#0000ff");
+	that.hoverOutlinePass.hiddenEdgeColor.set("#0000ff");
+	that.map.getThreeComposer().addPass(that.hoverOutlinePass);
+	this.clickOutlinePass = new THREE.OutlinePass( new THREE.Vector2( eventDiv[0].clientWidth, eventDiv[0].clientHeight ), that.map.getThreeScene(), that.map.getThreeCamera() );
+	that.clickOutlinePass.edgeStrength = 4;
+	that.clickOutlinePass.edgeThickness = 1;
+	that.clickOutlinePass.visibleEdgeColor.set("#00FF00");
+	that.clickOutlinePass.hiddenEdgeColor.set("#00FF00");
+	that.map.getThreeComposer().addPass(that.clickOutlinePass);
 // var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 // effectFXAA.uniforms[ 'resolution' ].value.set( 1 / eventDiv[0].clientWidth, 1
 // / eventDiv[0].clientHeight );
@@ -510,10 +505,6 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
-		hoverOutlinePass.edgeStrength = 4;
-		hoverOutlinePass.edgeThickness = 1;
-		hoverOutlinePass.visibleEdgeColor.set("#0000ff");
-		hoverOutlinePass.hiddenEdgeColor.set("#0000ff");
 
 		if (intersects.length > 0) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
@@ -521,23 +512,23 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.highlightObject["three"]["object"] = selectedObject.object;
 			that.highlightObject["three"]["distance"] =  selectedObject.distance;
 			console.log("three 객체의 거리는: "+selectedObject.distance);
-			var clicked = clickOutlinePass.selectedObjects;
+			var clicked = that.clickOutlinePass.selectedObjects;
 			if (that.selectedObject["three"]["object"]) {
 				if (that.selectedObject["three"]["object"].uuid === selectedObject.object.uuid) {
-					clickOutlinePass.selectedObjects = [];
+					that.clickOutlinePass.selectedObjects = [];
 				} else {
-					clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
+					that.clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
 				}	
 			}
-			hoverOutlinePass.selectedObjects = [selectedObject.object];
+			that.hoverOutlinePass.selectedObjects = [selectedObject.object];
 
 		} else {
 			that.highlightObject["three"]["object"] = undefined;
 			that.highlightObject["three"]["distance"] =  undefined;
-			hoverOutlinePass.selectedObjects = [];
-			var clicked = clickOutlinePass.selectedObjects;
+			that.hoverOutlinePass.selectedObjects = [];
+			var clicked = that.clickOutlinePass.selectedObjects;
 			if (that.selectedObject["three"]["object"]) {
-				clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
+				that.clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
 			}
 		}
 
@@ -1010,3 +1001,24 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 
 	obj.position.copy(centerCart);
 }
+
+/**
+ * 선택된 객체에 아웃라인을 표시한다
+ */
+gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object){
+	that = this;
+	that.hoverOutlinePass.selectedObjects = [];
+	that.clickOutlinePass.selectedObjects = [object];
+};
+
+/**
+ * 선택 해제된 객체에 아웃라인을 삭제한다
+ */
+gb3d.edit.EditingTool3D.prototype.removeSelectedOutline = function(){
+	that = this;
+	that.highlightObject["three"]["object"] = undefined;
+	that.highlightObject["three"]["distance"] =  undefined;
+	that.selectedObject["three"]["object"] = undefined;
+	that.selectedObject["three"]["distance"] =  undefined;
+	that.clickOutlinePass.selectedObjects = [];
+};
