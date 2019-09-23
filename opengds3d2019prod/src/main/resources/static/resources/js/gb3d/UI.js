@@ -1,3 +1,6 @@
+/*
+ * 사용하지않는 Class
+ */
 var gb3d;
 if (!gb3d)
 	gb3d = {};

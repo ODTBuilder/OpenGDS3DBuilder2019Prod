@@ -228,14 +228,16 @@ html, body {
 		var threeSidebar = new Sidebar( threeEditor );
 		document.body.appendChild( threeSidebar.dom );
 
-		var tiles = new gb3d.object.Tileset({
+		var tilesetManager = new gb3d.edit.TilesetManager( { map: gb3dMap });
+		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/NewYorkCityGml/tileset.json" );
+		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
 			"cesiumTileset" : new Cesium.Cesium3DTileset({
 				url : "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_2/tileset.json"
 			})
 		});
-		gb3dMap.addTileset(tiles);
+		gb3dMap.addTileset(tiles); */
 
 		var gbCam = gb3dMap.getCamera();
 

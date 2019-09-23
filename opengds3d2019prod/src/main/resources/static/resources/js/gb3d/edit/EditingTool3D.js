@@ -841,6 +841,13 @@ gb3d.edit.EditingTool3D.prototype.editToolToggle = function() {
 	}
 }
 
+/**
+ * Attribute Tab의 내용을 갱신
+ * # 사용되지않는 함수
+ * @method gb3d.edit.EditingTool3D#updateAttributeTab
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
+ * @function
+ */
 gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object) {
 	var rows = $("#attrAttr").find(".gb-object-row");
 	var inputs;
@@ -883,6 +890,13 @@ gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object) {
 	}
 }
 
+/**
+ * Style Tab의 내용을 갱신
+ * # 사용되지않는 함수
+ * @method gb3d.edit.EditingTool3D#updateStyleTab
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
+ * @function
+ */
 gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object) {
 	var that = this;
 	var tab = $("#attrStyle");
@@ -921,6 +935,13 @@ gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object) {
 	});
 }
 
+/**
+ * Material Tab의 내용을 갱신
+ * # 사용되지않는 함수
+ * @method gb3d.edit.EditingTool3D#updateMaterialTab
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
+ * @function
+ */
 gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object) {
 	var that = this;
 	var tab = $("#attrMaterial");
@@ -973,6 +994,12 @@ gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object) {
 	}
 }
 
+/**
+ * ThreeJS Object3D 객체의 Center를 지구 표면상에 위치시킨다.
+ * @method gb3d.edit.EditingTool3D#attachObjectToGround
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
+ * @function
+ */
 gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 	if (!object) {
 		return;
