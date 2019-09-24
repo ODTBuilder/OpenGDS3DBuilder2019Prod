@@ -196,6 +196,11 @@ html, body {
 			}
 		});
 		
+		var source = new ol.source.Vector();
+		var layer = new ol.layer.Vector({
+			"source" : source
+		});
+		layer.setMap(gbMap.getUpperMap());
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
