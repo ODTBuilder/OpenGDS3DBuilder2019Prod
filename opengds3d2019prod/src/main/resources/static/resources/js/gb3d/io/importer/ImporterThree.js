@@ -355,7 +355,6 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
 		// mesh.lookAt(new THREE.Vector3(1,0,0));
 		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
 
 		that.gb3dMap.getThreeScene().add(that.object);
@@ -607,8 +606,10 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 					var bearing;
 					if (pos[i + j] < 0) {
 						bearing = -90;
+						// bearing = 180;
 					} else {
 						bearing = 90;
+						// bearing = 0;
 					}
 					// 중점으로부터 x좌표 만큼 이동한 곳
 					var offsetx = turf.destination(centerPoint, distance, bearing);
@@ -619,8 +620,10 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 					var bearing;
 					if (pos[i + j + 1] < 0) {
 						bearing = 180;
+						// bearing = 90;
 					} else {
 						bearing = 0;
+						// bearing = -90;
 					}
 					// x오프셋 으로부터 y좌표 만큼 이동한 곳
 					var destination = turf.destination(offsetx, distance, bearing);
@@ -690,9 +693,9 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 				var feature = new ol.Feature(geom);
 				source.addFeature(feature);
 				worldPts = [];
-//				if (!!result) {
-//					result = turf.union(result, poly);
-//				}
+				// if (!!result) {
+				// result = turf.union(result, poly);
+				// }
 				// prev = turf.clone(result);
 			}
 		}
