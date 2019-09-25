@@ -367,38 +367,38 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 		
-		var floor = gb3d.io.ImporterThree.getFloorPlan( that.object, centerCart, that.gb3dMap.cesiumViewer.scene );
-		console.log(floor);
-		var geom, fea;
-		if(floor){
-			if(floor instanceof Array){
-				fea = [];
-				for(var i = 0; i < floor.length; i++){
-					if(floor[i].geometry.type === 'Polygon'){
-						geom = new ol.geom.Polygon(floor[i].geometry.coordinates);
-					} else if(floor[i].geometry.type === 'MultiPolygon'){
-						geom = new ol.geom.MultiPolygon(floor[i].geometry.coordinates);
-					}
-					fea.push(new ol.Feature({
-						 geometry: geom
-					}));
-				}
-				
-				source.addFeatures(fea);
-			} else {
-				if(floor.geometry.type === 'Polygon'){
-					geom = new ol.geom.Polygon(floor.geometry.coordinates);
-				} else if(floor.geometry.type === 'MultiPolygon'){
-					geom = new ol.geom.MultiPolygon(floor.geometry.coordinates);
-				}
-				
-				fea = new ol.Feature({
-					geometry: geom
-				});
-				
-				source.addFeature(fea);
-			}
-		}
+//		var floor = gb3d.io.ImporterThree.getFloorPlan( that.object, centerCart, that.gb3dMap.cesiumViewer.scene );
+//		console.log(floor);
+//		var geom, fea;
+//		if(floor){
+//			if(floor instanceof Array){
+//				fea = [];
+//				for(var i = 0; i < floor.length; i++){
+//					if(floor[i].geometry.type === 'Polygon'){
+//						geom = new ol.geom.Polygon(floor[i].geometry.coordinates);
+//					} else if(floor[i].geometry.type === 'MultiPolygon'){
+//						geom = new ol.geom.MultiPolygon(floor[i].geometry.coordinates);
+//					}
+//					fea.push(new ol.Feature({
+//						 geometry: geom
+//					}));
+//				}
+//				
+//				source.addFeatures(fea);
+//			} else {
+//				if(floor.geometry.type === 'Polygon'){
+//					geom = new ol.geom.Polygon(floor.geometry.coordinates);
+//				} else if(floor.geometry.type === 'MultiPolygon'){
+//					geom = new ol.geom.MultiPolygon(floor.geometry.coordinates);
+//				}
+//				
+//				fea = new ol.Feature({
+//					geometry: geom
+//				});
+//				
+//				source.addFeature(fea);
+//			}
+//		}
 	});
 }
 
@@ -519,7 +519,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian){
 		
 		var newVertices = new Float32Array(points);
 		var newNormalVertices = new Float32Array(normalPoints);
-		object.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( newVertices, 3 ) );
+		object.geometry.addAttribute( 'position', new THREE.BufferAttribute( newVertices, 3 ) );
 //		object.geometry.addAttribute( 'normal', new THREE.BufferAttribute( newNormalVertices, 3 ) );
 		console.log("mesh modified success")
 	}

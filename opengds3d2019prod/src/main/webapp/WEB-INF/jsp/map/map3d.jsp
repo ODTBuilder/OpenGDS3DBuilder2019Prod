@@ -228,8 +228,8 @@ html, body {
 		var threeSidebar = new Sidebar( threeEditor );
 		document.body.appendChild( threeSidebar.dom );
 
-		var tilesetManager = new gb3d.edit.TilesetManager( { map: gb3dMap });
-		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/NewYorkCityGml/tileset.json" );
+		var tilesetManager = new gb3d.edit.TilesetManager( { map: gb3dMap } );
+		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -462,15 +462,6 @@ html, body {
 		});
 
 		$("#textureImage").on("click", function() {
-
-		});
-
-		$(document).on("click", ".gb-declare-row > span > a", function() {
-			$("#declareTemp .gb-declare-row:last-child").clone().appendTo($(this).parent().parent().parent());
-		});
-
-		$(document).on("click", ".gb-declare-row > a", function() {
-			$(this).parent().remove();
 
 		});
 	</script>

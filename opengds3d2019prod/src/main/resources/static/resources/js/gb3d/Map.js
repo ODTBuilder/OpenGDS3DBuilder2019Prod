@@ -125,12 +125,12 @@ gb3d.Map = function(obj) {
 //	options.initPosition[1] - 1, 200000) : this.center;
 
 
-	this.gbMap.getView().setCenter([options.initPosition[0], options.initPosition[1]]);
+//	this.gbMap.getView().setCenter([options.initPosition[0], options.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
-	 this.cesiumViewer.camera.flyTo({
-	 destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-	 this.initPosition[1], this.initPosition[2])
-	 });
+//	this.cesiumViewer.camera.flyTo({
+//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+//				this.initPosition[1], this.initPosition[2])
+//	});
 
 	// 3D Tileset 객체
 	this.tiles = {};

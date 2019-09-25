@@ -34,7 +34,7 @@
 							<div class="builderLayerClientPanel"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrDeclare">
-							<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<!-- <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 								<div class="panel panel-default"  id="declareTemp" style="display: none;">
 									<div class="panel-heading" role="tab" id="headingOne">
 										<h4 class="panel-title gb-flex-between">
@@ -106,7 +106,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

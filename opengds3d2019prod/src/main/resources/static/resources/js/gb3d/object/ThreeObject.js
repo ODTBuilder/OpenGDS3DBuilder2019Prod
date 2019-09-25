@@ -45,6 +45,48 @@ gb3d.object.ThreeObject = function(obj) {
 }
 
 /**
+ * Layer를 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getLayer
+ * @return {ol.layer.Layer} Layer
+ */
+gb3d.object.ThreeObject.prototype.getLayer = function() {
+	return this.layer;
+};
+
+/**
+ * Layer를 할당한다.
+ * 
+ * @method gb3d.object.ThreeObject#setLayer
+ * @param {ol.layer.Layer}
+ *            layer - Layer
+ */
+gb3d.object.ThreeObject.prototype.setLayer = function( layer ) {
+	this.layer = layer;
+};
+
+/**
+ * tileId 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getTileId
+ * @return {String} Tileset ID
+ */
+gb3d.object.ThreeObject.prototype.getTileId = function() {
+	return this.tileId;
+};
+
+/**
+ * tileId 할당한다.
+ * 
+ * @method gb3d.object.ThreeObject#setTileId
+ * @param {String}
+ *            id - Tileset ID
+ */
+gb3d.object.ThreeObject.prototype.setTileId = function( id ) {
+	this.tileId = id;
+};
+
+/**
  * three object 객체를 반환한다.
  * 
  * @method gb3d.object.ThreeObject#getObject
