@@ -196,9 +196,9 @@ html, body {
 			}
 		});
 		
-		var source = new ol.source.Vector();
+		var sourceyj = new ol.source.Vector();
 		var layer = new ol.layer.Vector({
-			"source" : source
+			"source" : sourceyj
 		});
 		layer.setMap(gbMap.getUpperMap());
 		var mousePosition = new gb.map.MousePosition({

@@ -67,7 +67,9 @@ gb3d.io.ImporterThree = function(obj) {
 	this.object = undefined;
 	this.radian = 0;
 	this.axisVector = new THREE.Vector3(0, 0, 1);
-
+	// === 이준 시작 ===
+	this.pob = new ol.Collection();
+	// === 이준 끝 ====
 	var body = this.getModalBody();
 	var notice = $("<div>").text(this.translation.notice[this.locale]);
 	this.inputFile = $("<input>").attr({
@@ -353,17 +355,13 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var position = that.object.position;
 		var cart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]);
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
-		// mesh.lookAt(new THREE.Vector3(1,0,0));
 		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
-
-		that.gb3dMap.getThreeScene().add(that.object);
-		that.gb3dMap.addThreeObject(obj3d);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
 		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene);
-		console.log(floor);
+		// console.log(floor);
 		var geom, fea;
 		if (floor) {
 			if (floor instanceof Array) {
@@ -394,6 +392,17 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 				source.addFeature(fea);
 			}
 		}
+
+		// === 이준 시작 ===
+		var axisy1 = turf.point([ 90, 0 ]);
+		var pickPoint = turf.point(center);
+		var bearing = bearing = turf.bearing(pickPoint, axisy1);
+		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+		var zaxis = new THREE.Vector3(0, 0, 1);
+		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis, Cesium.Math.toRadians(bearing));
+		that.gb3dMap.getThreeScene().add(that.object);
+		that.gb3dMap.addThreeObject(obj3d);
+		// === 이준 끝 ===
 	});
 }
 
@@ -495,28 +504,29 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 		var points = [];
 		var normalPoints = [];
 		var vertices = object.geometry.attributes.position.array;
+		var normal = object.geometry.attributes.normal.array;
+		var normalFlag = Array.isArray(normal);
 		for (var j = 0; j < vertices.length; j = j + 3) {
 			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
-			var vertexNormal = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]).normalize();
-			// 뒤집은 쿼터니언각을 적용한다
-			// vertex.applyQuaternion(quaternion);
-			// vertexNormal.applyQuaternion(quaternion);
 			vertex.applyAxisAngle(axis, radian);
-			vertexNormal.applyAxisAngle(axis, radian);
 			points.push(vertex.x);
 			points.push(vertex.y);
 			points.push(vertex.z);
-			normalPoints.push(vertexNormal.x);
-			normalPoints.push(vertexNormal.y);
-			normalPoints.push(vertexNormal.z);
+			if (normalFlag) {
+				var norm = new THREE.Vector3(normal[j], normal[j + 1], normal[j + 2]);
+				norm.applyAxisAngle(axis, radian);
+				normalPoints.push(norm.x);
+				normalPoints.push(norm.y);
+				normalPoints.push(norm.z);
+			}
 		}
-
 		var newVertices = new Float32Array(points);
-		var newNormalVertices = new Float32Array(normalPoints);
 		object.geometry.addAttribute('position', new THREE.Float32BufferAttribute(newVertices, 3));
-		// object.geometry.addAttribute( 'normal', new THREE.BufferAttribute(
-		// newNormalVertices, 3 ) );
-		console.log("mesh modified success")
+		if (normalFlag) {
+			var newNormalVertices = new Float32Array(normalPoints);
+			object.geometry.addAttribute('normal', new THREE.BufferAttribute(newNormalVertices, 3));
+		}
+		console.log("mesh modified success");
 	}
 }
 
@@ -585,8 +595,9 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 		}
 	} else {
 		if (object.geometry instanceof THREE.BufferGeometry) {
+			// 겹치지 않아서 못 합친 폴리곤 모음
+			var mergeYet = [];
 			pos = object.geometry.attributes.position.array;
-
 			for (var i = 0; i < pos.length; i = i + 9) {
 				// if(!pos[i+3] || !pos[i+6]){
 				// console.log(pos[i+3]);
@@ -616,7 +627,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 					// x좌표 만큼 이동한 곳을 중점으로 y만큼 이동하기
 					// 좌표를 미터로 간주하고 킬로미터로 변환
 					var distance = Math.abs(pos[i + j + 1] / 1000);
-					// 진행방향 각도 x 축이면 서쪽 -90 또는 동쪽 90
+					// 진행방향 각도 y 축이면 남쪽 180 또는 북쪽 0
 					var bearing;
 					if (pos[i + j + 1] < 0) {
 						bearing = 180;
@@ -630,34 +641,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 					worldPts.push(destination);
 				}
 
-				// 버텍스의 위치가 중점으로 부터 얼마인지
-				// var localPt1 = [ pos[i], pos[i + 1] ];
-				// var pt1x = turf.lengthToDegrees(pos[i], "meters");
-				// var pt1y = turf.lengthToDegrees(pos[i + 1], "meters");
-
-				// var localPt2 = [ pos[i + 3], pos[i + 4] ];
-				// var pt2x = turf.lengthToDegrees(pos[i + 3], "meters");
-				// var pt2y = turf.lengthToDegrees(pos[i + 4], "meters");
-
-				// var localPt3 = [ pos[i + 6], pos[i + 7] ];
-				// var pt3x = turf.lengthToDegrees(pos[i + 6], "meters");
-				// var pt3y = turf.lengthToDegrees(pos[i + 7], "meters");
-
-				// 중점의 좌표에 더하기
-				// var worldPt1 = [ center[0] + pt1x, center[1] + pt1y ];
-				// var worldPt2 = [ center[0] + pt2x, center[1] + pt2y ];
-				// var worldPt3 = [ center[0] + pt3x, center[1] + pt3y ];
-				// if (worldPt1.length !== 2 || worldPt2.length !== 2 ||
-				// worldPt3.length !== 2) {
-				// continue;
-				// }
-				// if (worldPt1[0] === undefined || worldPt1[1] === undefined ||
-				// worldPt2[0] === undefined || worldPt2[1] === undefined ||
-				// worldPt3[0] === undefined || worldPt3[1] === undefined) {
-				// continue;
-				// }
-
-				if (!result) {
+				if (result === undefined) {
 					var pt1 = worldPts[0];
 					var pt2 = worldPts[1];
 					var pt3 = worldPts[2];
@@ -670,33 +654,86 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 					if (flag1 || flag2 || flag3) {
 						continue;
 					}
-					console.log([ [ worldPts[0], worldPts[1], worldPts[2], worldPts[0] ] ]);
 					result = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
 					var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
 					var feature = new ol.Feature(geom);
-					source.addFeature(feature);
+					 sourceyj.addFeature(feature);
 					worldPts = [];
-					continue;
+					// continue;
+				} else {
+					var pt1 = worldPts[0];
+					var pt2 = worldPts[1];
+					var pt3 = worldPts[2];
+					var flag1 = turf.booleanEqual(pt1, pt2);
+					var flag2 = turf.booleanEqual(pt1, pt3);
+					var flag3 = turf.booleanEqual(pt2, pt3);
+					if (flag1 || flag2 || flag3) {
+						continue;
+					}
+					// console.log([ [ turf.getCoord(worldPts[0]),
+					// turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]),
+					// turf.getCoord(worldPts[0]) ] ]);
+					poly = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
+					var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
+					var feature = new ol.Feature(geom);
+					 sourceyj.addFeature(feature);
+					worldPts = [];
+					// if (turf.booleanPointInPolygon(pt1, result) ||
+					// turf.booleanPointInPolygon(pt2, result) ||
+					// turf.booleanPointInPolygon(pt3, result)) {
+					var intersect = turf.intersect(result, poly);
+					if (intersect !== null && intersect !== undefined && (intersect.geometry.type === "LineString" || intersect.geometry.type === "Polygon")) {
+						try {
+							result = turf.union(result, poly);	
+						} catch (e) {
+							// TODO: handle exception
+							console.log(e);
+						}
+						console.log(result);
+						if (result.geometry.type === "MultiPolygon") {
+							console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
+						}
+					} else {
+						mergeYet.push(poly);
+					}
 				}
-				var pt1 = worldPts[0];
-				var pt2 = worldPts[1];
-				var pt3 = worldPts[2];
-				var flag1 = turf.booleanEqual(pt1, pt2);
-				var flag2 = turf.booleanEqual(pt1, pt3);
-				var flag3 = turf.booleanEqual(pt2, pt3);
-				if (flag1 || flag2 || flag3) {
-					continue;
+			}
+			if (result === undefined) {
+				console.log(pos.length);
+			}
+			var count = 1;
+			while (mergeYet.length > 0) {
+				var poly = mergeYet[mergeYet.length - count];
+				var pts = turf.explode(poly);
+				// if (turf.booleanPointInPolygon(pts.features[0], result) ||
+				// turf.booleanPointInPolygon(pts.features[1], result) ||
+				// turf.booleanPointInPolygon(pts.features[2], result)) {
+				var intersect = turf.intersect(result, poly);
+				if (intersect !== null && intersect !== undefined && (intersect.geometry.type === "LineString" || intersect.geometry.type === "Polygon")) {
+					try {
+						result = turf.union(result, poly);	
+					} catch (e) {
+						// TODO: handle exception
+						console.log(e);
+					}
+					
+					if (result.geometry.type === "MultiPolygon") {
+						console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
+					}
+					console.log(result);
+//					mergeYet.pop();
+					mergeYet.splice(mergeYet.length - count, 1);
+					console.log("스플라이스 후 배열 길이: "+mergeYet.length);
+					if (mergeYet.length === 88) {
+						console.log("here");
+					}
+					count = 1;
+				} else {
+					count++;	
 				}
-				console.log([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
-				poly = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
-				var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
-				var feature = new ol.Feature(geom);
-				source.addFeature(feature);
-				worldPts = [];
-				// if (!!result) {
-				// result = turf.union(result, poly);
-				// }
-				// prev = turf.clone(result);
+				if (mergeYet.length < count || mergeYet.length === 1) {
+					count = 1;
+				}
 			}
 		}
 	}
