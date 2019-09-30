@@ -56,7 +56,7 @@ gb3d.io.ImporterThree = function(obj) {
 	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
 	this.gb2dMap = this.gb3dMap ? this.gb3dMap.getGbMap() : undefined;
 	this.layer = options.layer ? options.layer : undefined;
-
+	this.feature = new ol.Feature();
 	obj.width = 300;
 	obj.autoOpen = false;
 	obj.title = this.translation.titlemsg[this.locale];
@@ -359,8 +359,30 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
-
-		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene);
+		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene, []);
+		var merge = floor[floor.length - 1];
+		floor.pop();
+		var count = 0;
+		while (floor.length > 0) {
+//			var intersect = turf.intersect(merge, floor[count]);
+			var intersect = merge.intersection(floor[count]);
+			if (intersect !== null && intersect !== undefined && (intersect.geometry.type === "LineString" || intersect.geometry.type === "Polygon")) {
+				merge = turf.union(merge, floor[count]);
+				floor.splice(count, 1);
+			} else {
+				count ++;
+			}
+			if (count > floor.length) {
+				count = 0;
+			}
+		}
+		// gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+		// var geomfac = new jsts.geom.GeometryFactory();
+		// var geomcollec = new jsts.geom.GeometryCollection(floor, geomfac);
+		// var uniPoly = new jsts.operation.union.UnaryUnionOp(geomcollec,
+		// geomfac);
+		var features = turf.featureCollection(floor);
+		var dissolved = turf.dissolve(features);
 		// console.log(floor);
 		var geom, fea;
 		if (floor) {
@@ -571,21 +593,25 @@ gb3d.io.ImporterThree.isGLTF1 = function(contents) {
 	return (json.asset != undefined && json.asset.version[0] < 2);
 }
 
-gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
+gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
+	var that = this;
 	var object = obj;
 	var center = center;
 	var scene = scene;
-	var pos, poly, result;
+	var pos, poly;
 	var prev = undefined;
-
+	var parser = new jsts.io.OL3Parser();
 	if (!object.geometry) {
 		if (object.children instanceof Array) {
-			result = [];
+			// result = [];
 			for (var i = 0; i < object.children.length; i++) {
 				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
 				// 재귀함수 요청
-				poly = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, scene);
-				result.push(poly);
+				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, scene, result);
+				// if (Array.isArray(result)) {
+				// result.push(poly);
+				// result = result.concat(polys);
+				// }
 				// if(!result){
 				// result = turf.clone(poly);
 				// }
@@ -593,150 +619,171 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene) {
 				// result = turf.union(result, poly);
 			}
 		}
-	} else {
-		if (object.geometry instanceof THREE.BufferGeometry) {
-			// 겹치지 않아서 못 합친 폴리곤 모음
-			var mergeYet = [];
-			pos = object.geometry.attributes.position.array;
-			for (var i = 0; i < pos.length; i = i + 9) {
-				// if(!pos[i+3] || !pos[i+6]){
-				// console.log(pos[i+3]);
-				// break;
-				// }
-				if ((!pos[i + 3] || !pos[i + 4] || !pos[i + 5]) || (!pos[i + 6] || !pos[i + 7] || !pos[i + 8])) {
-					console.log(pos[i + 3]);
-					break;
+		// return result;
+	} else if (object.geometry instanceof THREE.BufferGeometry) {
+		// 겹치지 않아서 못 합친 폴리곤 모음
+		var mergeYet = [];
+		pos = object.geometry.attributes.position.array;
+		for (var i = 0; i < pos.length; i = i + 9) {
+			// if(!pos[i+3] || !pos[i+6]){
+			// console.log(pos[i+3]);
+			// break;
+			// }
+			if ((!pos[i + 3] || !pos[i + 4] || !pos[i + 5]) || (!pos[i + 6] || !pos[i + 7] || !pos[i + 8])) {
+				console.log(pos[i + 3]);
+				break;
+			}
+			var worldPts = [];
+			// 중점설정
+			var centerPoint = turf.point(center);
+			for (var j = 0; j < 9; j += 3) {
+				// 좌표를 미터로 간주하고 킬로미터로 절대값 변환
+				var distance = Math.abs(pos[i + j] / 1000);
+				// 진행방향 각도 x 축이면 서쪽 -90 또는 동쪽 90
+				var bearing;
+				if (pos[i + j] < 0) {
+					bearing = -90;
+					// bearing = 180;
+				} else {
+					bearing = 90;
+					// bearing = 0;
 				}
-				var worldPts = [];
-				// 중점설정
-				var centerPoint = turf.point(center);
-				for (var j = 0; j < 9; j += 3) {
-					// 좌표를 미터로 간주하고 킬로미터로 절대값 변환
-					var distance = Math.abs(pos[i + j] / 1000);
-					// 진행방향 각도 x 축이면 서쪽 -90 또는 동쪽 90
-					var bearing;
-					if (pos[i + j] < 0) {
-						bearing = -90;
-						// bearing = 180;
-					} else {
-						bearing = 90;
-						// bearing = 0;
-					}
-					// 중점으로부터 x좌표 만큼 이동한 곳
-					var offsetx = turf.destination(centerPoint, distance, bearing);
-					// x좌표 만큼 이동한 곳을 중점으로 y만큼 이동하기
-					// 좌표를 미터로 간주하고 킬로미터로 변환
-					var distance = Math.abs(pos[i + j + 1] / 1000);
-					// 진행방향 각도 y 축이면 남쪽 180 또는 북쪽 0
-					var bearing;
-					if (pos[i + j + 1] < 0) {
-						bearing = 180;
-						// bearing = 90;
-					} else {
-						bearing = 0;
-						// bearing = -90;
-					}
-					// x오프셋 으로부터 y좌표 만큼 이동한 곳
-					var destination = turf.destination(offsetx, distance, bearing);
-					worldPts.push(destination);
+				// 중점으로부터 x좌표 만큼 이동한 곳
+				var offsetx = turf.destination(centerPoint, distance, bearing);
+				// x좌표 만큼 이동한 곳을 중점으로 y만큼 이동하기
+				// 좌표를 미터로 간주하고 킬로미터로 변환
+				var distance = Math.abs(pos[i + j + 1] / 1000);
+				// 진행방향 각도 y 축이면 남쪽 180 또는 북쪽 0
+				var bearing;
+				if (pos[i + j + 1] < 0) {
+					bearing = 180;
+					// bearing = 90;
+				} else {
+					bearing = 0;
+					// bearing = -90;
 				}
+				// x오프셋 으로부터 y좌표 만큼 이동한 곳
+				var destination = turf.destination(offsetx, distance, bearing);
+				destination = turf.point([ parseFloat(destination.geometry.coordinates[0].toFixed(6)), parseFloat(destination.geometry.coordinates[1].toFixed(6)) ]);
+				worldPts.push(destination);
+			}
 
-				if (result === undefined) {
-					var pt1 = worldPts[0];
-					var pt2 = worldPts[1];
-					var pt3 = worldPts[2];
-					var flag1 = turf.booleanEqual(pt1, pt2);
-					var flag2 = turf.booleanEqual(pt1, pt3);
-					var flag3 = turf.booleanEqual(pt2, pt3);
-					if (pt1 === undefined || pt2 === undefined || pt3 === undefined) {
-						continue;
-					}
-					if (flag1 || flag2 || flag3) {
-						continue;
-					}
-					result = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
-					var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
-					var feature = new ol.Feature(geom);
-					 sourceyj.addFeature(feature);
-					worldPts = [];
-					// continue;
-				} else {
-					var pt1 = worldPts[0];
-					var pt2 = worldPts[1];
-					var pt3 = worldPts[2];
-					var flag1 = turf.booleanEqual(pt1, pt2);
-					var flag2 = turf.booleanEqual(pt1, pt3);
-					var flag3 = turf.booleanEqual(pt2, pt3);
-					if (flag1 || flag2 || flag3) {
-						continue;
-					}
-					// console.log([ [ turf.getCoord(worldPts[0]),
-					// turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]),
-					// turf.getCoord(worldPts[0]) ] ]);
-					poly = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
-					var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
-					var feature = new ol.Feature(geom);
-					 sourceyj.addFeature(feature);
-					worldPts = [];
-					// if (turf.booleanPointInPolygon(pt1, result) ||
-					// turf.booleanPointInPolygon(pt2, result) ||
-					// turf.booleanPointInPolygon(pt3, result)) {
-					var intersect = turf.intersect(result, poly);
-					if (intersect !== null && intersect !== undefined && (intersect.geometry.type === "LineString" || intersect.geometry.type === "Polygon")) {
-						try {
-							result = turf.union(result, poly);	
-						} catch (e) {
-							// TODO: handle exception
-							console.log(e);
-						}
-						console.log(result);
-						if (result.geometry.type === "MultiPolygon") {
-							console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
-						}
-					} else {
-						mergeYet.push(poly);
-					}
-				}
+			// if (result === undefined) {
+			// var pt1 = worldPts[0];
+			// var pt2 = worldPts[1];
+			// var pt3 = worldPts[2];
+			// var flag1 = turf.booleanEqual(pt1, pt2);
+			// var flag2 = turf.booleanEqual(pt1, pt3);
+			// var flag3 = turf.booleanEqual(pt2, pt3);
+			// if (pt1 === undefined || pt2 === undefined || pt3 ===
+			// undefined) {
+			// continue;
+			// }
+			// if (flag1 || flag2 || flag3) {
+			// continue;
+			// }
+			// result = turf.polygon([ [ turf.getCoord(worldPts[0]),
+			// turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]),
+			// turf.getCoord(worldPts[0]) ] ]);
+			// var geom = new ol.geom.Polygon([ [
+			// turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]),
+			// turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ],
+			// "XY");
+			// var feature = new ol.Feature(geom);
+			// sourceyj.addFeature(feature);
+			// worldPts = [];
+			// // continue;
+			// } else {
+			var pt1 = worldPts[0];
+			var pt2 = worldPts[1];
+			var pt3 = worldPts[2];
+			var flag1 = turf.booleanEqual(pt1, pt2);
+			var flag2 = turf.booleanEqual(pt1, pt3);
+			var flag3 = turf.booleanEqual(pt2, pt3);
+			if (pt1 === undefined || pt2 === undefined || pt3 === undefined) {
+				continue;
 			}
-			if (result === undefined) {
-				console.log(pos.length);
+			if (flag1 || flag2 || flag3) {
+				continue;
 			}
-			var count = 1;
-			while (mergeYet.length > 0) {
-				var poly = mergeYet[mergeYet.length - count];
-				var pts = turf.explode(poly);
-				// if (turf.booleanPointInPolygon(pts.features[0], result) ||
-				// turf.booleanPointInPolygon(pts.features[1], result) ||
-				// turf.booleanPointInPolygon(pts.features[2], result)) {
-				var intersect = turf.intersect(result, poly);
-				if (intersect !== null && intersect !== undefined && (intersect.geometry.type === "LineString" || intersect.geometry.type === "Polygon")) {
-					try {
-						result = turf.union(result, poly);	
-					} catch (e) {
-						// TODO: handle exception
-						console.log(e);
-					}
-					
-					if (result.geometry.type === "MultiPolygon") {
-						console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
-					}
-					console.log(result);
-//					mergeYet.pop();
-					mergeYet.splice(mergeYet.length - count, 1);
-					console.log("스플라이스 후 배열 길이: "+mergeYet.length);
-					if (mergeYet.length === 88) {
-						console.log("here");
-					}
-					count = 1;
-				} else {
-					count++;	
-				}
-				if (mergeYet.length < count || mergeYet.length === 1) {
-					count = 1;
-				}
-			}
+			// console.log([ [ turf.getCoord(worldPts[0]),
+			// turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]),
+			// turf.getCoord(worldPts[0]) ] ]);
+//			var poly = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
+//			result.push(poly);
+			// var linear = geomfac.createLinearRing([
+			// turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]),
+			// turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ]);
+			// var poly = geomfac.createPolygon(linear);
+
+			var geom = new ol.geom.Polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ], "XY");
+			 var jstsGeom = parser.read(geom);
+			 result.push(jstsGeom);
+			// var feature = new ol.Feature(geom);
+			// sourceyj.addFeature(feature);
+			worldPts = [];
+			// if (turf.booleanPointInPolygon(pt1, result) ||
+			// turf.booleanPointInPolygon(pt2, result) ||
+			// turf.booleanPointInPolygon(pt3, result)) {
+			// var intersect = turf.intersect(result, poly);
+			// if (intersect !== null && intersect !== undefined &&
+			// (intersect.geometry.type === "LineString" ||
+			// intersect.geometry.type === "Polygon")) {
+			// try {
+			// result = turf.union(result, poly);
+			// } catch (e) {
+			// // TODO: handle exception
+			// console.log(e);
+			// }
+			// console.log(result);
+			// if (result.geometry.type === "MultiPolygon") {
+			// console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
+			// }
+			// } else {
+			// mergeYet.push(poly);
+			// }
+			// }
 		}
+		// if (result === undefined) {
+		// console.log(pos.length);
+		// }
+		// var count = 1;
+		// while (mergeYet.length > 0) {
+		// var poly = mergeYet[mergeYet.length - count];
+		// var pts = turf.explode(poly);
+		// // if (turf.booleanPointInPolygon(pts.features[0], result) ||
+		// // turf.booleanPointInPolygon(pts.features[1], result) ||
+		// // turf.booleanPointInPolygon(pts.features[2], result)) {
+		// var intersect = turf.intersect(result, poly);
+		// if (intersect !== null && intersect !== undefined &&
+		// (intersect.geometry.type === "LineString" ||
+		// intersect.geometry.type === "Polygon")) {
+		// try {
+		// result = turf.union(result, poly);
+		// } catch (e) {
+		// // TODO: handle exception
+		// console.log(e);
+		// }
+		//					
+		// if (result.geometry.type === "MultiPolygon") {
+		// console.log("겹친 부분이 멀티폴리곤인 곳 발견!");
+		// }
+		// console.log(result);
+		// // mergeYet.pop();
+		// mergeYet.splice(mergeYet.length - count, 1);
+		// console.log("스플라이스 후 배열 길이: "+mergeYet.length);
+		// if (mergeYet.length === 88) {
+		// console.log("here");
+		// }
+		// count = 1;
+		// } else {
+		// count++;
+		// }
+		// if (mergeYet.length < count || mergeYet.length === 1) {
+		// count = 1;
+		// }
+		// }
+		// sourceyj.addFeature(feature);
 	}
-
 	return result;
 }

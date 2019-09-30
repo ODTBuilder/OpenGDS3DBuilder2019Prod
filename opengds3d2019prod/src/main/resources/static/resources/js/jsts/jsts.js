@@ -30711,6 +30711,11 @@
       return new RelateOp(g1, g2).getIntersectionMatrix().isTouches(g1.getDimension(), g2.getDimension());
     }
 
+    static equalsTopo(g1, g2) {
+      if (!g1.getEnvelopeInternal().equals(g2.getEnvelopeInternal())) return false;
+      return RelateOp.relate(g1, g2).isEquals(g1.getDimension(), g2.getDimension());
+    }
+
     static relate() {
       if (arguments.length === 2) {
         const a = arguments[0];
@@ -35971,7 +35976,7 @@
     return this.getClass() === other.getClass();
   };
 
-  const version = '2.0.6 (0a96a17)';
+  const version = '2.0.8 (3ea000e)';
 
   exports.algorithm = algorithm;
   exports.densify = densify;
