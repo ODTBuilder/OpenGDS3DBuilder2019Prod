@@ -337,8 +337,9 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 	that.gb2dMap.getUpperMap().addInteraction(draw);
 
 	draw.on("drawend", function(evt) {
-		var feature = evt.feature;
-		feature.setId(that.object.uuid);
+		var feature = evt.feature.clone();
+		evt.feature = undefined;
+		// feature.setId(that.object.uuid);
 		var geometry = feature.getGeometry();
 		var coordinates = geometry.getCoordinates();
 		var obj3d = new gb3d.object.ThreeObject({
@@ -360,15 +361,15 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene, []);
-
 		var features = turf.featureCollection(floor);
-		var dissolved = turf.dissolve(features);
-		var coor = dissolved.features[0].geometry.coordinates;
-		var geom = new ol.geom.Polygon(coor[0], "XY");
-		var feature = new ol.Feature(geom);
-		sourceyj.addFeature(feature);
-		// console.log(floor);
-
+		var dissolved = undefined;
+		try {
+			dissolved = turf.dissolve(features);
+		} catch (e) {
+			// TODO: handle exception
+			console.error(e);
+			return;
+		}
 		var fea;
 		if (dissolved) {
 			if (dissolved.type === "FeatureCollection") {
@@ -376,23 +377,35 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 				for (var i = 0; i < dissolved.features.length; i++) {
 					if (dissolved.features[i].geometry.type === 'Polygon') {
 						if (that.layer.get("git").geometry === "Polygon") {
-							var geom = new ol.geom.Polygon(floor[i].geometry.coordinates, "XY");
-							fea.push(new ol.Feature(geom));
+							var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+							var feature = new ol.Feature(geom);
+							feature.setId(that.object.uuid);
+							obj3d["feature"] = feature;
+							fea.push(feature);
 						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon([ floor[i].geometry.coordinates ], "XY");
-							fea.push(new ol.Feature(geom));
+							var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+							var feature = new ol.Feature(geom);
+							feature.setId(that.object.uuid);
+							obj3d["feature"] = feature;
+							fea.push(feature);
 						}
 					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
 						if (that.layer.get("git").geometry === "Polygon") {
-							var outer = floor[i].geometry.coordinates;
-							for (var j = 0; j < outer.length; j++) {
-								var polygon = outer[j];
-								var geomPoly = new ol.geom.Polygon(polygon, "XY");
-								fea.push(new ol.Feature(geomPoly));
-							}
+							var outer = dissolved.features[i].geometry.coordinates;
+							// for (var j = 0; j < 1; j++) {
+							var polygon = outer[0];
+							var geomPoly = new ol.geom.Polygon(polygon, "XY");
+							var feature = new ol.Feature(geomPoly);
+							feature.setId(that.object.uuid);
+							fea.push(feature);
+							obj3d["feature"] = feature;
+							// }
 						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon(floor[i].geometry.coordinates, "XY");
-							fea.push(new ol.Feature(geom));
+							var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+							var feature = new ol.Feature(geom);
+							feature.setId(that.object.uuid);
+							obj3d["feature"] = feature;
+							fea.push(feature);
 						}
 					}
 
@@ -406,8 +419,10 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var pickPoint = turf.point(center);
 		var bearing = bearing = turf.bearing(pickPoint, axisy1);
 		console.log("y축 1과 객체 중점의 각도는: " + bearing);
-		var zaxis = new THREE.Vector3(0, 0, 1);
-		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis, Cesium.Math.toRadians(bearing));
+		// var zaxis = new THREE.Vector3(0, 0, 1);
+		// gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
+		// Cesium.Math.toRadians(bearing));
+		that.object.rotateZ(Cesium.Math.toRadians(bearing));
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
