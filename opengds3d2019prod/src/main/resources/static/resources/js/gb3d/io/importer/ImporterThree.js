@@ -367,21 +367,35 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var geom = new ol.geom.Polygon(coor[0], "XY");
 		var feature = new ol.Feature(geom);
 		sourceyj.addFeature(feature);
-		console.log(floor);
+		// console.log(floor);
 
-		var geom, fea;
+		var fea;
 		if (dissolved) {
 			if (dissolved.type === "FeatureCollection") {
 				fea = [];
 				for (var i = 0; i < dissolved.features.length; i++) {
 					if (dissolved.features[i].geometry.type === 'Polygon') {
-						geom = new ol.geom.Polygon(floor[i].geometry.coordinates);
+						if (that.layer.get("git").geometry === "Polygon") {
+							var geom = new ol.geom.Polygon(floor[i].geometry.coordinates, "XY");
+							fea.push(new ol.Feature(geom));
+						} else if (that.layer.get("git").geometry === "MultiPolygon") {
+							var geom = new ol.geom.MultiPolygon([ floor[i].geometry.coordinates ], "XY");
+							fea.push(new ol.Feature(geom));
+						}
 					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-						geom = new ol.geom.MultiPolygon(floor[i].geometry.coordinates);
+						if (that.layer.get("git").geometry === "Polygon") {
+							var outer = floor[i].geometry.coordinates;
+							for (var j = 0; j < outer.length; j++) {
+								var polygon = outer[j];
+								var geomPoly = new ol.geom.Polygon(polygon, "XY");
+								fea.push(new ol.Feature(geomPoly));
+							}
+						} else if (that.layer.get("git").geometry === "MultiPolygon") {
+							var geom = new ol.geom.MultiPolygon(floor[i].geometry.coordinates, "XY");
+							fea.push(new ol.Feature(geom));
+						}
 					}
-					fea.push(new ol.Feature({
-						geometry : geom
-					}));
+
 				}
 				source.addFeatures(fea);
 			}
@@ -575,12 +589,14 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
 	var parser = new jsts.io.OL3Parser();
 	if (!object.geometry) {
 		if (object.children instanceof Array) {
+			// result = [];
 			for (var i = 0; i < object.children.length; i++) {
 				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
 				// 재귀함수 요청
 				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, scene, result);
 			}
 		}
+		// return result;
 	} else if (object.geometry instanceof THREE.BufferGeometry) {
 		// 겹치지 않아서 못 합친 폴리곤 모음
 		var mergeYet = [];
@@ -624,6 +640,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
 				destination = turf.point([ parseFloat(destination.geometry.coordinates[0].toFixed(6)), parseFloat(destination.geometry.coordinates[1].toFixed(6)) ]);
 				worldPts.push(destination);
 			}
+
 			var pt1 = worldPts[0];
 			var pt2 = worldPts[1];
 			var pt3 = worldPts[2];
