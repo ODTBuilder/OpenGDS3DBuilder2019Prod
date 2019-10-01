@@ -528,7 +528,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 		var normalPoints = [];
 		var vertices = object.geometry.attributes.position.array;
 		var normal = object.geometry.attributes.normal.array;
-		var normalFlag = Array.isArray(normal);
+		var normalFlag = normal ? true : false; 
 		for (var j = 0; j < vertices.length; j = j + 3) {
 			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
 			vertex.applyAxisAngle(axis, radian);
