@@ -40,7 +40,7 @@
 <!-- jsts -->
 <script src="${pageContext.request.contextPath}/resources/js/jsts/jsts.js"></script>
 <!-- turf -->
-<script src="${pageContext.request.contextPath}/resources/js/turf/turf.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/turf/turf.js"></script>
 <%-- jsTree--%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jsTree/jstree.js"></script>
 <link rel="stylesheet" type="text/css"

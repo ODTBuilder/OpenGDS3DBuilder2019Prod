@@ -128,13 +128,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 	// ==========yijun start==========
 	this.isDragging = false;
 	this.isDown = false;
-	console.log("최초선언됨 다운: "+that.isDown+", 드래그: "+that.isDragging);
+//	console.log("최초선언됨 다운: "+that.isDown+", 드래그: "+that.isDragging);
 	// ==========yijun end==========
 	function onDocumentMouseClick(event) {
 //		that.isDown = false;
 		if(that.isDragging){
 			that.isDragging = false;
-			console.log("클릭이벤트 다운: "+that.isDown+", 드래그: "+that.isDragging);
+//			console.log("클릭이벤트 다운: "+that.isDown+", 드래그: "+that.isDragging);
 			return;
 		}
 		
@@ -238,13 +238,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 	cviewer.screenSpaceEventHandler.setInputAction(function onLeftDown(movement) {
 		that.isDragging = false;
 		that.isDown = true;	
-		console.log("왼다운 다운: "+that.isDown+", 드래그: "+that.isDragging);
+//		console.log("왼다운 다운: "+that.isDown+", 드래그: "+that.isDragging);
 		console.log(movement);
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 	
 	cviewer.screenSpaceEventHandler.setInputAction(function onLeftUp(movement) {
 		that.isDown = false;
-		console.log("왼업 다운: "+that.isDown+", 드래그: "+that.isDragging);
+//		console.log("왼업 다운: "+that.isDown+", 드래그: "+that.isDragging);
 	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 	
 	// Information about the currently selected feature
@@ -279,8 +279,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
 			if (that.isDown) {
 				that.isDragging = true;
-				console.log("왼다운 인식 됨 커서이동중 다운: "+that.isDown+", 드래그: "+that.isDragging);
-				console.log(movement);
+//				console.log("왼다운 인식 됨 커서이동중 다운: "+that.isDown+", 드래그: "+that.isDragging);
+//				console.log(movement);
 			}
 			
 			if (!that.getActiveTool()) {
