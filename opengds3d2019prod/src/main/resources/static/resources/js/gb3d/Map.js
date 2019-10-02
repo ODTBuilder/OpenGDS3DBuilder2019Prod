@@ -707,19 +707,6 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	return obj3d;
 }
 
-gb3d.Map.prototype.getThreeObjectById = function(id){
-	var threeObject = undefined,
-	featureId = id;
-
-	this.getThreeObjects().forEach(function(e){
-		if(e.getFeature().getId() === featureId){
-			threeObject = e;
-		}
-	});
-
-	return threeObject;
-}
-
 gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	var that = this;
 	var coord = arr,
