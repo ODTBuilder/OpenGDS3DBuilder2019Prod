@@ -818,12 +818,39 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 	var threeObject = undefined,
 	uuid = id;
 
-	this.getThreeObjects().forEach(function(e){
-		if(e.getObject().uuid === uuid){
-			threeObject = e;
+	var recursiveSelect = function(obj, uuid){
+		var result = false;
+		if (obj instanceof THREE.Group) {
+			if (obj.uuid === uuid) {
+				result = true;
+				return result;
+			}
+			var children = obj.children;
+			for (var i = 0; i < children.length; i++) {
+				result = recursiveSelect(obj.children[i], uuid);
+				if (result) {
+					break;
+				}
+			}
+		} else if (obj instanceof THREE.Mesh) {
+			if (obj.uuid === uuid) {
+				result = true;	
+			}
 		}
-	});
-
+		return result;
+	};
+	
+	var objs = this.getThreeObjects();
+	for (var i = 0; i < objs.length; i++) {
+		var flag = recursiveSelect(objs[i].getObject(), uuid);
+		if (flag) {
+			threeObject = objs[i];
+			break;
+		}
+	}
+// if(e.getObject().uuid === uuid){
+// threeObject = e;
+// }
 	return threeObject;
 }
 
