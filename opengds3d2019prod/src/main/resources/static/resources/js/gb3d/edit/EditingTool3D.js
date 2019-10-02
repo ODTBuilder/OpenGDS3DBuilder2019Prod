@@ -496,6 +496,28 @@ gb3d.edit.EditingTool3D = function(obj) {
 // / eventDiv[0].clientHeight );
 // that.map.getThreeComposer().addPass( effectFXAA );
 
+	var recursiveSelect = function(obj, uuid){
+		var result = false;
+		if (obj instanceof THREE.Group) {
+			if (obj.uuid === uuid) {
+				result = true;
+				return result;
+			}
+			var children = obj.children;
+			for (var i = 0; i < children.length; i++) {
+				result = recursiveSelect(obj.children[i], uuid);
+				if (result) {
+					break;
+				}
+			}
+		} else if (obj instanceof THREE.Mesh) {
+			if (obj.uuid === uuid) {
+				result = true;	
+			}
+		}
+		return result;
+	};
+	
 	var onDocumentMouseMove = function(event) {
 		if (!that.getActiveTool()) {
 			that.threeTransformControls.detach(that.pickedObject_);
@@ -526,9 +548,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.highlightObject["three"]["object"] = selectedObject.object;
 			that.highlightObject["three"]["distance"] =  selectedObject.distance;
 //			console.log("three 객체의 거리는: "+selectedObject.distance);
-			var clicked = that.clickOutlinePass.selectedObjects;
+//			var clicked = that.clickOutlinePass.selectedObjects;
 			if (that.selectedObject["three"]["object"]) {
-				if (that.selectedObject["three"]["object"].uuid === selectedObject.object.uuid) {
+				var flag = recursiveSelect(that.selectedObject["three"]["object"], that.selectedObject["three"]["object"].uuid);
+				if (flag) {
+//				if (that.selectedObject["three"]["object"].uuid === selectedObject.object.uuid) {
 					that.clickOutlinePass.selectedObjects = [];
 				} else {
 					that.clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
@@ -540,7 +564,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			that.highlightObject["three"]["object"] = undefined;
 			that.highlightObject["three"]["distance"] =  undefined;
 			that.hoverOutlinePass.selectedObjects = [];
-			var clicked = that.clickOutlinePass.selectedObjects;
+//			var clicked = that.clickOutlinePass.selectedObjects;
 			if (that.selectedObject["three"]["object"]) {
 				that.clickOutlinePass.selectedObjects = [that.selectedObject["three"]["object"]];
 			}
@@ -1021,6 +1045,8 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
  */
 gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object){
 	that = this;
+	that.selectedObject["three"]["object"] = object;
+	that.selectedObject["three"]["distance"] =  0;
 	that.hoverOutlinePass.selectedObjects = [];
 	that.clickOutlinePass.selectedObjects = [object];
 	that.silhouetteGreen.selected = [];
