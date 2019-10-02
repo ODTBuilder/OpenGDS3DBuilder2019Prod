@@ -4,6 +4,12 @@
     "tilesetVersion": "1.0.0-obj23dtiles",
     "gltfUpAxis": "Z"
   },
+  "properties": {
+    "Height": {
+      "minimum": 20,
+      "maximum": 20
+    }
+  },
   "geometricError": 200,
   "root": {
     "transform": [
@@ -37,7 +43,7 @@
     "geometricError": 0,
     "refine": "ADD",
     "content": {
-      "url": "4326_1.i3dm"
+      "url": "tree_billboard.i3dm"
     }
   }
 }
