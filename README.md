@@ -140,6 +140,7 @@ mybatis:
 ### 7. 지원 기능 ###
 
 - ### Openlayers Layer 편집 기능 지원<br>
+- ### ThreeJS 편집 기능 지원<br>
 
 ### 8. 요청방법 ###
 - [Producer 인터페이스 설계서.pdf]
