@@ -17,7 +17,7 @@ OpenGeoDT 팀
 
 특징
 =====
-- OpenGDS3DBuilder2018Prod 은 3차원 공간정보 편집 솔루션임.
+- OpenGDS3DBuilder2019Prod 은 3차원 공간정보 편집 솔루션임.
 - 웹 페이지상에서 3차원 공간정보를 편집할 수 있으며 댜양한 포맷의 3D 파일에 대한 Import/Export 기능을 지원함.
 - Geoserver를 연동하여 2차원 공간정보를 3차원 공간정보로 변환 및 가시화하는 기능을 지원함.
 - 다양한 웹 브라우저 지원가능, 플러그인 및 ActiveX 설치 없이 사용 가능함.
@@ -71,7 +71,7 @@ Getting Started
 - DocumentRoot(파일 저장 경로) 설정
 
 ### 6. 소스코드 설치 및 프로젝트 실행 ###
-- https://github.com/ODTBuilder/OpenGDS3DBuilder2018Prod 접속 후 소스코드 다운로드
+- https://github.com/ODTBuilder/OpenGDS3DBuilder2019Prod 접속 후 소스코드 다운로드
 - eclipse 실행 후 Project Import
 - 프로젝트 경로 내 src/main/resources/application.yml 접근 후 아래 속성들을 수정
 <pre><code>
@@ -142,7 +142,7 @@ mybatis:
 - ### Openlayers Layer 편집 기능 지원<br>
 
 ### 8. 요청방법 ###
-- [Producer 인터페이스 설계서.pdf](https://github.com/ODTBuilder/OpenGDSBuilder2018Prod/blob/master/Producer%20%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%20%EC%84%A4%EA%B3%84%EC%84%9C.pdf)를 참고
+- [Producer 인터페이스 설계서.pdf]
 
 사용 라이브러리
 =====
