@@ -158,7 +158,8 @@ mybatis:
 9. Spectrum 1.8.0 (MIT) http://numeraljs.com/
 10. Bootstrap v3.3.2 (MIT) http://getbootstrap.com
 11. JSTS (EPL) http://bjornharrtell.github.io/jsts/
-
+12. three.js r109 (MIT) https://github.com/mrdoob/three.js
+13. Cesium (Apache License 2.0) http://cesiumjs.org/
 
 Mail
 =====
