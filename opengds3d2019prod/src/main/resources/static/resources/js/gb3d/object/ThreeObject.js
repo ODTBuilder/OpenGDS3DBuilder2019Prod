@@ -40,8 +40,10 @@ gb3d.object.ThreeObject = function(obj) {
 	this.tileId = options.tileId ? options.tileId : undefined;
 	// 소속된 2D 레이어 또는 식별자
 	this.layer = options.layer ? options.layer : undefined;
-
+	// 수정횟수
 	this.modCount = 0;
+	// 그린 객체인지 파일 객체인지
+	this.isFromFile = options.file ? true : false;
 }
 
 /**
@@ -228,4 +230,25 @@ gb3d.object.ThreeObject.prototype.upModCount = function() {
  */
 gb3d.object.ThreeObject.prototype.getModCount = function() {
 	return this.modCount;
+};
+
+/**
+ * 파일 객체 여부를 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getIsFromFile
+ * @return {boolean} is from file?
+ */
+gb3d.object.ThreeObject.prototype.getIsFromFile = function() {
+	return this.isFromFile;
+};
+
+/**
+ * 파일 객체 여부를 설정한다.
+ * 
+ * @method gb3d.object.ThreeObject#setIsFromFile
+ * @param {boolean}
+ *            flag - is from file?
+ */
+gb3d.object.ThreeObject.prototype.setIsFromFile = function(flag) {
+	this.isFromFile = flag;
 };

@@ -347,7 +347,8 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			"center" : coordinates,
 			"extent" : geometry.getExtent(),
 			"type" : that.layer.get("git").geometry,
-			"feature" : feature
+			"feature" : feature,
+			"file" : true
 		});
 		var center = [ coordinates[0], coordinates[1] ];
 		var centerCart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1], 0);
@@ -358,6 +359,19 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
 		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
+
+		// 오브젝트에서 메쉬를 꺼낸다
+		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+		// 레이어 지오메트리 타입을 꺼낸다
+		var gtype = that.layer.get("git").geometry;
+		// 메쉬에 유저정보로 지오메트리 타입을 넣는다 - 폴리곤
+		that.object.userData.type = gtype;
+		for (var i = 0; i < result.length; i++) {
+			result[i].userData.type = gtype;			
+		}
+		
+		console.log(that.object);
+		console.log();
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
@@ -594,6 +608,18 @@ gb3d.io.ImporterThree.isGLTF1 = function(contents) {
 
 	return (json.asset != undefined && json.asset.version[0] < 2);
 }
+
+gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
+	if (obj instanceof THREE.Group) {
+		var chr = obj.children;
+		for (var i = 0; i < chr.length; i++) {
+			var result = gb3d.io.ImporterThree.getChildrenMeshes(chr[i], result);			
+		}
+	} else if (obj instanceof THREE.Mesh) {
+		result.push(obj);
+	}
+	return result;
+},
 
 gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
 	var that = this;

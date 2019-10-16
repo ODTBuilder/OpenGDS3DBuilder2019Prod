@@ -1905,7 +1905,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
 			
 			// ThreeJS vertex modify
-			that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent());
+			that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent(), evt);
 
 			gb.undo.pushAction({
 				undo: function(data){

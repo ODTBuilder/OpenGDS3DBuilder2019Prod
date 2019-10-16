@@ -75,7 +75,7 @@ gb3d.Map = function(obj) {
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
 		animation : false,
-		timeline : false,
+		timeline : true,
 		fullscreenButton : false,
 		allowTextureFilterAnisotropic : false,
 		contextOptions : {
@@ -103,6 +103,9 @@ gb3d.Map = function(obj) {
 		terrainShadows : Cesium.ShadowMode.DISABLED,
 	});
 
+	var scene = this.cesiumViewer.scene;
+	scene.sun = new Cesium.Sun(); 
+
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -129,11 +132,11 @@ gb3d.Map = function(obj) {
 // options.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
 
-	 this.cesiumViewer.camera.flyTo({
-	 destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-	 this.initPosition[1], this.initPosition[2])
-	 });
-		
+	this.cesiumViewer.camera.flyTo({
+		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+				this.initPosition[1], this.initPosition[2])
+	});
+
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -182,7 +185,7 @@ gb3d.Map = function(obj) {
 		"sync2D" : false
 	});
 	this.camera.syncWith2D();
-	
+
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
@@ -191,6 +194,7 @@ gb3d.Map = function(obj) {
 		that.threeComposer.render();
 		var sunCart = Cesium.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame();
 		that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
+// console.log(sunCart);
 	};
 	// 렌더링 시작
 	this.loop_();
@@ -666,16 +670,13 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry.faces = result.faces;
 // geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
-	geometry.computeFaceNormals();
-	geometry.computeBoundingSphere();
-
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
 		side : THREE.DoubleSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
 	latheMesh.position.copy(centerCart);
-	this.getThreeScene().add(latheMesh);
+// this.getThreeScene().add(latheMesh);
 	console.log(latheMesh.quaternion);
 	// 원점을 바라보도록 설정한다
 	latheMesh.lookAt(new THREE.Vector3(0,0,0));
@@ -692,6 +693,10 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	}
 
 	this.getThreeScene().add(latheMesh);
+// geometry.computeVertexNormals();
+	geometry.computeFaceNormals();
+	geometry.computeFlatVertexNormals();
+	geometry.computeBoundingSphere();
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
@@ -761,8 +766,8 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 // geometry.computeVertexNormals();
 
 	// compute face Normals
-	geometry.computeFaceNormals();
-	geometry.computeBoundingSphere();
+// geometry.computeFaceNormals();
+// geometry.computeBoundingSphere();
 
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
 		side : THREE.DoubleSide
@@ -785,7 +790,10 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		vertex.applyQuaternion(quaternion);
 	}
 	this.getThreeScene().add(latheMesh);
-
+// geometry.computeVertexNormals();
+	geometry.computeFaceNormals();
+	geometry.computeFlatVertexNormals();
+	geometry.computeBoundingSphere();
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
@@ -841,7 +849,7 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 		}
 		return result;
 	};
-	
+
 	var objs = this.getThreeObjects();
 	for (var i = 0; i < objs.length; i++) {
 		var flag = recursiveSelect(objs[i].getObject(), uuid);
@@ -870,7 +878,7 @@ gb3d.Map.prototype.selectThree = function(uuid){
 // this.tools.edit3d.updateStyleTab( object );
 
 		this.tools.edit3d.applySelectedOutline(object);
-		
+
 		if ( object.userData.object !== undefined ) {
 			// helper
 			threeEditor.select( object.userData.object );
@@ -1084,8 +1092,9 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 
 }
 
-gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
+gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 	var objects = this.getThreeObjects(),
+	evt = event,
 	coord = arr,
 	featureId = id,
 	ext = extent,
@@ -1100,6 +1109,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	cart;
 
 	var threeObject = this.getThreeObjectById(featureId);
+	var isFile = threeObject.getIsFromFile();
 	if(!threeObject){
 		return;
 	}
@@ -1107,99 +1117,172 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var lastCenter = threeObject.getCenter();
 	var position = threeObject.getObject().position;
 	var lastCart = Cesium.Cartesian3.fromDegrees(lastCenter[0], lastCenter[1]);
+// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
 	var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
+	// === 이준 시작 ===
 	object = threeObject.getObject();
-	geometry = object.geometry;
-
 	if(object === undefined){
 		return;
 	}
-
 	if(coord.length === 0){
 		coord = threeObject.getFeature().getGeometry().getCoordinates(true);
 	}
-
 	var opt = object.userData;
 	var center = [x, y];
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]);
+	var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 
-	if (opt.type === "MultiPoint" || opt.type === "Point") {
-		geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
-		geometry.vertices.forEach(function(vert, v){
-			vert.z += opt.depth/2;
-		});
-		object.geometry = geometry;
+	if (isFile) {
+		if (evt.angle_ !== undefined && (evt.angle_ > 0 || evt.angle_ < 0) ) {
+			// 회전
+			object.rotateZ(evt.angle_);
+		} else if (evt.ratio_ !== undefined) {
+			// 스케일
+			object.scale.x = evt.ratio_;
+			object.scale.y = evt.ratio_;
+			object.scale.z = evt.ratio_;
+		}
 		return;
 	}
-
-	if (opt.type === "MultiLineString" || opt.type === "LineString") {
-		var feature = threeObject.getFeature().clone();
-		if (feature.getGeometry() instanceof ol.geom.LineString) {
-			var beforeGeomTest = feature.getGeometry().clone();
-			console.log(beforeGeomTest.getCoordinates().length);
-			var beforeCoord = beforeGeomTest.getCoordinates();
-
-			var tline = turf.lineString(beforeCoord);
-
-			var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units : "meters"});
-			console.log(tbuffered);
-			var gjson = new ol.format.GeoJSON();
-			var bfeature = gjson.readFeature(tbuffered);
-
-			coord = bfeature.getGeometry().getCoordinates(true);
-			console.log(bfeature.getGeometry().getType());
-			console.log(coord);
-
-		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
-
+	var recursive = function(obj, result){
+		if (obj instanceof THREE.Group) {
+			var children = obj.children;
+			for (var i = 0; i < children.length; i++) {
+				result = recursive(children[i], result);
+			}
+		} else if (obj instanceof THREE.Mesh) {
+			result.push(obj);
 		}
-	}
+		return result;
+	};
+	var meshes = recursive(object, []);
+	for (var i = 0; i < meshes.length; i++) {
+		geometry = meshes[i].geometry;
 
-	var a, b, cp;
-	if(geometry instanceof THREE.Geometry){
-		if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
-			a = coord[0][0][0];
-			b = coord[0][0][1];
-		} else if(opt.type === "Polygon" || opt.type === "LineString"){
-			result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
-			a = coord[0][0];
-			b = coord[0][1];
+		if (opt.type === "MultiPoint" || opt.type === "Point") {
+			geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
+			geometry.vertices.forEach(function(vert, v){
+				vert.z += opt.depth/2;
+			});
+			object.geometry = geometry;
+// return;
+		} else if (opt.type === "MultiLineString" || opt.type === "LineString") {
+			var feature = threeObject.getFeature().clone();
+			if (feature.getGeometry() instanceof ol.geom.LineString) {
+				var beforeGeomTest = feature.getGeometry().clone();
+				console.log(beforeGeomTest.getCoordinates().length);
+				var beforeCoord = beforeGeomTest.getCoordinates();
+
+				var tline = turf.lineString(beforeCoord);
+
+				var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units : "meters"});
+				console.log(tbuffered);
+				var gjson = new ol.format.GeoJSON();
+				var bfeature = gjson.readFeature(tbuffered);
+
+				coord = bfeature.getGeometry().getCoordinates(true);
+				console.log(bfeature.getGeometry().getType());
+				console.log(coord);
+
+			} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+
+			}
 		} else {
-			return;
+			var a, b, cp;
+			if(geometry instanceof THREE.Geometry){
+				if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
+					result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
+					a = coord[0][0][0];
+					b = coord[0][0][1];
+				} else if(opt.type === "Polygon" || opt.type === "LineString"){
+					result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
+					a = coord[0][0];
+					b = coord[0][1];
+				} else {
+					return;
+				}
+				
+				geometry = new THREE.Geometry();
+				geometry.vertices = result.points;
+				geometry.faces = result.faces;
+				// geometry.translate(-centerCart.x, -centerCart.y,
+				// -centerCart.z);
+
+				object.lookAt(new THREE.Vector3(0,0,0));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+				// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+				var quaternion = object.quaternion.clone();
+				// 쿼터니언각을 뒤집는다
+				quaternion.inverse();
+				// 모든 지오메트리 버텍스에
+				var vertices = geometry.vertices;
+				for (var i = 0; i < vertices.length; i++) {
+					var vertex = vertices[i];
+					// 뒤집은 쿼터니언각을 적용한다
+					vertex.applyQuaternion(quaternion);
+				}
+
+				object.geometry = geometry;
+				// compute face Normals
+				geometry.computeFaceNormals();
+			} else if (geometry instanceof THREE.BufferGeometry) {
+				if(opt.type === "MultiPolygon" || opt.type === "MultiLineString"){
+					if (!isFile) {
+						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
+						a = coord[0][0][0];
+						b = coord[0][0][1];
+					}
+				} else if(opt.type === "Polygon" || opt.type === "LineString"){
+					if (!isFile) {
+						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
+						a = coord[0][0];
+						b = coord[0][1];
+					}
+				} else {
+					return;
+				}
+
+				if (!isFile) {
+					geometry = new THREE.Geometry();
+					geometry.vertices = result.points;
+					geometry.faces = result.faces;
+					// geometry.translate(-centerCart.x, -centerCart.y,
+					// -centerCart.z);
+
+					object.lookAt(new THREE.Vector3(0,0,0));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+					// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+					var quaternion = object.quaternion.clone();
+					// 쿼터니언각을 뒤집는다
+					quaternion.inverse();
+					// 모든 지오메트리 버텍스에
+					var vertices = geometry.vertices;
+					for (var i = 0; i < vertices.length; i++) {
+						var vertex = vertices[i];
+						// 뒤집은 쿼터니언각을 적용한다
+						vertex.applyQuaternion(quaternion);
+					}
+
+					object.geometry = geometry;
+					// compute face Normals
+					geometry.computeFaceNormals();
+				}
+			}
+			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
+
+// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
+// var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
+// Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
+
+			position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
+// position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		}
-
-		geometry = new THREE.Geometry();
-		geometry.vertices = result.points;
-		geometry.faces = result.faces;
-// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
-
-		object.lookAt(new THREE.Vector3(0,0,0));
-		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
-		var quaternion = object.quaternion.clone();
-		// 쿼터니언각을 뒤집는다
-		quaternion.inverse();
-		// 모든 지오메트리 버텍스에
-		var vertices = geometry.vertices;
-		for (var i = 0; i < vertices.length; i++) {
-			var vertex = vertices[i];
-			// 뒤집은 쿼터니언각을 적용한다
-			vertex.applyQuaternion(quaternion);
-		}
-
-		object.geometry = geometry;
-		// compute face Normals
-		geometry.computeFaceNormals();
+		// threeObject 수정 횟수 증가, Center 값 재설정
+		threeObject.upModCount();
+		threeObject.setCenter(center);
 	}
-
-	cp = gb3d.Math.crossProductFromDegrees(a, b, center);
-
-	position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-
-	// threeObject 수정 횟수 증가, Center 값 재설정
-	threeObject.upModCount();
-	threeObject.setCenter(center);
 };
 
 /**
