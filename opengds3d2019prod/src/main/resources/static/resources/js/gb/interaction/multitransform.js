@@ -74,7 +74,7 @@ gb.interaction.MultiTransform = function(opt_options) {
 	 * @private
 	 */
 	this.flatInteriorPoint_ = null;
-	
+
 	/**
 	 * 회전각
 	 * 
@@ -82,7 +82,7 @@ gb.interaction.MultiTransform = function(opt_options) {
 	 * @private
 	 */
 	this.angle_ = 0;
-	
+
 	/**
 	 * 크기 배율
 	 * 
@@ -91,7 +91,7 @@ gb.interaction.MultiTransform = function(opt_options) {
 	 */
 	this.scaleRatio_ = 1;
 	this.tempRatio = undefined;
-	
+
 	var options = opt_options ? opt_options : {};
 	this.features_ = options.features;
 };
@@ -181,7 +181,8 @@ gb.interaction.MultiTransform.prototype.handleDownEvent = function(evt) {
 	// this.dispatchEvent(new
 	// gb.interaction.MultiTransform.Event(gb.interaction.MultiTransformEventType.TRANSFORMSTART,
 	// feature, evt));
-	this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMSTART);
+	// this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMSTART);
+	this.dispatchEvent(new gb.interaction.MultiTransform.Event.TransformEvent(gb.interaction.MultiTransformEventType.TRANSFORMSTART, this.angle_, this.scaleRatio_));
 	return (!!feature && !!this.task_);
 };
 
@@ -204,7 +205,7 @@ gb.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
 		// shift키 누른채로 mouse move시 rotate 회전 속도가 절반으로 줄어듬
 		if (evt.originalEvent.shiftKey === true) {
 			feature.getGeometry().rotate(rad / 2, this.flatInteriorPoint_);
-			this.angle_ += rad/2;
+			this.angle_ += rad / 2;
 		} else {
 			feature.getGeometry().rotate(rad, this.flatInteriorPoint_);
 			this.angle_ += rad;
@@ -217,34 +218,19 @@ gb.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
 		var magni = this.scaleAlgorithm_(feature, cursorPoint);
 		if (magni[0] > magni[1]) {
 			feature.getGeometry().scale(magni[0], magni[0], this.flatInteriorPoint_);
-// this.scaleRatio_ = this.scaleRatio_ * magni[0];
-//			this.tempRatio = magni[0];
-// if (this.scaleRatio_ >= magni[0]) {
-// this.scaleRatio_ = magni[0];
-// } else {
-// this.scaleRatio_ = magni[0];
-// }
-			console.log(magni[0]);
+			this.scaleRatio_ = this.scaleRatio_ * magni[0];
 		} else {
 			feature.getGeometry().scale(magni[1], magni[1], this.flatInteriorPoint_);
-// this.scaleRatio_ = this.scaleRatio_ * magni[1];
-//			this.tempRatio = magni[1];
-// this.scaleRatio_ += magni[1];
-// if (this.scaleRatio_ >= magni[1]) {
-// this.scaleRatio_ = magni[1];
-// } else {
-// this.scaleRatio_ = magni[1];
-// }
-			console.log(magni[1]);
+			this.scaleRatio_ = this.scaleRatio_ * magni[1];
 		}
-		
+
 		this.angle_ = 0;
-//		console.log(this.scaleRatio_);
 	}
 	// this.dispatchEvent(new
 	// gb.interaction.MultiTransform.Event(gb.interaction.MultiTransformEventType.TRANSFORMING,
 	// feature, evt));
-	this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMING);
+	// this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMING);
+	this.dispatchEvent(new gb.interaction.MultiTransform.Event.TransformEvent(gb.interaction.MultiTransformEventType.TRANSFORMING, this.angle_, this.scaleRatio_));
 	this.prevCursor_ = evt.coordinate;
 };
 
@@ -317,11 +303,11 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 	var task = null;
 	var map = evt.map;
 	var element = evt.map.getTargetElement();
-	
+
 	if (feature) {
 		if (element.style.cursor !== '' && this.task_ !== 'rotate' && !this.task_.match(/^scale/i)) {
 			this.flipAlgorithm_(feature, this.task_);
-			
+
 			task = this.selectTask_(map, feature, evt.pixel);
 
 			if (!!task) {
@@ -349,21 +335,7 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 			}
 		}
 	}
-//	if (this.scale_ === true) {
-//		var cursorPoint = evt.coordinate;
-//		console.log(cursorPoint);
-//		var magni = this.scaleAlgorithm_(feature, cursorPoint);	
-//		if (magni[0] > magni[1]) {
-////			feature.getGeometry().scale(magni[0], magni[0], this.flatInteriorPoint_);
-//			this.scaleRatio_  =  magni[0];
-//		} else {
-////			feature.getGeometry().scale(magni[1], magni[1], this.flatInteriorPoint_);
-//			this.scaleRatio_  =  magni[1];
-//		}
-//		console.log(this.scaleRatio_);
-//	}
-	
-	
+
 	if (this.rotate_ || this.scale_) {
 		this.rotate_ = false;
 		this.scale_ = false;
@@ -459,8 +431,7 @@ gb.interaction.MultiTransform.prototype.drawMbr = function(evt) {
 
 		var vectorContext = evt.vectorContext;
 
-		mbr = new ol.geom.Polygon([ [ [ extent[0], extent[3] ], [ extent[0], extent[1] ], [ extent[2], extent[1] ],
-				[ extent[2], extent[3] ], [ extent[0], extent[3] ] ] ]);
+		mbr = new ol.geom.Polygon([ [ [ extent[0], extent[3] ], [ extent[0], extent[1] ], [ extent[2], extent[1] ], [ extent[2], extent[3] ], [ extent[0], extent[3] ] ] ]);
 
 		if (rotatePositionA > rotatePositionB) {
 			line = new ol.geom.LineString([ [ coorX, extent[3] ], [ coorX, extent[3] + rotatePositionB ] ]);
@@ -559,21 +530,18 @@ gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cur
 	flip.push(map.getPixelFromCoordinate([ extent[0], (extent[1] + extent[3]) / 2 ]));
 	flip.push(map.getPixelFromCoordinate([ extent[2], (extent[1] + extent[3]) / 2 ]));
 
-	if ((cursor[0] >= rotate[0] - AREA && cursor[0] <= rotate[0] + AREA)
-			&& (cursor[1] >= rotate[1] - AREA && cursor[1] <= rotate[1] + AREA)) {
+	if ((cursor[0] >= rotate[0] - AREA && cursor[0] <= rotate[0] + AREA) && (cursor[1] >= rotate[1] - AREA && cursor[1] <= rotate[1] + AREA)) {
 		task = 'rotate';
 	}
 
 	for ( var i in scale) {
-		if ((cursor[0] >= scale[i][0] - AREA && cursor[0] <= scale[i][0] + AREA)
-				&& (cursor[1] >= scale[i][1] - AREA && cursor[1] <= scale[i][1] + AREA)) {
+		if ((cursor[0] >= scale[i][0] - AREA && cursor[0] <= scale[i][0] + AREA) && (cursor[1] >= scale[i][1] - AREA && cursor[1] <= scale[i][1] + AREA)) {
 			(i % 2 === 0) ? task = 'scaleE' : task = 'scaleW';
 		}
 	}
 
 	for ( var i in flip) {
-		if ((cursor[0] >= flip[i][0] - AREA && cursor[0] <= flip[i][0] + AREA)
-				&& (cursor[1] >= flip[i][1] - AREA && cursor[1] <= flip[i][1] + AREA)) {
+		if ((cursor[0] >= flip[i][0] - AREA && cursor[0] <= flip[i][0] + AREA) && (cursor[1] >= flip[i][1] - AREA && cursor[1] <= flip[i][1] + AREA)) {
 			if (i === '0') {
 				task = 'down';
 			} else if (i === '1') {
@@ -697,7 +665,7 @@ gb.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direc
 		console.error('direction error');
 		return;
 	}
-	
+
 	if (geometry instanceof ol.geom.LineString || geometry instanceof ol.geom.MultiLineString) {
 		for (var i = 0; i < fcoordi.length / 2; i++) {
 			if (extentIndex === 1 || extentIndex === 3) {
@@ -717,7 +685,7 @@ gb.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direc
 	} else if (geometry instanceof ol.geom.Polygon) {
 		for (var i = 0; i < coordi.length; i++) {
 			newCoordi = [];
-			for (var j = 0; j < coordi[i].length; j++){
+			for (var j = 0; j < coordi[i].length; j++) {
 				if (extentIndex === 1 || extentIndex === 3) {
 					if (coordi[i][j][1] !== extent[extentIndex]) {
 						newCoordi.push([ coordi[i][j][0], 2 * extent[extentIndex] - coordi[i][j][1] ]);
@@ -737,9 +705,9 @@ gb.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direc
 	} else if (geometry instanceof ol.geom.MultiPolygon) {
 		for (var i = 0; i < coordi.length; i++) {
 			newCoordis = [];
-			for (var j = 0; j < coordi[i].length; j++){
+			for (var j = 0; j < coordi[i].length; j++) {
 				newCoordi = [];
-				for (var k = 0; k < coordi[i][j].length; k++){
+				for (var k = 0; k < coordi[i][j].length; k++) {
 					if (extentIndex === 1 || extentIndex === 3) {
 						if (coordi[i][j][k][1] !== extent[extentIndex]) {
 							newCoordi.push([ coordi[i][j][k][0], 2 * extent[extentIndex] - coordi[i][j][k][1] ]);
@@ -833,29 +801,29 @@ gb.interaction.MultiTransformEventType = {
  *            instances are instances of this type.
  */
 
-if(!gb.interaction.MultiTransform.Event){
+if (!gb.interaction.MultiTransform.Event) {
 	gb.interaction.MultiTransform["Event"] = {};
 }
 gb.interaction.MultiTransform.Event.TransformEvent = function(type, angle, ratio) {
-	 this.propagationStopped;
+	this.propagationStopped;
 
-    /**
+	/**
 	 * The event type.
 	 * 
 	 * @type {string}
 	 * @api
 	 */
-    this.type = type;
+	this.type = type;
 
-    /**
+	/**
 	 * The event target.
 	 * 
 	 * @type {Object}
 	 * @api
 	 */
-    this.target = null;
-    
+	this.target = null;
+
 	this.angle_ = angle;
-    this.ratio_ = ratio;
+	this.ratio_ = ratio;
 
 }

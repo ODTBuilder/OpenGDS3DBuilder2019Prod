@@ -1106,6 +1106,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 	result,
 	geometry,
 	shape,
+	geom,
 	cart;
 
 	var threeObject = this.getThreeObjectById(featureId);
@@ -1137,13 +1138,51 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 		if (evt.angle_ !== undefined && (evt.angle_ > 0 || evt.angle_ < 0) ) {
 			// 회전
 			object.rotateZ(evt.angle_);
+			console.log(object.scale);
 		} else if (evt.ratio_ !== undefined) {
 			// 스케일
-			object.scale.x = evt.ratio_;
-			object.scale.y = evt.ratio_;
-			object.scale.z = evt.ratio_;
+			object.scale.x = object.scale.x * evt.ratio_;
+			object.scale.y = object.scale.y * evt.ratio_;
+			object.scale.z = object.scale.z * evt.ratio_;
 		}
 		return;
+//		var floor = gb3d.io.ImporterThree.getFloorPlan(object, center, []);
+//		var features = turf.featureCollection(floor);
+//		var dissolved = undefined;
+//		try {
+//			dissolved = turf.dissolve(features);
+//		} catch (e) {
+//			// TODO: handle exception
+//			console.error(e);
+//			return;
+//		}
+//		var fea;
+//		if (dissolved) {
+//			if (dissolved.type === "FeatureCollection") {
+//				fea = [];
+//				for (var i = 0; i < dissolved.features.length; i++) {
+//					if (dissolved.features[i].geometry.type === 'Polygon') {
+//						if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "Polygon") {
+//							geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+//						} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "MultiPolygon") {
+//							geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+//						}
+//						break;
+//					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+//						if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "Polygon") {
+//							var outer = dissolved.features[i].geometry.coordinates;
+//							var polygon = outer[0];
+//							geom = new ol.geom.Polygon(polygon, "XY");
+//						} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "MultiPolygon") {
+//							geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+//						}
+//						break;
+//					}
+//				}
+////				source.addFeatures(fea);
+//			}
+//		}
+//		return geom;
 	}
 	var recursive = function(obj, result){
 		if (obj instanceof THREE.Group) {
@@ -1283,6 +1322,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 		threeObject.upModCount();
 		threeObject.setCenter(center);
 	}
+	return geom;
 };
 
 /**

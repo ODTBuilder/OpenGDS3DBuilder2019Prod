@@ -375,7 +375,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
-		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene, []);
+		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
 		var features = turf.featureCollection(floor);
 		var dissolved = undefined;
 		try {
@@ -621,11 +621,11 @@ gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
 	return result;
 },
 
-gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
+gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 	var that = this;
 	var object = obj;
 	var center = center;
-	var scene = scene;
+//	var scene = scene;
 	var pos, poly;
 	var prev = undefined;
 	var parser = new jsts.io.OL3Parser();
@@ -635,7 +635,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
 			for (var i = 0; i < object.children.length; i++) {
 				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
 				// 재귀함수 요청
-				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, scene, result);
+				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, result);
 			}
 		}
 		// return result;
