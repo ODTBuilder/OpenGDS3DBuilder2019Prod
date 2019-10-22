@@ -30,7 +30,7 @@ gb3d.Map = function(obj) {
 	};
 
 	// 2d 지도 영역 엘리먼트
-// this.target2d = undefined;
+//	this.target2d = undefined;
 	// 3d 지도 영역 엘리먼트
 	this.target = undefined;
 	// cesium 영역 엘리먼트
@@ -66,7 +66,7 @@ gb3d.Map = function(obj) {
 	}
 	// cesium 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
-// useDefaultRenderLoop : false,
+//		useDefaultRenderLoop : false,
 		scene3DOnly: true,
 		selectionIndicator : false,
 		homeButton : false,
@@ -116,20 +116,20 @@ gb3d.Map = function(obj) {
 	// 좌표계 중심
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
-// this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
-// this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+//	this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 	// 초기 위치
 	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
 	if (this.initPosition.length === 2) {
 		this.initPosition.push(15000);
 	}
-// Cesium.Cartesian3.fromDegrees(options.initPosition[0],
-// options.initPosition[1] - 1, 200000) : this.center;
+//	Cesium.Cartesian3.fromDegrees(options.initPosition[0],
+//	options.initPosition[1] - 1, 200000) : this.center;
 
 
-// this.gbMap.getView().setCenter([options.initPosition[0],
-// options.initPosition[1]]);
+//	this.gbMap.getView().setCenter([options.initPosition[0],
+//	options.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
 
 	this.cesiumViewer.camera.flyTo({
@@ -166,7 +166,7 @@ gb3d.Map = function(obj) {
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
-// this.threeRenderer.shadowMap.enabled = true;
+//	this.threeRenderer.shadowMap.enabled = true;
 	this.threeComposer = new THREE.EffectComposer(this.threeRenderer);
 
 	this.ambientLight = new THREE.AmbientLight( 0x404040 );
@@ -189,12 +189,17 @@ gb3d.Map = function(obj) {
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
-// that.renderCesium();
+//		that.renderCesium();
 		that.renderThreeObj();
 		that.threeComposer.render();
 		var sunCart = Cesium.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame();
-		that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
-// console.log(sunCart);
+
+//		that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
+		var time = Date.now() * 0.0005;
+		that.sunLight.position.x = Math.sin( time * 0.7 ) * 3000000000;
+		that.sunLight.position.y = Math.cos( time * 0.5 ) * 4000000000;
+		that.sunLight.position.z = Math.cos( time * 0.3 ) * 3000000000;
+//		console.log(sunCart);
 	};
 	// 렌더링 시작
 	this.loop_();
@@ -263,10 +268,10 @@ gb3d.Map = function(obj) {
 		});
 
 		// ***** 입력값 유효성 검사 필요 *****
-// that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
-// opt);
-// that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
-// opt);
+//		that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
+//		opt);
+//		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
+//		opt);
 		that.createLineStringObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
 		$("#lineObjectCreateModal").modal("hide");
@@ -360,7 +365,7 @@ gb3d.Map.prototype.getThreeTransformControls = function() {
  * @method gb3d.Map#renderCesium
  */
 gb3d.Map.prototype.renderCesium = function(){
-// var that = this;
+//	var that = this;
 	this.getCesiumViewer().render();
 	// cesium.viewer.scene.screenSpaceCameraController.enableInputs = false;
 }
@@ -404,7 +409,7 @@ gb3d.Map.prototype.renderThreeObj = function(){
 			// objs[i].getObject().lookAt(new THREE.Vector3(centerHigh.x,
 			// centerHigh.y, centerHigh.z));
 		}
-// objs[i].getObject().up.copy(latDir);
+//		objs[i].getObject().up.copy(latDir);
 	}
 
 	// Clone Cesium Camera projection position so the
@@ -442,22 +447,22 @@ gb3d.Map.prototype.renderThreeObj = function(){
  * 
  * @method gb3d.Map#render
  */
-// gb3d.Map.prototype.render = function(){
-// //var that = this;
-// that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
-// }
+//gb3d.Map.prototype.render = function(){
+////var that = this;
+//that.getThreeRenderer().render(that.getThreeScene(), that.getThreeCamera());
+//}
 
 /**
  * 렌더링 함수를 반복한다
  * 
  * @method gb3d.Map#loop
  */
-// gb3d.Map.prototype.loop = function(){
-// var that = this;
-// requestAnimationFrame(that.loop);
-// that.renderCesium();
-// that.renderThreeObj();
-// }
+//gb3d.Map.prototype.loop = function(){
+//var that = this;
+//requestAnimationFrame(that.loop);
+//that.renderCesium();
+//that.renderThreeObj();
+//}
 
 /**
  * three transform controls 객체를 반환한다.
@@ -576,11 +581,11 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	});
 
 	var doubleSideMaterial = new THREE.MeshNormalMaterial({
-		side : THREE.DoubleSide
+		side : THREE.FrontSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-// latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	this.getThreeScene().add(latheMesh);
@@ -629,7 +634,7 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
  * geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
  * 
  * var doubleSideMaterial = new THREE.MeshNormalMaterial({ side :
- * THREE.DoubleSide });
+ * THREE.FrontSide });
  * 
  * var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial); //
  * latheMesh.scale.set(1, 1, 1); latheMesh.position.copy(centerCart);
@@ -668,15 +673,143 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+	console.log("좌표 범위는: ");
+	console.log(result.range);
+//	geometry.faceVertexUvs[0] = result.faceVertexUvs;
+//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+	// 이준 시작
+	var bottomStart = result.uvindex["bottomStart"];
+	var bottomEnd = result.uvindex["bottomEnd"];
+	var topStart = result.uvindex["topStart"];
+	var topEnd = result.uvindex["topEnd"];
+	var sideStart = result.uvindex["sideStart"];
+	var sideEnd = result.uvindex["sideEnd"];
+	console.log(bottomStart);
+	console.log(bottomEnd);
+	console.log(topStart);
+	console.log(topEnd);
+	console.log(sideStart);
+	console.log(sideEnd);
+	geometry.computeBoundingBox();
+	var max = geometry.boundingBox.max,
+	min = geometry.boundingBox.min;
+	console.log(max);
+	console.log(min);
+	var offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
+	var range = new THREE.Vector3(((min.x - max.x) * -1) ,((min.y - max.y) * -1), ((min.z - max.z) * -1));
+	var faces = geometry.faces;
 
+	geometry.faceVertexUvs[0] = [];
+
+	for (var i = bottomStart; i < bottomEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		geometry.faceVertexUvs[0].push([
+//			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
+//			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
+//			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
+			new THREE.Vector2(1, 0),
+			new THREE.Vector2(1, 1),
+			new THREE.Vector2(0, 0)
+			]);
+	}
+	for (var i = topStart; i < topEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+
+		geometry.faceVertexUvs[0].push([
+//			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
+//			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
+//			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
+			new THREE.Vector2(1, 0),
+			new THREE.Vector2(1, 1),
+			new THREE.Vector2(0, 0)
+			]);
+	}
+	for (var i = sideStart; i < sideEnd; i = i + 2) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		console.log(v1.x+", "+v1.y);
+		console.log(v2.x+", "+v2.y);
+		console.log(v3.x+", "+v3.y);
+		var from1to2 = v1.distanceTo(v2);
+		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = v1.distanceTo(v3);
+		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
+		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		var from2to3 = v2.distanceTo(v3);
+//		console.log("2부터 3까지 거리는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(val2, 0),
+			new THREE.Vector2(0, val3)
+//			new THREE.Vector2(0, 0),
+//			new THREE.Vector2(1, 0),
+//			new THREE.Vector2(0, 1),
+			]);
+//		console.log((v1.x + offset.x)/range.x, (v1.y + offset.y)/range.y);
+//		console.log((v2.x + offset.x)/range.x, (v2.y + offset.y)/range.y);
+//		console.log((v3.x + offset.x)/range.x, (v3.y + offset.y)/range.y);
+		var face2 = faces[i+1];
+		var v1_2 = result.points[face2.a],
+		v2_2 = result.points[face2.b],
+		v3_3 = result.points[face2.c];
+		var from1to2 = v1_2.distanceTo(v2_2);
+		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = v1_2.distanceTo(v3_3);
+//		console.log("1부터 3까지 거리는: "+from1to3);
+		var from2to3 = v2_2.distanceTo(v3_3);
+		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
+		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, val3_2),
+			new THREE.Vector2(val2_2, 0),
+			new THREE.Vector2(val2_2, val3_2)
+//			new THREE.Vector2(0, 1),
+//			new THREE.Vector2(1, 0),
+//			new THREE.Vector2(1, 1),
+			]);
+//		geometry.faceVertexUvs[0].push([
+//		new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.z + offset.z)/range.z),
+//		new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.z + offset.z)/range.z),
+//		new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.z + offset.z)/range.z)
+//		]);
+	}
+
+//	for (var i = 0; i < faces.length ; i++) {
+
+//	var v1 = geometry.vertices[faces[i].a],
+//	v2 = geometry.vertices[faces[i].b],
+//	v3 = geometry.vertices[faces[i].c];
+
+//	geometry.faceVertexUvs[0].push([
+//	new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
+//	new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
+//	new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
+//	]);
+//	console.log((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y);
+//	console.log((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y);
+//	console.log((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y);
+//	}
+	geometry.uvsNeedUpdate = true;
+//	이준 끝
+//	var bgeometry = new THREE.BufferGeometry();
+//	bgeometry.fromGeometry(geometry);
+//	console.log(bgeometry);
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.DoubleSide
+		side : THREE.FrontSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
 	latheMesh.position.copy(centerCart);
-// this.getThreeScene().add(latheMesh);
 	console.log(latheMesh.quaternion);
 	// 원점을 바라보도록 설정한다
 	latheMesh.lookAt(new THREE.Vector3(0,0,0));
@@ -692,9 +825,11 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		vertex.applyQuaternion(quaternion);
 	}
 
+//	var vnh = new THREE.VertexNormalsHelper( latheMesh, 5 );
+//	this.getThreeScene().add(vnh);
 	this.getThreeScene().add(latheMesh);
-// geometry.computeVertexNormals();
-	geometry.computeFaceNormals();
+//	geometry.computeVertexNormals();
+//	geometry.computeFaceNormals();
 	geometry.computeFlatVertexNormals();
 	geometry.computeBoundingSphere();
 
@@ -760,21 +895,21 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
+//	geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
 	// compute Normals
-// geometry.computeVertexNormals();
+//	geometry.computeVertexNormals();
 
 	// compute face Normals
-// geometry.computeFaceNormals();
-// geometry.computeBoundingSphere();
+//	geometry.computeFaceNormals();
+//	geometry.computeBoundingSphere();
 
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.DoubleSide
+		side : THREE.FrontSide
 	});
 
 	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
-// latheMesh.scale.set(1, 1, 1);
+//	latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	// 원점을 바라보도록 설정한다
 	latheMesh.lookAt(new THREE.Vector3(0,0,0));
@@ -790,7 +925,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		vertex.applyQuaternion(quaternion);
 	}
 	this.getThreeScene().add(latheMesh);
-// geometry.computeVertexNormals();
+//	geometry.computeVertexNormals();
 	geometry.computeFaceNormals();
 	geometry.computeFlatVertexNormals();
 	geometry.computeBoundingSphere();
@@ -858,9 +993,9 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 			break;
 		}
 	}
-// if(e.getObject().uuid === uuid){
-// threeObject = e;
-// }
+//	if(e.getObject().uuid === uuid){
+//	threeObject = e;
+//	}
 	return threeObject;
 }
 
@@ -874,8 +1009,8 @@ gb3d.Map.prototype.selectThree = function(uuid){
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = object;
 		this.tools.edit3d.threeTransformControls.attach( object );
-// this.tools.edit3d.updateAttributeTab( object );
-// this.tools.edit3d.updateStyleTab( object );
+//		this.tools.edit3d.updateAttributeTab( object );
+//		this.tools.edit3d.updateStyleTab( object );
 
 		this.tools.edit3d.applySelectedOutline(object);
 
@@ -919,8 +1054,8 @@ gb3d.Map.prototype.unselectThree = function(uuid){
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = threeObject.getObject();
 		this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
-// this.tools.edit3d.updateAttributeTab( undefined );
-// this.tools.edit3d.updateStyleTab( undefined );
+//		this.tools.edit3d.updateAttributeTab( undefined );
+//		this.tools.edit3d.updateStyleTab( undefined );
 		threeEditor.select( null );
 		this.tools.edit3d.removeSelectedOutline();
 		return threeObject;
@@ -960,12 +1095,12 @@ gb3d.Map.prototype.syncSelect = function(id){
 		this.selectFeature(threeObject.getFeature().getId());
 	} else {
 		this.selectThree(threeObject.getObject().uuid);
-// this.cesiumViewer.camera.flyTo({
-// destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
-// threeObject.getCenter()[1],
-// this.cesiumViewer.camera.positionCartographic.height),
-// duration: 0
-// });
+//		this.cesiumViewer.camera.flyTo({
+//		destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
+//		threeObject.getCenter()[1],
+//		this.cesiumViewer.camera.positionCartographic.height),
+//		duration: 0
+//		});
 	}
 }
 
@@ -1027,7 +1162,7 @@ gb3d.Map.prototype.modifyObject2Dfrom3D = function(vertices, uuid){
 		degrees.push([lon, lat]);
 	}
 	degrees.push(degrees[0]);
-// threeObject.getFeature().getGeometry().setCoordinates(degrees);
+//	threeObject.getFeature().getGeometry().setCoordinates(degrees);
 }
 
 gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
@@ -1118,7 +1253,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 	var lastCenter = threeObject.getCenter();
 	var position = threeObject.getObject().position;
 	var lastCart = Cesium.Cartesian3.fromDegrees(lastCenter[0], lastCenter[1]);
-// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
+//	var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
 	var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
 	// === 이준 시작 ===
@@ -1150,37 +1285,43 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 //		var features = turf.featureCollection(floor);
 //		var dissolved = undefined;
 //		try {
-//			dissolved = turf.dissolve(features);
+//		dissolved = turf.dissolve(features);
 //		} catch (e) {
-//			// TODO: handle exception
-//			console.error(e);
-//			return;
+//		// TODO: handle exception
+//		console.error(e);
+//		return;
 //		}
 //		var fea;
 //		if (dissolved) {
-//			if (dissolved.type === "FeatureCollection") {
-//				fea = [];
-//				for (var i = 0; i < dissolved.features.length; i++) {
-//					if (dissolved.features[i].geometry.type === 'Polygon') {
-//						if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "Polygon") {
-//							geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-//						} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "MultiPolygon") {
-//							geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
-//						}
-//						break;
-//					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-//						if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "Polygon") {
-//							var outer = dissolved.features[i].geometry.coordinates;
-//							var polygon = outer[0];
-//							geom = new ol.geom.Polygon(polygon, "XY");
-//						} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry === "MultiPolygon") {
-//							geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
-//						}
-//						break;
-//					}
-//				}
-////				source.addFeatures(fea);
-//			}
+//		if (dissolved.type === "FeatureCollection") {
+//		fea = [];
+//		for (var i = 0; i < dissolved.features.length; i++) {
+//		if (dissolved.features[i].geometry.type === 'Polygon') {
+//		if (this.tools.edit2d.getLayer().getSource().get("git").geometry ===
+//		"Polygon") {
+//		geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+//		} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry ===
+//		"MultiPolygon") {
+//		geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates
+//		], "XY");
+//		}
+//		break;
+//		} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+//		if (this.tools.edit2d.getLayer().getSource().get("git").geometry ===
+//		"Polygon") {
+//		var outer = dissolved.features[i].geometry.coordinates;
+//		var polygon = outer[0];
+//		geom = new ol.geom.Polygon(polygon, "XY");
+//		} else if (this.tools.edit2d.getLayer().getSource().get("git").geometry ===
+//		"MultiPolygon") {
+//		geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates,
+//		"XY");
+//		}
+//		break;
+//		}
+//		}
+//		// source.addFeatures(fea);
+//		}
 //		}
 //		return geom;
 	}
@@ -1205,7 +1346,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 				vert.z += opt.depth/2;
 			});
 			object.geometry = geometry;
-// return;
+//			return;
 		} else if (opt.type === "MultiLineString" || opt.type === "LineString") {
 			var feature = threeObject.getFeature().clone();
 			if (feature.getGeometry() instanceof ol.geom.LineString) {
@@ -1241,7 +1382,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 				} else {
 					return;
 				}
-				
+
 				geometry = new THREE.Geometry();
 				geometry.vertices = result.points;
 				geometry.faces = result.faces;
@@ -1249,7 +1390,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 				// -centerCart.z);
 
 				object.lookAt(new THREE.Vector3(0,0,0));
-// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//				object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 				// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 				var quaternion = object.quaternion.clone();
 				// 쿼터니언각을 뒤집는다
@@ -1290,7 +1431,7 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 					// -centerCart.z);
 
 					object.lookAt(new THREE.Vector3(0,0,0));
-// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//					object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 					// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 					var quaternion = object.quaternion.clone();
 					// 쿼터니언각을 뒤집는다
@@ -1310,13 +1451,13 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 			}
 			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
 
-// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
-// var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
-// Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
+//			var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
+//			var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
+//			Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
 			position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-// position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
-// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//			position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
+//			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		}
 		// threeObject 수정 횟수 증가, Center 값 재설정
 		threeObject.upModCount();
@@ -1351,7 +1492,7 @@ gb3d.Map.prototype.addTileset = function(tileset){
 		this.getTileset()[layerid].push(tileset);
 		var ctile = tileset.getCesiumTileset();
 		var city = this.getCesiumViewer().scene.primitives.add(ctile);
-// this.getCesiumViewer().zoomTo(ctile);
+//		this.getCesiumViewer().zoomTo(ctile);
 
 		var heightOffset = 0;
 		city.readyPromise.then(function(tileset) {

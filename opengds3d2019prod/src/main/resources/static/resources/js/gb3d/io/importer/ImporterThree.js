@@ -371,7 +371,6 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		}
 		
 		console.log(that.object);
-		console.log();
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
