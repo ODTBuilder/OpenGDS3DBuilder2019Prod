@@ -710,9 +710,9 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 //			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
 //			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
 //			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
+			new THREE.Vector2(0, 0.6),
 			new THREE.Vector2(1, 0),
-			new THREE.Vector2(1, 1),
-			new THREE.Vector2(0, 0)
+			new THREE.Vector2(0, 1)
 			]);
 	}
 	for (var i = topStart; i < topEnd; i++) {
@@ -725,9 +725,9 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 //			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
 //			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
 //			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-			new THREE.Vector2(1, 0),
-			new THREE.Vector2(1, 1),
-			new THREE.Vector2(0, 0)
+			new THREE.Vector2(0, 1),
+			new THREE.Vector2(0, 0.6),
+			new THREE.Vector2(1, 0)
 			]);
 	}
 	for (var i = sideStart; i < sideEnd; i = i + 2) {
@@ -738,18 +738,33 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		console.log(v1.x+", "+v1.y);
 		console.log(v2.x+", "+v2.y);
 		console.log(v3.x+", "+v3.y);
-		var from1to2 = v1.distanceTo(v2);
+		// 텍스쳐 이미지에서 건물 옆면의 비율
+		var height = 0.6;
+		// 건물 바닥의 비율
+		var bottomStart = 0;
+
+		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("절대적인 가로길이 비율은 "+val2);
+		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
+		if (ratioVal2 > 1) {
+			ratioVal2 = 1;
+//			var ratioHeight = result.range.max.y/from1to2;
+//			bottomStart = height - ratioHeight;
+		}
+
+		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
 		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
-		var from1to3 = v1.distanceTo(v3);
+		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
 		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
 //		console.log("2부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
-			new THREE.Vector2(0, 0),
-			new THREE.Vector2(val2, 0),
-			new THREE.Vector2(0, val3)
+			new THREE.Vector2(0, bottomStart),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(0, height)
+//			new THREE.Vector2(0, val3)
 //			new THREE.Vector2(0, 0),
 //			new THREE.Vector2(1, 0),
 //			new THREE.Vector2(0, 1),
@@ -761,18 +776,18 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		var v1_2 = result.points[face2.a],
 		v2_2 = result.points[face2.b],
 		v3_3 = result.points[face2.c];
-		var from1to2 = v1_2.distanceTo(v2_2);
+		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
 		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = v1_2.distanceTo(v3_3);
 //		console.log("1부터 3까지 거리는: "+from1to3);
-		var from2to3 = v2_2.distanceTo(v3_3);
+		var from2to3 = parseFloat(v2_2.distanceTo(v3_3).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
 		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
-			new THREE.Vector2(0, val3_2),
-			new THREE.Vector2(val2_2, 0),
-			new THREE.Vector2(val2_2, val3_2)
+			new THREE.Vector2(0, height),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(ratioVal2, height)
 //			new THREE.Vector2(0, 1),
 //			new THREE.Vector2(1, 0),
 //			new THREE.Vector2(1, 1),
@@ -827,10 +842,12 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 
 //	var vnh = new THREE.VertexNormalsHelper( latheMesh, 5 );
 //	this.getThreeScene().add(vnh);
-	this.getThreeScene().add(latheMesh);
+	
 //	geometry.computeVertexNormals();
-//	geometry.computeFaceNormals();
 	geometry.computeFlatVertexNormals();
+	geometry.computeFaceNormals();
+	
+	this.getThreeScene().add(latheMesh);
 	geometry.computeBoundingSphere();
 
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -924,10 +941,13 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		// 뒤집은 쿼터니언각을 적용한다
 		vertex.applyQuaternion(quaternion);
 	}
-	this.getThreeScene().add(latheMesh);
+	
 //	geometry.computeVertexNormals();
-	geometry.computeFaceNormals();
 	geometry.computeFlatVertexNormals();
+	geometry.computeFaceNormals();
+	
+	this.getThreeScene().add(latheMesh);
+	
 	geometry.computeBoundingSphere();
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
