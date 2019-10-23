@@ -94,6 +94,9 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		depth = depth;
 	
 	coord.reverse();
+	
+	var polygon = new ol.geom.Polygon([coord], "XY");
+	
 	console.log(coord);
 	// 3차원 객체 밑면 vertex 계산
 	for(var i = 0; i < coordLength; i++){
@@ -188,74 +191,23 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		faces.push(new THREE.Face3(faceSide[i][0], faceSide[i][1], faceSide[i][2]));
 	}
 	
-	
-// console.log("min: "+min.x+", "+min.y);
-// console.log("max: "+max.x+", "+max.y);
-// var offset = new THREE.Vector2(0 - min.x, 0 - min.y);
-// var range = new THREE.Vector2(((min.x - max.x) * -1) ,((min.y - max.y) *
-// -1));
-// var faces = geometry.faces;
-
-// for (var i = bottomStart; i < bottomEnd; i++) {
-// var face = faces[i];
-// var v1 = points[face.a],
-// v2 = points[face.b],
-// v3 = points[face.c];
-//		
-// faceVertexUvs.push([
-// new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-// new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-// new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-// ]);
-// }
-// for (var i = topStart; i < topEnd; i++) {
-// var face = faces[i];
-// var v1 = points[face.a],
-// v2 = points[face.b],
-// v3 = points[face.c];
-//		
-// faceVertexUvs.push([
-// new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-// new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-// new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-// ]);
-// }
-// for (var i = sideStart; i < sideEnd; i++) {
-// var face = faces[i];
-// var v1 = points[face.a],
-// v2 = points[face.b],
-// v3 = points[face.c];
-//		
-// faceVertexUvs.push([
-// new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-// new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-// new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-// ]);
-// }
-// geometry.faceVertexUvs[0] = [];
-//
-// for (var i = 0; i < faces.length ; i++) {
-//
-// var v1 = geometry.vertices[faces[i].a],
-// v2 = geometry.vertices[faces[i].b],
-// v3 = geometry.vertices[faces[i].c];
-//
-// geometry.faceVertexUvs[0].push([
-// new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-// new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-// new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-// ]);
-// console.log((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y);
-// console.log((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y);
-// console.log((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y);
-// }
-	
 	return {
 		points: points,
 		faces: faces,
 		range: {
 			min: min,
 			max: max
+		},
+		coordinates: coord,
+		range2d: {
+			min: {
+				x: polygon.getExtent()[0],
+				y: polygon.getExtent()[1] 
+			},
+			max: {
+				x: polygon.getExtent()[2],
+				y: polygon.getExtent()[3] 
+			}
 		},
 		uvindex: {
 			bottomStart : bottomStart,

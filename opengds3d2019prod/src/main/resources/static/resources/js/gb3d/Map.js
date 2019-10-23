@@ -697,6 +697,8 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	console.log(min);
 	var offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
 	var range = new THREE.Vector3(((min.x - max.x) * -1) ,((min.y - max.y) * -1), ((min.z - max.z) * -1));
+	var offset2d = new THREE.Vector2(0 - result.range2d.min.x, 0 - result.range2d.min.y);
+	var range2d = new THREE.Vector2(((result.range2d.min.x - result.range2d.max.x) * -1) ,((result.range2d.min.y - result.range2d.max.y) * -1));
 	var faces = geometry.faces;
 
 	geometry.faceVertexUvs[0] = [];
@@ -710,26 +712,42 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 //			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
 //			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
 //			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-			new THREE.Vector2(0, 0.6),
-			new THREE.Vector2(1, 0),
-			new THREE.Vector2(0, 1)
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0)
 			]);
 	}
+	// 건물 윗면의 비율
+	var bottomStart = 0.6;
 	for (var i = topStart; i < topEnd; i++) {
 		var face = faces[i];
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-
+		var coord1 = result.coordinates[face.a - (result.coordinates.length - 1)];
+		var coord2 = result.coordinates[face.b - (result.coordinates.length - 1)];
+		var coord3 = result.coordinates[face.c - (result.coordinates.length - 1)];
+		console.log("2d 좌표의 값은:");
+		console.log(coord1);
+		console.log(coord2);
+		console.log(coord3);
+		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x ,(coord1[1] + offset2d.y)/range2d.y);
+		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x ,(coord2[1] + offset2d.y)/range2d.y);
+		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x ,(coord3[1] + offset2d.y)/range2d.y);
+		// 최저 y값이 0.6을 못넘으면 0.6으로 대체하고 x값도 y값의 비율에 맞춤
+		if (true) {
+			
+		}
 		geometry.faceVertexUvs[0].push([
-//			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-//			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-//			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
-			new THREE.Vector2(0, 1),
-			new THREE.Vector2(0, 0.6),
-			new THREE.Vector2(1, 0)
-			]);
+			vt1,
+			vt2,
+			vt3
+		]);
 	}
+	// 텍스쳐 이미지에서 건물 옆면의 비율
+	var height = 0.6;
+	// 건물 바닥의 비율
+	var bottomStart = 0;
 	for (var i = sideStart; i < sideEnd; i = i + 2) {
 		var face = faces[i];
 		var v1 = result.points[face.a],
@@ -738,10 +756,6 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		console.log(v1.x+", "+v1.y);
 		console.log(v2.x+", "+v2.y);
 		console.log(v3.x+", "+v3.y);
-		// 텍스쳐 이미지에서 건물 옆면의 비율
-		var height = 0.6;
-		// 건물 바닥의 비율
-		var bottomStart = 0;
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
