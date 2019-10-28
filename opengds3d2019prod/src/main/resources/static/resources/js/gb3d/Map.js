@@ -173,6 +173,9 @@ gb3d.Map = function(obj) {
 	this.threeScene.add(this.ambientLight);
 	this.sunLight = new THREE.PointLight();
 	this.sunLight.position.set( 0, 0, 0 );
+	that.sunLight.position.x = -456555707.42440885;
+	that.sunLight.position.y = 1309511774.8390865;
+	that.sunLight.position.z = 2611947852.695035;
 	this.threeScene.add(this.sunLight);
 
 	// 영역에 three 추가
@@ -195,11 +198,11 @@ gb3d.Map = function(obj) {
 		var sunCart = Cesium.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame();
 
 // that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
-		var time = Date.now() * 0.0005;
-		that.sunLight.position.x = Math.sin( time * 0.7 ) * 3000000000;
-		that.sunLight.position.y = Math.cos( time * 0.5 ) * 4000000000;
-		that.sunLight.position.z = Math.cos( time * 0.3 ) * 3000000000;
-// console.log(sunCart);
+//		var time = Date.now() * 0.0005;
+//		that.sunLight.position.x = Math.sin( time * 0.7 ) * 3000000000;
+//		that.sunLight.position.y = Math.cos( time * 0.5 ) * 4000000000;
+//		that.sunLight.position.z = Math.cos( time * 0.3 ) * 3000000000;
+//		console.log(that.sunLight.position);
 	};
 	// 렌더링 시작
 	this.loop_();
@@ -272,7 +275,7 @@ gb3d.Map = function(obj) {
 // opt);
 // that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
 // opt);
-		that.createLineStringObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
+		that.createLineStringObject2(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
 		$("#lineObjectCreateModal").modal("hide");
 	});
@@ -882,6 +885,271 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	return obj3d;
 }
 
+gb3d.Map.prototype.createLineStringObject2 = function(arr, extent, option){
+	var that = this;
+	var coord = arr,
+	geometry,
+	shape,
+	cart,
+	result,
+	obj3d,
+	depth = option.depth ? parseFloat(option.depth) : 50.0,
+			x = extent[0] + (extent[2] - extent[0]) / 2,
+			y = extent[1] + (extent[3] - extent[1]) / 2,
+			centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+
+	var feature = this.objectAttr.feature.clone();
+	if (feature.getGeometry() instanceof ol.geom.LineString) {
+		var beforeGeomTest = feature.getGeometry().clone();
+		console.log(beforeGeomTest.getCoordinates().length);
+		var beforeCoord = beforeGeomTest.getCoordinates();
+		// 시작점을 뽑는다
+		var start = beforeCoord[0];
+		var startPoint = turf.point(start);
+		var secondPoint = turf.point(beforeCoord[1]); 
+		// 시작점에 버퍼를 준다
+		var spBuffer = turf.buffer(startPoint, option["width"]/2, {units : "meters"});
+		
+		gb3d.Math.getRectangleFromLine(beforeCoord[0], beforeCoord[1], option["width"]/2);
+		// 시작점과 다음점의 선을 뽑는다
+//		var startLine = turf.lineString([beforeCoord[0], beforeCoord[1]]);
+//		// 이 선과 수직인 선의 양 끝점을 구한다
+////		var perpenPoint1= turf.point([(beforeCoord[0][1]) + ((beforeCoord[0][1] * -1) + (beforeCoord[0][0])), (beforeCoord[0][0] * -1) + ((beforeCoord[0][0] * -1) + (beforeCoord[0][1]))]);
+////		var perpenPoint2 =  turf.point([(beforeCoord[1][1]) + ((beforeCoord[1][1] * -1) + (beforeCoord[1][0])), (beforeCoord[1][0] * -1) + ((beforeCoord[1][0] * -1) + (beforeCoord[1][1]))]);
+//		var perpenPoint1= turf.point([beforeCoord[0][1], beforeCoord[0][0] * -1]);
+//		var perpenPoint2 =  turf.point([beforeCoord[1][1], beforeCoord[1][0] * -1]);
+//		// 멀리 떨어진 수직선 양끝점을 시작선의 양끝점에 맞도록 연산한다
+//		// 연산식
+//		var offsetX1 = ((perpenPoint1.geometry.coordinates[0] * -1) + (startPoint.geometry.coordinates[0]));
+//		var offsetY1 = ((perpenPoint1.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
+//		var perpenPoint1xOffset = perpenPoint1.geometry.coordinates[0] + offsetX1;
+//		var perpenPoint1yOffset = perpenPoint1.geometry.coordinates[1] + offsetY1;
+//		// 시작점에 맞춰진 수직선의 점 중 1
+//		var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX1, perpenPoint1.geometry.coordinates[1] + offsetY1]);
+//		console.log(visedPerpenPoint1);
+//		var perpenPoint2xOffset = perpenPoint2.geometry.coordinates[0] + offsetX1;
+//		var perpenPoint2yOffset = perpenPoint2.geometry.coordinates[1] + offsetY1;
+//		// 시작점에 맞춰진 수직선의 점 중 2
+//		var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX1, perpenPoint2.geometry.coordinates[1] + offsetY1]);
+//		console.log(visedPerpenPoint2);
+//		// 양 끝점을 각각 첫번째 점을 시작점에 맞춘 경우와 두번째 점을 시작점에 맞춘 경우의 선을 구한다
+//		 
+//		// 이 선과 수직인 선을 구한다 (x, y) -> (y, -x)
+//		var perpenLine = turf.lineString([visedPerpenPoint1.geometry.coordinates, visedPerpenPoint2.geometry.coordinates]);
+//		
+//		var po = new ol.geom.LineString([visedPerpenPoint1.geometry.coordinates, visedPerpenPoint2.geometry.coordinates], "XY");
+//		var fe = new ol.Feature(po);
+//		sourceyj.addFeature(fe);
+//		gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+//		// 수직인 선과 시작선의 교차점을 찾는다
+//		// 피처 콜렉션임
+//		var intersects = turf.lineIntersect(startLine, perpenLine);
+//		console.log(intersects);
+		/*
+		// 두 점의 각도를 구한다
+		var bearing1 = turf.bearing(startPoint, perpenPoint1);
+		var bearing2 = turf.bearing(startPoint, perpenPoint2);
+		// 시작점에서 각도만큼 버퍼 너비보다 2배 이동한 위치를 구한다(차집합에 문제가 없도록)
+		var distance = option["width"];
+		var options = {units : "kilometers"};
+		var destination1 = turf.destination(startPoint, distance, bearing1, options);
+		var destination2 = turf.destination(startPoint, distance, bearing2, options);
+		
+		var tline = turf.lineString(beforeCoord);
+
+		var tbuffered = turf.buffer(tline, option["width"]/2, {units : "meters"});
+		console.log(tbuffered);
+		var gjson = new ol.format.GeoJSON();
+		var bfeature = gjson.readFeature(tbuffered);
+
+		coord = bfeature.getGeometry().getCoordinates(true);
+		console.log(bfeature.getGeometry().getType());
+		console.log(coord);
+		*/
+
+	} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+
+	}
+/*
+	if(this.objectAttr.type === "MultiLineString"){
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
+	} else if(this.objectAttr.type === "LineString"){
+		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], [x, y], depth);
+	} else {
+		return;
+	}
+
+	geometry = new THREE.Geometry();
+	geometry.vertices = result.points;
+	geometry.faces = result.faces;
+
+	// 이준 시작
+	var bottomStart = result.uvindex["bottomStart"];
+	var bottomEnd = result.uvindex["bottomEnd"];
+	var topStart = result.uvindex["topStart"];
+	var topEnd = result.uvindex["topEnd"];
+	var sideStart = result.uvindex["sideStart"];
+	var sideEnd = result.uvindex["sideEnd"];
+	console.log(bottomStart);
+	console.log(bottomEnd);
+	console.log(topStart);
+	console.log(topEnd);
+	console.log(sideStart);
+	console.log(sideEnd);
+	geometry.computeBoundingBox();
+	var max = geometry.boundingBox.max,
+	min = geometry.boundingBox.min;
+	console.log(max);
+	console.log(min);
+	var offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
+	var range = new THREE.Vector3(((min.x - max.x) * -1) ,((min.y - max.y) * -1), ((min.z - max.z) * -1));
+	var offset2d = new THREE.Vector2(0 - result.range2d.min.x, 0 - result.range2d.min.y);
+	var range2d = new THREE.Vector2(((result.range2d.min.x - result.range2d.max.x) * -1) ,((result.range2d.min.y - result.range2d.max.y) * -1));
+	var faces = geometry.faces;
+
+	geometry.faceVertexUvs[0] = [];
+
+	for (var i = bottomStart; i < bottomEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0)
+			]);
+	}
+	// 건물 윗면의 비율
+	var bottomStart = 0.6;
+	for (var i = topStart; i < topEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		var coord1 = result.coordinates[face.a - (result.coordinates.length - 1)];
+		var coord2 = result.coordinates[face.b - (result.coordinates.length - 1)];
+		var coord3 = result.coordinates[face.c - (result.coordinates.length - 1)];
+		console.log("2d 좌표의 값은:");
+		console.log(coord1);
+		console.log(coord2);
+		console.log(coord3);
+		var vt1 = new THREE.Vector2(0, 0);
+		var vt2 = new THREE.Vector2(1, 0);
+		var vt3 = new THREE.Vector2(1, 1);
+//		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+//		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+//		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+		geometry.faceVertexUvs[0].push([
+			vt1,
+			vt2,
+			vt3
+		]);
+	}
+	// 텍스쳐 이미지에서 건물 옆면의 비율
+	var height = 0.6;
+	// 건물 바닥의 비율
+	var bottomStart = 0;
+	for (var i = sideStart; i < sideEnd; i = i + 2) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		console.log(v1.x+", "+v1.y);
+		console.log(v2.x+", "+v2.y);
+		console.log(v3.x+", "+v3.y);
+
+		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
+		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("절대적인 가로길이 비율은 "+val2);
+		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
+		if (ratioVal2 > 1) {
+			ratioVal2 = 1;
+// var ratioHeight = result.range.max.y/from1to2;
+// bottomStart = height - ratioHeight;
+		}
+
+		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
+		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
+		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		var from2to3 = v2.distanceTo(v3);
+// console.log("2부터 3까지 거리는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, bottomStart),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(0, height)
+			]);
+		var face2 = faces[i+1];
+		var v1_2 = result.points[face2.a],
+		v2_2 = result.points[face2.b],
+		v3_3 = result.points[face2.c];
+		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
+		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = v1_2.distanceTo(v3_3);
+// console.log("1부터 3까지 거리는: "+from1to3);
+		var from2to3 = parseFloat(v2_2.distanceTo(v3_3).toFixed(4));
+		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
+		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, height),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(ratioVal2, height)
+			]);
+	}
+
+	geometry.uvsNeedUpdate = true;
+// 이준 끝
+	
+	var doubleSideMaterial = new THREE.MeshStandardMaterial({
+		side : THREE.FrontSide
+	});
+
+	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
+// latheMesh.scale.set(1, 1, 1);
+	latheMesh.position.copy(centerCart);
+	// 원점을 바라보도록 설정한다
+	latheMesh.lookAt(new THREE.Vector3(0,0,0));
+	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+	var quaternion = latheMesh.quaternion.clone();
+	// 쿼터니언각을 뒤집는다
+	quaternion.inverse();
+	// 모든 지오메트리 버텍스에
+	var vertices = latheMesh.geometry.vertices;
+	for (var i = 0; i < vertices.length; i++) {
+		var vertex = vertices[i];
+		// 뒤집은 쿼터니언각을 적용한다
+		vertex.applyQuaternion(quaternion);
+	}
+	
+//	geometry.computeVertexNormals();
+	geometry.computeFlatVertexNormals();
+	geometry.computeFaceNormals();
+	
+	this.getThreeScene().add(latheMesh);
+	
+	geometry.computeBoundingSphere();
+	// userData 저장(THREE.Object3D 객체 속성)
+	latheMesh.userData.type = this.objectAttr.type;
+	latheMesh.userData.depth = depth;
+
+	obj3d = new gb3d.object.ThreeObject({
+		"object" : latheMesh,
+		"center" : [x, y],
+		"extent" : extent,
+		"type" : this.objectAttr.type,
+		"feature" : this.objectAttr.feature,
+		"buffer" : option["width"]/2
+	});
+
+	this.addThreeObject(obj3d);
+	return obj3d;
+	*/
+}
+
 gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	var that = this;
 	var coord = arr,
@@ -928,15 +1196,127 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
-// geometry.translate(-centerCart.x, -centerCart.y, -centerCart.z);
 
-	// compute Normals
-// geometry.computeVertexNormals();
+	// 이준 시작
+	var bottomStart = result.uvindex["bottomStart"];
+	var bottomEnd = result.uvindex["bottomEnd"];
+	var topStart = result.uvindex["topStart"];
+	var topEnd = result.uvindex["topEnd"];
+	var sideStart = result.uvindex["sideStart"];
+	var sideEnd = result.uvindex["sideEnd"];
+	console.log(bottomStart);
+	console.log(bottomEnd);
+	console.log(topStart);
+	console.log(topEnd);
+	console.log(sideStart);
+	console.log(sideEnd);
+	geometry.computeBoundingBox();
+	var max = geometry.boundingBox.max,
+	min = geometry.boundingBox.min;
+	console.log(max);
+	console.log(min);
+	var offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
+	var range = new THREE.Vector3(((min.x - max.x) * -1) ,((min.y - max.y) * -1), ((min.z - max.z) * -1));
+	var offset2d = new THREE.Vector2(0 - result.range2d.min.x, 0 - result.range2d.min.y);
+	var range2d = new THREE.Vector2(((result.range2d.min.x - result.range2d.max.x) * -1) ,((result.range2d.min.y - result.range2d.max.y) * -1));
+	var faces = geometry.faces;
 
-	// compute face Normals
-// geometry.computeFaceNormals();
-// geometry.computeBoundingSphere();
+	geometry.faceVertexUvs[0] = [];
 
+	for (var i = bottomStart; i < bottomEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0)
+			]);
+	}
+	// 건물 윗면의 비율
+	var bottomStart = 0.6;
+	for (var i = topStart; i < topEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		var coord1 = result.coordinates[face.a - (result.coordinates.length - 1)];
+		var coord2 = result.coordinates[face.b - (result.coordinates.length - 1)];
+		var coord3 = result.coordinates[face.c - (result.coordinates.length - 1)];
+		console.log("2d 좌표의 값은:");
+		console.log(coord1);
+		console.log(coord2);
+		console.log(coord3);
+		var vt1 = new THREE.Vector2(0, 0);
+		var vt2 = new THREE.Vector2(1, 0);
+		var vt3 = new THREE.Vector2(1, 1);
+//		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+//		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+//		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+		geometry.faceVertexUvs[0].push([
+			vt1,
+			vt2,
+			vt3
+		]);
+	}
+	// 텍스쳐 이미지에서 건물 옆면의 비율
+	var height = 0.6;
+	// 건물 바닥의 비율
+	var bottomStart = 0;
+	for (var i = sideStart; i < sideEnd; i = i + 2) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		console.log(v1.x+", "+v1.y);
+		console.log(v2.x+", "+v2.y);
+		console.log(v3.x+", "+v3.y);
+
+		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
+		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("절대적인 가로길이 비율은 "+val2);
+		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
+		if (ratioVal2 > 1) {
+			ratioVal2 = 1;
+// var ratioHeight = result.range.max.y/from1to2;
+// bottomStart = height - ratioHeight;
+		}
+
+		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
+		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
+		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		var from2to3 = v2.distanceTo(v3);
+// console.log("2부터 3까지 거리는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, bottomStart),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(0, height)
+			]);
+		var face2 = faces[i+1];
+		var v1_2 = result.points[face2.a],
+		v2_2 = result.points[face2.b],
+		v3_3 = result.points[face2.c];
+		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
+		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = v1_2.distanceTo(v3_3);
+// console.log("1부터 3까지 거리는: "+from1to3);
+		var from2to3 = parseFloat(v2_2.distanceTo(v3_3).toFixed(4));
+		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
+		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, height),
+			new THREE.Vector2(ratioVal2, bottomStart),
+			new THREE.Vector2(ratioVal2, height)
+			]);
+	}
+
+	geometry.uvsNeedUpdate = true;
+// 이준 끝
+	
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
 		side : THREE.FrontSide
 	});
@@ -958,7 +1338,7 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		vertex.applyQuaternion(quaternion);
 	}
 	
-// geometry.computeVertexNormals();
+//	geometry.computeVertexNormals();
 	geometry.computeFlatVertexNormals();
 	geometry.computeFaceNormals();
 	

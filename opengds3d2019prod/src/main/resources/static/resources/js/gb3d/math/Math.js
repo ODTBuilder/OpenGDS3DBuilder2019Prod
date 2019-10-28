@@ -219,3 +219,176 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		}
 	}
 }
+/**
+ * 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형을 반환한다
+ */
+gb3d.Math.getRectangleFromLine = function(p1, p2, radius){
+	var polygon = [];
+	var startPoint = turf.point(p1);
+	var secondPoint = turf.point(p2); 
+	// 시작점에 버퍼를 준다
+// var spBuffer = turf.buffer(startPoint, option["width"]/2, {units :
+// "meters"});
+	// 시작점과 다음점의 선을 뽑는다
+	var startLine = turf.lineString([p1, p2]);
+	// 이 선과 수직인 선의 양 끝점을 구한다
+// var perpenPoint1= turf.point([(beforeCoord[0][1]) + ((beforeCoord[0][1] * -1)
+// + (beforeCoord[0][0])), (beforeCoord[0][0] * -1) + ((beforeCoord[0][0] * -1)
+// + (beforeCoord[0][1]))]);
+// var perpenPoint2 = turf.point([(beforeCoord[1][1]) + ((beforeCoord[1][1] *
+// -1) + (beforeCoord[1][0])), (beforeCoord[1][0] * -1) + ((beforeCoord[1][0] *
+// -1) + (beforeCoord[1][1]))]);
+	var perpenPoint1 = turf.point([p1[1], p1[0] * -1]);
+	var perpenPoint2 = turf.point([p2[1], p2[0] * -1]);
+	// 멀리 떨어진 수직선 양끝점을 시작선의 양끝점에 맞도록 연산한다
+	// 연산식
+	var offsetX1 = ((perpenPoint1.geometry.coordinates[0] * -1) + (startPoint.geometry.coordinates[0]));
+	var offsetY1 = ((perpenPoint1.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
+	//	var perpenPoint1xOffset = perpenPoint1.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint1yOffset = perpenPoint1.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 1
+	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX1, perpenPoint1.geometry.coordinates[1] + offsetY1]);
+	console.log(visedPerpenPoint1);
+	//	var perpenPoint2xOffset = perpenPoint2.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint2yOffset = perpenPoint2.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 2
+	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX1, perpenPoint2.geometry.coordinates[1] + offsetY1]);
+	console.log(visedPerpenPoint2);
+	// 두 점중에 중심선의 점인 것을 찾는다
+	var center1;
+	var theOther1;
+	if (turf.booleanEqual(startPoint, visedPerpenPoint1)) {
+		center1 = visedPerpenPoint1;
+		theOther1 = visedPerpenPoint2;
+	} else if (turf.booleanEqual(startPoint, visedPerpenPoint2)) {
+		center1 = visedPerpenPoint2;
+		theOther1 = visedPerpenPoint1;
+	}
+	console.log(center1);
+	console.log(theOther1);
+	polygon.push(center1.geometry.coordinates);
+	// 각도를 잰다
+	var bearing1 = turf.bearing(center1, theOther1);
+	// 각도로 반지름 만큼 간 위치
+	var destination1 = turf.destination(center1, radius / 1000, bearing1);
+	// 해당 위치를 추가
+	polygon.push(destination1.geometry.coordinates);
+	
+	var po = new ol.geom.LineString([center1.geometry.coordinates, destination1.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	var offsetX2 = ((perpenPoint2.geometry.coordinates[0] * -1) + (startPoint.geometry.coordinates[0]));
+	var offsetY2 = ((perpenPoint2.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
+	//	var perpenPoint1xOffset = perpenPoint1.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint1yOffset = perpenPoint1.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 1
+	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX2, perpenPoint1.geometry.coordinates[1] + offsetY2]);
+	console.log(visedPerpenPoint1);
+	//	var perpenPoint2xOffset = perpenPoint2.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint2yOffset = perpenPoint2.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 2
+	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX2, perpenPoint2.geometry.coordinates[1] + offsetY2]);
+	console.log(visedPerpenPoint2);
+
+	var center2;
+	var theOther2;
+	if (turf.booleanEqual(startPoint, visedPerpenPoint1)) {
+		center2 = visedPerpenPoint1;
+		theOther2 = visedPerpenPoint2;
+	} else if (turf.booleanEqual(startPoint, visedPerpenPoint2)) {
+		center2 = visedPerpenPoint2;
+		theOther2 = visedPerpenPoint1;
+	}
+	console.log(center2);
+	console.log(theOther2);
+	// 각도를 잰다
+	var bearing2 = turf.bearing(center2, theOther2);
+	// 각도로 반지름 만큼 간 위치
+	var destination2 = turf.destination(center2, radius / 1000, bearing2);
+	// 해당 위치를 추가
+	polygon.push(destination2.geometry.coordinates);
+	
+	var po = new ol.geom.LineString([center2.geometry.coordinates, destination2.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	var offsetX3 = ((perpenPoint1.geometry.coordinates[0] * -1) + (secondPoint.geometry.coordinates[0]));
+	var offsetY3 = ((perpenPoint1.geometry.coordinates[1] * -1) + (secondPoint.geometry.coordinates[1]));
+	//	var perpenPoint1xOffset = perpenPoint1.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint1yOffset = perpenPoint1.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 1
+	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX3, perpenPoint1.geometry.coordinates[1] + offsetY3]);
+	console.log(visedPerpenPoint1);
+	//	var perpenPoint2xOffset = perpenPoint2.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint2yOffset = perpenPoint2.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 2
+	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX3, perpenPoint2.geometry.coordinates[1] + offsetY3]);
+	console.log(visedPerpenPoint2);
+
+	var center3;
+	var theOther3;
+	if (turf.booleanEqual(secondPoint, visedPerpenPoint1)) {
+		center3 = visedPerpenPoint1;
+		theOther3 = visedPerpenPoint2;
+	} else if (turf.booleanEqual(secondPoint, visedPerpenPoint2)) {
+		center3 = visedPerpenPoint2;
+		theOther3 = visedPerpenPoint1;
+	}
+	console.log(center3);
+	console.log(theOther3);
+	// 각도를 잰다
+	var bearing3 = turf.bearing(center3, theOther3);
+	// 각도로 반지름 만큼 간 위치
+	var destination3 = turf.destination(center3, radius / 1000, bearing3);
+	// 해당 위치를 추가
+	polygon.push(destination3.geometry.coordinates);
+	
+	var po = new ol.geom.LineString([center3.geometry.coordinates, destination3.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	var offsetX4 = ((perpenPoint2.geometry.coordinates[0] * -1) + (secondPoint.geometry.coordinates[0]));
+	var offsetY4 = ((perpenPoint2.geometry.coordinates[1] * -1) + (secondPoint.geometry.coordinates[1]));
+	//	var perpenPoint1xOffset = perpenPoint1.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint1yOffset = perpenPoint1.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 1
+	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX4, perpenPoint1.geometry.coordinates[1] + offsetY4]);
+	console.log(visedPerpenPoint1);
+	//	var perpenPoint2xOffset = perpenPoint2.geometry.coordinates[0] + offsetX1;
+	//	var perpenPoint2yOffset = perpenPoint2.geometry.coordinates[1] + offsetY1;
+	// 시작점에 맞춰진 수직선의 점 중 2
+	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX4, perpenPoint2.geometry.coordinates[1] + offsetY4]);
+	console.log(visedPerpenPoint2);
+	
+	var center4;
+	var theOther4;
+	if (turf.booleanEqual(secondPoint, visedPerpenPoint1)) {
+		center4 = visedPerpenPoint1;
+		theOther4 = visedPerpenPoint2;
+	} else if (turf.booleanEqual(secondPoint, visedPerpenPoint2)) {
+		center4 = visedPerpenPoint2;
+		theOther4 = visedPerpenPoint1;
+	}
+	console.log(center4);
+	console.log(theOther4);
+	// 각도를 잰다
+	var bearing4 = turf.bearing(center4, theOther4);
+	// 각도로 반지름 만큼 간 위치
+	var destination4 = turf.destination(center4, radius / 1000, bearing4);
+	// 해당 위치를 추가
+	polygon.push(destination4.geometry.coordinates);
+	
+	var po = new ol.geom.LineString([center4.geometry.coordinates, destination4.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	// 수직인 선과 시작선의 교차점을 찾는다
+	// 피처 콜렉션임
+//	var intersects = turf.lineIntersect(startLine, perpenLine);
+//	console.log(intersects);
+}
