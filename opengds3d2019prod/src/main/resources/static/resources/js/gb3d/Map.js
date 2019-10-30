@@ -908,82 +908,91 @@ gb3d.Map.prototype.createLineStringObject2 = function(arr, extent, option){
 		var start = beforeCoord[0];
 		var startPoint = turf.point(start);
 		var secondPoint = turf.point(beforeCoord[1]); 
-		// 시작점에 버퍼를 준다
-//		var spBuffer = turf.buffer(startPoint, option["width"]/2, {units : "meters"});
 		
-		var rectToSub = gb3d.Math.getRectangleFromLine(beforeCoord[0], beforeCoord[1], option["width"]/2);
-		var sector1 = turf.sector(startPoint, (option["width"]/2)/1000, rectToSub["angle1"], rectToSub["angle2"]);
-		console.log(sector1);
-		// 부채꼴에 가장 밖에 있는 포인트
-//		sector1.geometry.coordinates[0][1] = [127.0298, 37.5236];
-//		sector1.geometry.coordinates[0][sector1.geometry.coordinates[0].length-3] = [128.0298, 38.5236];
-//		sector1.geometry.coordinates[0][sector1.geometry.coordinates[0].length-2] = [128.0298, 38.5236];
-		// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함 
-		var from = turf.point(sector1.geometry.coordinates[0][1]);
-		var to = turf.point(sector1.geometry.coordinates[0][2]);
-		var distance = (turf.distance(from, to) * 100000);
-		// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-		if (distance < 5) {
-			sector1.geometry.coordinates[0].splice(2, 1);
-		}
-//		sector1.geometry.coordinates[0][1] = [128.0298, 38.5236];
+		var startRect = gb3d.Math.getRectangleFromLine(beforeCoord[0], beforeCoord[1], option["width"]/2);
+		var se1 = gb3d.Math.getSector(start, option["width"]/2, startRect["angle1"], startRect["angle2"], false);
+		console.log(se1);
 		
-		from = turf.point(sector1.geometry.coordinates[0][sector1.geometry.coordinates[0].length-3]);
-		to = turf.point(sector1.geometry.coordinates[0][sector1.geometry.coordinates[0].length-2]);
-		distance = (turf.distance(from, to) * 100000);
-		// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-		if (distance < 5) {
-			sector1.geometry.coordinates[0].splice(sector1.geometry.coordinates[0].length-3, 1);
-		}
-//		sector1.geometry.coordinates[0][sector1.geometry.coordinates[0].length-2] = [128.0298, 38.5236];
-		var po = new ol.geom.Polygon(sector1.geometry.coordinates, "XY");
-		var fe = new ol.Feature(po);
-		sourceyj.addFeature(fe);
-		gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+		// 라인의 마지막 점에 수행할 부채꼴
+		var endPoint = turf.point(beforeCoord[beforeCoord.length - 1]);
+		var endRect = gb3d.Math.getRectangleFromLine(beforeCoord[beforeCoord.length - 2], beforeCoord[beforeCoord.length - 1], option["width"]/2);
+		var se2 = gb3d.Math.getSector(beforeCoord[beforeCoord.length - 1], option["width"]/2, endRect["angle4"], endRect["angle3"], false);
+		console.log(se2);
+		
 		// 중간 점들을 포문 돌면서 네모 만들고 꺾인 부분 처리
 		// 제일 처음과 마지막 선은 다르게 처리해야 하므로 0과 마지막 인덱스를 뺀다
+		var midRects = [];
 		if (beforeCoord.length > 2) {
 			var startFor = 1;
 			var untilFor = beforeCoord.length - 2;
 			for (var i = startFor; i < untilFor; i++) {
-				var midRect = gb3d.Math.getRectangleFromLine(beforeCoord[0], beforeCoord[1], option["width"]/2);
+				var midRect = gb3d.Math.getRectangleFromLine(beforeCoord[i], beforeCoord[i+1], option["width"]/2);
+				midRects.push(midRect);
 			}
 		} else {
 			// 점이 두개만 있는 경우
 			
 		}
-		// 라인의 마지막 점에 수행할 부채꼴
-		var endPoint = turf.point(beforeCoord[beforeCoord.length - 1]);
-		var rectToSub2 = gb3d.Math.getRectangleFromLine(beforeCoord[beforeCoord.length - 2], beforeCoord[beforeCoord.length - 1], option["width"]/2);
-		var sector2 = turf.sector(endPoint, (option["width"]/2)/1000, rectToSub2["angle4"], rectToSub2["angle3"]);
-		console.log(sector2);
-		// 부채꼴에 가장 밖에 있는 포인트
-//		sector2.geometry.coordinates[0][1] = [127.0298, 37.5236];
-//		sector2.geometry.coordinates[0][sector2.geometry.coordinates[0].length-3] = [128.0298, 38.5236];
-//		sector2.geometry.coordinates[0][sector2.geometry.coordinates[0].length-2] = [128.0298, 38.5236];
-		// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함 
-		var from = turf.point(sector2.geometry.coordinates[0][1]);
-		var to = turf.point(sector2.geometry.coordinates[0][2]);
-		var distance = (turf.distance(from, to) * 100000);
-		// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-		if (distance < 5) {
-			sector2.geometry.coordinates[0].splice(2, 1);
+		// 안쪽으로 꺾인 라인의 교차점 찾기
+		// 사각형들을 잇는 부채꼴을 그리기
+		for (var i = 0; i < midRects.length; i++) {
+			var start13;
+			var start24;
+			var end13;
+			var end24;
+			var cmid13;
+			var cmid24;
+			var nmid13;
+			var nmid24;
+			if (i === 0) {
+				start13 = turf.lineString([startRect["p1"], startRect["p3"]]);
+				start24 = turf.lineString([startRect["p2"], startRect["p4"]]);
+				cmid13 = turf.lineString([midRects[i]["p1"], midRects[i]["p3"]]);
+				cmid24 = turf.lineString([midRects[i]["p2"], midRects[i]["p4"]]);
+				var intersects13 = turf.lineIntersect(start13, cmid13);
+				var intersects24 = turf.lineIntersect(start24, cmid24);
+				
+				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+					// 두 사각형이 평행임	
+					
+				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+					// 13번 선만 겹침
+					startRect["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+					
+					var po1 = new ol.geom.Point(startRect["p3"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+					
+					midRects[i]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+					
+					var po2 = new ol.geom.Point(midRects[i]["p1"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+					
+				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+					// 24번 선만 겹침
+					startRect["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+					
+					var po1 = new ol.geom.Point(startRect["p4"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+					
+					midRects[i]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+					
+					var po2 = new ol.geom.Point(midRects[i]["p2"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+				}
+			} else if (i === midRects.length - 1) {
+				
+			}
+			
 		}
-//		sector2.geometry.coordinates[0][1] = [128.0298, 38.5236];
 		
-		from = turf.point(sector2.geometry.coordinates[0][sector2.geometry.coordinates[0].length-3]);
-		to = turf.point(sector2.geometry.coordinates[0][sector2.geometry.coordinates[0].length-2]);
-		distance = (turf.distance(from, to) * 100000);
-		// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-		if (distance < 5) {
-			sector2.geometry.coordinates[0].splice(sector2.geometry.coordinates[0].length-3, 1);
-		}
-//		sector2.geometry.coordinates[0][sector2.geometry.coordinates[0].length-2] = [128.0298, 38.5236];
-		
-		var po = new ol.geom.Polygon(sector2.geometry.coordinates, "XY");
-		var fe = new ol.Feature(po);
-		sourceyj.addFeature(fe);
-		gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 		
 		// 시작점과 다음점의 선을 뽑는다
 //		var startLine = turf.lineString([beforeCoord[0], beforeCoord[1]]);

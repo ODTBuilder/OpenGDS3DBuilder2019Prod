@@ -407,3 +407,70 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		"angle4" : angleSto4
 	};
 }
+
+/**
+ * 두 점의 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형 폴리곤 좌표를 반환한다
+ * @param {Array.<Array.<Number>>} center - 중심좌표
+ * @param {number} radius - 부채꼴의 반지름(meter)
+ * @param {number} sangle - 부채꼴의 시작각
+ * @param {number} eangle - 부채꼴의 끝각
+ * @param {boolean} narrow - 좁은 각을 리턴할지
+ * @return {Object} 부채꼴의 좌표
+ */
+gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
+	var centerturf = turf.point(center);
+	console.log("시작각은: "+sangle);
+	console.log("끝각은: "+eangle);
+	var absSangle = Math.abs(sangle);
+	var absEangle = Math.abs(eangle);
+	var absSangleOppo = Math.abs(180 - Math.abs(sangle));
+	var absEangleOppo = Math.abs(180 - Math.abs(eangle));
+	var sanglea;
+	var eanglea;
+	var changed = false;
+	if (narrow) {
+		if (absSangle + absEangle < absSangleOppo + absEangleOppo) {
+			sanglea = sangle;
+			eanglea = eangle;
+		} else {
+			sanglea = eangle;
+			eanglea = sangle;
+			changed = true;
+		}	
+	} else {
+		sanglea = sangle;
+		eanglea = eangle;
+	}
+	var sector = turf.sector(centerturf, radius/1000, sanglea, eanglea);
+	console.log(sector);
+	// 부채꼴에 가장 밖에 있는 포인트
+	// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함 
+//	var from = turf.point(sector.geometry.coordinates[0][1]);
+//	var to = turf.point(sector.geometry.coordinates[0][2]);
+//	var distance = (turf.distance(from, to) * 100000);
+	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
+//	if (distance < 5) {
+//		sector1.geometry.coordinates[0].splice(2, 1);
+//	}
+//	sector1.geometry.coordinates[0][1] = [128.0298, 38.5236];
+	
+	var from = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
+	var to = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
+	var distance = (turf.distance(from, to) * 100000);
+	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
+	if (distance < 5) {
+		sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3, 1);
+	}
+	
+	var po = new ol.geom.Polygon(sector.geometry.coordinates, "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	return {
+		"center" : center,
+		"sindex" : !changed ? 1 : sector.geometry.coordinates[0].length-2,
+		"eindex" : !changed ? sector.geometry.coordinates[0].length-2 : 1,
+		"coordinates" : sector.geometry.coordinates
+	};
+}
