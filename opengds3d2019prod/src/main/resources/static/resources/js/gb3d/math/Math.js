@@ -9,59 +9,59 @@ if (!gb3d.Math)
 
 gb3d.Math.isParallel = function(pointA, pointB, standard){
 	var a, b, cart, va, vb, dot, result = false;
-	
+
 	a = Cesium.Cartesian3.fromDegrees(pointA[0], pointA[1]);
 	b = Cesium.Cartesian3.fromDegrees(pointB[0], pointB[1]);
 	cart = Cesium.Cartesian3.fromDegrees(standard[0], standard[1]);
-	
+
 	va = new THREE.Vector3(a.x - cart.x, a.y - cart.y, a.z - cart.z);
 	vb = new THREE.Vector3(b.x - cart.x, b.y - cart.y, b.z - cart.z);
-	
+
 	va.normalize();
 	vb.normalize();
-	
+
 	dot = parseFloat(va.dot(vb).toFixed(7));
-	
+
 	if(Math.abs(dot) == 1){
 		result = true;
 	}
-	
+
 	return result;
 }
 
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	var a, b, u, v, w, s, cart;
 	var ca = {}, cb = {}, cw;
-	
+
 	ca.x = pointA[0] - standard[0];
 	ca.y = pointA[1] - standard[1];
 	cb.x = pointB[0] - standard[0];
 	cb.y = pointB[1] - standard[1];
 	cw = ca.x*cb.y - ca.y*cb.x;
-	
+
 	a = Cesium.Cartesian3.fromDegrees(pointA[0], pointA[1]);
 	b = Cesium.Cartesian3.fromDegrees(pointB[0], pointB[1]);
 	cart = Cesium.Cartesian3.fromDegrees(standard[0], standard[1]);
-	
+
 	a.x = a.x - cart.x;
 	a.y = a.y - cart.y;
 	a.z = a.z - cart.z;
 	b.x = b.x - cart.x;
 	b.y = b.y - cart.y;
 	b.z = b.z - cart.z;
-	
+
 	u = -a.z*b.y + a.y*b.z;
 	v = a.z*b.x - a.x*b.z;
 	w = -a.y*b.x + a.x*b.y;
-	
+
 	if(cw < 0){
 		u = -u;
 		v = -v;
 		w = -w;
 	}
-	
+
 	s = Math.sqrt(Math.pow(u, 2) + Math.pow(v, 2) + Math.pow(w, 2));
-	
+
 	return {
 		u: u,
 		v: v,
@@ -72,31 +72,31 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 
 gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	var coord = arr,
-		points = [],
-		faceBottom = [],
-		faceTop = [],
-		faceSide = [],
-		faces = [],
-		faceVertexUvs = [],
-		min = {
+	points = [],
+	faceBottom = [],
+	faceTop = [],
+	faceSide = [],
+	faces = [],
+	faceVertexUvs = [],
+	min = {
 			x: 0,
 			y: 0
-		},
-		max = {
+	},
+	max = {
 			x: undefined,
 			y: depth
-		},
-		coordLength = coord.length - 1,
-		cart,
-		vect,
-		centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]),
-		centerVec = new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z),
-		depth = depth;
-	
+	},
+	coordLength = coord.length - 1,
+	cart,
+	vect,
+	centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]),
+	centerVec = new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z),
+	depth = depth;
+
 	coord.reverse();
-	
+
 	var polygon = new ol.geom.Polygon([coord], "XY");
-	
+
 	console.log(coord);
 	// 3차원 객체 밑면 vertex 계산
 	for(var i = 0; i < coordLength; i++){
@@ -122,13 +122,14 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		vect.sub(centerVec);
 		points.push(vect);
 	}
-	
+
 	faceBottom = THREE.ShapeUtils.triangulateShape(points, []);
-	
+	console.log("폴리곤 바닥면 삼각분할: ");
+	console.log(faceBottom);
 	for(var i = 0; i < faceBottom.length; i++){
 		faceTop.push([faceBottom[i][0] + coordLength, faceBottom[i][1] + coordLength, faceBottom[i][2] + coordLength]);
 	}
-	
+
 	if (Array.isArray(faceBottom)) {
 		for (var i = 0; i < faceBottom.length; i++) {
 			var elem = faceBottom[i];
@@ -138,7 +139,7 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		}
 	}
 	console.log(faceBottom);
-	
+
 	// 3차원 객체 윗면 vertex 계산
 	var cp;
 	for(var i = 1; i < coordLength-1; i++){
@@ -150,24 +151,24 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	console.log("좌표 길이는: "+coordLength);
 	for(var i = 0; i < coordLength; i++){
 		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
-		
+
 		if(i === 0){
 			faceSide.push([ 0, coordLength - 1, coordLength ]);
 			faceSide.push([ coordLength, coordLength - 1, 2*coordLength - 1]);
-// faceSide.push([ 2*coordLength - 1, coordLength,0]);
-// faceSide.push([ coordLength - 1, 2*coordLength - 1,0]);
+//			faceSide.push([ 2*coordLength - 1, coordLength,0]);
+//			faceSide.push([ coordLength - 1, 2*coordLength - 1,0]);
 		} else {
 			faceSide.push([ i, i - 1, i + coordLength]);
 			faceSide.push([ i + coordLength, i - 1, i - 1 + coordLength ]);
-// faceSide.push([ i - 1 + coordLength, i + coordLength,i ]);
-// faceSide.push([ i - 1, i - 1 + coordLength,i ]);
+//			faceSide.push([ i - 1 + coordLength, i + coordLength,i ]);
+//			faceSide.push([ i - 1, i - 1 + coordLength,i ]);
 		}
-		
-// if(i === 0){
-// cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1],
-// coord[i]);
-// }
-		
+
+//		if(i === 0){
+//		cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1],
+//		coord[i]);
+//		}
+
 		vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 		vect.sub(centerVec);
 		points.push(vect);
@@ -190,7 +191,7 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	for(var i = 0; i < faceSide.length; i++){
 		faces.push(new THREE.Face3(faceSide[i][0], faceSide[i][1], faceSide[i][2]));
 	}
-	
+
 	return {
 		points: points,
 		faces: faces,
@@ -282,12 +283,12 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination1.geometry.coordinates);
 	// 1번 점에 할당
 	p1Point = destination1;
-	
+
 	var po = new ol.geom.LineString([center1.geometry.coordinates, destination1.geometry.coordinates], "XY");
 	var fe = new ol.Feature(po);
 	sourceyj.addFeature(fe);
 	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-	
+
 	var offsetX2 = ((perpenPoint2.geometry.coordinates[0] * -1) + (startPoint.geometry.coordinates[0]));
 	var offsetY2 = ((perpenPoint2.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
@@ -317,12 +318,12 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination2.geometry.coordinates);
 	// 2번 점에 할당
 	p2Point = destination2;
-	
+
 	var po = new ol.geom.LineString([center2.geometry.coordinates, destination2.geometry.coordinates], "XY");
 	var fe = new ol.Feature(po);
 	sourceyj.addFeature(fe);
 	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-	
+
 	var offsetX3 = ((perpenPoint1.geometry.coordinates[0] * -1) + (endPoint.geometry.coordinates[0]));
 	var offsetY3 = ((perpenPoint1.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
@@ -352,13 +353,13 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination3.geometry.coordinates);
 	// 3번 점에 할당
 	p3Point = destination3;
-	
-	
+
+
 	var po = new ol.geom.LineString([center3.geometry.coordinates, destination3.geometry.coordinates], "XY");
 	var fe = new ol.Feature(po);
 	sourceyj.addFeature(fe);
 	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-	
+
 	var offsetX4 = ((perpenPoint2.geometry.coordinates[0] * -1) + (endPoint.geometry.coordinates[0]));
 	var offsetY4 = ((perpenPoint2.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
@@ -367,7 +368,7 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX4, perpenPoint2.geometry.coordinates[1] + offsetY4]);
 	console.log(visedPerpenPoint2);
-	
+
 	var center4;
 	var theOther4;
 	if (turf.booleanEqual(endPoint, visedPerpenPoint1)) {
@@ -388,8 +389,18 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination4.geometry.coordinates);
 	// 4번 점에 할당
 	p4Point = destination4;
-	
+
 	var po = new ol.geom.LineString([center4.geometry.coordinates, destination4.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+	var po = new ol.geom.LineString([p1Point.geometry.coordinates, p3Point.geometry.coordinates], "XY");
+	var fe = new ol.Feature(po);
+	sourceyj.addFeature(fe);
+	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+	
+	var po = new ol.geom.LineString([p2Point.geometry.coordinates, p4Point.geometry.coordinates], "XY");
 	var fe = new ol.Feature(po);
 	sourceyj.addFeature(fe);
 	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
@@ -410,11 +421,17 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 
 /**
  * 두 점의 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형 폴리곤 좌표를 반환한다
- * @param {Array.<Array.<Number>>} center - 중심좌표
- * @param {number} radius - 부채꼴의 반지름(meter)
- * @param {number} sangle - 부채꼴의 시작각
- * @param {number} eangle - 부채꼴의 끝각
- * @param {boolean} narrow - 좁은 각을 리턴할지
+ * 
+ * @param {Array.
+ *            <Array.<Number>>} center - 중심좌표
+ * @param {number}
+ *            radius - 부채꼴의 반지름(meter)
+ * @param {number}
+ *            sangle - 부채꼴의 시작각
+ * @param {number}
+ *            eangle - 부채꼴의 끝각
+ * @param {boolean}
+ *            narrow - 좁은 각을 리턴할지
  * @return {Object} 부채꼴의 좌표
  */
 gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
@@ -444,33 +461,468 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
 	var sector = turf.sector(centerturf, radius/1000, sanglea, eanglea);
 	console.log(sector);
 	// 부채꼴에 가장 밖에 있는 포인트
-	// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함 
+	// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함
 //	var from = turf.point(sector.geometry.coordinates[0][1]);
 //	var to = turf.point(sector.geometry.coordinates[0][2]);
 //	var distance = (turf.distance(from, to) * 100000);
 	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
 //	if (distance < 5) {
-//		sector1.geometry.coordinates[0].splice(2, 1);
+//	sector1.geometry.coordinates[0].splice(2, 1);
 //	}
 //	sector1.geometry.coordinates[0][1] = [128.0298, 38.5236];
-	
-//	var from = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
-//	var to = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
+
+//	var from =
+//	turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
+//	var to =
+//	turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
 //	var distance = (turf.distance(from, to) * 100000);
 //	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
 //	if (distance < 5) {
-//		sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3, 1);
+//	sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3,
+//	1);
 //	}
-	
+
 	var po = new ol.geom.Polygon(sector.geometry.coordinates, "XY");
 	var fe = new ol.Feature(po);
 	sourceyj.addFeature(fe);
 	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-	
+
 	return {
 		"center" : center,
 		"sindex" : !changed ? 1 : sector.geometry.coordinates[0].length-2,
-		"eindex" : !changed ? sector.geometry.coordinates[0].length-2 : 1,
-		"coordinates" : sector.geometry.coordinates
+				"eindex" : !changed ? sector.geometry.coordinates[0].length-2 : 1,
+						"coordinates" : sector.geometry.coordinates
 	};
+}
+
+gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, depth){
+	var coord = arr,
+	points = [],
+	faceBottom = [],
+	faceTop = [],
+	faceSide = [],
+	faces = [],
+	faceVertexUvs = [],
+	min = {
+			x: 0,
+			y: 0
+	},
+	max = {
+			x: undefined,
+			y: depth
+	},
+	coordLength = coord.length - 1,
+	cart,
+	vect,
+	centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1]),
+	centerVec = new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z),
+	depth = depth;
+
+	// 라인 상태에서 말고 버퍼된 상태에서 수행해야함
+	// 3차원 객체 밑면 vertex 계산
+	/*
+	for(var i = 0; i < coordLength; i++){
+		if (i > 0) {
+			var from = turf.point([coord[i-1][0], coord[i-1][1]]);
+			var to = turf.point([coord[i][0], coord[i][1]]);
+			console.log(from);
+			console.log(to);
+			if (i === 1) {
+				var distance = turf.distance(from, to);
+				distance = distance * 1000;
+				max.x = distance; 
+			} else if (i > 1) {
+				var distance = turf.distance(from, to);
+				distance = distance * 1000;
+				if (max.x < distance) {
+					max.x = distance;
+				}
+			}
+		}
+		cart = Cesium.Cartesian3.fromDegrees(coord[i][0], coord[i][1]);
+		vect = new THREE.Vector3(cart.x, cart.y, cart.z);
+		vect.sub(centerVec);
+		points.push(vect);
+	}
+	*/
+	var bufferedLineString = [];
+	
+	// 시작점을 뽑는다
+	var start = coord[0];
+	var startPoint = turf.point(start);
+	var secondPoint = turf.point(coord[1]); 
+
+	var startRect = gb3d.Math.getRectangleFromLine(coord[0], coord[1], radius);
+	var se1 = gb3d.Math.getSector(start, radius, startRect["angle1"], startRect["angle2"], false);
+	console.log(se1);
+	// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
+	var exceptLastSE1 = se1.coordinates[0].slice(0, se1.coordinates[0].length - 1);
+	bufferedLineString = bufferedLineString.concat(exceptLastSE1);
+	console.log("지금까지 연결된 배열: ");
+	console.log(bufferedLineString);
+	
+	// 라인의 마지막 점에 수행할 부채꼴
+	var endPoint = turf.point(coord[coord.length - 1]);
+	var endRect = gb3d.Math.getRectangleFromLine(coord[coord.length - 2], coord[coord.length - 1], radius);
+	var se2 = gb3d.Math.getSector(coord[coord.length - 1], radius, endRect["angle4"], endRect["angle3"], false);
+	console.log(se2);
+
+	// 시작선과 끝선의 긴쪽 모서리
+	var start13 = turf.lineString([startRect["p1"], startRect["p3"]]);
+	var start24 = turf.lineString([startRect["p2"], startRect["p4"]]);
+	var end13 = turf.lineString([endRect["p1"], endRect["p3"]]);
+	var end24 = turf.lineString([endRect["p2"], endRect["p4"]]);
+
+	// 중간 점들을 포문 돌면서 네모 만들고 꺾인 부분 처리
+	// 제일 처음과 마지막 선은 다르게 처리해야 하므로 0과 마지막 인덱스를 뺀다
+	var midRects = [];
+	if (coord.length > 3) {
+		var startFor = 1;
+		var untilFor = coord.length - 2;
+		for (var i = startFor; i < untilFor; i++) {
+			var midRect = gb3d.Math.getRectangleFromLine(coord[i], coord[i+1], radius);
+			midRects.push(midRect);
+		}
+	} else if(coord.length === 3){
+		// 점이 두개만 있는 경우
+		var intersects13 = turf.lineIntersect(start13, end13);
+		var intersects24 = turf.lineIntersect(start24, end24);
+
+		if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+			// 두 사각형이 평행임
+
+		} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+			// 13번 선만 겹침
+			startRect["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+
+			var po1 = new ol.geom.Point(startRect["p3"], "XY");
+			var fe1 = new ol.Feature(po1);
+			sourceyj.addFeature(fe1);
+			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+			endRect["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+
+			var po2 = new ol.geom.Point(endRect["p1"], "XY");
+			var fe2 = new ol.Feature(po2);
+			sourceyj.addFeature(fe2);
+			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+			var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"] );
+		} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+			// 24번 선만 겹침
+			startRect["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+
+			var po1 = new ol.geom.Point(startRect["p4"], "XY");
+			var fe1 = new ol.Feature(po1);
+			sourceyj.addFeature(fe1);
+			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+			endRect["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+
+			var po2 = new ol.geom.Point(endRect["p2"], "XY");
+			var fe2 = new ol.Feature(po2);
+			sourceyj.addFeature(fe2);
+			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+			var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"] );
+		} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
+			// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
+			var center = turf.point(startRect["end"]);
+			var point1 = turf.point(endRect["p1"]);
+			var point2 = turf.point(endRect["p2"]);
+			
+			var bearing1 = turf.bearing(center, point1);
+			var abs1 = Math.abs(bearing1);
+			var bearing2 = Math.abs(turf.bearing(center, point2));
+			var abs2 = Math.abs(bearing2);
+			
+			if (abs1 > abs2) {
+				console.log("1번과의 각도는: "+bearing1);
+				console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+				var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"] );
+			} else if (abs1 < abs2) {
+				console.log("2번과의 각도는: "+bearing2);
+				console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
+				var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"] );
+			}
+		}
+	} else if (coord.length < 2) {
+		console.error("need over 1 points");
+		return;
+	}
+	// 안쪽으로 꺾인 라인의 교차점 찾기
+	// 사각형들을 잇는 부채꼴을 그리기
+	console.log("중간선들의 개수는: "+midRects.length);
+	if (midRects.length > 0) {
+		for (var i = 0; i < midRects.length; i++) {
+			var cmid13;
+			var cmid24;
+			var nmid13;
+			var nmid24;
+			if (i === 0) {
+				cmid13 = turf.lineString([midRects[i]["p1"], midRects[i]["p3"]]);
+				cmid24 = turf.lineString([midRects[i]["p2"], midRects[i]["p4"]]);
+				var intersects13 = turf.lineIntersect(start13, cmid13);
+				var intersects24 = turf.lineIntersect(start24, cmid24);
+
+				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+					// 두 사각형이 평행임
+
+				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+					// 13번 선만 겹침
+					startRect["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(startRect["p3"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i]["p1"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], midRects[i]["angle2"] );
+				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+					// 24번 선만 겹침
+					startRect["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(startRect["p4"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i]["p2"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"] );
+				} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
+					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
+					var center = turf.point(startRect["end"]);
+					var point1 = turf.point(midRects[i]["p1"]);
+					var point2 = turf.point(midRects[i]["p2"]);
+					
+					var bearing1 = turf.bearing(center, point1);
+					var abs1 = Math.abs(bearing1);
+					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var abs2 = Math.abs(bearing2);
+					
+					if (abs1 > abs2) {
+						console.log("1번과의 각도는: "+bearing1);
+						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"] );
+					} else if (abs1 < abs2) {
+						console.log("2번과의 각도는: "+bearing2);
+						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], midRects[i]["angle2"] );
+					}
+				}
+
+				if (midRects.length > 1) {
+					nmid13 = turf.lineString([midRects[i+1]["p1"], midRects[i+1]["p3"]]);
+					nmid24 = turf.lineString([midRects[i+1]["p2"], midRects[i+1]["p4"]]);
+					var intersects13 = turf.lineIntersect(cmid13, nmid13);
+					var intersects24 = turf.lineIntersect(cmid24, nmid24);
+
+					if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+						// 두 사각형이 평행임
+
+					} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+						// 13번 선만 겹침
+						midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+
+						var po1 = new ol.geom.Point(midRects[i]["p3"], "XY");
+						var fe1 = new ol.Feature(po1);
+						sourceyj.addFeature(fe1);
+						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+						midRects[i+1]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+
+						var po2 = new ol.geom.Point(midRects[i+1]["p1"], "XY");
+						var fe2 = new ol.Feature(po2);
+						sourceyj.addFeature(fe2);
+						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+					} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+						// 24번 선만 겹침
+						midRects[i]["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+
+						var po1 = new ol.geom.Point(midRects[i]["p4"], "XY");
+						var fe1 = new ol.Feature(po1);
+						sourceyj.addFeature(fe1);
+						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+						midRects[i+1]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+
+						var po2 = new ol.geom.Point(midRects[i+1]["p2"], "XY");
+						var fe2 = new ol.Feature(po2);
+						sourceyj.addFeature(fe2);
+						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+					} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
+						// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
+						var center = turf.point(midRects[i]["end"]);
+						var point1 = turf.point(midRects[i+1]["p1"]);
+						var point2 = turf.point(midRects[i+1]["p2"]);
+						
+						var bearing1 = turf.bearing(center, point1);
+						var abs1 = Math.abs(bearing1);
+						var bearing2 = Math.abs(turf.bearing(center, point2));
+						var abs2 = Math.abs(bearing2);
+						
+						if (abs1 > abs2) {
+							console.log("1번과의 각도는: "+bearing1);
+							console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+						} else if (abs1 < abs2) {
+							console.log("2번과의 각도는: "+bearing2);
+							console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+						}
+					}
+				}
+			}  
+			if (i === midRects.length - 1) {
+				cmid13 = turf.lineString([midRects[i]["p1"], midRects[i]["p3"]]);
+				cmid24 = turf.lineString([midRects[i]["p2"], midRects[i]["p4"]]);
+				var intersects13 = turf.lineIntersect(end13, cmid13);
+				var intersects24 = turf.lineIntersect(end24, cmid24);
+
+				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+					// 두 사각형이 평행임
+
+				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+					// 13번 선만 겹침
+					endRect["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(endRect["p1"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i]["p3"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(endRect["start"], radius, midRects[i]["angle4"], endRect["angle2"]);
+				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+					// 24번 선만 겹침
+					endRect["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(endRect["p2"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i]["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i]["p4"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(endRect["start"], radius, endRect["angle1"], midRects[i]["angle3"]);
+				} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
+					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
+					var center = turf.point(midRects[i]["end"]);
+					var point1 = turf.point(endRect["p1"]);
+					var point2 = turf.point(endRect["p2"]);
+					
+					var bearing1 = turf.bearing(center, point1);
+					var abs1 = Math.abs(bearing1);
+					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var abs2 = Math.abs(bearing2);
+					
+					if (abs1 > abs2) {
+						console.log("1번과의 각도는: "+bearing1);
+						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, endRect["angle1"], midRects[i]["angle3"] );
+					} else if (abs1 < abs2) {
+						console.log("2번과의 각도는: "+bearing2);
+						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], endRect["angle2"] );
+					}
+				}
+			}
+			if (i !== 0 && i !== midRects.length - 1 && midRects.length > 1) {
+
+				cmid13 = turf.lineString([midRects[i]["p1"], midRects[i]["p3"]]);
+				cmid24 = turf.lineString([midRects[i]["p2"], midRects[i]["p4"]]);
+				nmid13 = turf.lineString([midRects[i+1]["p1"], midRects[i+1]["p3"]]);
+				nmid24 = turf.lineString([midRects[i+1]["p2"], midRects[i+1]["p4"]]);
+				var intersects13 = turf.lineIntersect(cmid13, nmid13);
+				var intersects24 = turf.lineIntersect(cmid24, nmid24);
+
+				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
+					// 두 사각형이 평행임
+
+				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
+					// 13번 선만 겹침
+					midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(midRects[i]["p3"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i+1]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i+1]["p1"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
+					// 24번 선만 겹침
+					midRects[i]["p4"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po1 = new ol.geom.Point(midRects[i]["p4"], "XY");
+					var fe1 = new ol.Feature(po1);
+					sourceyj.addFeature(fe1);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					midRects[i+1]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
+
+					var po2 = new ol.geom.Point(midRects[i+1]["p2"], "XY");
+					var fe2 = new ol.Feature(po2);
+					sourceyj.addFeature(fe2);
+					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
+
+					var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+				}  else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
+					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
+					var center = turf.point(midRects[i]["end"]);
+					var point1 = turf.point(midRects[i+1]["p1"]);
+					var point2 = turf.point(midRects[i+1]["p2"]);
+					
+					var bearing1 = turf.bearing(center, point1);
+					var abs1 = Math.abs(bearing1);
+					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var abs2 = Math.abs(bearing2);
+					
+					if (abs1 > abs2) {
+						console.log("1번과의 각도는: "+bearing1);
+						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+					} else if (abs1 < abs2) {
+						console.log("2번과의 각도는: "+bearing2);
+						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
+						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+					}
+				}
+			}
+		}
+	} 
 }
