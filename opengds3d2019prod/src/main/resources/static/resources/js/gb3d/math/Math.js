@@ -454,13 +454,13 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
 //	}
 //	sector1.geometry.coordinates[0][1] = [128.0298, 38.5236];
 	
-	var from = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
-	var to = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
-	var distance = (turf.distance(from, to) * 100000);
-	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-	if (distance < 5) {
-		sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3, 1);
-	}
+//	var from = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
+//	var to = turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
+//	var distance = (turf.distance(from, to) * 100000);
+//	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
+//	if (distance < 5) {
+//		sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3, 1);
+//	}
 	
 	var po = new ol.geom.Polygon(sector.geometry.coordinates, "XY");
 	var fe = new ol.Feature(po);
