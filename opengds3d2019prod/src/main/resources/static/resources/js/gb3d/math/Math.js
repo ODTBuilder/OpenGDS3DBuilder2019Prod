@@ -590,7 +590,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 		if (intersects13.features.length > 0 && intersects24.features.length > 0) {
 			// 두 사각형이 평행임
-
+			console.log("두 사각형이 평행임");
 		} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
 			// 13번 선만 겹침
 			startRect["p3"] = intersects13.features[0]["geometry"]["coordinates"];
@@ -633,17 +633,30 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			
 			var bearing1 = turf.bearing(center, point1);
 			var abs1 = Math.abs(bearing1);
-			var bearing2 = Math.abs(turf.bearing(center, point2));
+			var bearing2 = turf.bearing(center, point2);
 			var abs2 = Math.abs(bearing2);
 			
 			if (abs1 > abs2) {
 				console.log("1번과의 각도는: "+bearing1);
 				console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
+				// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+				var center = turf.point(startRect["end"]);
+				var point1 = turf.point(startRect["start"]);
+				var point2 = turf.point(endRect["end"]);
+				var bearing1 = turf.bearing(center, point1);
+				var bearing2 = Math.abs(turf.bearing(center, point2));
+				
 				var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"] );
+//				if (parseFloat((abs1 + abs2).toFixed(2)) >= 180) {
+//					console.log("두 선이 겹치지 않게 그려진 평행한 선");
+//				}
 			} else if (abs1 < abs2) {
 				console.log("2번과의 각도는: "+bearing2);
 				console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
 				var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"] );
+//				if (parseFloat((abs1 + abs2).toFixed(2)) >= 180) {
+//					console.log("두 선이 겹치지 않게 그려진 평행한 선");
+//				}
 			}
 		}
 	} else if (coord.length < 2) {
@@ -667,7 +680,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
 					// 두 사각형이 평행임
-
+					console.log("두 사각형이 평행임");
 				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
 					// 13번 선만 겹침
 					startRect["p3"] = intersects13.features[0]["geometry"]["coordinates"];
@@ -732,7 +745,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					if (intersects13.features.length > 0 && intersects24.features.length > 0) {
 						// 두 사각형이 평행임
-
+						console.log("두 사각형이 평행임");
 					} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
 						// 13번 선만 겹침
 						midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
@@ -798,7 +811,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
 					// 두 사각형이 평행임
-
+					console.log("두 사각형이 평행임");
 				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
 					// 13번 선만 겹침
 					endRect["p1"] = intersects13.features[0]["geometry"]["coordinates"];
@@ -866,7 +879,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 				if (intersects13.features.length > 0 && intersects24.features.length > 0) {
 					// 두 사각형이 평행임
-
+					console.log("두 사각형이 평행임");
 				} else if (intersects13.features.length > 0 && intersects24.features.length === 0) {
 					// 13번 선만 겹침
 					midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
