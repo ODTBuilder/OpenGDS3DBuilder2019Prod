@@ -257,10 +257,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY1 = ((perpenPoint1.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX1, perpenPoint1.geometry.coordinates[1] + offsetY1]);
-	console.log(visedPerpenPoint1);
+//	console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX1, perpenPoint2.geometry.coordinates[1] + offsetY1]);
-	console.log(visedPerpenPoint2);
+//	console.log(visedPerpenPoint2);
 	// 두 점중에 중심선의 점인 것을 찾는다
 	var center1;
 	var theOther1;
@@ -271,8 +271,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center1 = visedPerpenPoint2;
 		theOther1 = visedPerpenPoint1;
 	}
-	console.log(center1);
-	console.log(theOther1);
+//	console.log(center1);
+//	console.log(theOther1);
 	polygon.push(center1.geometry.coordinates);
 	// 각도를 잰다
 	var bearing1 = turf.bearing(center1, theOther1);
@@ -293,10 +293,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY2 = ((perpenPoint2.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX2, perpenPoint1.geometry.coordinates[1] + offsetY2]);
-	console.log(visedPerpenPoint1);
+//	console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX2, perpenPoint2.geometry.coordinates[1] + offsetY2]);
-	console.log(visedPerpenPoint2);
+//	console.log(visedPerpenPoint2);
 
 	var center2;
 	var theOther2;
@@ -307,8 +307,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center2 = visedPerpenPoint2;
 		theOther2 = visedPerpenPoint1;
 	}
-	console.log(center2);
-	console.log(theOther2);
+//	console.log(center2);
+//	console.log(theOther2);
 	// 각도를 잰다
 	var bearing2 = turf.bearing(center2, theOther2);
 	angleSto2 = bearing2;
@@ -328,10 +328,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY3 = ((perpenPoint1.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX3, perpenPoint1.geometry.coordinates[1] + offsetY3]);
-	console.log(visedPerpenPoint1);
+//	console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX3, perpenPoint2.geometry.coordinates[1] + offsetY3]);
-	console.log(visedPerpenPoint2);
+//	console.log(visedPerpenPoint2);
 
 	var center3;
 	var theOther3;
@@ -342,8 +342,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center3 = visedPerpenPoint2;
 		theOther3 = visedPerpenPoint1;
 	}
-	console.log(center3);
-	console.log(theOther3);
+//	console.log(center3);
+//	console.log(theOther3);
 	// 각도를 잰다
 	var bearing3 = turf.bearing(center3, theOther3);
 	angleSto3 = bearing3;
@@ -364,10 +364,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY4 = ((perpenPoint2.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX4, perpenPoint1.geometry.coordinates[1] + offsetY4]);
-	console.log(visedPerpenPoint1);
+//	console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX4, perpenPoint2.geometry.coordinates[1] + offsetY4]);
-	console.log(visedPerpenPoint2);
+//	console.log(visedPerpenPoint2);
 
 	var center4;
 	var theOther4;
@@ -378,8 +378,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center4 = visedPerpenPoint2;
 		theOther4 = visedPerpenPoint1;
 	}
-	console.log(center4);
-	console.log(theOther4);
+//	console.log(center4);
+//	console.log(theOther4);
 	// 각도를 잰다
 	var bearing4 = turf.bearing(center4, theOther4);
 	angleSto4 = bearing4;
@@ -459,7 +459,7 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
 		eanglea = eangle;
 	}
 	var sector = turf.sector(centerturf, radius/1000, sanglea, eanglea);
-	console.log(sector);
+//	console.log(sector);
 	// 부채꼴에 가장 밖에 있는 포인트
 	// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함
 //	var from = turf.point(sector.geometry.coordinates[0][1]);
@@ -554,18 +554,16 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 	var startRect = gb3d.Math.getRectangleFromLine(coord[0], coord[1], radius);
 	var se1 = gb3d.Math.getSector(start, radius, startRect["angle1"], startRect["angle2"], false);
-	console.log(se1);
 	// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 	var exceptLastSE1 = se1.coordinates[0].slice(0, se1.coordinates[0].length - 1);
 	bufferedLineString = bufferedLineString.concat(exceptLastSE1);
-	console.log("지금까지 연결된 배열: ");
-	console.log(bufferedLineString);
+//	console.log("지금까지 연결된 배열: ");
+//	console.log(bufferedLineString);
 	
 	// 라인의 마지막 점에 수행할 부채꼴
 	var endPoint = turf.point(coord[coord.length - 1]);
 	var endRect = gb3d.Math.getRectangleFromLine(coord[coord.length - 2], coord[coord.length - 1], radius);
 	var se2 = gb3d.Math.getSector(coord[coord.length - 1], radius, endRect["angle4"], endRect["angle3"], false);
-	console.log(se2);
 
 	// 시작선과 끝선의 긴쪽 모서리
 	var start13 = turf.lineString([startRect["p1"], startRect["p3"]]);
@@ -635,7 +633,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			var abs1 = Math.abs(bearing1);
 			var bearing2 = turf.bearing(center, point2);
 			var abs2 = Math.abs(bearing2);
-			
+			var round;
 			if (abs1 > abs2) {
 				console.log("1번과의 각도는: "+bearing1);
 				console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
@@ -644,19 +642,67 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				var point1 = turf.point(startRect["start"]);
 				var point2 = turf.point(endRect["end"]);
 				var bearing1 = turf.bearing(center, point1);
-				var bearing2 = Math.abs(turf.bearing(center, point2));
-				
-				var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"] );
-//				if (parseFloat((abs1 + abs2).toFixed(2)) >= 180) {
-//					console.log("두 선이 겹치지 않게 그려진 평행한 선");
-//				}
+				var bearing2 = turf.bearing(center, point2);
+				if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+					var abs1 = Math.abs(bearing1);
+					var abs2 = Math.abs(bearing2);
+					var flag;
+					if (abs1 > abs2) {
+						flag = abs1 - abs2;
+					} else if (abs1 < abs2) {
+						flag = abs2 - abs1;
+					}
+					round = parseFloat(flag.toFixed(2));
+					console.log("두 선의 각도는: "+round);
+				} else {
+					var abs1 = Math.abs(bearing1);
+					var abs2 = Math.abs(bearing2);
+					var flag = abs1 + abs2;
+					round = parseFloat(flag.toFixed(2));
+					console.log("두 선의 각도는: "+round);
+				}
 			} else if (abs1 < abs2) {
 				console.log("2번과의 각도는: "+bearing2);
 				console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
-				var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"] );
-//				if (parseFloat((abs1 + abs2).toFixed(2)) >= 180) {
-//					console.log("두 선이 겹치지 않게 그려진 평행한 선");
-//				}
+				// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+				var center = turf.point(startRect["end"]);
+				var point1 = turf.point(startRect["start"]);
+				var point2 = turf.point(endRect["end"]);
+				var bearing1 = turf.bearing(center, point1);
+				var bearing2 = turf.bearing(center, point2);
+				var round;
+				if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+					var abs1 = Math.abs(bearing1);
+					var abs2 = Math.abs(bearing2);
+					var flag;
+					if (abs1 > abs2) {
+						flag = abs1 - abs2;
+					} else if (abs1 < abs2) {
+						flag = abs2 - abs1;
+					}
+					round = parseFloat(flag.toFixed(2));
+					console.log("두 선의 각도는: "+round);
+				} else {
+					var abs1 = Math.abs(bearing1);
+					var abs2 = Math.abs(bearing2);
+					var flag = abs1 + abs2;
+					round = parseFloat(flag.toFixed(2));
+					console.log("두 선의 각도는: "+round);
+				}
+			}
+			if (round < 180) {
+				// 사각형의 위 아래 좌표의 높이를 비교해서 부채꼴을 그릴 위치를 뒤집는다
+				if (startRect["p3"][1] > startRect["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"]);
+				} else {
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"]);	
+				}
+			} else if (round > 180) {
+				if (startRect["p3"][1] > startRect["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"]);
+				} else {
+					var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"]);											
+				}
 			}
 		}
 	} else if (coord.length < 2) {
@@ -723,17 +769,76 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					var bearing1 = turf.bearing(center, point1);
 					var abs1 = Math.abs(bearing1);
-					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var bearing2 = turf.bearing(center, point2);
 					var abs2 = Math.abs(bearing2);
-					
+					var round;
 					if (abs1 > abs2) {
 						console.log("1번과의 각도는: "+bearing1);
 						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(startRect["end"]);
+						var point1 = turf.point(startRect["start"]);
+						var point2 = turf.point(midRects[i]["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
 					} else if (abs1 < abs2) {
 						console.log("2번과의 각도는: "+bearing2);
 						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], midRects[i]["angle2"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(startRect["end"]);
+						var point1 = turf.point(startRect["start"]);
+						var point2 = turf.point(midRects[i]["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
+					}
+					if (round < 180) {
+						if (startRect["p3"][1] > startRect["p4"][1] && midRects[i]["p1"][1] > midRects[i]["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], midRects[i]["angle2"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"]);	
+						}
+					} else if (round > 180) {
+						if (startRect["p3"][1] > startRect["p4"][1] && midRects[i]["p1"][1] > midRects[i]["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], midRects[i]["angle2"]);											
+						}
 					}
 				}
 
@@ -788,17 +893,78 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						var bearing1 = turf.bearing(center, point1);
 						var abs1 = Math.abs(bearing1);
-						var bearing2 = Math.abs(turf.bearing(center, point2));
+						var bearing2 = turf.bearing(center, point2);
 						var abs2 = Math.abs(bearing2);
-						
+						var round;
 						if (abs1 > abs2) {
 							console.log("1번과의 각도는: "+bearing1);
 							console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
-							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+							// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+							var center = turf.point(midRects[i]["end"]);
+							var point1 = turf.point(midRects[i]["start"]);
+							var point2 = turf.point(midRects[i+1]["end"]);
+							var bearing1 = turf.bearing(center, point1);
+							var bearing2 = turf.bearing(center, point2);
+							if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+								var abs1 = Math.abs(bearing1);
+								var abs2 = Math.abs(bearing2);
+								var flag;
+								if (abs1 > abs2) {
+									flag = abs1 - abs2;
+								} else if (abs1 < abs2) {
+									flag = abs2 - abs1;
+								}
+								round = parseFloat(flag.toFixed(2));
+								console.log("두 선의 각도는: "+round);
+								
+							} else {
+								var abs1 = Math.abs(bearing1);
+								var abs2 = Math.abs(bearing2);
+								var flag = abs1 + abs2;
+								round = parseFloat(flag.toFixed(2));
+								console.log("두 선의 각도는: "+round);
+							}
 						} else if (abs1 < abs2) {
 							console.log("2번과의 각도는: "+bearing2);
 							console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
-							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+							// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+							var center = turf.point(midRects[i]["end"]);
+							var point1 = turf.point(midRects[i]["start"]);
+							var point2 = turf.point(midRects[i+1]["end"]);
+							var bearing1 = turf.bearing(center, point1);
+							var bearing2 = turf.bearing(center, point2);
+							if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+								var abs1 = Math.abs(bearing1);
+								var abs2 = Math.abs(bearing2);
+								var flag;
+								if (abs1 > abs2) {
+									flag = abs1 - abs2;
+								} else if (abs1 < abs2) {
+									flag = abs2 - abs1;
+								}
+								round = parseFloat(flag.toFixed(2));
+								console.log("두 선의 각도는: "+round);
+								
+							} else {
+								var abs1 = Math.abs(bearing1);
+								var abs2 = Math.abs(bearing2);
+								var flag = abs1 + abs2;
+								round = parseFloat(flag.toFixed(2));
+								console.log("두 선의 각도는: "+round);
+							}
+						}
+						if (round < 180) {
+							if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
+								var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"]);
+							} else {
+								var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"]);	
+							}
+						} else if (round > 180) {
+							if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
+								var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"]);
+							} else {
+								var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"]);											
+							}
 						}
 					}
 				}
@@ -854,17 +1020,78 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					var bearing1 = turf.bearing(center, point1);
 					var abs1 = Math.abs(bearing1);
-					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var bearing2 = turf.bearing(center, point2);
 					var abs2 = Math.abs(bearing2);
-					
+					var round;
 					if (abs1 > abs2) {
 						console.log("1번과의 각도는: "+bearing1);
 						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, endRect["angle1"], midRects[i]["angle3"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(midRects[i]["end"]);
+						var point1 = turf.point(midRects[i]["start"]);
+						var point2 = turf.point(endRect["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						var round;
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
 					} else if (abs1 < abs2) {
 						console.log("2번과의 각도는: "+bearing2);
 						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], endRect["angle2"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(midRects[i]["end"]);
+						var point1 = turf.point(midRects[i]["start"]);
+						var point2 = turf.point(endRect["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						var round;
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
+					}
+					if (round < 180) {
+						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], endRect["angle2"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, endRect["angle1"], midRects[i]["angle3"]);	
+						}
+					} else if (round > 180) {
+						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, endRect["angle1"], midRects[i]["angle3"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], endRect["angle2"]);											
+						}
 					}
 				}
 			}
@@ -922,17 +1149,76 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					var bearing1 = turf.bearing(center, point1);
 					var abs1 = Math.abs(bearing1);
-					var bearing2 = Math.abs(turf.bearing(center, point2));
+					var bearing2 = turf.bearing(center, point2);
 					var abs2 = Math.abs(bearing2);
-					
+					var round;
 					if (abs1 > abs2) {
 						console.log("1번과의 각도는: "+bearing1);
 						console.log("즉, 앞 3번과 뒤 1번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(midRects[i]["end"]);
+						var point1 = turf.point(midRects[i]["start"]);
+						var point2 = turf.point(midRects[i+1]["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
 					} else if (abs1 < abs2) {
 						console.log("2번과의 각도는: "+bearing2);
 						console.log("즉, 앞 4번과 뒤 2번을 잇는 부채꼴");
-						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
+						// 앞 end를 중심으로 앞 start와 뒤 end의 각도를 구해서 90도 이상이면 평행하게 그은 선으로 간주하고 부채꼴 그리면 안됨
+						var center = turf.point(midRects[i]["end"]);
+						var point1 = turf.point(midRects[i]["start"]);
+						var point2 = turf.point(midRects[i+1]["end"]);
+						var bearing1 = turf.bearing(center, point1);
+						var bearing2 = turf.bearing(center, point2);
+						if ((bearing1 < 0 && bearing2 < 0) || (bearing1 > 0 && bearing2 > 0)) {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag;
+							if (abs1 > abs2) {
+								flag = abs1 - abs2;
+							} else if (abs1 < abs2) {
+								flag = abs2 - abs1;
+							}
+							var round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						} else {
+							var abs1 = Math.abs(bearing1);
+							var abs2 = Math.abs(bearing2);
+							var flag = abs1 + abs2;
+							var round = parseFloat(flag.toFixed(2));
+							console.log("두 선의 각도는: "+round);
+						}
+					}
+					if (round < 180) {
+						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"]);	
+						}
+					} else if (round > 180) {
+						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"]);
+						} else {
+							var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"]);											
+						}
 					}
 				}
 			}
