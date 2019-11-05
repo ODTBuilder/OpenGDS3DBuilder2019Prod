@@ -2217,8 +2217,42 @@
 					// }
 					//
 					// }
+					
 					result.push(obj);
 					console.log(result);
+					// Three tree에 node 복사
+					var bool = false;
+					for(var i in result){
+						if(result[i].parent === "#"){
+							bool = true;
+						}
+					}
+					
+					var last = [], group = [];
+					if(bool){
+						for(var i in result){
+							if(this._data.layerproperties.threeTree.get_node(result[i].id)){
+								continue;
+							}
+							if(result[i].type === "Group" && result[i].parent === "#"){
+								this._data.layerproperties.threeTree.create_node(result[i].parent, result[i], "last", false, false);
+							} else if(result[i].type === "Group" || result[i].type === "FakeGroup"){
+								group.push(result[i]);
+							} else {
+								last.push(result[i]);
+							}
+						}
+						
+						for(var i in group){
+							this._data.layerproperties.threeTree.create_node(group[i].parent, group[i], "last", false, false);
+						}
+						
+						for(var i in last){
+							this._data.layerproperties.threeTree.create_node(last[i].parent, last[i], "last", false, false);
+						}
+						
+//						this._data.layerproperties.threeTree.refresh();
+					}
 					return result;
 				},
 				/**

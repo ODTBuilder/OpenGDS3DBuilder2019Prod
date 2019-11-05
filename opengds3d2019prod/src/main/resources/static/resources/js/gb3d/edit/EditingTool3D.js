@@ -39,7 +39,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		content : "delete",
 		icon : "fas fa-eraser fa-lg",
 		clickEvent : function() {
-			console.log("remove");
+			that.map.removeThreeObject( that.pickedObject_.uuid );
 		},
 		color : ""
 	}, {
@@ -130,6 +130,29 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.isDown = false;
 //	console.log("최초선언됨 다운: "+that.isDown+", 드래그: "+that.isDragging);
 	// ==========yijun end==========
+	
+	// ThreeJS Object User Data 창 생성
+	var ath1 = $("<th>").text("Name");
+	var ath2 = $("<th>").text("Value");
+	var atr = $("<tr>").append(ath1).append(ath2);
+	var ahd = $("<thead>").append(atr);
+	this.attrTB_ = $("<tbody>");
+	var atb = $("<table>").addClass("gb-table").append(ahd).append(this.attrTB_);
+	
+	this.attrPop_ = new gb.panel.PanelBase({
+		"target": ".area-3d",
+		"width" : "300px",
+		"positionX" : 5,
+		"positionY" : 55,
+		"autoOpen" : false,
+		"body" : atb
+	});
+	
+	$(this.attrPop_.getPanel()).find(".gb-panel-body").css({
+		"max-height" : "400px",
+		"overflow-y" : "auto"
+	});
+	
 	function onDocumentMouseClick(event) {
 //		that.isDown = false;
 		if(that.isDragging){
@@ -191,6 +214,31 @@ gb3d.edit.EditingTool3D = function(obj) {
 //			that.updateStyleTab(object);
 //			that.updateMaterialTab(object);
 			
+			// ThreeJS Object User Data창 내용 갱신
+			$( that.attrTB_ ).empty();
+			var userData = object.userData;
+			var td1, td2, tform, tr;
+			for( var i in userData ){
+				td1 = $("<td>").text(i);
+				
+				tform = $("<input>").addClass("gb-edit-sel-alist").attr({
+					"type" : "text"
+				}).css({
+					"width" : "100%",
+					"border" : "none"
+				}).val(userData[i]).on("input", function(e) {
+					var key = $(this).parent().prev().text();
+					var val = $(this).val();
+					userData[key] = val;
+				});
+				
+				td2 = $("<td>").append(tform);
+				
+				tr = $("<tr>").append(td1).append(td2);
+				that.attrTB_.append(tr);
+			}
+			that.attrPop_.open();
+			
 			if ( object.userData.object !== undefined ) {
 				// helper
 				threeEditor.select( object.userData.object );
@@ -202,6 +250,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		} else {
 			that.removeSelectedOutline();
 			threeEditor.select( null );
+			that.attrPop_.close();
 		}
 		
 
@@ -374,7 +423,19 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// Highlight newly selected feature
 			that.silhouetteGreen.selected = [ pickedFeature ];
 
+			
+			
+			// Set feature infobox description
+			var propNames = pickedFeature.getPropertyNames();
+			var featureName = pickedFeature.getProperty('name');
+			that.selectedEntity.name = featureName;
+			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
 			cviewer.selectedEntity = that.selectedEntity;
+			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
+			for( var i in propNames ){
+				that.selectedEntity.description += '<tr><th>' + propNames[i] + '</th><td>' + pickedFeature.getProperty(propNames[i]) + '</td></tr>';
+			}
+			that.selectedEntity.description += '</tbody></table>';
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	} else {
 		// Silhouettes are not supported. Instead, change the feature color.
@@ -1010,8 +1071,13 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 		return;
 	}
 
-	var obj = object, threeObject = this.map.getThreeObjectByUuid(obj.uuid), extent = threeObject.getExtent(), x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2, centerCart = Cesium.Cartesian3
-	.fromDegrees(x, y);
+	var obj = object,
+		threeObject = this.map.getThreeObjectByUuid(obj.uuid),
+		feature = threeObject.getFeature(),
+		extent = feature.getGeometry().getExtent(),
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y);
 
 	obj.position.copy(centerCart);
 }

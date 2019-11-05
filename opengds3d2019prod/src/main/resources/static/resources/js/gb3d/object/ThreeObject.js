@@ -40,9 +40,32 @@ gb3d.object.ThreeObject = function(obj) {
 	this.tileId = options.tileId ? options.tileId : undefined;
 	// 소속된 2D 레이어 또는 식별자
 	this.layer = options.layer ? options.layer : undefined;
+	// openlayers jstree id
+	this.treeid = options.treeid ? options.treeid : undefined;
 
 	this.modCount = 0;
 }
+
+/**
+ * treeid를 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getTreeid
+ * @return {String} Layer
+ */
+gb3d.object.ThreeObject.prototype.getTreeid = function() {
+	return this.treeid;
+};
+
+/**
+ * treeid를 할당한다.
+ * 
+ * @method gb3d.object.ThreeObject#setTreeid
+ * @param {string}
+ *            treeid - jstree id
+ */
+gb3d.object.ThreeObject.prototype.setTreeid = function( treeid ) {
+	this.treeid = treeid;
+};
 
 /**
  * Layer를 반환한다.

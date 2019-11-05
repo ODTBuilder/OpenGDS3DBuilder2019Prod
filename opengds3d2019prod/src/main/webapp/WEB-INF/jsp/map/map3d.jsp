@@ -235,8 +235,8 @@ html, body {
 
 		var tilesetManager = new gb3d.edit.TilesetManager( { map: gb3dMap } );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
-		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/TilesetWithDiscreteLOD/tileset.json", "testLayerTile2", "testLayer" );
-		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer" );
+		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
+		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer" );
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -275,6 +275,11 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
+		var threeTree = new gb3d.tree.Three({
+			"target" : "#attrObject",
+			"map" : gb3dMap
+		});
+		
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -285,7 +290,8 @@ html, body {
 			"token" : urlList.token,
 			"url" : {
 				"getLegend" : urlList.getLegend + urlList.token
-			}
+			},
+			"threeTree" : threeTree.jstree,
 		});
 
 		var uploadSHP = new gb.geoserver.UploadSHP({
@@ -304,11 +310,6 @@ html, body {
 			"url" : undefined,
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap
-		});
-
-		var threeTree = new gb3d.tree.Three({
-			"target" : "#attrObject",
-			"map" : gb3dMap
 		});
 
 		var importThree = new gb3d.io.ImporterThree({
@@ -380,11 +381,18 @@ html, body {
 			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			isDisplay : false
 		});
+		
+		/* otree.getJSTreeElement().on('create_node.jstreeol3', function(e, data) {
+			var instance = threeTree.jstree;
+			var parent = data.parent;
+			var node = data.node;
+			instance.create_node(parent, node.original, "last", false, false);
+		}); */
 
 		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
 			var treeid = data.selected[0];
 			var layer = data.instance.get_LayerById(treeid);
-
+			
 			if (!layer) {
 				return;
 			}
