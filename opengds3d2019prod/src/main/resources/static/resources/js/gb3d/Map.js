@@ -904,24 +904,25 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var beforeGeomTest = feature.getGeometry().clone();
 		console.log(beforeGeomTest.getCoordinates().length);
 		var beforeCoord = beforeGeomTest.getCoordinates();
-		var result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(beforeCoord, option["width"]/2, [x, y], depth);
+		result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(beforeCoord, option["width"]/2, [x, y], depth);
 	} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
 
 	}
-/*
-	if(this.objectAttr.type === "MultiLineString"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
-	} else if(this.objectAttr.type === "LineString"){
-		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], [x, y], depth);
-	} else {
-		return;
-	}
+
+//	if(this.objectAttr.type === "MultiLineString"){
+//		result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], option["width"]/2, [x, y], depth);
+//	} else if(this.objectAttr.type === "LineString"){
+//		result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord, option["width"]/2, [x, y], depth);
+//	} else {
+//		return;
+//	}
 
 	geometry = new THREE.Geometry();
 	geometry.vertices = result.points;
 	geometry.faces = result.faces;
 
 	// 이준 시작
+	/*
 	var bottomStart = result.uvindex["bottomStart"];
 	var bottomEnd = result.uvindex["bottomEnd"];
 	var topStart = result.uvindex["topStart"];
@@ -1039,6 +1040,7 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 	}
 
 	geometry.uvsNeedUpdate = true;
+	*/
 // 이준 끝
 	
 	var doubleSideMaterial = new THREE.MeshStandardMaterial({
@@ -1084,7 +1086,7 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 
 	this.addThreeObject(obj3d);
 	return obj3d;
-	*/
+	
 }
 
 gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
