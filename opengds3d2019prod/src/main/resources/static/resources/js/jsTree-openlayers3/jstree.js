@@ -667,10 +667,10 @@
 									layer.set("treeid", id);
 								}
 							} else {
-								layer.set("treeid", id);
+//								layer.set("treeid", id);
 							}
 						} else {
-							layer.set("treeid", id);
+//							layer.set("treeid", id);
 						}
 					}
 				},

@@ -341,11 +341,12 @@ gb3d.tree.Three = function(obj) {
 		var threeObject = e.object;
 		var object = threeObject.getObject();
 		var treeid = threeObject.getTreeid();
+		var featureId = threeObject.feature.getId();
 		
 		that.jstree.create_node( treeid, {
 			"parent": treeid,
 			"id": object.uuid,
-			"text": object.uuid
+			"text": featureId
 		}, "last", false, false );
 	} );
 	

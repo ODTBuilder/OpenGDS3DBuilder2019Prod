@@ -386,7 +386,10 @@ html, body {
 			var instance = threeTree.jstree;
 			var parent = data.parent;
 			var node = data.node;
-			instance.create_node(parent, node.original, "last", false, false);
+			
+			if(!instance.get_node(node.id)){
+				instance.create_node(parent, node.original, "last", false, false);
+			}
 		}); */
 
 		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
