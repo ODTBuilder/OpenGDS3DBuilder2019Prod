@@ -527,25 +527,31 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	 * points.push(vect); }
 	 */
 	var sectorVertice = [];
-	var sectorFacesTop = [];
 	var sectorFacesBottom = [];
+	var sectorFacesTop = [];
 	var sectorSides = [];
 
+	var jointSectorVertice = [];
+	var jointSectorFacesBottom = [];
+	var jointSectorFacesTop = [];
+	var jointSectorSides = [];
+	
 	var rectangleVertice = [];
-	var rectangleFacesTop = [];
 	var rectangleFacesBottom = [];
+	var rectangleFacesTop = [];
 	var rectangleSides = [];
 
 	var points2d = [];
-	var start2DSectorTopStart = 0;
-	var start2DSectorTopEnd = 0;
-	var end2DSectorTopStart = 0;
-	var end2DSectorTopEnd = 0;
 	
-	var sectorStartTopStart = 0;
-	var sectorStartTopEnd = 0;
-	var sectorEndTopStart = 0;
-	var sectorEndTopEnd = 0;
+	var sectorStartTopStart;
+	var sectorStartTopEnd;
+	var sectorStartBottomStart;
+	var sectorStartBottomEnd;
+	
+	var sectorEndTopStart;
+	var sectorEndTopEnd;
+	var sectorEndBottomStart;
+	var sectorEndBottomEnd;
 	
 	for(var i = 0; i < coordLength; i++){
 		if (i > 0) {
@@ -588,19 +594,26 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	// 부채꼴 밑면 버텍스 및 페이스
 	var vlength = sectorVertice.length;
 	for (var i = 0; i < exceptLast.length; i++) {
+		points2d.push([exceptLast[i][0], exceptLast[i][1]]);
 		cart = Cesium.Cartesian3.fromDegrees(exceptLast[i][0], exceptLast[i][1]);
 		vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 		vect.sub(centerVec);
 		sectorVertice.push(vect);
 		if (i !== 0 || i !== exceptLast.length - 1) {
+			if (i === 1) {
+				sectorStartBottomStart = sectorFacesBottom.length;
+			}
 			if (exceptLast[0] && exceptLast[i] && exceptLast[i+1]) {
 				var face = [vlength + 0, vlength + i, vlength + i+1];
 				sectorFacesBottom.push(face);			
-			}	
+			}
+			if (i === exceptLast.length - 2) {
+				sectorStartBottomEnd = sectorFacesBottom.length;
+			}
 		}
 	}
-	start2DSectorTopEnd = sectorVertice.length;
-	end2DSectorTopStart = sectorVertice.length;
+	sectorStartTopStart = sectorStartBottomStart;
+	sectorStartTopEnd = sectorStartBottomEnd;
 	
 	// 부채꼴 윗면 페이스
 	var blength = exceptLast.length;
@@ -612,6 +625,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		sectorTopFaces[k].reverse();
 	}
 	sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+	
 	// 부채꼴 윗면 버텍스
 	var cp;
 	for(var i = 1; i < exceptLast.length; i++){
@@ -621,7 +635,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		}
 	}
 	console.log("좌표 길이는: "+exceptLast.length);
-	sectorStartTopStart  = sectorVertice.length;
+	
 	for(var i = 0; i < exceptLast.length; i++){
 		points2d.push([exceptLast[i][0], exceptLast[i][1]]);
 		cart = Cesium.Cartesian3.fromDegrees(exceptLast[i][0], exceptLast[i][1]);
@@ -634,7 +648,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		vect.sub(centerVec);
 		sectorVertice.push(vect);
 	}
-	sectorStartTopEnd  = sectorVertice.length;
 // console.log("지금까지 연결된 배열: ");
 // console.log(bufferedLineString);
 
@@ -662,14 +675,21 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		vect.sub(centerVec);
 		sectorVertice.push(vect);
 		if (i !== 0 || i !== exceptLast.length - 1) {
+			if (i === 1) {
+				sectorEndBottomStart = sectorFacesBottom.length;
+			}
 			if (exceptLast[0] && exceptLast[i] && exceptLast[i+1]) {
 				var face = [vlength, vlength + i, vlength + i + 1];
 				sectorFacesBottom.push(face);	
 				currentSectorFaces.push(face);
 			}	
+			if (i === exceptLast.length - 2) {
+				sectorEndBottomEnd = sectorFacesBottom.length;
+			}
 		}
 	}
-	end2DSectorTopEnd = sectorVertice.length;
+	sectorEndTopStart = sectorEndBottomStart;
+	sectorEndTopEnd = sectorEndBottomEnd;
 	// 부채꼴 윗면 페이스
 	var blength = exceptLast.length;
 	var sectorTopFaces = JSON.parse(JSON.stringify(currentSectorFaces));   
@@ -679,7 +699,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 		sectorTopFaces[k].reverse();
 	}
-	sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+	sectorFacesTop = sectorFacesTop.concat(sectorTopFaces);
 	// 부채꼴 윗면 버텍스
 	var cp;
 	for(var i = 1; i < exceptLast.length; i++){
@@ -689,7 +709,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		}
 	}
 	console.log("좌표 길이는: "+exceptLast.length);
-	sectorEndTopStart  = sectorVertice.length;
 	for(var i = 0; i < exceptLast.length; i++){
 		points2d.push([exceptLast[i][0], exceptLast[i][1]]);
 		cart = Cesium.Cartesian3.fromDegrees(exceptLast[i][0], exceptLast[i][1]);
@@ -702,7 +721,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		vect.sub(centerVec);
 		sectorVertice.push(vect);
 	}
-	sectorEndTopEnd  = sectorVertice.length;
+	
 	// 시작선과 끝선의 긴쪽 모서리
 	var start13 = turf.lineString([startRect["p1"], startRect["p3"]]);
 	var start24 = turf.lineString([startRect["p2"], startRect["p4"]]);
@@ -757,17 +776,20 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			
 			// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 			var exceptLast = outerSector.coordinates;
-			var vlength = sectorVertice.length;
+// var vlength = sectorVertice.length;
+			var vlength = jointSectorVertice.length;
 			var currentSectorFaces = [];
 			for (var j = 0; j < exceptLast.length; j++) {
 				cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 				vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 				vect.sub(centerVec);
-				sectorVertice.push(vect);
+				jointSectorVertice.push(vect);
+//				sectorVertice.push(vect);
 				if (j !== 0 || j !== exceptLast.length - 1) {
 					if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 						var face = [vlength, vlength + j, vlength + j + 1];
-						sectorFacesBottom.push(face);
+// sectorFacesBottom.push(face);
+						jointSectorFacesBottom.push(face);
 						currentSectorFaces.push(face);
 					}	
 				}
@@ -781,7 +803,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 				sectorTopFaces[k].reverse();
 			}
-			sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+// sectorFacesTop = sectorFacesTop.concat(sectorTopFaces);
+			jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 			// 3차원 객체 윗면 vertex 계산
 			var cp;
 			for(var j = 1; j < exceptLast.length; j++){
@@ -794,12 +817,15 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			for (var j = 0; j < exceptLast.length; j++){
 				cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 				if(j > 1){
-					sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-					sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+//					sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+//					sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+					jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+					jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 				}
 				vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 				vect.sub(centerVec);
-				sectorVertice.push(vect);
+// sectorVertice.push(vect);
+				jointSectorVertice.push(vect);
 			}
 		} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
 			// 24번 선만 겹침
@@ -831,17 +857,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			
 			// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 			var exceptLast = outerSector.coordinates;
-			var vlength = sectorVertice.length;
+			var vlength = jointSectorVertice.length;
 			var currentSectorFaces = [];
 			for (var j = 0; j < exceptLast.length; j++){
 				cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 				vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 				vect.sub(centerVec);
-				sectorVertice.push(vect);
+				jointSectorVertice.push(vect);
 				if (j !== 0 || j !== exceptLast.length - 1) {
 					if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 						var face = [vlength, vlength + j, vlength + j + 1];
-						sectorFacesBottom.push(face);	
+						jointSectorFacesBottom.push(face);	
 						currentSectorFaces.push(face);
 					}	
 				}
@@ -855,7 +881,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 				sectorTopFaces[k].reverse();
 			}
-			sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//			jointSectorFacesTop = jointSectorFacesBottom.concat(sectorTopFaces);
+			jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 			// 3차원 객체 윗면 vertex 계산
 			var cp;
 			for(var j = 1; j < exceptLast.length; j++){
@@ -868,12 +895,13 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			for (var j = 0; j < exceptLast.length; j++){
 				cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 				if(j > 1){
-					sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-					sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+					jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+					jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 				}
 				vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 				vect.sub(centerVec);
-				sectorVertice.push(vect);
+//				sectorVertice.push(vect);
+				jointSectorVertice.push(vect);
 			}
 		} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
 			// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
@@ -964,17 +992,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				
 				// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 				var exceptLast = outerSector.coordinates;
-				var vlength = sectorVertice.length;
+				var vlength = jointSectorVertice.length;
 				var currentSectorFaces = [];
 				for (var j = 0; j < exceptLast.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 					vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 					vect.sub(centerVec);
-					sectorVertice.push(vect);
+					jointSectorVertice.push(vect);
 					if (j !== 0 || j !== exceptLast.length - 1) {
 						if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 							var face = [vlength, vlength + j, vlength + j + 1];
-							sectorFacesBottom.push(face);			
+							jointSectorFacesBottom.push(face);			
 							currentSectorFaces.push(face);
 						}	
 					}
@@ -988,7 +1016,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 					sectorTopFaces[k].reverse();
 				}
-				sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//				jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+				jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 				// 3차원 객체 윗면 vertex 계산
 				var cp;
 				for(var j = 1; j < exceptLast.length; j++){
@@ -1001,12 +1030,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				for (var j = 0; j < exceptLast.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 					if(j > 1){
-						sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-						sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+						jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+						jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 					}
 					vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 					vect.sub(centerVec);
-					sectorVertice.push(vect);
+					jointSectorVertice.push(vect);
 				}
 			} else if (round > 180) {
 				if (startRect["p3"][1] > startRect["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
@@ -1026,17 +1055,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				
 				// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 				var exceptLast = outerSector.coordinates;
-				var vlength = sectorVertice.length;
+				var vlength = jointSectorVertice.length;
 				var currentSectorFaces = [];
 				for (var j = 0; j < exceptLast.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 					vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 					vect.sub(centerVec);
-					sectorVertice.push(vect);
+					jointSectorVertice.push(vect);
 					if (j !== 0 || j !== exceptLast.length - 1) {
 						if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 							var face = [vlength, vlength + j, vlength + j + 1];
-							sectorFacesBottom.push(face);			
+							jointSectorFacesBottom.push(face);			
 							currentSectorFaces.push(face);
 						}	
 					}
@@ -1050,7 +1079,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 					sectorTopFaces[k].reverse();
 				}
-				sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//				jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+				jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 				// 3차원 객체 윗면 vertex 계산
 				var cp;
 				for(var j = 1; j < exceptLast.length; j++){
@@ -1063,12 +1093,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				for (var j = 0; j < exceptLast.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 					if(j > 1){
-						sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-						sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+						jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+						jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 					}
 					vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 					vect.sub(centerVec);
-					sectorVertice.push(vect);
+					jointSectorVertice.push(vect);
 				}
 			}
 		}
@@ -1196,6 +1226,68 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			rectangleVertice.push(vect);
 		}
 
+	} else if (coord.length === 2) {
+		// 반시계로 넣음 1-3-4-2
+		var rectOrder = [startRect["p1"], startRect["p3"], startRect["end"], startRect["p4"], startRect["p2"], startRect["start"]];
+		// 사각형 밑면 버텍스
+		var rvlength = rectangleVertice.length;
+		for (var j = 0; j < rectOrder.length; j++) {
+			cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
+			vect = new THREE.Vector3(cart.x, cart.y, cart.z);
+			vect.sub(centerVec);
+			rectangleVertice.push(vect);
+		}
+		// 사각형 밑면 페이스
+		var rface1 = [rvlength + 4, rvlength + 3, rvlength + 5];
+		var rface2 = [rvlength + 3, rvlength + 2, rvlength + 5];
+		var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0];
+		var rface4 = [rvlength + 2, rvlength + 1, rvlength + 0];
+		rectangleFacesBottom.push(rface1);
+		rectangleFacesBottom.push(rface2);
+		rectangleFacesBottom.push(rface3);
+		rectangleFacesBottom.push(rface4);
+		var currentRectangleTopFaces = [];
+		currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
+		currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface2)));
+		currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface3)));
+		currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4)));
+		// 사각형 윗면 페이스
+		var rolength = rectOrder.length;
+		for (var j = 0; j < currentRectangleTopFaces.length; j++) {
+			currentRectangleTopFaces[j][0] = currentRectangleTopFaces[j][0] + rolength;
+			currentRectangleTopFaces[j][1] = currentRectangleTopFaces[j][1] + rolength;
+			currentRectangleTopFaces[j][2] = currentRectangleTopFaces[j][2] + rolength;
+			currentRectangleTopFaces[j].reverse();
+		}
+		var rectangleTopFaces = JSON.parse(JSON.stringify(currentRectangleTopFaces));
+		rectangleFacesTop = rectangleFacesTop.concat(rectangleTopFaces);
+
+		// 사각형 벡터 계산
+		var cp;
+		for(var i = 1; i < rectOrder.length -1; i++){
+			if(!gb3d.Math.isParallel(rectOrder[i+1], rectOrder[i-1], rectOrder[i])){
+				cp = gb3d.Math.crossProductFromDegrees(rectOrder[i+1], rectOrder[i-1], rectOrder[i]);
+				break;
+			}
+		}
+		console.log("좌표 길이는: "+rectOrder.length);
+		// 사각형 윗면 버텍스
+// rvlength = rectangleVertice.length;
+		for(var i = 0; i < rectOrder.length; i++){
+			cart = Cesium.Cartesian3.fromDegrees(rectOrder[i][0], rectOrder[i][1]);
+			// 보여야 할 사각형 옆면 페이스
+			if (i === 0) {
+				rectangleSides.push([ rvlength + i + 1, rvlength + 1 + rectOrder.length, rvlength + i ]);
+				rectangleSides.push([ rvlength + 1 + rectOrder.length, rvlength + rectOrder.length, rvlength + i ]);	
+			} else if (i === 3) {
+				rectangleSides.push([ rvlength + i + 1, rvlength + (2 * rectOrder.length - 2), rvlength + i ]);
+				rectangleSides.push([ rvlength + (2 * rectOrder.length - 2), rvlength + i + rectOrder.length, rvlength + i ]);
+			}
+			
+			vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
+			vect.sub(centerVec);
+			rectangleVertice.push(vect);
+		}
 	} else if (coord.length < 2) {
 		console.error("need over 1 points");
 		return;
@@ -1248,17 +1340,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);	
+								jointSectorFacesBottom.push(face);	
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -1272,7 +1364,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -1285,12 +1378,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
 					// 24번 선만 겹침
@@ -1321,17 +1414,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);		
+								jointSectorFacesBottom.push(face);		
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -1345,7 +1438,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -1358,12 +1452,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
 					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
@@ -1452,17 +1546,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);
+									jointSectorFacesBottom.push(face);
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -1476,7 +1570,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -1489,12 +1584,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					} else if (round > 180) {
 						if (startRect["p3"][1] > startRect["p4"][1] && midRects[i]["p1"][1] > midRects[i]["p2"][1]) {
@@ -1514,17 +1609,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);			
+									jointSectorFacesBottom.push(face);			
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -1538,7 +1633,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -1551,12 +1647,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					}
 				}
@@ -1658,17 +1754,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						extentSource.addFeature(fe);
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);			
+									jointSectorFacesBottom.push(face);			
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -1682,7 +1778,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -1695,12 +1792,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
 						// 24번 선만 겹침
@@ -1731,17 +1828,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);			
+									jointSectorFacesBottom.push(face);			
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -1755,7 +1852,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -1768,12 +1866,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
 						// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
@@ -1865,17 +1963,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							
 							// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 							var exceptLast = outerSector.coordinates;
-							var vlength = sectorVertice.length;
+							var vlength = jointSectorVertice.length;
 							var currentSectorFaces = [];
 							for (var j = 0; j < exceptLast.length; j++){
 								cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 								vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 								vect.sub(centerVec);
-								sectorVertice.push(vect);
+								jointSectorVertice.push(vect);
 								if (j !== 0 || j !== exceptLast.length - 1) {
 									if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 										var face = [vlength, vlength + j, vlength + j + 1];
-										sectorFacesBottom.push(face);		
+										jointSectorFacesBottom.push(face);		
 										currentSectorFaces.push(face);
 									}	
 								}
@@ -1889,7 +1987,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 								sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 								sectorTopFaces[k].reverse();
 							}
-							sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//							jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+							jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 							// 3차원 객체 윗면 vertex 계산
 							var cp;
 							for(var j = 1; j < exceptLast.length; j++){
@@ -1902,12 +2001,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							for (var j = 0; j < exceptLast.length; j++){
 								cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 								if(j > 1){
-									sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-									sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+									jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+									jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 								}
 								vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 								vect.sub(centerVec);
-								sectorVertice.push(vect);
+								jointSectorVertice.push(vect);
 							}
 						} else if (round > 180) {
 							if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
@@ -1928,17 +2027,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							
 							// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 							var exceptLast = outerSector.coordinates;
-							var vlength = sectorVertice.length;
+							var vlength = jointSectorVertice.length;
 							var currentSectorFaces = [];
 							for (var j = 0; j < exceptLast.length; j++){
 								cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 								vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 								vect.sub(centerVec);
-								sectorVertice.push(vect);
+								jointSectorVertice.push(vect);
 								if (j !== 0 || j !== exceptLast.length - 1) {
 									if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 										var face = [vlength, vlength + j, vlength + j + 1];
-										sectorFacesBottom.push(face);		
+										jointSectorFacesBottom.push(face);		
 										currentSectorFaces.push(face);
 									}	
 								}
@@ -1952,7 +2051,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 								sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 								sectorTopFaces[k].reverse();
 							}
-							sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//							jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+							jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 							// 3차원 객체 윗면 vertex 계산
 							var cp;
 							for(var j = 1; j < exceptLast.length; j++){
@@ -1965,12 +2065,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							for (var j = 0; j < exceptLast.length; j++){
 								cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 								if(j > 1){
-									sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-									sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+									jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+									jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 								}
 								vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 								vect.sub(centerVec);
-								sectorVertice.push(vect);
+								jointSectorVertice.push(vect);
 							}
 						}
 					}
@@ -2018,7 +2118,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					}
 					console.log("좌표 길이는: "+rectOrder.length);
 					// 사각형 윗면 버텍스
-// rvlength = rectangleVertice.length;
 					for(var j = 0; j < rectOrder.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
 						// 보여야 할 사각형 옆면 페이스
@@ -2136,17 +2235,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);		
+								jointSectorFacesBottom.push(face);		
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -2160,7 +2259,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -2173,12 +2273,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
 					// 24번 선만 겹침
@@ -2209,17 +2309,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);		
+								jointSectorFacesBottom.push(face);		
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -2233,7 +2333,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -2246,12 +2347,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
 					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
@@ -2342,17 +2443,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);			
+									jointSectorFacesBottom.push(face);			
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -2366,7 +2467,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -2379,12 +2481,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					} else if (round > 180) {
 						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && endRect["p1"][1] > endRect["p2"][1]) {
@@ -2404,17 +2506,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);			
+									jointSectorFacesBottom.push(face);			
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -2428,7 +2530,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -2441,12 +2544,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					}
 					
@@ -2615,17 +2718,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);			
+								jointSectorFacesBottom.push(face);			
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -2639,7 +2742,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -2652,12 +2756,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
 					// 24번 선만 겹침
@@ -2688,17 +2792,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 					var exceptLast = outerSector.coordinates;
-					var vlength = sectorVertice.length;
+					var vlength = jointSectorVertice.length;
 					var currentSectorFaces = [];
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 						if (j !== 0 || j !== exceptLast.length - 1) {
 							if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 								var face = [vlength, vlength + j, vlength + j + 1];
-								sectorFacesBottom.push(face);			
+								jointSectorFacesBottom.push(face);			
 								currentSectorFaces.push(face);
 							}	
 						}
@@ -2712,7 +2816,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-					sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
 					for(var j = 1; j < exceptLast.length; j++){
@@ -2725,12 +2830,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					for (var j = 0; j < exceptLast.length; j++){
 						cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 						if(j > 1){
-							sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-							sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+							jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+							jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 						}
 						vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 						vect.sub(centerVec);
-						sectorVertice.push(vect);
+						jointSectorVertice.push(vect);
 					}
 				}  else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
 					// 너무 많이 꺾여서 겹쳐야 되는 두선이 거의 평행한데다가 짧아서 교차하지 않음
@@ -2819,17 +2924,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);		
+									jointSectorFacesBottom.push(face);		
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -2843,7 +2948,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-						sectorFacesTop = sectorFacesTop.concat(sectorTopFaces); 
+//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
 						for(var j = 1; j < exceptLast.length; j++){
@@ -2856,12 +2962,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					} else if (round > 180) {
 						if (midRects[i]["p3"][1] > midRects[i]["p4"][1] && midRects[i+1]["p1"][1] > midRects[i+1]["p2"][1]) {
@@ -2881,17 +2987,17 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
-						var vlength = sectorVertice.length;
+						var vlength = jointSectorVertice.length;
 						var currentSectorFaces = [];
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 							if (j !== 0 || j !== exceptLast.length - 1) {
 								if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 									var face = [vlength, vlength + j, vlength + j + 1];
-									sectorFacesBottom.push(face);		
+									jointSectorFacesBottom.push(face);		
 									currentSectorFaces.push(face);
 								}	
 							}
@@ -2918,12 +3024,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						for (var j = 0; j < exceptLast.length; j++){
 							cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 							if(j > 1){
-								sectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
-								sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
+								jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
+								jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 							}
 							vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 							vect.sub(centerVec);
-							sectorVertice.push(vect);
+							jointSectorVertice.push(vect);
 						}
 					}
 				}
@@ -3056,41 +3162,77 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	console.log(sectorFacesBottom);
 	console.log(sectorFacesTop);
 	console.log(sectorSides);
+	
+	console.log(jointSectorVertice);
+	console.log(jointSectorFacesBottom);
+	console.log(jointSectorFacesTop);
+	console.log(jointSectorSides);
+	
 	console.log(rectangleVertice);
 	console.log(rectangleFacesBottom);
 	console.log(rectangleFacesTop);
 	console.log(rectangleSides);
+	
+	for (var i = 0; i < jointSectorFacesBottom.length; i++) {
+		jointSectorFacesBottom[i][0] = jointSectorFacesBottom[i][0] +  (sectorVertice.length);
+		jointSectorFacesBottom[i][1] = jointSectorFacesBottom[i][1] +  (sectorVertice.length);
+		jointSectorFacesBottom[i][2] = jointSectorFacesBottom[i][2] +  (sectorVertice.length);
+	}
+	for (var i = 0; i < jointSectorFacesTop.length; i++) {
+		jointSectorFacesTop[i][0] = jointSectorFacesTop[i][0] +  (sectorVertice.length);
+		jointSectorFacesTop[i][1] = jointSectorFacesTop[i][1] +  (sectorVertice.length);
+		jointSectorFacesTop[i][2] = jointSectorFacesTop[i][2] +  (sectorVertice.length);
+	}
+	for (var i = 0; i < jointSectorSides.length; i++) {
+		jointSectorSides[i][0] = jointSectorSides[i][0] +  (sectorVertice.length);
+		jointSectorSides[i][1] = jointSectorSides[i][1] +  (sectorVertice.length);
+		jointSectorSides[i][2] = jointSectorSides[i][2] +  (sectorVertice.length);
+	}
+	
 	for (var i = 0; i < rectangleFacesBottom.length; i++) {
-		rectangleFacesBottom[i][0] = rectangleFacesBottom[i][0] +  sectorVertice.length;
-		rectangleFacesBottom[i][1] = rectangleFacesBottom[i][1] +  sectorVertice.length;
-		rectangleFacesBottom[i][2] = rectangleFacesBottom[i][2] +  sectorVertice.length;
+		rectangleFacesBottom[i][0] = rectangleFacesBottom[i][0] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleFacesBottom[i][1] = rectangleFacesBottom[i][1] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleFacesBottom[i][2] = rectangleFacesBottom[i][2] +  (sectorVertice.length + jointSectorVertice.length);
 	}
 	for (var i = 0; i < rectangleFacesTop.length; i++) {
-		rectangleFacesTop[i][0] = rectangleFacesTop[i][0] +  sectorVertice.length;
-		rectangleFacesTop[i][1] = rectangleFacesTop[i][1] +  sectorVertice.length;
-		rectangleFacesTop[i][2] = rectangleFacesTop[i][2] +  sectorVertice.length;
+		rectangleFacesTop[i][0] = rectangleFacesTop[i][0] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleFacesTop[i][1] = rectangleFacesTop[i][1] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleFacesTop[i][2] = rectangleFacesTop[i][2] +  (sectorVertice.length + jointSectorVertice.length);
 	}
 	for (var i = 0; i < rectangleSides.length; i++) {
-		rectangleSides[i][0] = rectangleSides[i][0] +  sectorVertice.length;
-		rectangleSides[i][1] = rectangleSides[i][1] +  sectorVertice.length;
-		rectangleSides[i][2] = rectangleSides[i][2] +  sectorVertice.length;
+		rectangleSides[i][0] = rectangleSides[i][0] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleSides[i][1] = rectangleSides[i][1] +  (sectorVertice.length + jointSectorVertice.length);
+		rectangleSides[i][2] = rectangleSides[i][2] +  (sectorVertice.length + jointSectorVertice.length);
 	}
 	var sectorBottomfacesStart =  0;
 	var sectorBottomfacesEnd =  sectorFacesBottom.length;
 	var sectorTopfacesStart =  sectorFacesBottom.length;
 	var sectorTopfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length;
+
 	var sectorSidesStart =  sectorFacesBottom.length + sectorFacesTop.length;
 	var sectorSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length;
 	
-	var rectangleBottomfacesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length;
-	var rectangleBottomfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + rectangleFacesBottom.length;
-	var rectangleTopfacesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + rectangleFacesBottom.length;
-	var rectangleTopfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
-	var rectangleSidesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
-	var rectangleSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length + rectangleSides.length;
+	var jointSectorBottomfacesStart = sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length;
+	var jointSectorBottomfacesEnd = sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length;
+	var jointSectorTopfacesStart = sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length;
+	var jointSectorTopfacesEnd = sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length;
 	
-	var points = sectorVertice.concat(rectangleVertice);
-	var bfaces = sectorFacesBottom.concat(sectorFacesTop).concat(sectorSides).concat(rectangleFacesBottom).concat(rectangleFacesTop).concat(rectangleSides);
+	var jointSectorSidesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length;
+	var jointSectorSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length;
+	
+	var rectangleBottomfacesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length;
+	var rectangleBottomfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length;
+	var rectangleTopfacesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length;
+	var rectangleTopfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
+	var rectangleSidesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
+	var rectangleSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length + rectangleSides.length;
+	
+// var jointSectorVertice = [];
+// var jointSectorFacesTop = [];
+// var jointSectorFacesBottom = [];
+	
+	var points = sectorVertice.concat(jointSectorVertice).concat(rectangleVertice);
+	var bfaces = sectorFacesBottom.concat(sectorFacesTop).concat(sectorSides).concat(jointSectorFacesBottom).concat(jointSectorFacesTop).concat(jointSectorSides).concat(rectangleFacesBottom).concat(rectangleFacesTop).concat(rectangleSides);
 	var faces = [];
 	for (var i = 0; i < bfaces.length; i++) {
 		faces.push(new THREE.Face3(bfaces[i][0], bfaces[i][1], bfaces[i][2]));
@@ -3115,22 +3257,25 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			}
 		},
 		uvindex: {
-			sector2DStartTopStart : start2DSectorTopStart,
-			sector2DStartTopEnd : start2DSectorTopEnd,
-			sector2DEndTopStart : end2DSectorTopStart,
-			sector2DEndTopEnd : end2DSectorTopEnd,
-			
 			sectorStartTopStart: sectorStartTopStart,
 			sectorStartTopEnd: sectorStartTopEnd,
+			sectorStartBottomStart: sectorStartBottomStart,
+			sectorStartBottomEnd: sectorStartBottomEnd,
+			
 			sectorEndTopStart: sectorEndTopStart,
 			sectorEndTopEnd: sectorEndTopEnd,
-				
-			sectorBottomStart : sectorBottomfacesStart,
-			sectorBottomEnd : sectorBottomfacesEnd,
-			sectorTopStart : sectorTopfacesStart,
-			sectorTopEnd : sectorTopfacesEnd,
-			sectorSideStart :  sectorSidesStart,
-			sectorSideEnd : sectorSidesEnd,
+			sectorEndBottomStart: sectorEndBottomStart,
+			sectorEndBottomEnd: sectorEndBottomEnd,
+			
+			sectorSidesStart : sectorSidesStart,
+			sectorSidesEnd : sectorSidesEnd,
+			
+			jointSectorBottomfacesStart : jointSectorBottomfacesStart,
+			jointSectorBottomfacesEnd : jointSectorBottomfacesEnd,
+			jointSectorTopfacesStart : jointSectorTopfacesStart,
+			jointSectorTopfacesEnd : jointSectorTopfacesEnd,
+			jointSectorSidesStart :  jointSectorSidesStart,
+			jointSectorSidesEnd : jointSectorSidesEnd,
 			
 			rectangleBottomStart : rectangleBottomfacesStart,
 			rectangleBottomEnd : rectangleBottomfacesEnd,

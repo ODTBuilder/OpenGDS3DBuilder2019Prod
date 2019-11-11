@@ -927,20 +927,21 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 	geometry.faces = result.faces;
 
 	// 이준 시작
-	var sector2DStartTopStart = result.uvindex["sector2DStartTopStart"];
-	var sector2DStartTopEnd = result.uvindex["sector2DStartTopEnd"];
-	var sector2DEndTopStart = result.uvindex["sector2DEndTopStart"];
-	var sector2DEndTopEnd = result.uvindex["sector2DEndTopEnd"];
-	
 	var sectorStartTopStart = result.uvindex["sectorStartTopStart"];
 	var sectorStartTopEnd = result.uvindex["sectorStartTopEnd"];
 	var sectorEndTopStart = result.uvindex["sectorEndTopStart"];
 	var sectorEndTopEnd = result.uvindex["sectorEndTopEnd"];
 	
+	var sectorStartBottomStart = result.uvindex["sectorStartBottomStart"];
+	var sectorStartBottomEnd = result.uvindex["sectorStartBottomEnd"];
+	var sectorEndBottomStart = result.uvindex["sectorEndBottomStart"];
+	var sectorEndBottomEnd = result.uvindex["sectorEndBottomEnd"];
+	
 	var sectorBottomStart = result.uvindex["sectorBottomStart"];
 	var sectorBottomEnd = result.uvindex["sectorBottomEnd"];
 	var sectorTopStart = result.uvindex["sectorTopStart"];
 	var sectorTopEnd = result.uvindex["sectorTopEnd"];
+	
 	var sectorSideStart = result.uvindex["sectorSideStart"];
 	var sectorSideEnd = result.uvindex["sectorSideEnd"];
 	
@@ -963,8 +964,8 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 	var faces = geometry.faces;
 
 	geometry.faceVertexUvs[0] = [];
-	// 부채꼴 밑면 - 0으로 없애기
-	for (var i = sectorBottomStart; i < sectorBottomEnd; i++) {
+	// 시작 부채꼴 밑면 - 0으로 없애기
+	for (var i = sectorStartBottomStart; i < sectorStartBottomEnd; i++) {
 		var face = faces[i];
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
@@ -976,17 +977,15 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 			]);
 	}
 	// 시작과 끝의 부채꼴
-	var copySectorStartTopStart = sectorStartTopStart;
-	var copySectorStartTopEnd = sectorStartTopEnd;
-	for (var i = copySectorStartTopStart; i < copySectorStartTopEnd; i++) {
+	for (var i = sectorStartTopStart; i < sectorStartTopEnd; i++) {
 		// 이 버텍스와 연결되는 2d 버텍스
 		var face = faces[i];
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		var coord1 = result.coordinatesSSE[face.a - (sectorStartTopStart)];
-		var coord2 = result.coordinatesSSE[face.b - (sectorStartTopStart)];
-		var coord3 = result.coordinatesSSE[face.c - (sectorStartTopStart)];
+		var coord1 = result.coordinatesSSE[face.a];
+		var coord2 = result.coordinatesSSE[face.b];
+		var coord3 = result.coordinatesSSE[face.c];
 		console.log("2d 좌표의 값은:");
 		console.log(coord1);
 		console.log(coord2);
@@ -1003,17 +1002,28 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		]);
 	}
 	
-	var copySectorEndTopStart = sectorEndTopStart;
-	var copySectorEndTopEnd = sectorEndTopEnd;
-	for (var i = copySectorEndTopStart; i < copySectorEndTopEnd; i++) {
+	// 시작 부채꼴 밑면 - 0으로 없애기
+	for (var i = sectorEndBottomStart; i < sectorEndBottomEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0),
+			new THREE.Vector2(0, 0)
+			]);
+	}
+	
+	for (var i = sectorEndTopStart; i < sectorEndTopEnd; i++) {
 		// 이 버텍스와 연결되는 2d 버텍스
 		var face = faces[i];
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		var coord1 = result.coordinatesSSE[face.a - (sectorEndTopStart)];
-		var coord2 = result.coordinatesSSE[face.b - (sectorEndTopStart)];
-		var coord3 = result.coordinatesSSE[face.c - (sectorEndTopStart)];
+		var coord1 = result.coordinatesSSE[face.a];
+		var coord2 = result.coordinatesSSE[face.b];
+		var coord3 = result.coordinatesSSE[face.c];
 		console.log("2d 좌표의 값은:");
 		console.log(coord1);
 		console.log(coord2);
@@ -1031,30 +1041,30 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 	}
 	
 //	// 도로 윗면의 비율
-//	var bottomStart = 0.6;
-//	for (var i = sectorTopStart; i < sectorTopEnd; i++) {
-//		var face = faces[i];
-//		var v1 = result.points[face.a],
-//		v2 = result.points[face.b],
-//		v3 = result.points[face.c];
-//		var coord1 = result.coordinatesSSE[face.a - (result.coordinates.length - 1)];
-//		var coord2 = result.coordinatesSSE[face.b - (result.coordinates.length - 1)];
-//		var coord3 = result.coordinatesSSE[face.c - (result.coordinates.length - 1)];
-//		console.log("2d 좌표의 값은:");
-//		console.log(coord1);
-//		console.log(coord2);
-//		console.log(coord3);
-//		
-//		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
-//		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
-//		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
-//		
-//		geometry.faceVertexUvs[0].push([
-//			vt1,
-//			vt2,
-//			vt3
-//		]);
-//	}
+	var bottomStart = 0.6;
+	for (var i = sectorTopStart; i < sectorTopEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		var coord1 = result.coordinatesSSE[face.a - (result.coordinates.length - 1)];
+		var coord2 = result.coordinatesSSE[face.b - (result.coordinates.length - 1)];
+		var coord3 = result.coordinatesSSE[face.c - (result.coordinates.length - 1)];
+		console.log("2d 좌표의 값은:");
+		console.log(coord1);
+		console.log(coord2);
+		console.log(coord3);
+		
+		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
+		
+		geometry.faceVertexUvs[0].push([
+			vt1,
+			vt2,
+			vt3
+		]);
+	}
 //	// 텍스쳐 이미지에서 건물 옆면의 비율
 //	var height = 0.6;
 //	// 건물 바닥의 비율
