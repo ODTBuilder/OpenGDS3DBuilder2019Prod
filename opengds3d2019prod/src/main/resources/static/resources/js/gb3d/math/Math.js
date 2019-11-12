@@ -804,7 +804,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				sectorTopFaces[k].reverse();
 			}
 // sectorFacesTop = sectorFacesTop.concat(sectorTopFaces);
-			jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+//			jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+			jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 			// 3차원 객체 윗면 vertex 계산
 			var cp;
 			for(var j = 1; j < exceptLast.length; j++){
@@ -3224,6 +3225,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	var rectangleBottomfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length;
 	var rectangleTopfacesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length;
 	var rectangleTopfacesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
+	
 	var rectangleSidesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
 	var rectangleSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length + rectangleSides.length;
 	
@@ -3257,32 +3259,24 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			}
 		},
 		uvindex: {
-			sectorStartTopStart: sectorStartTopStart,
-			sectorStartTopEnd: sectorStartTopEnd,
-			sectorStartBottomStart: sectorStartBottomStart,
-			sectorStartBottomEnd: sectorStartBottomEnd,
-			
-			sectorEndTopStart: sectorEndTopStart,
-			sectorEndTopEnd: sectorEndTopEnd,
-			sectorEndBottomStart: sectorEndBottomStart,
-			sectorEndBottomEnd: sectorEndBottomEnd,
-			
+			sectorBottomfacesStart : sectorBottomfacesStart,
+			sectorBottomfacesEnd : sectorBottomfacesEnd,
+			sectorTopfacesStart : sectorTopfacesStart,
+			sectorTopfacesEnd : sectorTopfacesEnd,
 			sectorSidesStart : sectorSidesStart,
 			sectorSidesEnd : sectorSidesEnd,
-			
 			jointSectorBottomfacesStart : jointSectorBottomfacesStart,
 			jointSectorBottomfacesEnd : jointSectorBottomfacesEnd,
 			jointSectorTopfacesStart : jointSectorTopfacesStart,
 			jointSectorTopfacesEnd : jointSectorTopfacesEnd,
-			jointSectorSidesStart :  jointSectorSidesStart,
+			jointSectorSidesStart : jointSectorSidesStart,
 			jointSectorSidesEnd : jointSectorSidesEnd,
-			
-			rectangleBottomStart : rectangleBottomfacesStart,
-			rectangleBottomEnd : rectangleBottomfacesEnd,
-			rectangleTopStart : rectangleTopfacesStart, 
-			rectangleTopEnd : rectangleTopfacesEnd,
-			rectangleSideStart :  rectangleSidesStart,
-			rectangleSideEnd : rectangleSidesEnd
+			rectangleBottomfacesStart : rectangleBottomfacesStart,
+			rectangleBottomfacesEnd : rectangleBottomfacesEnd,
+			rectangleTopfacesStart : rectangleTopfacesStart,
+			rectangleTopfacesEnd : rectangleTopfacesEnd,
+			rectangleSidesStart : rectangleSidesStart,
+			rectangleSidesEnd : rectangleSidesEnd
 		}
 	}
 }
