@@ -1094,8 +1094,8 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 			bottomLimit = topLimit - ratioHeight;
 		}
 //		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
-//		
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		
+//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;

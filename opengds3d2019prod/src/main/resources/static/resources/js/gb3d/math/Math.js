@@ -284,11 +284,6 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	// 1번 점에 할당
 	p1Point = destination1;
 
-	var po = new ol.geom.LineString([center1.geometry.coordinates, destination1.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-
 	var offsetX2 = ((perpenPoint2.geometry.coordinates[0] * -1) + (startPoint.geometry.coordinates[0]));
 	var offsetY2 = ((perpenPoint2.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
@@ -318,11 +313,6 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination2.geometry.coordinates);
 	// 2번 점에 할당
 	p2Point = destination2;
-
-	var po = new ol.geom.LineString([center2.geometry.coordinates, destination2.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 
 	var offsetX3 = ((perpenPoint1.geometry.coordinates[0] * -1) + (endPoint.geometry.coordinates[0]));
 	var offsetY3 = ((perpenPoint1.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
@@ -354,12 +344,6 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	// 3번 점에 할당
 	p3Point = destination3;
 
-
-	var po = new ol.geom.LineString([center3.geometry.coordinates, destination3.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-
 	var offsetX4 = ((perpenPoint2.geometry.coordinates[0] * -1) + (endPoint.geometry.coordinates[0]));
 	var offsetY4 = ((perpenPoint2.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
@@ -389,21 +373,6 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	polygon.push(destination4.geometry.coordinates);
 	// 4번 점에 할당
 	p4Point = destination4;
-
-	var po = new ol.geom.LineString([center4.geometry.coordinates, destination4.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-
-	var po = new ol.geom.LineString([p1Point.geometry.coordinates, p3Point.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
-
-	var po = new ol.geom.LineString([p2Point.geometry.coordinates, p4Point.geometry.coordinates], "XY");
-	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 
 	return {
 		"start" : startPoint.geometry.coordinates,
@@ -554,7 +523,14 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	var sectorEndBottomEnd;
 
 	for(var i = 0; i < coordLength; i++){
-		if (i > 0) {
+		if (coordLength === 1 && i === 0) {
+			var from = turf.point([coord[0][0], coord[0][1]]);
+			var to = turf.point([coord[1][0], coord[1][1]]);
+			var distance = turf.distance(from, to);
+			distance = distance * 1000;
+			max.x = distance; 
+			break;
+		} else if (i > 0) {
 			var from = turf.point([coord[i-1][0], coord[i-1][1]]);
 			var to = turf.point([coord[i][0], coord[i][1]]);
 			// console.log(from);
@@ -585,8 +561,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 	var po = new ol.geom.Polygon([se1.coordinates], "XY");
 	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 	extentSource.addFeature(fe);
 
 	// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -660,8 +634,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 	var po = new ol.geom.Polygon([se2.coordinates], "XY");
 	var fe = new ol.Feature(po);
-	sourceyj.addFeature(fe);
-	gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 	extentSource.addFeature(fe);
 
 	// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -752,16 +724,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 			var po1 = new ol.geom.Point(startRect["p3"], "XY");
 			var fe1 = new ol.Feature(po1);
-			sourceyj.addFeature(fe1);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe1);
 
 			endRect["p1"] = intersects13.features[0]["geometry"]["coordinates"];
 
 			var po2 = new ol.geom.Point(endRect["p1"], "XY");
 			var fe2 = new ol.Feature(po2);
-			sourceyj.addFeature(fe2);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe2);
 
 			var outerSector = gb3d.Math.getSector(startRect["end"], radius, startRect["angle4"], endRect["angle2"] );
@@ -770,8 +738,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 			var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 			var fe = new ol.Feature(po);
-			sourceyj.addFeature(fe);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe);
 
 			// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -836,16 +802,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 			var po1 = new ol.geom.Point(startRect["p4"], "XY");
 			var fe1 = new ol.Feature(po1);
-			sourceyj.addFeature(fe1);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe1);
 
 			endRect["p2"] = intersects24.features[0]["geometry"]["coordinates"];
 
 			var po2 = new ol.geom.Point(endRect["p2"], "XY");
 			var fe2 = new ol.Feature(po2);
-			sourceyj.addFeature(fe2);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe2);
 
 			var outerSector = gb3d.Math.getSector(startRect["end"], radius, endRect["angle1"], startRect["angle3"] );
@@ -854,8 +816,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 			var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 			var fe = new ol.Feature(po);
-			sourceyj.addFeature(fe);
-			gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 			extentSource.addFeature(fe);
 
 			// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -989,8 +949,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 				var fe = new ol.Feature(po);
-				sourceyj.addFeature(fe);
-				gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 				extentSource.addFeature(fe);
 
 				// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1052,8 +1010,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 				var fe = new ol.Feature(po);
-				sourceyj.addFeature(fe);
-				gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 				extentSource.addFeature(fe);
 
 				// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1324,16 +1280,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(startRect["p3"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i]["p1"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					// 부채꼴 함수 종종 오류나서 좌표가 유실되기 때문에 좌표를 사각형의 꼭지점으로 대체해줌
@@ -1342,8 +1294,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ?  midRects[i]["p2"] : startRect["p4"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1399,16 +1349,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(startRect["p4"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i]["p2"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					var outerSector = gb3d.Math.getSector(startRect["end"], radius, midRects[i]["angle1"], startRect["angle3"] );
@@ -1416,8 +1362,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ?  startRect["p3"] : midRects[i]["p1"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1548,8 +1492,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1611,8 +1553,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1744,16 +1684,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 						var po1 = new ol.geom.Point(midRects[i]["p3"], "XY");
 						var fe1 = new ol.Feature(po1);
-						sourceyj.addFeature(fe1);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe1);
 
 						midRects[i+1]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
 
 						var po2 = new ol.geom.Point(midRects[i+1]["p1"], "XY");
 						var fe2 = new ol.Feature(po2);
-						sourceyj.addFeature(fe2);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe2);
 
 						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
@@ -1761,8 +1697,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? midRects[i+1]["p2"] : midRects[i]["p4"];
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 						var exceptLast = outerSector.coordinates;
@@ -1817,16 +1751,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 						var po1 = new ol.geom.Point(midRects[i]["p4"], "XY");
 						var fe1 = new ol.Feature(po1);
-						sourceyj.addFeature(fe1);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe1);
 
 						midRects[i+1]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
 
 						var po2 = new ol.geom.Point(midRects[i+1]["p2"], "XY");
 						var fe2 = new ol.Feature(po2);
-						sourceyj.addFeature(fe2);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe2);
 
 						var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
@@ -1834,8 +1764,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? midRects[i]["p3"] : midRects[i+1]["p1"];
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -1969,8 +1897,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 							var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 							var fe = new ol.Feature(po);
-							sourceyj.addFeature(fe);
-							gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 							extentSource.addFeature(fe);
 
 							// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2033,8 +1959,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 							var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 							var fe = new ol.Feature(po);
-							sourceyj.addFeature(fe);
-							gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 							extentSource.addFeature(fe);
 
 							// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2227,16 +2151,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(midRects[i]["p3"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i+1]["p1"] = intersects13.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i+1]["p1"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i]["angle4"], midRects[i+1]["angle2"] );
@@ -2244,8 +2164,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? midRects[i+1]["p2"] : midRects[i]["p4"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2301,16 +2219,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(midRects[i]["p4"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i+1]["p2"] = intersects24.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i+1]["p2"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					var outerSector = gb3d.Math.getSector(midRects[i]["end"], radius, midRects[i+1]["angle1"], midRects[i]["angle3"] );
@@ -2318,8 +2232,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? midRects[i]["p3"] : midRects[i+1]["p1"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2450,8 +2362,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2513,8 +2423,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2708,16 +2616,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(endRect["p1"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i]["p3"] = intersects13.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i]["p3"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					var outerSector = gb3d.Math.getSector(endRect["start"], radius, midRects[i]["angle4"], endRect["angle2"]);
@@ -2725,8 +2629,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? endRect["p2"] : midRects[i]["p4"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2782,16 +2684,12 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 					var po1 = new ol.geom.Point(endRect["p2"], "XY");
 					var fe1 = new ol.Feature(po1);
-					sourceyj.addFeature(fe1);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe1);
 
 					midRects[i]["p4"] = intersects24.features[0]["geometry"]["coordinates"];
 
 					var po2 = new ol.geom.Point(midRects[i]["p4"], "XY");
 					var fe2 = new ol.Feature(po2);
-					sourceyj.addFeature(fe2);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe2);
 
 					var outerSector = gb3d.Math.getSector(endRect["start"], radius, endRect["angle1"], midRects[i]["angle3"]);
@@ -2799,8 +2697,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 					outerSector.coordinates[outerSector.eindex] = !outerSector.changed ? midRects[i]["p3"] : endRect["p1"];
 					var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 					var fe = new ol.Feature(po);
-					sourceyj.addFeature(fe);
-					gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 					extentSource.addFeature(fe);
 
 					// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2933,8 +2829,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
@@ -2996,8 +2890,6 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						}
 						var po = new ol.geom.Polygon([outerSector.coordinates], "XY");
 						var fe = new ol.Feature(po);
-						sourceyj.addFeature(fe);
-						gbMap.getUpperMap().getView().fit(sourceyj.getExtent());
 						extentSource.addFeature(fe);
 
 						// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
