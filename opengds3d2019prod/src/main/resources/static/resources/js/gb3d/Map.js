@@ -972,6 +972,64 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 			new THREE.Vector2(0, 0)
 			]);
 	}
+	var startOnly = (sectorTopfacesEnd - sectorTopfacesStart)/2;
+	var coordStart = [];
+	for (var i = sectorTopfacesStart; i < (sectorTopfacesStart + startOnly); i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		var coord1 = result.coordinatesSSE[face.a];
+		var coord2 = result.coordinatesSSE[face.b];
+		var coord3 = result.coordinatesSSE[face.c];
+		coordStart.push(coord1);
+		coordStart.push(coord2);
+		coordStart.push(coord3);
+	}
+	var lineStart = turf.lineString(coordStart);
+	var bboxStart = turf.bbox(lineStart);
+	var startRange2d = {
+			"min" : {
+				"x" : bboxStart[0],
+				"y" : bboxStart[1]
+			},
+			"max" : {
+				"x" : bboxStart[2],
+				"y" : bboxStart[3]
+			}
+	};
+	var offset2dStart = new THREE.Vector2(0 - startRange2d.min.x, 0 - startRange2d.min.y);
+	var range2dStart = new THREE.Vector2(((startRange2d.min.x - startRange2d.max.x) * -1) ,((startRange2d.min.y - startRange2d.max.y) * -1));
+	
+	var endOnly = (sectorTopfacesEnd - sectorTopfacesStart)/2;
+	var coordEnd = [];
+	for (var i = (sectorTopfacesStart + endOnly); i < sectorTopfacesEnd; i++) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		var coord1 = result.coordinatesSSE[face.a];
+		var coord2 = result.coordinatesSSE[face.b];
+		var coord3 = result.coordinatesSSE[face.c];
+		coordEnd.push(coord1);
+		coordEnd.push(coord2);
+		coordEnd.push(coord3);
+	}
+	var lineEnd = turf.lineString(coordEnd);
+	var bboxEnd = turf.bbox(lineEnd);
+	var endRange2d = {
+			"min" : {
+				"x" : bboxEnd[0],
+				"y" : bboxEnd[1]
+			},
+			"max" : {
+				"x" : bboxEnd[2],
+				"y" : bboxEnd[3]
+			}
+	};
+	var offset2dEnd = new THREE.Vector2(0 - endRange2d.min.x, 0 - endRange2d.min.y);
+	var range2dEnd = new THREE.Vector2(((endRange2d.min.x - endRange2d.max.x) * -1) ,((endRange2d.min.y - endRange2d.max.y) * -1));
+	
 	// 양끝의 부채꼴 윗면
 	for (var i = sectorTopfacesStart; i < sectorTopfacesEnd; i++) {
 		// 이 버텍스와 연결되는 2d 버텍스
@@ -982,18 +1040,29 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var coord1 = result.coordinatesSSE[face.a];
 		var coord2 = result.coordinatesSSE[face.b];
 		var coord3 = result.coordinatesSSE[face.c];
-		console.log("2d 좌표의 값은:");
-		console.log(coord1);
-		console.log(coord2);
-		console.log(coord3);
+//		console.log("2d 좌표의 값은:");
+//		console.log(coord1);
+//		console.log(coord2);
+//		console.log(coord3);
 
 //		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.2);
 //		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.2);
 //		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.2);
-
-		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 2,(coord1[1] + offset2d.y)/range2d.y * 2);
-		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 2,(coord2[1] + offset2d.y)/range2d.y * 2);
-		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 2,(coord3[1] + offset2d.y)/range2d.y * 2);
+		var vt1;
+		var vt2;
+		var vt3;
+		if ( i < (sectorTopfacesStart + startOnly)) {
+			var vt1 = new THREE.Vector2((coord1[0] + offset2dStart.x)/range2dStart.x * 0.4,(coord1[1] + offset2dStart.y)/range2dStart.y * 0.4 + 0.2);
+			var vt2 = new THREE.Vector2((coord2[0] + offset2dStart.x)/range2dStart.x * 0.4,(coord2[1] + offset2dStart.y)/range2dStart.y * 0.4 + 0.2);
+			var vt3 = new THREE.Vector2((coord3[0] + offset2dStart.x)/range2dStart.x * 0.4,(coord3[1] + offset2dStart.y)/range2dStart.y * 0.4 + 0.2);	
+		} else if (i > (sectorTopfacesStart + startOnly)) {
+			var vt1 = new THREE.Vector2((coord1[0] + offset2dEnd.x)/range2dEnd.x * 0.4,(coord1[1] + offset2dEnd.y)/range2dEnd.y * 0.4 + 0.2);
+			var vt2 = new THREE.Vector2((coord2[0] + offset2dEnd.x)/range2dEnd.x * 0.4,(coord2[1] + offset2dEnd.y)/range2dEnd.y * 0.4 + 0.2);
+			var vt3 = new THREE.Vector2((coord3[0] + offset2dEnd.x)/range2dEnd.x * 0.4,(coord3[1] + offset2dEnd.y)/range2dEnd.y * 0.4 + 0.2);
+		} else {
+			console.log("예외 있음");
+		}
+		
 		
 		geometry.faceVertexUvs[0].push([
 			vt1,
@@ -1011,28 +1080,28 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+//		console.log(v1.x+", "+v1.y);
+//		console.log(v2.x+", "+v2.y);
+//		console.log(v3.x+", "+v3.y);
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("절대적인 가로길이 비율은 "+val2);
+//		console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from1to2 * topLimit / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
 			var ratioHeight = result.range.max.y/from1to2;
 			bottomLimit = topLimit - ratioHeight;
 		}
-		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
-		
+//		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
+//		
 		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+//		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-		console.log("1부터 3까지 거리는: "+from2to3);
+//		console.log("1부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, bottomLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -1044,12 +1113,12 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		v3_2 = result.points[face2.c];
 		var from1to3 = parseFloat(v1_2.distanceTo(v3_2).toFixed(4));
 		var val2_2 = from1to3 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
+//		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
 		var from2to3 = v2_2.distanceTo(v3_2);
-		console.log("2부터 3까지 거리는: "+from2to3);
+//		console.log("2부터 3까지 거리는: "+from2to3);
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+//		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, topLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -1084,10 +1153,10 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var coord1 = result.coordinatesSSE[face.a];
 		var coord2 = result.coordinatesSSE[face.b];
 		var coord3 = result.coordinatesSSE[face.c];
-		console.log("2d 좌표의 값은:");
-		console.log(coord1);
-		console.log(coord2);
-		console.log(coord3);
+//		console.log("2d 좌표의 값은:");
+//		console.log(coord1);
+//		console.log(coord2);
+//		console.log(coord3);
 		
 		var vt1 = new THREE.Vector2(0.04, 1);
 		var vt2 = new THREE.Vector2(0, 1);
@@ -1109,28 +1178,28 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+//		console.log(v1.x+", "+v1.y);
+//		console.log(v2.x+", "+v2.y);
+//		console.log(v3.x+", "+v3.y);
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("절대적인 가로길이 비율은 "+val2);
+//		console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from1to2 * topLimit / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
 			var ratioHeight = result.range.max.y/from1to2;
 			bottomLimit = topLimit - ratioHeight;
 		}
-		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
+//		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
 		
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+//		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-		console.log("1부터 3까지 거리는: "+from2to3);
+//		console.log("1부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, bottomLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -1142,12 +1211,12 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		v3_2 = result.points[face2.c];
 		var from1to3 = parseFloat(v1_2.distanceTo(v3_2).toFixed(4));
 		var val2_2 = from1to3 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
+//		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
 		var from2to3 = v2_2.distanceTo(v3_2);
-		console.log("2부터 3까지 거리는: "+from2to3);
+//		console.log("2부터 3까지 거리는: "+from2to3);
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+//		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, topLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -1161,9 +1230,9 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+		// console.log(v1.x+", "+v1.y);
+		// console.log(v2.x+", "+v2.y);
+		// console.log(v3.x+", "+v3.y);
 
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, 0),
@@ -1195,13 +1264,13 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+		// console.log(v1.x+", "+v1.y);
+		// console.log(v2.x+", "+v2.y);
+		// console.log(v3.x+", "+v3.y);
 
 		var from2to3 = parseFloat(v2.distanceTo(v3).toFixed(4));
 		var val2 = from2to3 > result.range.max.x ? 1 : from2to3/result.range.max.x;
-		console.log("절대적인 가로길이 비율은 "+val2);
+		// console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from2to3 / result.range.max.x;
 		var widthLimit = 1;
 		if (ratioVal2 > 1) {
@@ -1210,13 +1279,13 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 			widthLimit = widthLimit - ratioWidth;
 		}
 
-		console.log("가로가 "+result.range.max.x+"일때 최고 세로 길이에 대한 비율을 1으로하면 가로 길이의 비율은 "+widthLimit);
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		// console.log("가로가 "+result.range.max.x+"일때 최고 세로 길이에 대한 비율을 1으로하면 가로 길이의 비율은 "+widthLimit);
+		// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		// console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-		console.log("2부터 3까지 거리는: "+from2to3);
+		// console.log("2부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, midLimit),
 			new THREE.Vector2(ratioVal2, topLimit),
@@ -1229,10 +1298,10 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		v3_2 = result.points[face2.c];
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("1부터 3까지 거리(u축, x축)는: "+from1to2);
+		// console.log("1부터 3까지 거리(u축, x축)는: "+from1to2);
 		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from2to3);
+		// console.log("1부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, midLimit),
 			new THREE.Vector2(ratioVal2, midLimit),
@@ -1243,20 +1312,20 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+		// console.log(v1.x+", "+v1.y);
+		// console.log(v2.x+", "+v2.y);
+		// console.log(v3.x+", "+v3.y);
 
 		var from2to3 = parseFloat(v2.distanceTo(v3).toFixed(4));
 		var val2 = from2to3 > result.range.max.x ? 1 : from2to3/result.range.max.x;
-		console.log("절대적인 가로길이 비율은 "+val2);
-		console.log("가로가 "+result.range.max.x+"일때 최고 세로 길이에 대한 비율을 1으로하면 가로 길이의 비율은 "+widthLimit);
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		// console.log("절대적인 가로길이 비율은 "+val2);
+		// console.log("가로가 "+result.range.max.x+"일때 최고 세로 길이에 대한 비율을 1으로하면 가로 길이의 비율은 "+widthLimit);
+		// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		// console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-		console.log("2부터 3까지 거리는: "+from2to3);
+		// console.log("2부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, bottomLimit),
 			new THREE.Vector2(ratioVal2, midLimit),
@@ -1269,69 +1338,69 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		v3_2 = result.points[face2.c];
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("1부터 3까지 거리(u축, x축)는: "+from1to2);
+		// console.log("1부터 3까지 거리(u축, x축)는: "+from1to2);
 		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from2to3);
+		// console.log("1부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, bottomLimit),
 			new THREE.Vector2(ratioVal2, bottomLimit),
 			new THREE.Vector2(ratioVal2, midLimit)
 		]);
 	}
-//	// 텍스쳐 이미지에서 건물 옆면의 비율
-//	var height = 0.6;
-//	// 건물 바닥의 비율
-//	var bottomStart = 0;
-//	for (var i = sideStart; i < sideEnd; i = i + 2) {
-//		var face = faces[i];
-//		var v1 = result.points[face.a],
-//		v2 = result.points[face.b],
-//		v3 = result.points[face.c];
-//		console.log(v1.x+", "+v1.y);
-//		console.log(v2.x+", "+v2.y);
-//		console.log(v3.x+", "+v3.y);
-//
-//		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
-//		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("절대적인 가로길이 비율은 "+val2);
-//		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
-//		if (ratioVal2 > 1) {
-//			ratioVal2 = 1;
-//			var ratioHeight = result.range.max.y/from1to2;
-//			bottomStart = height - ratioHeight;
-//		}
-//
-//		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
-//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
-//		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
-//		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-//		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
-//		var from2to3 = v2.distanceTo(v3);
-//		console.log("2부터 3까지 거리는: "+from2to3);
-//		geometry.faceVertexUvs[0].push([
-//			new THREE.Vector2(0, bottomStart),
-//			new THREE.Vector2(ratioVal2, bottomStart),
-//			new THREE.Vector2(0, height)
-//			]);
-//		var face2 = faces[i+1];
-//		var v1_2 = result.points[face2.a],
-//		v2_2 = result.points[face2.b],
-//		v3_2 = result.points[face2.c];
-//		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
-//		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
-//		var from1to3 = v1_2.distanceTo(v3_2);
-//		console.log("1부터 3까지 거리는: "+from1to3);
-//		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
-//		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-//		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
-//		geometry.faceVertexUvs[0].push([
-//			new THREE.Vector2(0, height),
-//			new THREE.Vector2(ratioVal2, bottomStart),
-//			new THREE.Vector2(ratioVal2, height)
-//			]);
-//	}
+	// 텍스쳐 이미지에서 건물 옆면의 비율
+	var TopLimit = 0.2;
+	// 건물 바닥의 비율
+	var bottomLimit = 0;
+	for (var i = rectangleSidesStart; i < rectangleSidesEnd; i = i + 2) {
+		var face = faces[i];
+		var v1 = result.points[face.a],
+		v2 = result.points[face.b],
+		v3 = result.points[face.c];
+		// console.log(v1.x+", "+v1.y);
+		// console.log(v2.x+", "+v2.y);
+		// console.log(v3.x+", "+v3.y);
+
+		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
+		var val2 = from1to3 > result.range.max.x ? 1 : from1to3/result.range.max.x;
+		// console.log("절대적인 가로길이 비율은 "+val2);
+		var ratioVal2 = from1to3 * 0.2 / result.range.max.y;
+		if (ratioVal2 > 1) {
+			ratioVal2 = 1;
+			var ratioHeight = result.range.max.y/from1to3;
+			bottomLimit = TopLimit - ratioHeight;
+		}
+
+		// console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2로하면 가로 길이"+from1to3+"의 비율은 "+ratioVal2);
+		// console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
+		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
+		var val3 = from1to2 > result.range.max.y ? 1 : from1to2/result.range.max.y;
+		// console.log("1부터 2까지 거리(v축, y축)는: "+from1to2);
+		var from2to3 = v2.distanceTo(v3);
+		// console.log("2부터 3까지 거리는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(ratioVal2, bottomLimit),
+			new THREE.Vector2(ratioVal2, TopLimit),
+			new THREE.Vector2(0, bottomLimit)
+		]);
+		var face2 = faces[i+1];
+		var v1_2 = result.points[face2.a],
+		v2_2 = result.points[face2.b],
+		v3_2 = result.points[face2.c];
+		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
+		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
+		// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		var from1to3 = v1_2.distanceTo(v3_2);
+		// console.log("1부터 3까지 거리는: "+from1to3);
+		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
+		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
+		// console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+		geometry.faceVertexUvs[0].push([
+			new THREE.Vector2(ratioVal2, TopLimit),
+			new THREE.Vector2(0, TopLimit),
+			new THREE.Vector2(0, bottomLimit)
+		]);
+	}
 
 	geometry.uvsNeedUpdate = true;
 
@@ -1400,19 +1469,19 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	var feature = this.objectAttr.feature.clone();
 	if (feature.getGeometry() instanceof ol.geom.LineString) {
 		var beforeGeomTest = feature.getGeometry().clone();
-		console.log(beforeGeomTest.getCoordinates().length);
+		// console.log(beforeGeomTest.getCoordinates().length);
 		var beforeCoord = beforeGeomTest.getCoordinates();
 
 		var tline = turf.lineString(beforeCoord);
 
 		var tbuffered = turf.buffer(tline, option["width"]/2, {units : "meters"});
-		console.log(tbuffered);
+		// console.log(tbuffered);
 		var gjson = new ol.format.GeoJSON();
 		var bfeature = gjson.readFeature(tbuffered);
 
 		coord = bfeature.getGeometry().getCoordinates(true);
-		console.log(bfeature.getGeometry().getType());
-		console.log(coord);
+		// console.log(bfeature.getGeometry().getType());
+		// console.log(coord);
 
 	} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
 
@@ -1437,17 +1506,17 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 	var topEnd = result.uvindex["topEnd"];
 	var sideStart = result.uvindex["sideStart"];
 	var sideEnd = result.uvindex["sideEnd"];
-	console.log(bottomStart);
-	console.log(bottomEnd);
-	console.log(topStart);
-	console.log(topEnd);
-	console.log(sideStart);
-	console.log(sideEnd);
+	// console.log(bottomStart);
+	// console.log(bottomEnd);
+	// console.log(topStart);
+	// console.log(topEnd);
+	// console.log(sideStart);
+	// console.log(sideEnd);
 	geometry.computeBoundingBox();
 	var max = geometry.boundingBox.max,
 	min = geometry.boundingBox.min;
-	console.log(max);
-	console.log(min);
+	// console.log(max);
+	// console.log(min);
 	var offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
 	var range = new THREE.Vector3(((min.x - max.x) * -1) ,((min.y - max.y) * -1), ((min.z - max.z) * -1));
 	var offset2d = new THREE.Vector2(0 - result.range2d.min.x, 0 - result.range2d.min.y);
@@ -1477,10 +1546,10 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		var coord1 = result.coordinates[face.a - (result.coordinates.length - 1)];
 		var coord2 = result.coordinates[face.b - (result.coordinates.length - 1)];
 		var coord3 = result.coordinates[face.c - (result.coordinates.length - 1)];
-		console.log("2d 좌표의 값은:");
-		console.log(coord1);
-		console.log(coord2);
-		console.log(coord3);
+		// console.log("2d 좌표의 값은:");
+		// console.log(coord1);
+		// console.log(coord2);
+		// console.log(coord3);
 		var vt1 = new THREE.Vector2(0, 0);
 		var vt2 = new THREE.Vector2(1, 0);
 		var vt3 = new THREE.Vector2(1, 1);
@@ -1505,13 +1574,13 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-		console.log(v1.x+", "+v1.y);
-		console.log(v2.x+", "+v2.y);
-		console.log(v3.x+", "+v3.y);
+		// console.log(v1.x+", "+v1.y);
+		// console.log(v2.x+", "+v2.y);
+		// console.log(v3.x+", "+v3.y);
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("절대적인 가로길이 비율은 "+val2);
+		// console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
@@ -1519,13 +1588,13 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 //			bottomStart = height - ratioHeight;
 		}
 
-		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		// console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
+		// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+		// console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-//		console.log("2부터 3까지 거리는: "+from2to3);
+//		// console.log("2부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, bottomStart),
 			new THREE.Vector2(ratioVal2, bottomStart),
@@ -1537,12 +1606,12 @@ gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
 		v3_2 = result.points[face2.c];
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+		// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = v1_2.distanceTo(v3_2);
-//		console.log("1부터 3까지 거리는: "+from1to3);
+//		// console.log("1부터 3까지 거리는: "+from1to3);
 		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+		// console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, height),
 			new THREE.Vector2(ratioVal2, bottomStart),
