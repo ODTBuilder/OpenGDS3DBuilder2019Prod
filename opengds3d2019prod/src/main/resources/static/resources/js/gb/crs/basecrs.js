@@ -164,30 +164,38 @@ gb.crs.BaseCRS = function(obj) {
 	var area = $("<div>").addClass("gb-basecrs-area").append(label).append(this.searchBar).append(this.validIconSpan);
 	this.setModalBody(area);
 
-	var closeBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-default").text(
-			this.translation.close[this.locale]).click(function() {
+	var closeBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-default").text(this.translation.close[this.locale]).click(function() {
 		that.close();
 	});
 	/**
 	 * @private
 	 * @type {HTMLElement}
 	 */
-	this.searchBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text(
-			this.translation.ok[this.locale]).click(
-			function() {
-				// 공백 제거
-				var val = $(that.searchBar).val().replace(/(\s*)/g, '');
-				if (that.getValidEPSG()) {
-					that.applyProjection(that.getProjection().code, that.getProjection().name, that.getProjection().proj4, that
-							.getProjection().bbox);
-					that.close();
-				}
-			});
+	this.searchBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text(this.translation.ok[this.locale]).click(function() {
+		// 공백 제거
+		var val = $(that.searchBar).val().replace(/(\s*)/g, '');
+		if (that.getValidEPSG()) {
+			that.applyProjection(that.getProjection().code, that.getProjection().name, that.getProjection().proj4, that.getProjection().bbox);
+			that.close();
+		}
+	});
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(this.searchBtn).append(closeBtn);
 	this.setModalFooter(buttonArea);
 	$("body").append(this.modal);
 	$("body").append(this.background);
-	this.searchEPSGCode(this.epsg, true, this.callback);
+	var nowMap = this.maps[0];
+	if (nowMap) {
+		var view = nowMap.getView();
+		var nowProj = view.getProjection();
+		var nowCode = nowProj.getCode();
+		var codeIdx = nowCode.indexOf("EPSG:");
+		if (nowCode.substring(codeIdx + 5) !== this.epsg) {
+			this.searchEPSGCode(this.epsg, true, this.callback);
+		} else {
+			var newProjCode = 'EPSG:' + this.getEPSGCode();
+			$(this.getMessage()).text(newProjCode);
+		}
+	}
 };
 gb.crs.BaseCRS.prototype = Object.create(gb.modal.ModalBase.prototype);
 gb.crs.BaseCRS.prototype.constructor = gb.crs.BaseCRS;
@@ -374,7 +382,8 @@ gb.crs.BaseCRS.prototype.applyProjection = function(code, name, proj4def, bbox, 
 		var fromLonLat = ol.proj.getTransform('EPSG:4326', newProj);
 
 		// very approximate calculation of projection extent
-//		var extent = ol.extent.applyTransform([ bbox[1], bbox[2], bbox[3], bbox[0] ], fromLonLat);
+		// var extent = ol.extent.applyTransform([ bbox[1], bbox[2], bbox[3],
+		// bbox[0] ], fromLonLat);
 		var extent = ol.extent.applyTransform([ bbox[1], bbox[2], bbox[3], bbox[0] ], fromLonLat);
 		newProj.setExtent(extent);
 		view = new ol.View({
@@ -403,8 +412,7 @@ gb.crs.BaseCRS.prototype.applyProjection = function(code, name, proj4def, bbox, 
 			}
 		}
 	}
-//	view.fit(extent);
-	view.fit([126.89620971679686, 37.38702714443207, 127.16880798339842, 37.652758955955505]);
+	view.fit(extent);
 	console.log(this.getEPSGCode());
 	if (typeof callback === "function") {
 		callback();

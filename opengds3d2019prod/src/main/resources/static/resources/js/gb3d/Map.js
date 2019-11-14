@@ -71,7 +71,7 @@ gb3d.Map = function(obj) {
 		selectionIndicator : false,
 		homeButton : false,
 		sceneModePicker : false,
-		infoBox : false,
+		infoBox : true,
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
 		animation : false,
@@ -125,12 +125,15 @@ gb3d.Map = function(obj) {
 // options.initPosition[1] - 1, 200000) : this.center;
 
 
+// this.gbMap.getView().setCenter([options.initPosition[0],
+// options.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
-//	this.cesiumViewer.camera.flyTo({
-//		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-//				this.initPosition[1], this.initPosition[2])
-//	});
-
+//
+//	 this.cesiumViewer.camera.flyTo({
+//	 destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
+//	 this.initPosition[1], this.initPosition[2])
+//	 });
+		
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -160,9 +163,14 @@ gb3d.Map = function(obj) {
 	this.threeCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	// three 랜더러
 	this.threeRenderer = new THREE.WebGLRenderer({alpha: true});
+// this.threeRenderer.shadowMap.enabled = true;
+	this.threeComposer = new THREE.EffectComposer(this.threeRenderer);
 
-	this.threeLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-	this.threeScene.add(this.threeLight);
+	this.ambientLight = new THREE.AmbientLight( 0x404040 );
+	this.threeScene.add(this.ambientLight);
+	this.sunLight = new THREE.PointLight();
+	this.sunLight.position.set( 0, 0, 0 );
+	this.threeScene.add(this.sunLight);
 
 	// 영역에 three 추가
 	this.threeElem.appendChild(this.threeRenderer.domElement);
@@ -170,14 +178,19 @@ gb3d.Map = function(obj) {
 	this.camera = new gb3d.Camera({
 		"cesiumCamera" : this.cesiumViewer.camera,
 		"threeCamera" : this.threeCamera,
-		"olMap" : this.gbMap.getUpperMap()
+		"olMap" : this.gbMap.getUpperMap(),
+		"sync2D" : false
 	});
-
+	this.camera.syncWith2D();
+	
 	// 렌더링을 위한 루프 함수
 	this.loop_ = function(){
 		that.requestFrame = requestAnimationFrame(that.loop_);
 // that.renderCesium();
 		that.renderThreeObj();
+		that.threeComposer.render();
+		var sunCart = Cesium.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame();
+		that.sunLight.position.set( sunCart.x, sunCart.y, sunCart.z );
 	};
 	// 렌더링 시작
 	this.loop_();
@@ -416,6 +429,7 @@ gb3d.Map.prototype.renderThreeObj = function(){
 	that.getThreeCamera().updateProjectionMatrix();
 
 	that.getThreeRenderer().setSize(width, height);
+	that.getThreeComposer().setSize(width, height);
 	that.getThreeRenderer().render(that.threeScene, that.threeCamera);
 }
 
@@ -512,12 +526,13 @@ gb3d.Map.prototype.addThreeObject = function(object){
  * @param {Array.
  *            <Number>} extent - Extent
  */
-gb3d.Map.prototype.createObjectByCoord = function(type, feature){
+gb3d.Map.prototype.createObjectByCoord = function(type, feature, treeid){
 	this.objectAttr.type = type;
 	this.objectAttr.coordinate = feature.getGeometry().getCoordinates(true);
 	this.objectAttr.extent = feature.getGeometry().getExtent();
 	this.objectAttr.id = feature.getId();
 	this.objectAttr.feature = feature;
+	this.objectAttr.treeid = treeid;
 
 	switch(type){
 	case "Point":
@@ -578,7 +593,8 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 		"center" : [x, y],
 		"extent" : extent,
 		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
+		"feature" : this.objectAttr.feature,
+		"treeid" : this.objectAttr.treeid
 	});
 
 	this.addThreeObject(obj3d);
@@ -628,16 +644,16 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var that = this;
 	var coord = arr,
-	geometry,
-	shape,
-	cart,
-	result,
-	obj3d,
-	depth = option.depth ? parseFloat(option.depth) : 50.0,
-			x = extent[0] + (extent[2] - extent[0]) / 2,
-			y = extent[1] + (extent[3] - extent[1]) / 2,
-			centerCart = Cesium.Cartesian3.fromDegrees(x, y),
-			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+		geometry,
+		shape,
+		cart,
+		result,
+		obj3d,
+		depth = option.depth ? parseFloat(option.depth) : 50.0,
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
 	if(this.objectAttr.type === "MultiPolygon"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
@@ -688,24 +704,12 @@ gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 		"center" : [x, y],
 		"extent" : extent,
 		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
+		"feature" : this.objectAttr.feature,
+		"treeid" : this.objectAttr.treeid
 	});
 
 	this.addThreeObject(obj3d);
 	return obj3d;
-}
-
-gb3d.Map.prototype.getThreeObjectById = function(id){
-	var threeObject = undefined,
-	featureId = id;
-
-	this.getThreeObjects().forEach(function(e){
-		if(e.getFeature().getId() === featureId){
-			threeObject = e;
-		}
-	});
-
-	return threeObject;
 }
 
 gb3d.Map.prototype.createLineStringObject = function(arr, extent, option){
@@ -819,13 +823,75 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 	var threeObject = undefined,
 	uuid = id;
 
-	this.getThreeObjects().forEach(function(e){
-		if(e.getObject().uuid === uuid){
-			threeObject = e;
+	var recursiveSelect = function(obj, uuid){
+		var result = false;
+		if (obj instanceof THREE.Group) {
+			if (obj.uuid === uuid) {
+				result = true;
+				return result;
+			}
+			var children = obj.children;
+			for (var i = 0; i < children.length; i++) {
+				result = recursiveSelect(obj.children[i], uuid);
+				if (result) {
+					break;
+				}
+			}
+		} else if (obj instanceof THREE.Mesh) {
+			if (obj.uuid === uuid) {
+				result = true;	
+			}
 		}
-	});
-
+		return result;
+	};
+	
+	var objs = this.getThreeObjects();
+	for (var i = 0; i < objs.length; i++) {
+		var flag = recursiveSelect(objs[i].getObject(), uuid);
+		if (flag) {
+			threeObject = objs[i];
+			break;
+		}
+	}
+// if(e.getObject().uuid === uuid){
+// threeObject = e;
+// }
 	return threeObject;
+}
+
+/**
+ * Object를 삭제한다.
+ * @method gb3d.Map#removeObject
+ * @param {THREE.Object3D | String} object - ThreeObject 객체 또는 uuid
+ * @param {Boolean} bool - true 설정 시 remove 취소. 기본 false
+ * @function
+ */
+gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
+	var threeObject = undefined;
+	var bool = cancel ? true : false;
+	
+	if( object instanceof gb3d.object.ThreeObject ) {
+		threeObject = object;
+	} else if( typeof object === "string" ) {
+		threeObject = this.getThreeObjectByUuid( object );
+	}
+	
+	if( !threeObject ) {
+		return;
+	}
+	
+	var scene = this.getThreeScene(),
+		obj = threeObject.getObject(),
+		layer = threeObject.getLayer(),
+		feature = threeObject.getFeature();
+	
+	if( bool ){
+		obj["visible"] = true;
+		obj.userData.remove = false;
+	} else {
+		obj["visible"] = false;
+		obj.userData.remove = true;
+	}
 }
 
 gb3d.Map.prototype.selectThree = function(uuid){
@@ -834,10 +900,22 @@ gb3d.Map.prototype.selectThree = function(uuid){
 		return false;
 	}
 
+	var object = threeObject.getObject();
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
-		this.tools.edit3d.pickedObject_ = threeObject.getObject();
-		this.tools.edit3d.threeTransformControls.attach( threeObject.getObject() );
-		this.tools.edit3d.updateAttributeTab( threeObject.getObject() );
+		this.tools.edit3d.pickedObject_ = object;
+		this.tools.edit3d.threeTransformControls.attach( object );
+// this.tools.edit3d.updateAttributeTab( object );
+// this.tools.edit3d.updateStyleTab( object );
+
+		this.tools.edit3d.applySelectedOutline(object);
+		
+		if ( object.userData.object !== undefined ) {
+			// helper
+			threeEditor.select( object.userData.object );
+		} else {
+			threeEditor.select( object );
+		}
+
 		return threeObject;
 	} else {
 		return false;
@@ -871,8 +949,10 @@ gb3d.Map.prototype.unselectThree = function(uuid){
 	if(this.tools.edit3d instanceof gb3d.edit.EditingTool3D){
 		this.tools.edit3d.pickedObject_ = threeObject.getObject();
 		this.tools.edit3d.threeTransformControls.detach( threeObject.getObject() );
-		this.tools.edit3d.updateAttributeTab( undefined );
-		this.tools.edit3d.updateStyleTab( undefined );
+// this.tools.edit3d.updateAttributeTab( undefined );
+// this.tools.edit3d.updateStyleTab( undefined );
+		threeEditor.select( null );
+		this.tools.edit3d.removeSelectedOutline();
 		return threeObject;
 	} else {
 		return false;
@@ -929,10 +1009,11 @@ gb3d.Map.prototype.syncUnselect = function(id){
 		if(!threeObject){
 			return;
 		}
-
-		this.unselectFeature(threeObject.getFeature().getId());
 	} else {
 		this.unselectThree(threeObject.getObject().uuid);
+	}
+	if (threeObject) {
+		this.unselectFeature(threeObject.getFeature().getId());		
 	}
 }
 
@@ -1000,6 +1081,7 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var a, b, cp;
 	switch(type){
 	case "Point":
+	case "MultiPoint":
 		a = featureCoord;
 		b = featureCoord;
 		break;
@@ -1026,15 +1108,24 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 		b = featureCoord[0][1];
 		break;
 	case "Polygon":
+	case "MultiLineString":
 		a = featureCoord[0][0];
 		b = featureCoord[0][1];
+		break;
+	case "MultiPolygon":
+		a = featureCoord[0][0][0];
+		b = featureCoord[0][0][1];
 		break;
 	default:
 		break;
 	}
 
-	cp = gb3d.Math.crossProductFromDegrees(a, b, centerCoord);
-	position.copy(new THREE.Vector3(cart.x + (cp.u/cp.s)*vec, cart.y + (cp.v/cp.s)*vec, cart.z + (cp.w/cp.s)*vec));
+	if( type === "Point" || type === "MultiPoint" ){
+		position.copy(new THREE.Vector3(cart.x + vec, cart.y + vec, cart.z + vec));
+	} else {
+		cp = gb3d.Math.crossProductFromDegrees(a, b, centerCoord);
+		position.copy(new THREE.Vector3(cart.x + (cp.u/cp.s)*vec, cart.y + (cp.v/cp.s)*vec, cart.z + (cp.w/cp.s)*vec));
+	}
 
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);
@@ -1043,18 +1134,18 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 
 gb3d.Map.prototype.modify3DVertices = function(arr, id, extent) {
 	var objects = this.getThreeObjects(),
-	coord = arr,
-	featureId = id,
-	ext = extent,
-	x = ext[0] + (ext[2] - ext[0]) / 2,
-	y = ext[1] + (ext[3] - ext[1]) / 2,
-	points = [],
-	threeObject,
-	object = undefined,
-	result,
-	geometry,
-	shape,
-	cart;
+		coord = arr,
+		featureId = id,
+		ext = extent,
+		x = ext[0] + (ext[2] - ext[0]) / 2,
+		y = ext[1] + (ext[3] - ext[1]) / 2,
+		points = [],
+		threeObject,
+		object = undefined,
+		result,
+		geometry,
+		shape,
+		cart;
 
 	var threeObject = this.getThreeObjectById(featureId);
 	if(!threeObject){
@@ -1236,3 +1327,23 @@ gb3d.Map.prototype.getTilesetByLayer = function(lid){
 gb3d.Map.prototype.setTileset = function(tiles){
 	this.tiles = tiles;
 }
+
+/**
+ * three 컴포저 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getThreeComposer
+ * @return {THREE.EffectComposer}
+ */
+gb3d.Map.prototype.getThreeComposer = function(){
+	return this.threeComposer;
+};
+
+/**
+ * 바인딩 영역을 반환한다
+ * 
+ * @method gb3d.Map#getBindingElement
+ * @return {HTMLElement}
+ */
+gb3d.Map.prototype.getBindingElement = function(){
+	return this.bind3dElem;
+};

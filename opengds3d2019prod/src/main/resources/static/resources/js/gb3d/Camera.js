@@ -1,3 +1,221 @@
+if (!ol.events.Event) {
+	/**
+	 * @classdesc Stripped down implementation of the W3C DOM Level 2 Event
+	 *            interface.
+	 * @see {@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-interface}
+	 * 
+	 * This implementation only provides `type` and `target` properties, and
+	 * `stopPropagation` and `preventDefault` methods. It is meant as base class
+	 * for higher level events defined in the library, and works with
+	 * {@link ol.events.EventTarget}.
+	 * 
+	 * @constructor
+	 * @implements {oli.events.Event}
+	 * @param {string}
+	 *            type Type.
+	 */
+	ol.events.Event = function(type) {
+
+		/**
+		 * @type {boolean}
+		 */
+		this.propagationStopped;
+
+		/**
+		 * The event type.
+		 * 
+		 * @type {string}
+		 * @api
+		 */
+		this.type = type;
+
+		/**
+		 * The event target.
+		 * 
+		 * @type {Object}
+		 * @api
+		 */
+		this.target = null;
+
+	};
+
+	/**
+	 * Stop event propagation.
+	 * 
+	 * @function
+	 * @override
+	 * @api
+	 */
+	ol.events.Event.prototype.preventDefault =
+
+	/**
+	 * Stop event propagation.
+	 * 
+	 * @function
+	 * @override
+	 * @api
+	 */
+	ol.events.Event.prototype.stopPropagation = function() {
+		this.propagationStopped = true;
+	};
+
+	/**
+	 * @param {Event|ol.events.Event}
+	 *            evt Event
+	 */
+	ol.events.Event.stopPropagation = function(evt) {
+		evt.stopPropagation();
+	};
+
+	/**
+	 * @param {Event|ol.events.Event}
+	 *            evt Event
+	 */
+	ol.events.Event.preventDefault = function(evt) {
+		evt.preventDefault();
+	};
+
+	// goog.provide('ol.events.EventTarget');
+
+	// goog.require('ol');
+	// goog.require('ol.Disposable');
+	// goog.require('ol.events');
+	// goog.require('ol.events.Event');
+}
+if (!ol.MapEvent) {
+	/**
+	 * @classdesc Events emitted as map events are instances of this type. See
+	 *            {@link ol.Map} for which events trigger a map event.
+	 * 
+	 * @constructor
+	 * @extends {ol.events.Event}
+	 * @implements {oli.MapEvent}
+	 * @param {string}
+	 *            type Event type.
+	 * @param {ol.Map}
+	 *            map Map.
+	 * @param {?olx.FrameState=}
+	 *            opt_frameState Frame state.
+	 */
+	ol.MapEvent = function(type, map, opt_frameState) {
+
+		ol.events.Event.call(this, type);
+
+		/**
+		 * The map where the event occurred.
+		 * 
+		 * @type {ol.Map}
+		 * @api
+		 */
+		this.map = map;
+
+		/**
+		 * The frame state at the time of the event.
+		 * 
+		 * @type {?olx.FrameState}
+		 * @api
+		 */
+		this.frameState = opt_frameState !== undefined ? opt_frameState : null;
+
+	};
+	ol.inherits(ol.MapEvent, ol.events.Event);
+
+	// goog.provide('ol.MapBrowserEvent');
+
+	// goog.require('ol');
+	// goog.require('ol.MapEvent');
+}
+if (!ol.MapBrowserEvent) {
+	/**
+	 * @classdesc Events emitted as map browser events are instances of this
+	 *            type. See {@link ol.Map} for which events trigger a map
+	 *            browser event.
+	 * 
+	 * @constructor
+	 * @extends {ol.MapEvent}
+	 * @implements {oli.MapBrowserEvent}
+	 * @param {string}
+	 *            type Event type.
+	 * @param {ol.Map}
+	 *            map Map.
+	 * @param {Event}
+	 *            browserEvent Browser event.
+	 * @param {boolean=}
+	 *            opt_dragging Is the map currently being dragged?
+	 * @param {?olx.FrameState=}
+	 *            opt_frameState Frame state.
+	 */
+	ol.MapBrowserEvent = function(type, map, browserEvent, opt_dragging, opt_frameState) {
+
+		ol.MapEvent.call(this, type, map, opt_frameState);
+
+		/**
+		 * The original browser event.
+		 * 
+		 * @const
+		 * @type {Event}
+		 * @api
+		 */
+		this.originalEvent = browserEvent;
+
+		/**
+		 * The map pixel relative to the viewport corresponding to the original
+		 * browser event.
+		 * 
+		 * @type {ol.Pixel}
+		 * @api
+		 */
+		this.pixel = map.getEventPixel(browserEvent);
+
+		/**
+		 * The coordinate in view projection corresponding to the original
+		 * browser event.
+		 * 
+		 * @type {ol.Coordinate}
+		 * @api
+		 */
+		this.coordinate = map.getCoordinateFromPixel(this.pixel);
+
+		/**
+		 * Indicates if the map is currently being dragged. Only set for
+		 * `POINTERDRAG` and `POINTERMOVE` events. Default is `false`.
+		 * 
+		 * @type {boolean}
+		 * @api
+		 */
+		this.dragging = opt_dragging !== undefined ? opt_dragging : false;
+
+	};
+	ol.inherits(ol.MapBrowserEvent, ol.MapEvent);
+
+	/**
+	 * Prevents the default browser action.
+	 * 
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/event.preventDefault
+	 * @override
+	 * @api
+	 */
+	ol.MapBrowserEvent.prototype.preventDefault = function() {
+		ol.MapEvent.prototype.preventDefault.call(this);
+		this.originalEvent.preventDefault();
+	};
+
+	/**
+	 * Prevents further propagation of the current event.
+	 * 
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/event.stopPropagation
+	 * @override
+	 * @api
+	 */
+	ol.MapBrowserEvent.prototype.stopPropagation = function() {
+		ol.MapEvent.prototype.stopPropagation.call(this);
+		this.originalEvent.stopPropagation();
+	};
+
+	// goog.provide('ol.MapBrowserEventType');
+	// goog.require('ol.events.EventType');
+}
+
 /**
  * @namespace {Object} gb3d
  */
@@ -22,29 +240,52 @@ gb3d.Camera = function(obj) {
 	this.cesiumCamera = options.cesiumCamera instanceof Cesium.Camera ? options.cesiumCamera : undefined;
 	this.threeCamera = options.threeCamera instanceof THREE.Camera ? options.threeCamera : undefined;
 	this.olMap = options.olMap instanceof ol.Map ? options.olMap : undefined;
-
+	this.sync2D = options.sync2D;
+	this.firstConst = true;
 	// this.icon = optzions.icon ? options.icon : undefined;
 	// this.sector = options.sector ? options.sector : undefined;
 	if (!this.cesiumCamera || !this.threeCamera || !this.olMap) {
 		console.error("constructor parameter not provided");
 		return;
 	}
-	this.olView = this.olMap.getView();
+	this.olView = this.olMap ? this.olMap.getView() : undefined;
 	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
 
 	if (this.cesiumCamera !== undefined) {
 		this.cesiumCamera.changed.addEventListener(function() {
 			that.updateCamCartigraphicPosition();
+			if (that.sync2D) {
+				that.syncWith2D();
+			}
 		});
 		this.cesiumCamera.moveStart.addEventListener(function() {
 			that.updateCamCartigraphicPosition();
+			if (that.sync2D) {
+				that.syncWith2D();
+			}
 		});
 		this.cesiumCamera.moveEnd.addEventListener(function() {
 			that.updateCamCartigraphicPosition();
-			console.log(Cesium.Math.toDegrees(that.cesiumCamera.heading));
+			// console.log(Cesium.Math.toDegrees(that.cesiumCamera.heading));
+			if (that.firstConst) {
+				that.firstConst = false;
+				that.syncWith2D();
+			}
+			if (that.sync2D) {
+				that.syncWith2D();
+			}
 		});
 	}
 
+	this.wheelZoomIntr = undefined;
+	var intrs = this.olMap.getInteractions();
+	for (var i = 0; i < intrs.getLength(); i++) {
+		var intr = intrs.item(i);
+		if (intr instanceof ol.interaction.MouseWheelZoom) {
+			this.wheelZoomIntr = intr;
+			break;
+		}
+	}
 	this.icon = $("<img>")
 			.attr(
 					{
@@ -91,6 +332,28 @@ gb3d.Camera = function(obj) {
 		stopEvent : true
 	});
 	this.olMap.addOverlay(this.sectOverlay);
+	var wheelEvt = function(e) {
+		var E = e.originalEvent;
+		// delta = 0;
+		// console.log(E);
+		// if (E.detail) {
+		// delta = E.detail * -40;
+		// } else {
+		// delta = E.wheelDelta;
+		// }
+		// console.log(delta);
+		// if (delta === 120) {
+		// } else if (delta === -120) {
+		// }
+		// 마우스 이벤트 만들어서
+		var whevt = new ol.MapBrowserEvent("wheel", that.olMap, E);
+		// 휠줌인터렉션에 전달
+		if (that.wheelZoomIntr !== undefined) {
+			that.wheelZoomIntr.handleEvent(whevt);
+		}
+	};
+	$(this.icon).on('mousewheel DOMMouseScroll', wheelEvt);
+	$(this.sector).on('mousewheel DOMMouseScroll', wheelEvt);
 
 	this.camStyle = new ol.style.Style({
 		"image" : new ol.style.Icon({
@@ -194,15 +457,15 @@ gb3d.Camera = function(obj) {
 
 		that.isCamDragging = false;
 		that.isCamDown = true;
-		console.log(that.getCamIconOverlay().getPosition());
-		console.log(that.cursorCoord);
+		// console.log(that.getCamIconOverlay().getPosition());
+		// console.log(that.cursorCoord);
 		that.prevCursorCoord = [ that.cursorCoord[0], that.cursorCoord[1] ];
 	});
 	$(document).mousemove(function() {
 		if (that.isCamDown && that.isCamMoving) {
 			that.isCamDragging = true;
-			console.log(that.getCamIconOverlay().getPosition());
-			console.log(that.cursorCoord);
+			// console.log(that.getCamIconOverlay().getPosition());
+			// console.log(that.cursorCoord);
 
 			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
 			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
@@ -224,8 +487,8 @@ gb3d.Camera = function(obj) {
 			var wasCamDown = that.isCamDown;
 			that.isCamDragging = false;
 			that.isCamDown = false;
-			console.log(that.getCamIconOverlay().getPosition());
-			console.log(that.cursorCoord);
+			// console.log(that.getCamIconOverlay().getPosition());
+			// console.log(that.cursorCoord);
 
 			var distancex = that.cursorCoord[0] - that.prevCursorCoord[0];
 			var distancey = that.cursorCoord[1] - that.prevCursorCoord[1];
@@ -265,14 +528,8 @@ gb3d.Camera = function(obj) {
 		e.stopPropagation();
 		that.rdragging = true;
 		that.target_wp = $(that.sector);
-		if (!that.target_wp.data("origin"))
-			that.target_wp.data("origin", {
-				left : that.target_wp.offset().left + 60,
-				top : that.target_wp.offset().top + 60
-			});
-		that.o_x = that.target_wp.data("origin").left;
-		that.o_y = that.target_wp.data("origin").top; // origin point
-
+		that.o_x = that.target_wp.offset().left + 60;
+		that.o_y = that.target_wp.offset().top + 60; // origin point
 		that.last_angle = that.target_wp.data("last_angle") || 0;
 	})
 
@@ -447,8 +704,8 @@ gb3d.Camera.prototype.updateCesiumCameraPosition = function(heading) {
 	var camPos = this.getCamIconOverlay().getPosition();
 	// var camCart = Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1]);
 	var ccam = this.getCesiumCamera();
-	console.log(ccam.positionWC);
-	console.log(ccam.positionCartographic);
+	// console.log(ccam.positionWC);
+	// console.log(ccam.positionCartographic);
 	var carto = ccam.positionCartographic;
 	ccam.flyTo({
 		destination : Cesium.Cartesian3.fromDegrees(camPos[0], camPos[1], carto["height"]),
@@ -459,4 +716,22 @@ gb3d.Camera.prototype.updateCesiumCameraPosition = function(heading) {
 			roll : ccam.roll
 		}
 	});
+};
+
+/**
+ * cesium camera의 시점을 openlayers 시점과 연동한다
+ * 
+ * @method gb3d.Map#syncWith2D
+ */
+gb3d.Camera.prototype.syncWith2D = function() {
+	var that = this;
+	if (that.olView) {
+		var rect = that.cesiumCamera.computeViewRectangle();
+		if (rect) {
+			var rightup = Cesium.Rectangle.northeast(rect);
+			var leftdown = Cesium.Rectangle.southwest(rect);
+			var extent = [ Cesium.Math.toDegrees(leftdown.longitude), Cesium.Math.toDegrees(leftdown.latitude), Cesium.Math.toDegrees(rightup.longitude), Cesium.Math.toDegrees(rightup.latitude) ];
+			that.olView.fit(extent);
+		}
+	}
 };

@@ -6,7 +6,7 @@ if (!gb.interaction)
 
 /**
  * @classdesc
- * Copy, Paste 기능 Class. Shift+C 또는 Shift+Y 키이벤트를 통해 Copy, Paste 기능을 실행할 수 있다.
+ * Copy, Paste 기능 Class. Shift+C 또는 Shift+V 키이벤트를 통해 Copy, Paste 기능을 실행할 수 있다.
  * @example
  * var source = ol.source.Vector({
  * 	format: new ol.format.GeoJSON()
@@ -70,6 +70,7 @@ gb.interaction.Copypaste = function(obj) {
 		console.error("gb.interaction.Copypaste: 'sources' is a required field.");
 	}
 	this.record_ = options.featureRecord;
+	this.map3d_ = options.map3d || undefined;
 	
 	this.setActive(true);
 	
@@ -128,6 +129,29 @@ gb.interaction.Copypaste.prototype.paste = function(){
 				feature.setId(gb.interaction.Copypaste.createFeatureId(vectorSource));
 				this.record_.create(vectorSource.get("git").tempLayer, feature);
 				vectorSource.addFeature(feature);
+				
+				if(this.map3d_){
+					var threeObject = this.map3d_.getThreeObjectById(arr[i].getId());
+					if(threeObject){
+						var object = threeObject.getObject();
+						var clone = object.clone();
+						var extent = arr[i].getGeometry().getExtent();
+						var x = extent[0] + (extent[2] - extent[0]) / 2;
+						var y = extent[1] + (extent[3] - extent[1]) / 2;
+						
+						this.map3d_.getThreeScene().add(clone);
+						
+						var obj3d = new gb3d.object.ThreeObject({
+							"object" : clone,
+							"center" : [x, y],
+							"extent" : extent,
+							"type" : threeObject.type,
+							"feature" : feature
+						});
+
+						this.map3d_.addThreeObject(obj3d);
+					}
+				}
 			}
 		}
 	}

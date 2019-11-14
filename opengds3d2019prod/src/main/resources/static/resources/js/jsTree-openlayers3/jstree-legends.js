@@ -132,7 +132,7 @@ $.jstreeol3.plugins.legends = function(options, parent) {
 														} else if (fake === "child") {
 															var csld = git["sld"];
 															if (csld !== undefined) {
-																console.log(csld);
+//																console.log(csld);
 															}
 															var source = layer.getSource();
 															if (source instanceof ol.source.TileWMS) {

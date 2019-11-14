@@ -30,6 +30,7 @@ gb.panel.PanelBase = function(obj) {
 	this.right = options.right ? true : false;
 	this.y = options.positionY ? options.positionY : 0;
 	this.autoOpen = options.autoOpen ? true : false;
+	this.target = options.target ? options.target : "body";
 	var span = $("<span>").html("&times;");
 	/**
 	 * @private
@@ -79,7 +80,7 @@ gb.panel.PanelBase = function(obj) {
 	// containment : "body"
 	// });
 
-	$("body").append(this.panel);
+	$(this.target).append(this.panel);
 
 	if (this.autoOpen) {
 		this.open();
