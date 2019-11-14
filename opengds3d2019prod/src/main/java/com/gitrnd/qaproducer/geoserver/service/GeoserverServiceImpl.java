@@ -1139,6 +1139,79 @@ public class GeoserverServiceImpl implements GeoserverService {
 	
 	
 	
+	
+	@Override
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, double minVal, double maxVal){
+		int puFlag = 500;
+		JSONObject returnJSON = new JSONObject();
+		
+		
+		
+		if (dtGeoManager != null && workspace != null && datastore != null) {
+			if(layerName == null){
+				logger.warn("레이어명 null");
+				puFlag = 610;
+			}else{
+				dtReader = dtGeoManager.getReader();
+				dtPublisher = dtGeoManager.getPublisher();
+				
+				boolean wsFlag = false;
+				boolean dsFlag = false;
+
+				wsFlag = dtReader.existsWorkspace(workspace);
+				dsFlag = dtReader.existsDatastore(workspace, datastore);
+				if (wsFlag && dsFlag) {
+					if (dtReader.existsLayer(workspace, layerName, true)) {
+						String defaultTempPath = System.getProperty("java.io.tmpdir") + "GeoDT_Upload";
+						Path tmp = null;
+						
+						if (!new File(defaultTempPath).exists()) {
+							new File(defaultTempPath).mkdirs();
+						}
+						
+						try {
+							tmp = Files.createTempDirectory(FileSystems.getDefault().getPath(defaultTempPath), "temp_");
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+						
+						File tmpFile = null;
+						
+						
+						
+					}else{
+						logger.warn("레이어가 존재하지 않습니다.");
+					}
+				} else {
+					logger.warn("workspace 또는 datastore 존재 X");
+					puFlag = 607;
+				}
+			}
+		}else{
+			logger.warn("Geoserver 정보X");
+			puFlag = 604;
+		}
+		returnJSON.put("status_code", puFlag);
+		return null;
+	}
+	
+	@Override
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, double defVal){
+		
+		return null;
+	}
+	
+	@Override
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, String attribute){
+		
+		return null;
+	}
+	
+	
+	
+	
 	/**
      * 디렉토리 및 파일을 압축한다.
      * @param path 압축할 디렉토리 및 파일
