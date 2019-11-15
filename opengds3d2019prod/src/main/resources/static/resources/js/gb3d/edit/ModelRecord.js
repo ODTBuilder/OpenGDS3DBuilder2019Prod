@@ -222,7 +222,8 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, tileId, model) {
  */
 gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
 	var id = layer;
-
+	var tileId = !tileId : "notile" : tileId;
+	
 	if (!id) {
 		return;
 	}

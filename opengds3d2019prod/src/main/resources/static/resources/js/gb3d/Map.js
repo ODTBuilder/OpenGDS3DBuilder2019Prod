@@ -41,7 +41,9 @@ gb3d.Map = function(obj) {
 	this.bind3dElem = $("<div>").addClass("gb3d-map-bind3d-area")[0];
 	// gbMap
 	this.gbMap = options.gbMap instanceof gb.Map ? options.gbMap : undefined;
-
+	// 3d 모델 레코드 객채
+	this.modelRecord = options.modelRecord instanceof gb3d.edit.ModelRecord ? options.modelRecord : undefined; 
+	
 	if (!this.gbMap) {
 		console.error("gbMap must be set");
 		return;
@@ -607,13 +609,14 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 		x = extent[0] + (extent[2] - extent[0]) / 2,
 		y = extent[1] + (extent[3] - extent[1]) / 2,
 		type = option.type || "box",
-//		width = option.width || 40,
-//		height = option.height || 40,
-//		depth = option.depth || 40,
+// width = option.width || 40,
+// height = option.height || 40,
+// depth = option.depth || 40,
 		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
 		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
-//	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
+// geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height),
+// parseInt(depth));
 	
 	switch(type){
 	case "box":
@@ -651,9 +654,9 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
-//	latheMesh.userData.width = width;
-//	latheMesh.userData.height = height;
-//	latheMesh.userData.depth = depth;
+// latheMesh.userData.width = width;
+// latheMesh.userData.height = height;
+// latheMesh.userData.depth = depth;
 	for(var i in option){
 		if(i === "type"){
 			continue;
@@ -671,6 +674,10 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	});
 
 	this.addThreeObject(obj3d);
+	
+	var record = this.getModelRecord();
+	record.create(layer, undefined, obj3d);
+	
 	return obj3d;
 }
 
@@ -1141,9 +1148,12 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 
 /**
  * Object를 삭제한다.
+ * 
  * @method gb3d.Map#removeObject
- * @param {THREE.Object3D | String} object - ThreeObject 객체 또는 uuid
- * @param {Boolean} bool - true 설정 시 remove 취소. 기본 false
+ * @param {THREE.Object3D |
+ *            String} object - ThreeObject 객체 또는 uuid
+ * @param {Boolean}
+ *            bool - true 설정 시 remove 취소. 기본 false
  * @function
  */
 gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
@@ -1590,8 +1600,8 @@ gb3d.Map.prototype.modify3DVertices = function(arr, id, extent, event) {
 				}
 
 				
-//				geometry.vertices = result.points;
-//				geometry.faces = result.faces;
+// geometry.vertices = result.points;
+// geometry.faces = result.faces;
 				// geometry.translate(-centerCart.x, -centerCart.y,
 				// -centerCart.z);
 
@@ -1780,4 +1790,24 @@ gb3d.Map.prototype.getThreeComposer = function(){
  */
 gb3d.Map.prototype.getBindingElement = function(){
 	return this.bind3dElem;
+};
+
+/**
+ * 3D 모델 레코드 객체를 반환한다.
+ * 
+ * @method gb3d.Map#getModelRecord
+ * @return {gb3d.edit.ModelRecord}
+ */
+gb3d.Map.prototype.getModelRecord = function(){
+	return this.modelRecord;
+};
+
+/**
+ * 3D 모델 레코드 객체를 설정한다.
+ * 
+ * @method gb3d.Map#setModelRecord
+ * @param {gb3d.edit.ModelRecord} record - 3D 모델 레코드 객체
+ */
+gb3d.Map.prototype.setModelRecord = function(record){
+	this.modelRecord = record;
 };
