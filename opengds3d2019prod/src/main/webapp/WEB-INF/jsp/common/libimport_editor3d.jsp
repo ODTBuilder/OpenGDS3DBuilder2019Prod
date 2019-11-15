@@ -246,3 +246,4 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/TilesetManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/style/Declarative.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/importer/ImporterThree.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/ModelRecord.js"></script>
