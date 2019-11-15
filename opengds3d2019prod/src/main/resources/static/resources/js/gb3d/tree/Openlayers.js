@@ -480,6 +480,7 @@ gb3d.tree.OpenLayers = function(obj) {
 		console.error("gb3d.tree.OpenLayers: 'map' is a required field.");
 	}
 	this.editingTool = options.editingTool || undefined;
+	this.threeTree = options.threeTree || undefined;
 	this.token = options.token || "";
 	this.locale = options.locale || "en";
 	this.uploadjson = options.uploadJSON !== undefined ? options.uploadJSON : undefined;
@@ -541,7 +542,8 @@ gb3d.tree.OpenLayers = function(obj) {
 					"style" : new gb.style.LayerStyle({
 						"locale" : this.locale
 					}),
-					"editingTool" : this.editingTool
+					"editingTool" : this.editingTool,
+					"threeTree" : this.threeTree
 				},
 				"search" : {
 					show_only_matches : true
@@ -655,7 +657,8 @@ gb3d.tree.OpenLayers = function(obj) {
 										"locale" : that.locale,
 										"gb3dMap" : that.gb3dMap,
 										"layer" : layer,
-										"locale" : that.locale
+										"locale" : that.locale,
+										"threeTree" : that.threeTree
 									});
 									modal.open();
 								}

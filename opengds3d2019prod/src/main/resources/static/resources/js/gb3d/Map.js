@@ -69,9 +69,9 @@ gb3d.Map = function(obj) {
 // useDefaultRenderLoop : false,
 		scene3DOnly: true,
 		selectionIndicator : false,
-		homeButton : false,
+		homeButton : true,
 		sceneModePicker : false,
-		infoBox : false,
+		infoBox : true,
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
 		animation : false,
@@ -96,7 +96,7 @@ gb3d.Map = function(obj) {
 			url : 'https://a.tile.openstreetmap.org/'
 		}),
 		baseLayerPicker : true,
-		geocoder : false,
+		geocoder : true,
 		automaticallyTrackDataSourceClocks : false,
 		dataSources : null,
 		clock : null,
@@ -106,6 +106,10 @@ gb3d.Map = function(obj) {
 	var scene = this.cesiumViewer.scene;
 	scene.sun = new Cesium.Sun(); 
 
+	$(".cesium-baseLayerPicker-dropDown").css({
+		"zIndex": 1
+	});
+	
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -229,19 +233,49 @@ gb3d.Map = function(obj) {
 		show: false
 	});
 
+	var optionsOfType = {
+		"box": {
+			"width": 40,
+			"height": 40,
+			"depth": 40
+		},
+		"cylinder": {
+			"radiusTop": 20,
+			"radiusBottom": 20,
+			"height": 40
+		},
+		"circle": {
+			"radius": 20
+		},
+		"dodecahedron": {
+			"radius": 20
+		},
+		"icosahedron": {
+			"radius": 20
+		}
+	}
+	
 	$("#pointObjectCreateModal select").on("change", function(e){
 		var val = $(this).val();
 		var content = $("#pointObjectCreateModal .type-content");
+		content.empty();
+		
+		var div, span, input;
+		var options = optionsOfType[val];
+		
+		for(var i in options){
+			span = $("<span class='Text'>").text(i);
+			input = $("<input class='form-control' style='flex: 1;'>").val(options[i]);
+			div = $("<div class='gb-object-row' data-val='" + i + "'>");
+			div.append(span).append(input);
+			content.append(div);
+		}
 	});
 
 	$("#pointObjectConfirm").on("click", function(e){
-		var opt = {
-				type: "box",
-				width: 0,
-				height: 0,
-				depth: 0
-		};
-
+		var opt = {};
+		
+		opt.type = $("#pointObjectCreateModal select:first-child").val();
 		$("#pointObjectCreateModal").find(".gb-object-row").each(function(i, d){
 			if($(d).find("input").length !== 0){
 				opt[$(d).data("val")] = $(d).find("input").val();
@@ -538,12 +572,13 @@ gb3d.Map.prototype.addThreeObject = function(object){
  * @param {Array.
  *            <Number>} extent - Extent
  */
-gb3d.Map.prototype.createObjectByCoord = function(type, feature){
+gb3d.Map.prototype.createObjectByCoord = function(type, feature, treeid){
 	this.objectAttr.type = type;
 	this.objectAttr.coordinate = feature.getGeometry().getCoordinates(true);
 	this.objectAttr.extent = feature.getGeometry().getExtent();
 	this.objectAttr.id = feature.getId();
 	this.objectAttr.feature = feature;
+	this.objectAttr.treeid = treeid;
 
 	switch(type){
 	case "Point":
@@ -565,22 +600,43 @@ gb3d.Map.prototype.createObjectByCoord = function(type, feature){
 
 gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	var coord = arr,
-	points = [],
-	geometry,
-	cart,
-	obj3d,
-	x = extent[0] + (extent[2] - extent[0]) / 2,
-	y = extent[1] + (extent[3] - extent[1]) / 2,
-	type = option.type || "box",
-	width = option.width || 40,
-	height = option.height || 40,
-	depth = option.depth || 40,
-	centerCart = Cesium.Cartesian3.fromDegrees(x, y),
-	centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+		points = [],
+		geometry,
+		cart,
+		obj3d,
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		type = option.type || "box",
+//		width = option.width || 40,
+//		height = option.height || 40,
+//		depth = option.depth || 40,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
-	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
+//	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
+	
+	switch(type){
+	case "box":
+		geometry = new THREE.BoxGeometry(parseInt(option.width || 40), parseInt(option.height || 40), parseInt(option.depth || 40));
+		break;
+	case "cylinder":
+		geometry = new THREE.CylinderGeometry(parseInt(option.radiusTop), parseInt(option.radiusBottom), parseInt(option.height));
+		break;
+	case "circle":
+		geometry = new THREE.CircleGeometry(parseInt(option.radius));
+		break;
+	case "dodecahedron":
+		geometry = new THREE.DodecahedronGeometry(parseInt(option.radius));
+		break;
+	case "icosahedron":
+		geometry = new THREE.IcosahedronGeometry(parseInt(option.radius));
+		break;
+	}
+	
 	geometry.vertices.forEach(function(vert, v){
-		vert.z += depth/2;
+		if(option.depth){
+			vert.z += option.depth/2;
+		}
 	});
 
 	var doubleSideMaterial = new THREE.MeshNormalMaterial({
@@ -595,16 +651,23 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
-	latheMesh.userData.width = width;
-	latheMesh.userData.height = height;
-	latheMesh.userData.depth = depth;
+//	latheMesh.userData.width = width;
+//	latheMesh.userData.height = height;
+//	latheMesh.userData.depth = depth;
+	for(var i in option){
+		if(i === "type"){
+			continue;
+		}
+		latheMesh.userData[i] = option[i];
+	}
 
 	obj3d = new gb3d.object.ThreeObject({
 		"object" : latheMesh,
 		"center" : [x, y],
 		"extent" : extent,
 		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
+		"feature" : this.objectAttr.feature,
+		"treeid" : this.objectAttr.treeid
 	});
 
 	this.addThreeObject(obj3d);
@@ -654,16 +717,16 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 gb3d.Map.prototype.createPolygonObject = function(arr, extent, option){
 	var that = this;
 	var coord = arr,
-	geometry,
-	shape,
-	cart,
-	result,
-	obj3d,
-	depth = option.depth ? parseFloat(option.depth) : 50.0,
-			x = extent[0] + (extent[2] - extent[0]) / 2,
-			y = extent[1] + (extent[3] - extent[1]) / 2,
-			centerCart = Cesium.Cartesian3.fromDegrees(x, y),
-			centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+		geometry,
+		shape,
+		cart,
+		result,
+		obj3d,
+		depth = option.depth ? parseFloat(option.depth) : 50.0,
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
 	if(this.objectAttr.type === "MultiPolygon"){
 		result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], [x, y], depth);
@@ -798,7 +861,8 @@ gb3d.Map.prototype.createLineStringObjectOnRoad = function(arr, extent, option){
 		"extent" : extent,
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
-		"buffer" : option["width"]/2
+		"buffer" : option["width"]/2,
+		"treeid" : this.objectAttr.treeid
 	});
 
 	this.addThreeObject(obj3d);
@@ -1075,6 +1139,41 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 	return threeObject;
 }
 
+/**
+ * Object를 삭제한다.
+ * @method gb3d.Map#removeObject
+ * @param {THREE.Object3D | String} object - ThreeObject 객체 또는 uuid
+ * @param {Boolean} bool - true 설정 시 remove 취소. 기본 false
+ * @function
+ */
+gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
+	var threeObject = undefined;
+	var bool = cancel ? true : false;
+	
+	if( object instanceof gb3d.object.ThreeObject ) {
+		threeObject = object;
+	} else if( typeof object === "string" ) {
+		threeObject = this.getThreeObjectByUuid( object );
+	}
+	
+	if( !threeObject ) {
+		return;
+	}
+	
+	var scene = this.getThreeScene(),
+		obj = threeObject.getObject(),
+		layer = threeObject.getLayer(),
+		feature = threeObject.getFeature();
+	
+	if( bool ){
+		obj["visible"] = true;
+		obj.userData.remove = false;
+	} else {
+		obj["visible"] = false;
+		obj.userData.remove = true;
+	}
+}
+
 gb3d.Map.prototype.selectThree = function(uuid){
 	var threeObject = this.getThreeObjectByUuid(uuid);
 	if(!threeObject){
@@ -1262,6 +1361,7 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var a, b, cp;
 	switch(type){
 	case "Point":
+	case "MultiPoint":
 		a = featureCoord;
 		b = featureCoord;
 		break;
@@ -1283,20 +1383,28 @@ gb3d.Map.prototype.moveObject3Dfrom2D = function(id, center, coord){
 		} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
 
 		}
-
 		a = featureCoord[0][0];
 		b = featureCoord[0][1];
 		break;
 	case "Polygon":
+	case "MultiLineString":
 		a = featureCoord[0][0];
 		b = featureCoord[0][1];
+		break;
+	case "MultiPolygon":
+		a = featureCoord[0][0][0];
+		b = featureCoord[0][0][1];
 		break;
 	default:
 		break;
 	}
 
-	cp = gb3d.Math.crossProductFromDegrees(a, b, centerCoord);
-	position.copy(new THREE.Vector3(cart.x + (cp.u/cp.s)*vec, cart.y + (cp.v/cp.s)*vec, cart.z + (cp.w/cp.s)*vec));
+	if( type === "Point" || type === "MultiPoint" ){
+		position.copy(new THREE.Vector3(cart.x + vec, cart.y + vec, cart.z + vec));
+	} else {
+		cp = gb3d.Math.crossProductFromDegrees(a, b, centerCoord);
+		position.copy(new THREE.Vector3(cart.x + (cp.u/cp.s)*vec, cart.y + (cp.v/cp.s)*vec, cart.z + (cp.w/cp.s)*vec));
+	}
 
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);

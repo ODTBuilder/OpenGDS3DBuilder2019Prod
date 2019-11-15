@@ -56,6 +56,7 @@ gb3d.io.ImporterThree = function(obj) {
 	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
 	this.gb2dMap = this.gb3dMap ? this.gb3dMap.getGbMap() : undefined;
 	this.layer = options.layer ? options.layer : undefined;
+	this.threeTree = options.threeTree ? options.threeTree : undefined;
 	this.feature = new ol.Feature();
 	obj.width = 300;
 	obj.autoOpen = false;
@@ -357,7 +358,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var position = that.object.position;
 		var cart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]);
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
-		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
 
 		// 오브젝트에서 메쉬를 꺼낸다
@@ -377,69 +378,95 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
 		var features = turf.featureCollection(floor);
 		var dissolved = undefined;
-		try {
-			dissolved = turf.dissolve(features);
-		} catch (e) {
-			// TODO: handle exception
-			console.error(e);
-			return;
-		}
-		var fea;
-		if (dissolved) {
-			if (dissolved.type === "FeatureCollection") {
-				fea = [];
-				for (var i = 0; i < dissolved.features.length; i++) {
-					if (dissolved.features[i].geometry.type === 'Polygon') {
-						if (that.layer.get("git").geometry === "Polygon") {
-							var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						}
-					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-						if (that.layer.get("git").geometry === "Polygon") {
-							var outer = dissolved.features[i].geometry.coordinates;
-							// for (var j = 0; j < 1; j++) {
-							var polygon = outer[0];
-							var geomPoly = new ol.geom.Polygon(polygon, "XY");
-							var feature = new ol.Feature(geomPoly);
-							feature.setId(that.object.uuid);
-							fea.push(feature);
-							obj3d["feature"] = feature;
-							// }
-						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						}
-					}
-
-				}
-				source.addFeatures(fea);
-			}
-		}
-
-		// === 이준 시작 ===
-		var axisy1 = turf.point([ 90, 0 ]);
-		var pickPoint = turf.point(center);
-		var bearing = bearing = turf.bearing(pickPoint, axisy1);
-		console.log("y축 1과 객체 중점의 각도는: " + bearing);
-		// var zaxis = new THREE.Vector3(0, 0, 1);
-		// gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
-		// Cesium.Math.toRadians(bearing));
-		that.object.rotateZ(Cesium.Math.toRadians(bearing));
+//		try {
+//			dissolved = turf.dissolve(features);
+//		} catch (e) {
+//			// TODO: handle exception
+//			console.error(e);
+//			return;
+//		}
+//		var fea;
+//		if (dissolved) {
+//			if (dissolved.type === "FeatureCollection") {
+//				fea = [];
+//				for (var i = 0; i < dissolved.features.length; i++) {
+//					if (dissolved.features[i].geometry.type === 'Polygon') {
+//						if (that.layer.get("git").geometry === "Polygon") {
+//							var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+//							var feature = new ol.Feature(geom);
+//							feature.setId(that.object.uuid);
+//							obj3d["feature"] = feature;
+//							fea.push(feature);
+//						} else if (that.layer.get("git").geometry === "MultiPolygon") {
+//							var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+//							var feature = new ol.Feature(geom);
+//							feature.setId(that.object.uuid);
+//							obj3d["feature"] = feature;
+//							fea.push(feature);
+//						}
+//					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+//						if (that.layer.get("git").geometry === "Polygon") {
+//							var outer = dissolved.features[i].geometry.coordinates;
+//							// for (var j = 0; j < 1; j++) {
+//							var polygon = outer[0];
+//							var geomPoly = new ol.geom.Polygon(polygon, "XY");
+//							var feature = new ol.Feature(geomPoly);
+//							feature.setId(that.object.uuid);
+//							fea.push(feature);
+//							obj3d["feature"] = feature;
+//							// }
+//						} else if (that.layer.get("git").geometry === "MultiPolygon") {
+//							var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+//							var feature = new ol.Feature(geom);
+//							feature.setId(that.object.uuid);
+//							obj3d["feature"] = feature;
+//							fea.push(feature);
+//						}
+//					}
+//
+//				}
+//				source.addFeatures(fea);
+//			}
+//		}
+//
+//		// === 이준 시작 ===
+//		var axisy1 = turf.point([ 90, 0 ]);
+//		var pickPoint = turf.point(center);
+//		var bearing = bearing = turf.bearing(pickPoint, axisy1);
+//		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+//		// var zaxis = new THREE.Vector3(0, 0, 1);
+//		// gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
+//		// Cesium.Math.toRadians(bearing));
+//		that.object.rotateZ(Cesium.Math.toRadians(bearing));
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
+		
+		var treeid = layer.get("treeid");
+		
+		var l = source.getFeatureById(treeid + ".new0");
+		
+		if (!l) {
+			var fid = treeid + ".new0";
+			feature.setId(fid);
+		} else {
+			var count = 1;
+			while(source.getFeatureById(treeid + ".new" + count) !== null){
+				count++;
+			}
+			var fid = treeid + ".new" + count;
+			feature.setId(fid);
+		}
+
+		source.addFeature(feature);
+		var featureId = obj3d.feature.getId();
+		
+		that.threeTree.create_node( treeid, {
+			"parent": treeid,
+			"id": that.object.uuid,
+			"text": featureId,
+			"type": "Three"
+		}, "last", false, false );
 	});
 }
 
@@ -541,7 +568,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 		var points = [];
 		var normalPoints = [];
 		var vertices = object.geometry.attributes.position.array;
-		var normal = object.geometry.attributes.normal.array;
+		var normal = object.geometry.attributes.normal ? object.geometry.attributes.normal.array : false;
 		var normalFlag = normal ? true : false; 
 		for (var j = 0; j < vertices.length; j = j + 3) {
 			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
