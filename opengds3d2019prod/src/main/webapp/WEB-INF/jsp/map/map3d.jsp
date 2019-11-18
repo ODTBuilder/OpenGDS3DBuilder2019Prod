@@ -196,12 +196,6 @@ html, body {
 			}
 		});
 
-		var sourceyj = new ol.source.Vector();
-		var layer = new ol.layer.Vector({
-			"source" : sourceyj
-		});
-		layer.setMap(gbMap.getUpperMap());
-
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
@@ -223,14 +217,9 @@ html, body {
 			"epsg" : "4326"
 		});
 
-		var mrecord = new gb3d.edit.ModelRecord({
-			//id : "feature_id",
-			locale : locale
-		});
-
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-			"modelRecord" : mrecord,
+// 			"modelRecord" : mrecord,
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
@@ -353,25 +342,36 @@ html, body {
 				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
 			}
 		});
-
+		
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale
+		});
+		
+		var epan;
+		// editing Tool 3D
+		var epan3d = new gb3d.edit.EditingTool3D({
+			targetElement : $(".area-3d")[0],
+			map : gb3dMap,
+			isDisplay : false,
+			modelRecord : mrecord,
+			locale : locale || "en",
+			editingTool2D : function(){
+				return epan;
+			}
+		});
+		
 		// EditTool 활성화
-		var epan = new gb3d.edit.EditingTool2D({
+		epan = new gb3d.edit.EditingTool2D({
 			targetElement : gbMap.getLowerDiv()[0],
 			map : gb3dMap,
+			editingTool3D : epan3d,
 			featureRecord : frecord,
 			otree : otree,
 			wfsURL : urlList.getWFSFeature + urlList.token,
 			layerInfo : urlList.getLayerInfo + urlList.token,
 			locale : locale || "en",
 			isEditing : gb.module.isEditing
-		});
-
-		var epan3d = new gb3d.edit.EditingTool3D({
-			targetElement : $(".area-3d")[0],
-			map : gb3dMap,
-			isDisplay : false,
-			modelRecord : mrecord,
-			locale : locale || "en"
 		});
 
 		$("#editTool").click(function(e) {

@@ -222,12 +222,18 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, tileId, model) {
  */
 gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
 	var id = layer;
-	var tileId = !tileId : "notile" : tileId;
-	
+	var tileId = !tileId ? "temp" : tileId;
+
 	if (!id) {
 		return;
 	}
-
+	if (id instanceof ol.layer.Base) {
+		id = id.get("id") ? id.get("id") : id.get("name");
+	}
+	if (!id) {
+		console.error("no layer id.");
+		return;
+	}
 	// if (!id.split(":")[1] || !id.split(":")[3]) {
 	// return;
 	// }
@@ -254,8 +260,16 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
  */
 gb3d.edit.ModelRecord.prototype.remove = function(layer, tileId, model) {
 	var id = layer;
+	var tileId = !tileId ? "temp" : tileId;
 
 	if (!id) {
+		return;
+	}
+	if (id instanceof ol.layer.Base) {
+		id = id.get("id") ? id.get("id") : id.get("name");
+	}
+	if (!id) {
+		console.error("no layer id.");
 		return;
 	}
 
@@ -318,8 +332,16 @@ gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
  */
 gb3d.edit.ModelRecord.prototype.update = function(layer, tileId, model) {
 	var id = layer;
+	var tileId = !tileId ? "temp" : tileId;
 
 	if (!id) {
+		return;
+	}
+	if (id instanceof ol.layer.Base) {
+		id = id.get("id") ? id.get("id") : id.get("name");
+	}
+	if (!id) {
+		console.error("no layer id.");
 		return;
 	}
 
@@ -364,7 +386,7 @@ gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, tileId, m
 	var model = undefined;
 	if (!!this.created[layerId]) {
 		if (!!this.created[layerId][tileId]) {
-			
+
 		}
 		if (this.created[layerId][modelId] instanceof gb3d.object.ThreeObject) {
 			model = this.created[layerId][modelId];

@@ -1340,6 +1340,8 @@ gb3d.tree.OpenLayers.prototype.openAddLayer = function() {
 				}
 
 				vectorLayer.set("name", codeInput.val());
+				vectorLayer.set("id", codeInput.val());
+				
 				that.map.addLayer(vectorLayer);
 				that.refreshList();
 				addGeoServerModal.close();

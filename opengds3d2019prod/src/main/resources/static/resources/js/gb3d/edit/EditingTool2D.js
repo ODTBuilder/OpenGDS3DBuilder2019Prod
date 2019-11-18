@@ -150,6 +150,11 @@ gb3d.edit.EditingTool2D = function(obj) {
 	gb3d.edit.EditingToolBase.call(this, obj);
 	
 	/**
+	 * editing tool 3d 객체
+	 */
+	this.editingTool3D = obj.editingTool3D instanceof gb3d.edit.EditingTool3D ? obj.editingTool3D : undefined; 
+	
+	/**
 	 * 현재 편집중인 레이어
 	 * 
 	 * @private
@@ -1102,7 +1107,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 	
 	// ThreeJS Object unselect
 	this.interaction.select.getFeatures().on("remove", function(evt) {
-		that.mapObj.syncUnselect( evt.element.getId() );
+		that.getEditingTool3D().syncUnselect( evt.element.getId() );
 	});
 
 	this.interaction.select.getFeatures().on("change:length", function(evt) {
@@ -1225,7 +1230,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			var layer = source.get("git").tempLayer;
 			
 			// threeJS Object Select
-			that.mapObj.syncSelect(that.features.item(0).getId());
+			that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 			
 			if (1) {
 				for (var i = 0; i < props.length; i++) {
@@ -1491,7 +1496,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						
 						// ThreeObject remove
 						var threeObject = that.mapObj.getThreeObjectById(data.feature.getId());
-						that.mapObj.removeThreeObject( threeObject );
+                        that.mapObj.removeThreeObject( threeObject );
 					},
 					redo: function(data){
 						data.layer.getSource().addFeature(data.feature);
@@ -1685,7 +1690,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 					}
 				}
 				// ----- ThreeJS Object Create --------
-				that.mapObj.createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID);
+				that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
 			}
 		});
 		this.deactiveIntrct_([ "select", "dragbox", "move", "modify", "rotate" ]);
@@ -1805,7 +1810,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 				var x = extent[0] + (extent[2] - extent[0]) / 2;
 				var y = extent[1] + (extent[3] - extent[1]) / 2;
 				// ThreeJS move
-				that.mapObj.moveObject3Dfrom2D(features.item(i).getId(), [x,y], features.item(i).getGeometry().getCoordinates(true));
+				that.getEditingTool3D().moveObject3Dfrom2D(features.item(i).getId(), [x,y], features.item(i).getGeometry().getCoordinates(true));
 			}
 			
 			gb.undo.pushAction({
@@ -1823,7 +1828,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						var ext = geom.getExtent();
 						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
 						var centerY = ext[1] + (ext[3] - ext[1]) / 2;
-						that.mapObj.moveObject3Dfrom2D(data.features[i].getId(), [centerX, centerY], data.features[i].getGeometry().getCoordinates(true));
+						that.getEditingTool3D().moveObject3Dfrom2D(data.features[i].getId(), [centerX, centerY], data.features[i].getGeometry().getCoordinates(true));
 					}
 				},
 				redo: function(data){
@@ -1840,7 +1845,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						var ext = geom.getExtent();
 						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
 						var centerY = ext[1] + (ext[3] - ext[1]) / 2;
-						that.mapObj.moveObject3Dfrom2D(data.features[i].getId(), [centerX, centerY], data.features[i].getGeometry().getCoordinates(true));
+						that.getEditingTool3D().moveObject3Dfrom2D(data.features[i].getId(), [centerX, centerY], data.features[i].getGeometry().getCoordinates(true));
 					}
 				},
 				data: {
@@ -1932,7 +1937,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
 			// ThreeJS vertex modify
-			var floor = that.mapObj.modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent(), evt);
+			var floor = that.getEditingTool3D().modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent(), evt);
 // feature.setGeometry(floor);
 			
 			gb.undo.pushAction({
@@ -1943,7 +1948,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					data.that.featureRecord.update(data.layer, data.feature);
 					
 					// ThreeJS vertex modify
-					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(),
+					that.getEditingTool3D().modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(),
 							data.feature.getGeometry().getExtent());
 				},
 				redo: function(data){
@@ -1953,7 +1958,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					data.that.featureRecord.update(data.layer, data.feature);
 					
 					// ThreeJS vertex modify
-					that.mapObj.modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(), 
+					that.getEditingTool3D().modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(), 
 							data.feature.getGeometry().getExtent());
 				},
 				data: {
@@ -2003,8 +2008,19 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 		return;
 	}
 
+	console.log(selectSource.get("git").tempLayer);
+	that.setLayer(selectSource.get("git").tempLayer);
+	var git = selectSource.get("git");
+	
 	if (this.interaction.select.getFeatures().getLength() > 0) {
 
+		if(git instanceof Object){
+			if(git.geometry === "Point"){
+				alert(this.translation.transformPointHint[this.locale]);
+				return;
+			}
+		}
+		
 		this.interaction.modify = new ol.interaction.Modify({
 			features : this.interaction.select.getFeatures()
 		});
@@ -2033,7 +2049,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 				});
 				
 				// ThreeJS vertex modify
-				that.mapObj.modify3DVertices(features.item(i).getGeometry().getCoordinates(true), features.item(i).getId(), 
+				that.getEditingTool3D().modify3DVertices(features.item(i).getGeometry().getCoordinates(true), features.item(i).getId(), 
 						features.item(i).getGeometry().getExtent());
 			}
 			
@@ -2050,7 +2066,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								data.that.featureRecord.update(data.layer, data.features[i]);
 								
 								// ThreeJS vertex modify
-								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
+								that.getEditingTool3D().modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
 										data.features[i].getGeometry().getExtent());
 								break;
 							}
@@ -2069,7 +2085,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								data.that.featureRecord.update(data.layer, data.features[i]);
 								
 								// ThreeJS vertex modify
-								that.mapObj.modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
+								that.getEditingTool3D().modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
 										data.features[i].getGeometry().getExtent());
 								break;
 							}
@@ -4082,3 +4098,10 @@ gb3d.edit.EditingTool2D.prototype.checkActiveTool = function(){
 	
 	return active;
 }
+
+/**
+ * 연동된 3D 편집툴 객체를 반환한다.
+ */
+gb3d.edit.EditingTool2D.prototype.getEditingTool3D = function(){
+	return this.editingTool3D;
+};
