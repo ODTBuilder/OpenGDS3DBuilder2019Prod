@@ -657,8 +657,7 @@ gb3d.tree.OpenLayers = function(obj) {
 										"locale" : that.locale,
 										"gb3dMap" : that.gb3dMap,
 										"layer" : layer,
-										"locale" : that.locale,
-										"threeTree" : that.threeTree
+										"locale" : that.locale
 									});
 									modal.open();
 								}

@@ -174,6 +174,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			return;
 		}
 
+
 		event.preventDefault();
 		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;

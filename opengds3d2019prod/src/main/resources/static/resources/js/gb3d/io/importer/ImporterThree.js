@@ -56,7 +56,6 @@ gb3d.io.ImporterThree = function(obj) {
 	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
 	this.gb2dMap = this.gb3dMap ? this.gb3dMap.getGbMap() : undefined;
 	this.layer = options.layer ? options.layer : undefined;
-	this.threeTree = options.threeTree ? options.threeTree : undefined;
 	this.feature = new ol.Feature();
 	obj.width = 300;
 	obj.autoOpen = false;
@@ -357,7 +356,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var position = that.object.position;
 		var cart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]);
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
-//		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
@@ -428,32 +427,6 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
-		
-		var treeid = layer.get("treeid");
-		
-		var l = source.getFeatureById(treeid + ".new0");
-		
-		if (!l) {
-			var fid = treeid + ".new0";
-			feature.setId(fid);
-		} else {
-			var count = 1;
-			while(source.getFeatureById(treeid + ".new" + count) !== null){
-				count++;
-			}
-			var fid = treeid + ".new" + count;
-			feature.setId(fid);
-		}
-
-		source.addFeature(feature);
-		var featureId = obj3d.feature.getId();
-		
-		that.threeTree.create_node( treeid, {
-			"parent": treeid,
-			"id": that.object.uuid,
-			"text": featureId,
-			"type": "Three"
-		}, "last", false, false );
 	});
 }
 
@@ -555,7 +528,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 		var points = [];
 		var normalPoints = [];
 		var vertices = object.geometry.attributes.position.array;
-		var normal = object.geometry.attributes.normal ? object.geometry.attributes.normal.array : false;
+		var normal = object.geometry.attributes.normal.array;
 		var normalFlag = normal ? true : false; 
 		for (var j = 0; j < vertices.length; j = j + 3) {
 			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
