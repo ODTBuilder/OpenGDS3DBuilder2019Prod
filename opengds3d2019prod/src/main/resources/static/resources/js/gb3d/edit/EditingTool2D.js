@@ -2205,6 +2205,9 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 					// ThreeObject remove
 					var threeObject = that.mapObj.getThreeObjectById(features.item(i).getId());
 					that.mapObj.removeThreeObject( threeObject );
+					
+					var record = that.getEditingTool3D().getModelRecord();
+					record.remove(threeObject.getLayer(), undefined, threeObject);
 				}
 
 				gb.undo.pushAction({

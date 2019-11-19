@@ -247,6 +247,7 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
 		this.created[id][tileId] = {};
 	}
 	this.created[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
+	console.log("model created");
 }
 /**
  * 삭제한 model를 편집이력에 임시저장한다.
@@ -285,7 +286,7 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, tileId, model) {
 	if ((this.id ? model.getFeature().get(this.id) : model.getFeature().getId()).search(".new") !== -1) {
 		var keys = Object.keys(this.created[id][tileId]);
 		for (var i = 0; i < keys.length; i++) {
-			if (this.created[id][tileId][keys[i]].getId() === model.getFeature().getId()) {
+			if (keys[i] === (this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
 				delete this.created[id][tileId][keys[i]];
 				break;
 			}
@@ -300,6 +301,7 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, tileId, model) {
 			}
 		}
 	}
+	console.log("model removed");
 }
 /**
  * layer ID를 통해 해당 레이어의 편집이력을 모두 삭제한다.
@@ -368,6 +370,7 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, tileId, model) {
 		}
 		this.modified[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
 	}
+	console.log("model updated");
 }
 
 /**
@@ -429,12 +432,12 @@ gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, modelId)
  * @return {gb3d.object.ThreeObject} 삭제 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
  *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) {
+gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, featureId) {
 	var model = undefined;
 	if (!!this.removed[layerId]) {
-		if (this.removed[layerId][modelId] instanceof gb3d.object.ThreeObject) {
-			model = this.removed[layerId][modelId];
-			delete this.removed[layerId][modelId];
+		if (this.removed[layerId][featureId] instanceof gb3d.object.ThreeObject) {
+			model = this.removed[layerId][featureId];
+			delete this.removed[layerId][featureId];
 		}
 	}
 	return model;

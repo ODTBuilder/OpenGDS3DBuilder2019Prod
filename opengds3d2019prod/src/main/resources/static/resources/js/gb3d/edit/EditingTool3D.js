@@ -13,6 +13,77 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var that = this;
 	gb3d.edit.EditingToolBase.call(this, obj);
 
+	this.translation = {
+			"notSupportHistory" : {
+				"en" : "This layer is not support feature history",
+				"ko" : "피처 이력을 지원하지 않는 레이어 입니다."
+			},
+			"alertSelectFeature" : {
+				"en" : "you should select Feature",
+				"ko" : "피처를 선택해 주세요."
+			},
+			"alertSelectOneLayer" : {
+				"en" : "you must select only one Layer",
+				"ko" : "레이어는 하나만 선택해야 합니다."
+			},
+			"returnMustArray" : {
+				"en" : "The return type must be an array",
+				"ko" : "리턴 객체는 배열이어야 합니다"
+			},
+			"editToolHint" : {
+				"en" : "Please zoom in to edit",
+				"ko" : "편집하시려면 확대해주세요"
+			},
+			"changes" : {
+				"en" : "Changes",
+				"ko" : "변경이력"
+			},
+			"add" : {
+				"ko" : "추가",
+				"en" : "Add"
+			},
+			"cancel" : {
+				"ko" : "취소",
+				"en" : "Cancel"
+			},
+			"delete" : {
+				"ko" : "삭제",
+				"en" : "Delete"
+			},
+			"deleteFeature" : {
+				"ko" : "객체 삭제",
+				"en" : "Delete Feature"
+			},
+			"notNullHint" : {
+				"ko" : "빈 값이 허용되지않습니다.",
+				"en" : "null values ​​are not allowed."
+			},
+			"valueHint" : {
+				"ko" : "타입에 맞게 값을 입력해야합니다.",
+				"en" : "You must enter a value for the type."
+			},
+			"tempLayer" : {
+				"ko" : "Move 임시레이어",
+				"en" : "Move temporary layer"
+			},
+			"deleteFeaturesHint" : {
+				"ko" : "선택한 객체들을 정말로 삭제하시겠습니까?",
+				"en" : "Are you sure you want to delete the selected features?"
+			},
+			"selectFeatureNum" : {
+				"ko" : "선택된 객체 수",
+				"en" : "Number of selected features"
+			},
+			"transformPointHint" : {
+				"ko" : "Point객체는 변환 기능을 사용할 수 없습니다.",
+				"en" : "Point objects can not use the transform function."
+			},
+			"requiredOption" : {
+				"ko" : "은 필수 입력항목입니다.",
+				"en" : "is a required field."
+			}
+		};
+	
 	// EditingTool3D 작업 표시줄 기본 항목
 	var defaultList = [ {
 		content : "Move(W key)",
@@ -39,7 +110,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 		content : "delete",
 		icon : "fas fa-eraser fa-lg",
 		clickEvent : function() {
-			that.map.removeThreeObject(that.pickedObject_.uuid);
+// that.getMap().removeThreeObject(that.pickedObject_.uuid);
+			var edit2d;
+			if(typeof that.getEditingTool2D === "function"){
+				edit2d = that.getEditingTool2D()();
+			};
+			edit2d.remove();
 		},
 		color : ""
 	}, {
@@ -64,6 +140,195 @@ gb3d.edit.EditingTool3D = function(obj) {
 			id : undefined
 	};
 
+	// =====================================
+	var typeSpan = $("<span>").addClass("Text").text("Type");
+	var opt1 = $("<option>").attr("value", "box").text("Box");
+	var opt2 = $("<option>").attr("value", "cylinder").text("Cylinder");
+	var opt3 = $("<option>").attr("value", "circle").text("Circle");
+	var opt4 = $("<option>").attr("value", "dodecahedron").text("Dodecahedron");
+	var opt5 = $("<option>").attr("value", "icosahedron").text("Icosahedron");
+	var typeSelect = $("<select>").addClass("form-control").append(opt1).append(opt2).append(opt3).append(opt4).append(opt5);
+	var row1 = $("<div>").addClass("gb-object-row").attr("data-val", "type").append(typeSpan).append(typeSelect);
+	
+	var widthSpan = $("<span>").addClass("Text").text("Width");
+	var widthInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row2 = $("<div>").addClass("gb-object-row").attr("data-val", "width").append(widthSpan).append(widthInput);
+
+	var heightSpan = $("<span>").addClass("Text").text("Height");
+	var heightInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row3 = $("<div>").addClass("gb-object-row").attr("data-val", "height").append(heightSpan).append(heightInput);
+	
+	var depthSpan = $("<span>").addClass("Text").text("Depth");
+	var depthInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row4 = $("<div>").addClass("gb-object-row").attr("data-val", "depth").append(depthSpan).append(depthInput);
+	
+	var content = $("<div>").addClass("type-content").append(row2).append(row3).append(row4);
+	
+	var body = $("<div>").append(row1).append(content);
+	
+	
+	var okBtn = 
+		$("<button>")
+			.css({
+				"float" : "right"
+			})
+			.addClass("gb-button")
+			.addClass("gb-button-primary")
+			.text(that.translation.add[that.locale]);
+	
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn);
+	
+	var modalFooter = $("<div>").append(buttonArea);
+	
+	this.point3DModal = new gb.modal.ModalBase({
+		"title" : "3D Object Attribute",
+		"width" : 540,
+		"autoOpen" : false,
+		"body" : body,
+		"footer" : modalFooter
+	});
+	
+	$(typeSelect).on("change", function(e){
+		var val = $(this).val();
+		var content =  $(that.point3DModal.getModalBody()).find(".type-content");
+		content.empty();
+
+		var div, span, input;
+		var options = optionsOfType[val];
+
+		for(var i in options){
+			span = $("<span class='Text'>").text(i);
+			input = $("<input class='form-control' style='flex: 1;'>").val(options[i]);
+			div = $("<div class='gb-object-row' data-val='" + i + "'>");
+			div.append(span).append(input);
+			content.append(div);
+		}
+	});
+	
+	okBtn.click(function(){
+		var opt = {};
+
+		opt.type = $(that.point3DModal.getModalBody()).find("select:first-child").val();
+		$(that.point3DModal.getModalBody()).find(".gb-object-row").each(function(i, d){
+			if($(d).find("input").length !== 0){
+				opt[$(d).data("val")] = $(d).find("input").val();
+			} else if($(d).find("select").length !== 0){
+				opt[$(d).data("val")] = $(d).find("select").val();
+			}
+		});
+
+		// ***** 입력값 유효성 검사 필요 *****
+		that.createPointObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
+
+// $("#pointObjectCreateModal").modal("hide");
+		that.point3DModal.close();
+	});
+	
+	// =====================================
+	
+	var textureSpan = $("<span>").addClass("Text").text("Texture");
+	var textureInput = $("<input>").addClass("form-control");
+	var row5 = $("<div>").addClass("gb-object-row").attr("data-val", "texture").append(textureSpan).append(textureInput);
+	
+	var content = $("<div>").addClass("type-content").append(row2).append(row4).append(row5);
+	
+	var body = $("<div>").append(content);
+	
+	var okBtn = 
+		$("<button>")
+			.css({
+				"float" : "right"
+			})
+			.addClass("gb-button")
+			.addClass("gb-button-primary")
+			.text(that.translation.add[that.locale]);
+	
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn);
+	
+	var modalFooter = $("<div>").append(buttonArea);
+	
+	this.line3DModal = new gb.modal.ModalBase({
+		"title" : "3D Object Attribute",
+		"width" : 540,
+		"autoOpen" : false,
+		"body" : body,
+		"footer" : modalFooter
+	});
+	
+	okBtn.click(function(){
+		
+		var opt = {
+				width: 0,
+				depth: 0
+		};
+
+		$(that.line3DModal.getModalBody()).find(".gb-object-row").each(function(i, d){
+			if($(d).find("input").length !== 0){
+				opt[$(d).data("val")] = isNaN(parseFloat($(d).find("input").val())) ? 40 : parseFloat($(d).find("input").val());
+			} else if($(d).find("select").length !== 0){
+				opt[$(d).data("val")] = $(d).find("select").val();
+			}
+		});
+
+		// ***** 입력값 유효성 검사 필요 *****
+// that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
+// opt);
+// that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
+// opt);
+		that.createLineStringObjectOnRoad(that.objectAttr.coordinate, that.objectAttr.extent, opt);
+// $("#pointObjectCreateModal").modal("hide");
+		that.line3DModal.close();
+	});
+	
+	// =====================================
+	
+	var content = $("<div>").addClass("type-content").append(row4).append(row5);
+	
+	var body = $("<div>").append(content);
+	
+	var okBtn = 
+		$("<button>")
+			.css({
+				"float" : "right"
+			})
+			.addClass("gb-button")
+			.addClass("gb-button-primary")
+			.text(that.translation.add[that.locale]);
+	
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn);
+	
+	var modalFooter = $("<div>").append(buttonArea);
+	
+	this.polygon3DModal = new gb.modal.ModalBase({
+		"title" : "3D Object Attribute",
+		"width" : 540,
+		"autoOpen" : false,
+		"body" : body,
+		"footer" : modalFooter
+	});
+	
+	okBtn.click(function(){
+		
+		var opt = {
+				depth: 0
+		};
+
+		$(that.polygon3DModal.getModalBody()).find(".gb-object-row").each(function(i, d){
+			if($(d).find("input").length !== 0){
+				opt[$(d).data("val")] = $(d).find("input").val();
+			} else if($(d).find("select").length !== 0){
+				opt[$(d).data("val")] = $(d).find("select").val();
+			}
+		});
+
+		// ***** 입력값 유효성 검사 필요 *****
+
+		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
+
+//		$("#polygonObjectCreateModal").modal("hide");
+		that.polygon3DModal.close();
+	});
+	
 	// =============== modal event listener ===============
 	$("#pointObjectCreateModal").modal({
 		backdrop: "static",
@@ -152,10 +417,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 		});
 
 		// ***** 입력값 유효성 검사 필요 *****
-//		that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
-//		opt);
-//		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
-//		opt);
+// that.createLineObject(that.objectAttr.coordinate, that.objectAttr.extent,
+// opt);
+// that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
+// opt);
 		that.createLineStringObjectOnRoad(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
 		$("#lineObjectCreateModal").modal("hide");
@@ -214,7 +479,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 	this.threeTransformControls.addEventListener('objectChange', function(e) {
 		var object = e.target.object, mode = that.threeTransformControls.getMode();
-
+		
 		// ThreeJS 객체 Attribute 업데이트
 		if (object !== undefined) {
 			if (threeEditor.helpers[object.id] !== undefined) {
@@ -228,22 +493,22 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (object.geometry instanceof THREE.BufferGeometry || !object.geometry) {
 				return;
 			}
-			that.map.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
+			that.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
 			break;
 		case "rotate":
 			break;
 		case "translate":
-			that.map.moveObject2Dfrom3D(object.position, object.uuid);
+			that.moveObject2Dfrom3D(object.position, object.uuid);
 			break;
 		default:
 		}
 
-		that.map.getThreeObjects().forEach(function(e) {
+		that.getMap().getThreeObjects().forEach(function(e) {
 			if (e.getObject().uuid === object.uuid) {
 				// 선택된 객체의 수정횟수를 증가시킨다.
 				e.upModCount();
 				
-				var record = this.getModelRecord();
+				var record = that.getModelRecord();
 				record.update(e.getLayer(), undefined, e);
 			}
 		});
@@ -348,27 +613,27 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			// ThreeJS Object User Data창 내용 갱신
 			
-//			$(that.attrTB_).empty();
-//			var td1, td2, tform, tr;
-//			for ( var i in userData) {
-//				td1 = $("<td>").text(i);
+// $(that.attrTB_).empty();
+// var td1, td2, tform, tr;
+// for ( var i in userData) {
+// td1 = $("<td>").text(i);
 //
-//				tform = $("<input>").addClass("gb-edit-sel-alist").attr({
-//					"type" : "text"
-//				}).css({
-//					"width" : "100%",
-//					"border" : "none"
-//				}).val(userData[i]).on("input", function(e) {
-//					var key = $(this).parent().prev().text();
-//					var val = $(this).val();
-//					userData[key] = val;
-//				});
+// tform = $("<input>").addClass("gb-edit-sel-alist").attr({
+// "type" : "text"
+// }).css({
+// "width" : "100%",
+// "border" : "none"
+// }).val(userData[i]).on("input", function(e) {
+// var key = $(this).parent().prev().text();
+// var val = $(this).val();
+// userData[key] = val;
+// });
 //
-//				td2 = $("<td>").append(tform);
+// td2 = $("<td>").append(tform);
 //
-//				tr = $("<tr>").append(td1).append(td2);
-//				that.attrTB_.append(tr);
-//			}
+// tr = $("<tr>").append(td1).append(td2);
+// that.attrTB_.append(tr);
+// }
 			var userData = object.userData;
 			that.updateAttributePopup(userData);
 			that.attrPop_.open();
@@ -992,7 +1257,7 @@ gb3d.edit.EditingTool3D.updateStyleByInput = function(row, obj) {
 		return;
 	}
 
-	var threeObject = obj.map.getThreeObjectByUuid(pickedObject.uuid);
+	var threeObject = this.getMap().getThreeObjectByUuid(pickedObject.uuid);
 	if (!threeObject) {
 		return;
 	}
@@ -1002,7 +1267,7 @@ gb3d.edit.EditingTool3D.updateStyleByInput = function(row, obj) {
 	}
 
 	pickedObject.userData[row.data("key")] = $(input[0]).val();
-	obj.map.modify3DVertices([], threeObject.getFeature().getId(), threeObject.getFeature().getGeometry().getExtent());
+	this.modify3DVertices([], threeObject.getFeature().getId(), threeObject.getFeature().getGeometry().getExtent());
 }
 
 gb3d.edit.EditingTool3D.updateMaterialByInput = function(row, obj) {
@@ -1018,7 +1283,7 @@ gb3d.edit.EditingTool3D.updateMaterialByInput = function(row, obj) {
 		return;
 	}
 
-	var threeObject = obj.map.getThreeObjectByUuid(pickedObject.uuid);
+	var threeObject = this.getMap().getThreeObjectByUuid(pickedObject.uuid);
 	if (!threeObject) {
 		return;
 	}
@@ -1233,7 +1498,7 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 		return;
 	}
 
-	var obj = object, threeObject = this.map.getThreeObjectByUuid(obj.uuid), feature = threeObject.getFeature(), extent = feature.getGeometry().getExtent(), x = extent[0] + (extent[2] - extent[0])
+	var obj = object, threeObject = this.getMap().getThreeObjectByUuid(obj.uuid), feature = threeObject.getFeature(), extent = feature.getGeometry().getExtent(), x = extent[0] + (extent[2] - extent[0])
 	/ 2, y = extent[1] + (extent[3] - extent[1]) / 2, centerCart = Cesium.Cartesian3.fromDegrees(x, y);
 
 	obj.position.copy(centerCart);
@@ -1287,15 +1552,18 @@ gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, 
 	switch (type) {
 	case "Point":
 	case "MultiPoint":
-		$("#pointObjectCreateModal").modal();
+// $("#pointObjectCreateModal").modal();
+		this.point3DModal.open();
 		break;
 	case "LineString":
 	case "MultiLineString":
-		$("#lineObjectCreateModal").modal();
+//		$("#lineObjectCreateModal").modal();
+		this.line3DModal.open();
 		break;
 	case "Polygon":
 	case "MultiPolygon":
-		$("#polygonObjectCreateModal").modal();
+//		$("#polygonObjectCreateModal").modal();
+		this.polygon3DModal.open();
 		break;
 	default:
 		return;
@@ -1364,13 +1632,14 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 		"extent" : extent,
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
-		"treeid" : this.objectAttr.treeid
+		"treeid" : this.objectAttr.treeid,
+		"layer" : this.objectAttr.layer
 	});
 
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(this.objectAttr.layer, undefined, obj3d);
+	record.create(obj3d.getLayer(), undefined, obj3d);
 
 	return obj3d;
 }
@@ -1435,13 +1704,15 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 		"center" : [ x, y ],
 		"extent" : extent,
 		"type" : this.objectAttr.type,
-		"feature" : this.objectAttr.feature
+		"feature" : this.objectAttr.feature,
+		"treeid" : this.objectAttr.treeid,
+		"layer" : this.objectAttr.layer
 	});
 
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(this.objectAttr.layer, undefined, obj3d);
+	record.create(obj3d.getLayer(), undefined, obj3d);
 
 	return obj3d;
 }
@@ -1508,14 +1779,14 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 		"extent" : extent,
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
-		"buffer" : option["width"] / 2,
-		"treeid" : this.objectAttr.treeid
+		"treeid" : this.objectAttr.treeid,
+		"layer" : this.objectAttr.layer
 	});
 
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(this.objectAttr.layer, undefined, obj3d);
+	record.create(obj3d.getLayer(), undefined, obj3d);
 
 	return obj3d;
 
@@ -1548,8 +1819,8 @@ gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
 	that.updateAttributePopup(object.userData);
 	that.attrPop_.open();
 	
-//	this.updateAttributeTab( object );
-//	this.updateStyleTab( object );
+// this.updateAttributeTab( object );
+// this.updateStyleTab( object );
 
 	this.applySelectedOutline(object);
 
@@ -1594,8 +1865,8 @@ gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
 
 	this.pickedObject_ = threeObject.getObject();
 	this.threeTransformControls.detach( threeObject.getObject() );
-//	this.updateAttributeTab( undefined );
-//	this.updateStyleTab( undefined );
+// this.updateAttributeTab( undefined );
+// this.updateStyleTab( undefined );
 	threeEditor.select( null );
 	this.removeSelectedOutline();
 	
@@ -1638,12 +1909,12 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
 		this.selectFeature(threeObject.getFeature().getId());
 	} else {
 		this.selectThree(threeObject.getObject().uuid);
-//		this.cesiumViewer.camera.flyTo({
-//		destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
-//		threeObject.getCenter()[1],
-//		this.cesiumViewer.camera.positionCartographic.height),
-//		duration: 0
-//		});
+// this.cesiumViewer.camera.flyTo({
+// destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
+// threeObject.getCenter()[1],
+// this.cesiumViewer.camera.positionCartographic.height),
+// duration: 0
+// });
 	}
 }
 
@@ -1671,7 +1942,7 @@ gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
 	carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(centerCoord),
 	lon = Cesium.Math.toDegrees(carto.longitude),
 	lat = Cesium.Math.toDegrees(carto.latitude),
-	threeObject = this.getThreeObjectByUuid(id),
+	threeObject = this.getMap().getThreeObjectByUuid(id),
 	geometry = threeObject.getFeature().getGeometry(),
 	lastCenter = threeObject.getCenter(),
 	deltaX = lon - lastCenter[0],
@@ -1705,10 +1976,11 @@ gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid
 		degrees.push([lon, lat]);
 	}
 	degrees.push(degrees[0]);
-//	threeObject.getFeature().getGeometry().setCoordinates(degrees);
+// threeObject.getFeature().getGeometry().setCoordinates(degrees);
 }
 
 gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coord){
+	var that = this;
 	var featureId = id;
 	var featureCoord = coord;
 	var threeObject = this.getMap().getThreeObjectById(featureId);
@@ -1776,10 +2048,12 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
 
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);
-
+	var record = that.getModelRecord();
+	record.update(threeObject.getLayer(), undefined, threeObject);
 }
 
 gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, event) {
+	var that = this;
 	var objects = this.getMap().getThreeObjects(),
 	evt = event,
 	coord = arr,
@@ -1805,7 +2079,7 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 	var lastCenter = threeObject.getCenter();
 	var position = threeObject.getObject().position;
 	var lastCart = Cesium.Cartesian3.fromDegrees(lastCenter[0], lastCenter[1]);
-//	var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
+// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
 	var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
 	// === 이준 시작 ===
@@ -1833,49 +2107,49 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 			object.scale.z = object.scale.z * evt.ratio_;
 		}
 		return;
-//		var floor = gb3d.io.ImporterThree.getFloorPlan(object, center, []);
-//		var features = turf.featureCollection(floor);
-//		var dissolved = undefined;
-//		try {
-//		dissolved = turf.dissolve(features);
-//		} catch (e) {
-//		// TODO: handle exception
-//		console.error(e);
-//		return;
-//		}
-//		var fea;
-//		if (dissolved) {
-//		if (dissolved.type === "FeatureCollection") {
-//		fea = [];
-//		for (var i = 0; i < dissolved.features.length; i++) {
-//		if (dissolved.features[i].geometry.type === 'Polygon') {
-//		if (edit2d.getLayer().getSource().get("git").geometry ===
-//		"Polygon") {
-//		geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-//		} else if (edit2d.getLayer().getSource().get("git").geometry ===
-//		"MultiPolygon") {
-//		geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates
-//		], "XY");
-//		}
-//		break;
-//		} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-//		if (edit2d.getLayer().getSource().get("git").geometry ===
-//		"Polygon") {
-//		var outer = dissolved.features[i].geometry.coordinates;
-//		var polygon = outer[0];
-//		geom = new ol.geom.Polygon(polygon, "XY");
-//		} else if (edit2d.getLayer().getSource().get("git").geometry ===
-//		"MultiPolygon") {
-//		geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates,
-//		"XY");
-//		}
-//		break;
-//		}
-//		}
-//		// source.addFeatures(fea);
-//		}
-//		}
-//		return geom;
+// var floor = gb3d.io.ImporterThree.getFloorPlan(object, center, []);
+// var features = turf.featureCollection(floor);
+// var dissolved = undefined;
+// try {
+// dissolved = turf.dissolve(features);
+// } catch (e) {
+// // TODO: handle exception
+// console.error(e);
+// return;
+// }
+// var fea;
+// if (dissolved) {
+// if (dissolved.type === "FeatureCollection") {
+// fea = [];
+// for (var i = 0; i < dissolved.features.length; i++) {
+// if (dissolved.features[i].geometry.type === 'Polygon') {
+// if (edit2d.getLayer().getSource().get("git").geometry ===
+// "Polygon") {
+// geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+// } else if (edit2d.getLayer().getSource().get("git").geometry ===
+// "MultiPolygon") {
+// geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates
+// ], "XY");
+// }
+// break;
+// } else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+// if (edit2d.getLayer().getSource().get("git").geometry ===
+// "Polygon") {
+// var outer = dissolved.features[i].geometry.coordinates;
+// var polygon = outer[0];
+// geom = new ol.geom.Polygon(polygon, "XY");
+// } else if (edit2d.getLayer().getSource().get("git").geometry ===
+// "MultiPolygon") {
+// geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates,
+// "XY");
+// }
+// break;
+// }
+// }
+// // source.addFeatures(fea);
+// }
+// }
+// return geom;
 	}
 	var recursive = function(obj, result){
 		if (obj instanceof THREE.Group) {
@@ -1898,29 +2172,29 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 				vert.z += opt.depth/2;
 			});
 			object.geometry = geometry;
-//			return;
-//			} else if (opt.type === "MultiLineString" || opt.type === "LineString") {
-//			var feature = threeObject.getFeature().clone();
-//			if (feature.getGeometry() instanceof ol.geom.LineString) {
-//			var beforeGeomTest = feature.getGeometry().clone();
-//			console.log(beforeGeomTest.getCoordinates().length);
-//			var beforeCoord = beforeGeomTest.getCoordinates();
+// return;
+// } else if (opt.type === "MultiLineString" || opt.type === "LineString") {
+// var feature = threeObject.getFeature().clone();
+// if (feature.getGeometry() instanceof ol.geom.LineString) {
+// var beforeGeomTest = feature.getGeometry().clone();
+// console.log(beforeGeomTest.getCoordinates().length);
+// var beforeCoord = beforeGeomTest.getCoordinates();
 
-//			var tline = turf.lineString(beforeCoord);
+// var tline = turf.lineString(beforeCoord);
 
-//			var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units :
-//			"meters"});
-//			console.log(tbuffered);
-//			var gjson = new ol.format.GeoJSON();
-//			var bfeature = gjson.readFeature(tbuffered);
+// var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units :
+// "meters"});
+// console.log(tbuffered);
+// var gjson = new ol.format.GeoJSON();
+// var bfeature = gjson.readFeature(tbuffered);
 
-//			coord = bfeature.getGeometry().getCoordinates(true);
-//			console.log(bfeature.getGeometry().getType());
-//			console.log(coord);
+// coord = bfeature.getGeometry().getCoordinates(true);
+// console.log(bfeature.getGeometry().getType());
+// console.log(coord);
 
-//			} else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
+// } else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
 
-//			}
+// }
 		} else {
 			var a, b, cp;
 			if(geometry instanceof THREE.Geometry){
@@ -1957,13 +2231,13 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 					return;
 				}
 
-//				geometry.vertices = result.points;
-//				geometry.faces = result.faces;
+// geometry.vertices = result.points;
+// geometry.faces = result.faces;
 				// geometry.translate(-centerCart.x, -centerCart.y,
 				// -centerCart.z);
 
 				object.lookAt(new THREE.Vector3(0,0,0));
-//				object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 				// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 				var quaternion = object.quaternion.clone();
 				// 쿼터니언각을 뒤집는다
@@ -2016,7 +2290,7 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 					// -centerCart.z);
 
 					object.lookAt(new THREE.Vector3(0,0,0));
-//					object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 					// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 					var quaternion = object.quaternion.clone();
 					// 쿼터니언각을 뒤집는다
@@ -2036,31 +2310,33 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 			}
 			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
 
-//			var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
-//			var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
-//			Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
+// var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
+// var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
+// Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
 			position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-//			position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
-//			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+// position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		}
 		// threeObject 수정 횟수 증가, Center 값 재설정
 		threeObject.upModCount();
 		threeObject.setCenter(center);
+		var record = that.getModelRecord();
+		record.update(threeObject.getLayer(), undefined, threeObject);
 	}
 	return geom;
 };
 
 /**
- * editing tool 2d 를 반환한다. 
-*/
+ * editing tool 2d 를 반환한다.
+ */
 gb3d.edit.EditingTool3D.prototype.getEditingTool2D = function() {
 	return this.editingTool2D;
 };
 
 /**
- * 속성 정보창을 업데이트 한다. 
-*/
+ * 속성 정보창을 업데이트 한다.
+ */
 gb3d.edit.EditingTool3D.prototype.updateAttributePopup = function(userData) {
 	var that = this;
 	var td1, td2, tform, tr;
@@ -2100,7 +2376,8 @@ gb3d.edit.EditingTool3D.prototype.getModelRecord = function(){
  * 3D 모델 레코드 객체를 설정한다.
  * 
  * @method gb3d.edit.EditingTool3D#setModelRecord
- * @param {gb3d.edit.ModelRecord} record - 3D 모델 레코드 객체
+ * @param {gb3d.edit.ModelRecord}
+ *            record - 3D 모델 레코드 객체
  */
 gb3d.edit.EditingTool3D.prototype.setModelRecord = function(record){
 	this.modelRecord = record;
