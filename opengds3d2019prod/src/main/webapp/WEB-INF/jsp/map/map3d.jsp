@@ -195,14 +195,7 @@ html, body {
 				"layers" : []
 			}
 		});
-		
-        var sourceyj = new ol.source.Vector();
-        var layer = new ol.layer.Vector({
-            "source" : sourceyj
-        });
-        layer.setMap(gbMap.getUpperMap());
 
-        
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
@@ -226,19 +219,22 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
+// 			"modelRecord" : mrecord,
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
-		
-		// ThreeJS Eidtor
-		var threeEditor = new Editor( gb3dMap.getThreeCamera(), gb3dMap.getThreeScene() );
-		var threeSidebar = new Sidebar( threeEditor );
-		document.body.appendChild( threeSidebar.dom );
 
-		var tilesetManager = new gb3d.edit.TilesetManager( { map: gb3dMap } );
+		// ThreeJS Eidtor
+		var threeEditor = new Editor(gb3dMap.getThreeCamera(), gb3dMap.getThreeScene());
+		var threeSidebar = new Sidebar(threeEditor);
+		document.body.appendChild(threeSidebar.dom);
+
+		var tilesetManager = new gb3d.edit.TilesetManager({
+			map : gb3dMap
+		});
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
-		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer" );
+		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -266,13 +262,6 @@ html, body {
 			layerInfoURL : urlList.getLayerInfo + urlList.token
 		});
 
-		var mrecord = new gb3d.edit.ModelRecord({
-			//id : "feature_id",
-			locale : locale,
-			wfstURL : urlList.wfst + urlList.token,
-			layerInfoURL : urlList.getLayerInfo + urlList.token
-		});
-		
 		var uploadjson = new gb.geoserver.UploadGeoJSON({
 			"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"epsg" : function() {
@@ -288,7 +277,7 @@ html, body {
 			"target" : "#attrObject",
 			"map" : gb3dMap
 		});
-		
+
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -353,25 +342,36 @@ html, body {
 				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
 			}
 		});
-
+		
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale
+		});
+		
+		var epan;
+		// editing Tool 3D
+		var epan3d = new gb3d.edit.EditingTool3D({
+			targetElement : $(".area-3d")[0],
+			map : gb3dMap,
+			isDisplay : false,
+			modelRecord : mrecord,
+			locale : locale || "en",
+			editingTool2D : function(){
+				return epan;
+			}
+		});
+		
 		// EditTool 활성화
-		var epan = new gb3d.edit.EditingTool2D({
+		epan = new gb3d.edit.EditingTool2D({
 			targetElement : gbMap.getLowerDiv()[0],
 			map : gb3dMap,
+			editingTool3D : epan3d,
 			featureRecord : frecord,
-			meatureRecord : mrecord,
 			otree : otree,
 			wfsURL : urlList.getWFSFeature + urlList.token,
 			layerInfo : urlList.getLayerInfo + urlList.token,
 			locale : locale || "en",
 			isEditing : gb.module.isEditing
-		});
-
-		var epan3d = new gb3d.edit.EditingTool3D({
-			targetElement : $(".area-3d")[0],
-			map : gb3dMap,
-			isDisplay : false,
-			locale : locale || "en"
 		});
 
 		$("#editTool").click(function(e) {
@@ -392,7 +392,7 @@ html, body {
 			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			isDisplay : false
 		});
-		
+
 		/* otree.getJSTreeElement().on('create_node.jstreeol3', function(e, data) {
 			var instance = threeTree.jstree;
 			var parent = data.parent;
@@ -406,7 +406,7 @@ html, body {
 		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
 			var treeid = data.selected[0];
 			var layer = data.instance.get_LayerById(treeid);
-			
+
 			if (!layer) {
 				return;
 			}
