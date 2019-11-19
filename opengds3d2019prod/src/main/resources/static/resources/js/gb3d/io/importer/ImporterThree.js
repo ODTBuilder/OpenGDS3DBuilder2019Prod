@@ -56,6 +56,7 @@ gb3d.io.ImporterThree = function(obj) {
 	this.gb3dMap = options.gb3dMap ? options.gb3dMap : undefined;
 	this.gb2dMap = this.gb3dMap ? this.gb3dMap.getGbMap() : undefined;
 	this.layer = options.layer ? options.layer : undefined;
+	this.threeTree = options.threeTree ? options.threeTree : undefined;
 	this.feature = new ol.Feature();
 	obj.width = 300;
 	obj.autoOpen = false;
@@ -347,7 +348,8 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			"center" : coordinates,
 			"extent" : geometry.getExtent(),
 			"type" : that.layer.get("git").geometry,
-			"feature" : feature
+			"feature" : feature,
+			"file" : true
 		});
 		var center = [ coordinates[0], coordinates[1] ];
 		var centerCart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1], 0);
@@ -356,12 +358,24 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var position = that.object.position;
 		var cart = Cesium.Cartesian3.fromDegrees(coordinates[0], coordinates[1]);
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
-		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
+
+		// 오브젝트에서 메쉬를 꺼낸다
+		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+		// 레이어 지오메트리 타입을 꺼낸다
+		var gtype = that.layer.get("git").geometry;
+		// 메쉬에 유저정보로 지오메트리 타입을 넣는다 - 폴리곤
+		that.object.userData.type = gtype;
+		for (var i = 0; i < result.length; i++) {
+			result[i].userData.type = gtype;			
+		}
+		
+		console.log(that.object);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
-		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, that.gb3dMap.cesiumViewer.scene, []);
+		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
 		var features = turf.featureCollection(floor);
 		var dissolved = undefined;
 //		try {
@@ -427,6 +441,32 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
+		
+		var treeid = layer.get("treeid");
+		
+		var l = source.getFeatureById(treeid + ".new0");
+		
+		if (!l) {
+			var fid = treeid + ".new0";
+			feature.setId(fid);
+		} else {
+			var count = 1;
+			while(source.getFeatureById(treeid + ".new" + count) !== null){
+				count++;
+			}
+			var fid = treeid + ".new" + count;
+			feature.setId(fid);
+		}
+
+		source.addFeature(feature);
+		var featureId = obj3d.feature.getId();
+		
+		that.threeTree.create_node( treeid, {
+			"parent": treeid,
+			"id": that.object.uuid,
+			"text": featureId,
+			"type": "Three"
+		}, "last", false, false );
 	});
 }
 
@@ -528,7 +568,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 		var points = [];
 		var normalPoints = [];
 		var vertices = object.geometry.attributes.position.array;
-		var normal = object.geometry.attributes.normal.array;
+		var normal = object.geometry.attributes.normal ? object.geometry.attributes.normal.array : false;
 		var normalFlag = normal ? true : false; 
 		for (var j = 0; j < vertices.length; j = j + 3) {
 			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
@@ -595,11 +635,23 @@ gb3d.io.ImporterThree.isGLTF1 = function(contents) {
 	return (json.asset != undefined && json.asset.version[0] < 2);
 }
 
-gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
+gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
+	if (obj instanceof THREE.Group) {
+		var chr = obj.children;
+		for (var i = 0; i < chr.length; i++) {
+			var result = gb3d.io.ImporterThree.getChildrenMeshes(chr[i], result);			
+		}
+	} else if (obj instanceof THREE.Mesh) {
+		result.push(obj);
+	}
+	return result;
+},
+
+gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 	var that = this;
 	var object = obj;
 	var center = center;
-	var scene = scene;
+//	var scene = scene;
 	var pos, poly;
 	var prev = undefined;
 	var parser = new jsts.io.OL3Parser();
@@ -609,7 +661,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, scene, result) {
 			for (var i = 0; i < object.children.length; i++) {
 				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
 				// 재귀함수 요청
-				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, scene, result);
+				result = gb3d.io.ImporterThree.getFloorPlan(object.children[i], center, result);
 			}
 		}
 		// return result;

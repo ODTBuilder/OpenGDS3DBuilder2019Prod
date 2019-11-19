@@ -196,11 +196,13 @@ html, body {
 			}
 		});
 		
-		var sourceyj = new ol.source.Vector();
-		var layer = new ol.layer.Vector({
-			"source" : sourceyj
-		});
-		layer.setMap(gbMap.getUpperMap());
+        var sourceyj = new ol.source.Vector();
+        var layer = new ol.layer.Vector({
+            "source" : sourceyj
+        });
+        layer.setMap(gbMap.getUpperMap());
+
+        
 		var mousePosition = new gb.map.MousePosition({
 			map : gbMap.getUpperMap()
 		});
@@ -264,6 +266,13 @@ html, body {
 			layerInfoURL : urlList.getLayerInfo + urlList.token
 		});
 
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale,
+			wfstURL : urlList.wfst + urlList.token,
+			layerInfoURL : urlList.getLayerInfo + urlList.token
+		});
+		
 		var uploadjson = new gb.geoserver.UploadGeoJSON({
 			"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"epsg" : function() {
@@ -286,6 +295,7 @@ html, body {
 			"gb3dMap" : gb3dMap,
 			"map" : gbMap.getUpperMap(),
 			"frecord" : frecord,
+			"mrecord" : mrecord,
 			"uploadJSON" : uploadjson,
 			"token" : urlList.token,
 			"url" : {
@@ -349,6 +359,7 @@ html, body {
 			targetElement : gbMap.getLowerDiv()[0],
 			map : gb3dMap,
 			featureRecord : frecord,
+			meatureRecord : mrecord,
 			otree : otree,
 			wfsURL : urlList.getWFSFeature + urlList.token,
 			layerInfo : urlList.getLayerInfo + urlList.token,
