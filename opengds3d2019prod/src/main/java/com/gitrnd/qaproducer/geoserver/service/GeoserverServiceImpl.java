@@ -54,6 +54,7 @@ import com.gitrnd.gdsbuilder.fileread.shp.SHPFileWriter;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverPublisher;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverReader;
+import com.gitrnd.gdsbuilder.geoserver.converter.type.GeneralMapExport;
 import com.gitrnd.gdsbuilder.geoserver.data.DTGSGeogigDatastoreEncoder;
 import com.gitrnd.gdsbuilder.geoserver.data.DTGeoserverManagerList;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
@@ -651,27 +652,6 @@ public class GeoserverServiceImpl implements GeoserverService {
 		}
 		return puFlag;
 	}
-	
-	
-	
-	
-	
-	
-
-	private void deleteDirectory(File dir) {
-
-		if (dir.exists()) {
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					deleteDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
 
 	/**
 	 * @since 2018. 7. 13.
@@ -1141,17 +1121,15 @@ public class GeoserverServiceImpl implements GeoserverService {
 	
 	
 	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, double minVal, double maxVal){
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String srs, String layerName, double minVal, double maxVal){
 		int puFlag = 500;
 		JSONObject returnJSON = new JSONObject();
-		
-		
-		
 		if (dtGeoManager != null && workspace != null && datastore != null) {
 			if(layerName == null){
 				logger.warn("레이어명 null");
 				puFlag = 610;
 			}else{
+				String serverURL = dtGeoManager.getRestURL();
 				dtReader = dtGeoManager.getReader();
 				dtPublisher = dtGeoManager.getPublisher();
 				
@@ -1176,11 +1154,21 @@ public class GeoserverServiceImpl implements GeoserverService {
 							e1.printStackTrace();
 						}
 						
+						String outputFolderPath = tmp.toString();
 						
-						File tmpFile = null;
+						int downReNum = new GeneralMapExport(serverURL, workspace, layerName, outputFolderPath, srs).export();
 						
-						
-						
+						if(downReNum == 200){
+							String shpPath = outputFolderPath + "/" + layerName +".shp";
+							
+							
+							
+							
+							//다 처리하고 임시폴더 삭제
+							deleteDirectory(tmp.toFile());
+						}else{
+							logger.warn("다운로드 실패");
+						}
 					}else{
 						logger.warn("레이어가 존재하지 않습니다.");
 					}
@@ -1198,13 +1186,13 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 	
 	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, double defVal){
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String srs, String layerName, double defVal){
 		
 		return null;
 	}
 	
 	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layerName, String attribute){
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String srs, String layerName, String attribute){
 		
 		return null;
 	}
@@ -1325,6 +1313,21 @@ public class GeoserverServiceImpl implements GeoserverService {
    	private static void FileNio2Copy(String source, String dest) throws IOException {
    		Files.copy(new File(source).toPath(), new File(dest).toPath());
    	}
+   	
+   	private void deleteDirectory(File dir) {
+
+		if (dir.exists()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					file.delete();
+				}
+			}
+		}
+		dir.delete();
+	}
 }
 
 /**

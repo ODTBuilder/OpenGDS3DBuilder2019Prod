@@ -276,7 +276,7 @@ public class GeoserverController extends AbstractController {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
 		}
-		String serverName = (String) request.getParameter("serverName");
+		/*String serverName = (String) request.getParameter("serverName");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		String workspace = (String) request.getParameter("workspace");
 		if (dtGeoserverManager == null) {
@@ -285,7 +285,13 @@ public class GeoserverController extends AbstractController {
 			response.sendError(601, "workspace를 입력하지 않았습니다.");
 		} else {
 			proService.requestGetMap(dtGeoserverManager, workspace, request, response);
-		}
+		}*/
+		
+		String serverName = (String) request.getParameter("serverName");
+		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
+
+		
+		geoserverService.geolayerTo3DTiles(dtGeoserverManager, "osm", "osm_korea","EPSG:4326","gis_osm_buildings", 20, 100);
 	}
 
 	/**
@@ -831,6 +837,7 @@ public class GeoserverController extends AbstractController {
 		String workspace = (String) request.getParameter("workspace");
 		String datastore = (String) request.getParameter("datastore");
 		String layerName = (String) request.getParameter("layerName");
+		String srs = (String) request.getParameter("srs");
 		String heightType = (String) request.getParameter("heightType");
 		
 		//조건에 따른 파라미터
