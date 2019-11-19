@@ -242,6 +242,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (e.getObject().uuid === object.uuid) {
 				// 선택된 객체의 수정횟수를 증가시킨다.
 				e.upModCount();
+				
+				var record = this.getModelRecord();
+				record.update(e.getLayer(), undefined, e);
 			}
 		});
 	});

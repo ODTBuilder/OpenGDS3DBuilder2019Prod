@@ -124,7 +124,7 @@
 <!-- gb.versioning.Feature -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/versioning/feature.js"></script>
 <!-- gb.edit -->
-<script src="${pageContext.request.contextPath}/resources/js/gb/edit/edithistory.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb/edit/featurerecord.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/undo.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/modifylayerprop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
