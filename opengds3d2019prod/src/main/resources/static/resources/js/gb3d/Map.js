@@ -69,13 +69,13 @@ gb3d.Map = function(obj) {
 // useDefaultRenderLoop : false,
 		scene3DOnly: true,
 		selectionIndicator : false,
-		homeButton : false,
+		homeButton : true,
 		sceneModePicker : false,
 		infoBox : true,
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
 		animation : false,
-		timeline : false,
+		timeline : true,
 		fullscreenButton : false,
 		allowTextureFilterAnisotropic : false,
 		contextOptions : {
@@ -96,13 +96,17 @@ gb3d.Map = function(obj) {
 			url : 'https://a.tile.openstreetmap.org/'
 		}),
 		baseLayerPicker : true,
-		geocoder : false,
+		geocoder : true,
 		automaticallyTrackDataSourceClocks : false,
 		dataSources : null,
 		clock : null,
 		terrainShadows : Cesium.ShadowMode.DISABLED,
 	});
 
+	$(".cesium-baseLayerPicker-dropDown").css({
+		"zIndex": 1
+	});
+	
 	// 3D Tileset 객체
 	this.tiles = {};
 
@@ -217,19 +221,49 @@ gb3d.Map = function(obj) {
 		show: false
 	});
 
+	var optionsOfType = {
+		"box": {
+			"width": 40,
+			"height": 40,
+			"depth": 40
+		},
+		"cylinder": {
+			"radiusTop": 20,
+			"radiusBottom": 20,
+			"height": 40
+		},
+		"circle": {
+			"radius": 20
+		},
+		"dodecahedron": {
+			"radius": 20
+		},
+		"icosahedron": {
+			"radius": 20
+		}
+	}
+	
 	$("#pointObjectCreateModal select").on("change", function(e){
 		var val = $(this).val();
 		var content = $("#pointObjectCreateModal .type-content");
+		content.empty();
+		
+		var div, span, input;
+		var options = optionsOfType[val];
+		
+		for(var i in options){
+			span = $("<span class='Text'>").text(i);
+			input = $("<input class='form-control' style='flex: 1;'>").val(options[i]);
+			div = $("<div class='gb-object-row' data-val='" + i + "'>");
+			div.append(span).append(input);
+			content.append(div);
+		}
 	});
 
 	$("#pointObjectConfirm").on("click", function(e){
-		var opt = {
-				type: "box",
-				width: 0,
-				height: 0,
-				depth: 0
-		};
-
+		var opt = {};
+		
+		opt.type = $("#pointObjectCreateModal select:first-child").val();
 		$("#pointObjectCreateModal").find(".gb-object-row").each(function(i, d){
 			if($(d).find("input").length !== 0){
 				opt[$(d).data("val")] = $(d).find("input").val();
@@ -554,25 +588,46 @@ gb3d.Map.prototype.createObjectByCoord = function(type, feature, treeid){
 
 gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 	var coord = arr,
-	points = [],
-	geometry,
-	cart,
-	obj3d,
-	x = extent[0] + (extent[2] - extent[0]) / 2,
-	y = extent[1] + (extent[3] - extent[1]) / 2,
-	type = option.type || "box",
-	width = option.width || 40,
-	height = option.height || 40,
-	depth = option.depth || 40,
-	centerCart = Cesium.Cartesian3.fromDegrees(x, y),
-	centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
+		points = [],
+		geometry,
+		cart,
+		obj3d,
+		x = extent[0] + (extent[2] - extent[0]) / 2,
+		y = extent[1] + (extent[3] - extent[1]) / 2,
+		type = option.type || "box",
+//		width = option.width || 40,
+//		height = option.height || 40,
+//		depth = option.depth || 40,
+		centerCart = Cesium.Cartesian3.fromDegrees(x, y),
+		centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
 
-	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
+//	geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height), parseInt(depth));
+	
+	switch(type){
+	case "box":
+		geometry = new THREE.BoxGeometry(parseInt(option.width || 40), parseInt(option.height || 40), parseInt(option.depth || 40));
+		break;
+	case "cylinder":
+		geometry = new THREE.CylinderGeometry(parseInt(option.radiusTop), parseInt(option.radiusBottom), parseInt(option.height));
+		break;
+	case "circle":
+		geometry = new THREE.CircleGeometry(parseInt(option.radius));
+		break;
+	case "dodecahedron":
+		geometry = new THREE.DodecahedronGeometry(parseInt(option.radius));
+		break;
+	case "icosahedron":
+		geometry = new THREE.IcosahedronGeometry(parseInt(option.radius));
+		break;
+	}
+	
 	geometry.vertices.forEach(function(vert, v){
-		vert.z += depth/2;
+		if(option.depth){
+			vert.z += option.depth/2;
+		}
 	});
 
-	var doubleSideMaterial = new THREE.MeshNormalMaterial({
+	var doubleSideMaterial = new THREE.MeshStandardMaterial({
 		side : THREE.DoubleSide
 	});
 
@@ -584,9 +639,15 @@ gb3d.Map.prototype.createPointObject = function(arr, extent, option){
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
-	latheMesh.userData.width = width;
-	latheMesh.userData.height = height;
-	latheMesh.userData.depth = depth;
+//	latheMesh.userData.width = width;
+//	latheMesh.userData.height = height;
+//	latheMesh.userData.depth = depth;
+	for(var i in option){
+		if(i === "type"){
+			continue;
+		}
+		latheMesh.userData[i] = option[i];
+	}
 
 	obj3d = new gb3d.object.ThreeObject({
 		"object" : latheMesh,

@@ -78,27 +78,63 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.OBJExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
-								var center = threeObject.getCenter();
-								var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+//								var threeObject = that.map.getThreeObjectByUuid( id );
+//								var center = threeObject.getCenter();
+//								var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									result = exporter.parse( object );
+									downloadString( result, id + '.obj' );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										result = exporter.parse( object );
+										downloadString( result, id + '.obj' );
+									}
 								}
 								
-								var object = threeObject.getObject().clone();
+//								if(!threeObject){
+//									return;
+//								}
+								
+//								var object = threeObject.getObject().clone();
 //								object.lookAt(0, 0, 0);
 //								object.matrix.setPosition(new THREE.Vector3(0, 0, 0));
 //								object.matrixWorld.setPosition(new THREE.Vector3(0, 0, 0));
 //								object.matrix.makeRotationFromQuaternion(threeObject.getObject().quaternion);
 //								object.matrixWorld.makeRotationFromQuaternion(threeObject.getObject().quaternion);
-								
-								resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+//								
+//								resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
 //								object.applyQuaternion(threeObject.getObject().quaternion);
 //								object.rotation.copy(new THREE.Euler(0, 0, 0));
-								var result = exporter.parse( object );
-								downloadString( result, id + '.obj' );
+//								var result = exporter.parse( object );
+//								downloadString( result, id + '.obj' );
 							}
 						},
 						"dae" : {
@@ -109,19 +145,43 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.ColladaExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									result = exporter.parse( object );
+									downloadString( result, id + '.dae' );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										result = exporter.parse( object );
+										downloadString( result, id + '.dae' );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								var result = exporter.parse( object );
-								downloadString( result.data, id + '.dae' );
 							}
 						},
 						"glb" : {
@@ -132,22 +192,49 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.GLTFExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									exporter.parse( object, function( result ){
+										
+										downloadArrayBuffer( result, id + '.glb' );
+										
+									}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										exporter.parse( object, function( result ){
+											
+											downloadArrayBuffer( result, id + '.glb' );
+											
+										}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								exporter.parse( object, function( result ){
-									
-									downloadArrayBuffer( result, id + '.glb' );
-									
-								}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
 							}
 						},
 						"gltf" : {
@@ -158,21 +245,47 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.GLTFExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									exporter.parse( object, function(result){
+										var output = JSON.stringify( result, null, 2 );
+										downloadString( output, id + '.gltf' );
+									} );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										exporter.parse( object, function(result){
+											var output = JSON.stringify( result, null, 2 );
+											downloadString( output, id + '.gltf' );
+										} );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								exporter.parse( object, function(result){
-									var output = JSON.stringify( result, null, 2 );
-									downloadString( output, id + '.gltf' );
-								} );
 							}
 						},
 						"draco" : {
@@ -183,19 +296,43 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.DRACOExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									result = exporter.parse( object.geometry );
+									downloadString( result, id + '.drc' );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										result = exporter.parse( object.geometry );
+										downloadString( result, id + '.drc' );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								var result = exporter.parse( object.geometry );
-								downloadString( result, id + '.drc' );
 							}
 						},
 						"ply" : {
@@ -206,19 +343,43 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.PLYExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									result = exporter.parse( object );
+									downloadString( result, id + '.ply' );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										result = exporter.parse( object );
+										downloadString( result, id + '.ply' );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								var result = exporter.parse( object );
-								downloadString( result, id + '.ply' );
 							}
 						},
 						"stl" : {
@@ -229,25 +390,138 @@ gb3d.tree.Three = function(obj) {
 							"action" : function(data) {
 								var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
 								var exporter = new THREE.STLExporter();
+								var type = obj.type;
 								var id = obj.id;
-								var threeObject = that.map.getThreeObjectByUuid( id );
 								
-								if(!threeObject){
-									return;
+								var child, threeObject, object, center, centerHigh, result;
+								if(type === "Three"){
+									threeObject = that.map.getThreeObjectByUuid( id );
+									
+									if(!threeObject){
+										return;
+									}
+									
+									object = threeObject.getObject().clone();
+									center = threeObject.getCenter();
+									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+									
+									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									
+									result = exporter.parse( object );
+									downloadString( result, id + '.stl' );
+								} else {
+									for(var i in obj.children){
+										child = inst.get_node(obj.children[i]);
+										threeObject = that.map.getThreeObjectByUuid( child.id );
+										if(!threeObject){
+											continue;
+										}
+										
+										object = threeObject.getObject().clone();
+										center = threeObject.getCenter();
+										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+										
+										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										
+										result = exporter.parse( object );
+										downloadString( result, id + '.stl' );
+									}
 								}
-								
-								var object = threeObject.getObject().clone();
-								object.position.copy(new THREE.Vector3(0, 0, 0));
-								resetMatrixWorld( object );
-								
-								var result = exporter.parse( object );
-								downloadString( result, id + '.stl' );
 							}
 						}
 					}
 				}
 				
-				totalObj["export"] = exportObj;
+				var lookAtObj = {
+					"separator_before" : false,
+					"icon" : "fas fa-ruler-combined",
+					"separator_after" : false,
+					"label" : "수평맞추기",
+					"action" : function(data){
+						var inst = $.jstree.reference(data.reference),
+							obj = inst.get_node(data.reference),
+							type = obj.type,
+							id = obj.id;
+						
+						var child, threeObject, object, center, centerHigh;
+						if(type === "Three"){
+							threeObject = that.map.getThreeObjectByUuid( id );
+							if(!threeObject){
+								return;
+							}
+							object = threeObject.getObject();
+							center = threeObject.getCenter();
+							centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+							
+							// Three Object 지구 평면에 맞게 회전
+							object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+						} else {
+							for(var i in obj.children){
+								child = inst.get_node(obj.children[i]);
+								threeObject = that.map.getThreeObjectByUuid( child.id );
+								if(!threeObject){
+									continue;
+								}
+								
+								object = threeObject.getObject();
+								center = threeObject.getCenter();
+								centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+								
+								// Three Object 지구 평면에 맞게 회전
+								object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+							}
+						}
+					}
+				}
+				
+				var quaternionObj = {
+					"separator_before" : false,
+					"icon" : "fas fa-grip-lines-vertical",
+					"separator_after" : false,
+					"label" : "축맞추기",
+					"action": function(data){
+						var inst = $.jstree.reference(data.reference),
+							obj = inst.get_node(data.reference),
+							type = obj.type,
+							id = obj.id;
+						
+						var child, threeObject, object, center, centerHigh, quaternion, vertices;
+						if(type === "Three"){
+							threeObject = that.map.getThreeObjectByUuid( id );
+							if(!threeObject){
+								return;
+							}
+							
+							object = threeObject.getObject();
+							center = threeObject.getCenter();
+							centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+							
+							applyQuaternion( object, centerHigh, object.quaternion.clone() );
+						} else {
+							for(var i in obj.children){
+								child = inst.get_node(obj.children[i]);
+								threeObject = that.map.getThreeObjectByUuid( child.id );
+								if(!threeObject){
+									continue;
+								}
+								
+								object = threeObject.getObject();
+								center = threeObject.getCenter();
+								centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+								
+								applyQuaternion( object, centerHigh, object.quaternion.clone() );
+							}
+						}
+					}
+				}
+				
+				if(o.type === "Point" || o.type === "MultiPoint" || o.type === "LineString" ||
+						o.type === "MultiLineString" || o.type === "Polygon" || o.type === "MultiPolygon" || o.type === "Three"){
+					totalObj["export"] = exportObj;
+					totalObj["lookat"] = lookAtObj;
+					totalObj["quaternion"] = quaternionObj;
+				}
+				
 				return totalObj;
 			}
 		},
@@ -305,6 +579,9 @@ gb3d.tree.Three = function(obj) {
 			},
 			"MultiPoint" : {
 				"icon" : "fas fa-circle gb-fa-xxs"
+			},
+			"Three" : {
+				"icon" : "fas fa-cube gb-fa-xxs"
 			}
 		},
 		"search" : {
@@ -346,7 +623,8 @@ gb3d.tree.Three = function(obj) {
 		that.jstree.create_node( treeid, {
 			"parent": treeid,
 			"id": object.uuid,
-			"text": featureId
+			"text": featureId,
+			"type": "Three"
 		}, "last", false, false );
 	} );
 	
@@ -398,6 +676,59 @@ gb3d.tree.Three = function(obj) {
 //			object.matrix.makeRotationFromQuaternion(quat);
 //			object.matrixWorld.makeRotationFromQuaternion(quat);
 //			object.setRotationFromQuaternion(quat);
+		}
+	}
+	
+	function applyQuaternion ( obj, centerHigh, quaternion ) {
+		var object = obj;
+		var ch = centerHigh;
+		var quat = quaternion;
+		
+		var rotation, normal, position, vertices;
+		if(!object.geometry){
+			if(object.children instanceof Array){
+				for(var i = 0; i < object.children.length; i++){
+					rotation = object.rotation.clone();
+					object.lookAt(new THREE.Vector3(ch.x, ch.y, ch.z));
+					if(object.rotation.equals(rotation)){
+						return;
+					}
+					applyQuaternion(object.children[i], ch, object.quaternion.clone());
+				}
+			}
+		} else {
+			// 원점을 바라보도록 설정한다
+			rotation = object.rotation.clone();
+			object.lookAt(new THREE.Vector3(ch.x, ch.y, ch.z));
+			if(object.rotation.equals(rotation)){
+				return;
+			}
+			// 쿼터니언각을 뒤집는다
+			quat.inverse();
+			// 모든 지오메트리 버텍스에
+			if(object.geometry instanceof THREE.BufferGeometry){
+				position = object.geometry.attributes.position;
+				
+				var points = [];
+				for (var i = 0; i < position.count; i++){
+					var x = position.getX(i), y = position.getY(i), z = position.getZ(i);
+					var vertex = new THREE.Vector3(x, y, z);
+					vertex.applyQuaternion(quat);
+					points.push(vertex.x);
+					points.push(vertex.y);
+					points.push(vertex.z);
+				}
+				
+				var newVertices = new Float32Array(points);
+				object.geometry.addAttribute('position', new THREE.Float32BufferAttribute(newVertices, 3));
+			} else {
+				vertices = object.geometry.vertices;
+				for (var i = 0; i < vertices.length; i++) {
+					var vertex = vertices[i];
+					// 뒤집은 쿼터니언각을 적용한다
+					vertex.applyQuaternion(quat);
+				}
+			}
 		}
 	}
 }
