@@ -107,14 +107,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 		},
 		color : ""
 	}, {
-		content : "delete",
+		content : "Delete",
 		icon : "fas fa-eraser fa-lg",
 		clickEvent : function() {
 // that.getMap().removeThreeObject(that.pickedObject_.uuid);
-			var edit2d;
-			if(typeof that.getEditingTool2D === "function"){
-				edit2d = that.getEditingTool2D()();
-			};
+			var edit2d = that.getEditingTool2D();
 			edit2d.remove();
 		},
 		color : ""
@@ -187,6 +184,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		"body" : body,
 		"footer" : modalFooter
 	});
+	this.point3DModal.modalHead.find("button").remove();
 	
 	$(typeSelect).on("change", function(e){
 		var val = $(this).val();
@@ -254,6 +252,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		"body" : body,
 		"footer" : modalFooter
 	});
+	this.line3DModal.modalHead.find("button").remove();
 	
 	okBtn.click(function(){
 		
@@ -306,6 +305,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		"body" : body,
 		"footer" : modalFooter
 	});
+	this.polygon3DModal.modalHead.find("button").remove();
 	
 	okBtn.click(function(){
 		
@@ -325,7 +325,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
-//		$("#polygonObjectCreateModal").modal("hide");
+// $("#polygonObjectCreateModal").modal("hide");
 		that.polygon3DModal.close();
 	});
 	
@@ -1557,12 +1557,12 @@ gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, 
 		break;
 	case "LineString":
 	case "MultiLineString":
-//		$("#lineObjectCreateModal").modal();
+// $("#lineObjectCreateModal").modal();
 		this.line3DModal.open();
 		break;
 	case "Polygon":
 	case "MultiPolygon":
-//		$("#polygonObjectCreateModal").modal();
+// $("#polygonObjectCreateModal").modal();
 		this.polygon3DModal.open();
 		break;
 	default:
@@ -1840,10 +1840,7 @@ gb3d.edit.EditingTool3D.prototype.selectFeature = function(id){
 		return false;
 	}
 
-	var edit2d;
-	if(typeof this.getEditingTool2D === "function"){
-		edit2d = this.getEditingTool2D()();
-	};
+	var edit2d = this.getEditingTool2D();
 	if(edit2d instanceof gb3d.edit.EditingTool2D){
 		if(!edit2d.interaction.select){
 			return false;
@@ -1880,10 +1877,7 @@ gb3d.edit.EditingTool3D.prototype.unselectFeature = function(id){
 	if(!threeObject){
 		return false;
 	}
-	var edit2d;
-	if(typeof this.getEditingTool2D === "function"){
-		edit2d = this.getEditingTool2D()();
-	};
+	var edit2d = this.getEditingTool2D();
 	if(edit2d instanceof gb3d.edit.EditingTool2D){
 		if(!edit2d.interaction.select){
 			return false;
@@ -2331,7 +2325,7 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
  * editing tool 2d 를 반환한다.
  */
 gb3d.edit.EditingTool3D.prototype.getEditingTool2D = function() {
-	return this.editingTool2D;
+	return typeof this.editingTool2D === "function" ? this.editingTool2D() : this.editingTool2D;
 };
 
 /**

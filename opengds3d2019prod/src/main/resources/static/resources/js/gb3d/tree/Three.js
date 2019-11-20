@@ -593,6 +593,8 @@ gb3d.tree.Three = function(obj) {
 		]
 	});
 	
+	this.editingTool3D = options.editingTool3D ? options.editingTool3D : undefined;
+	
 	this.jstree = $(this.panelBody).jstree(true);
 	
 	$(this.panelBody).on("select_node.jstree", function(evt, data){
@@ -609,8 +611,8 @@ gb3d.tree.Three = function(obj) {
 		}
 		
 		if(selected.length !== 0){
-			that.map.selectThree(selected[0]);
-			that.map.syncSelect(selected[0]);
+			that.getEditingTool3D().selectThree(selected[0]);
+			that.getEditingTool3D().syncSelect(selected[0]);
 		}
 	});
 	
@@ -732,3 +734,12 @@ gb3d.tree.Three = function(obj) {
 		}
 	}
 }
+/**
+ * 3D 모델 편집도구 객체를 반환한다.
+ * 
+ * @method gb3d.tree.Three#getEditingTool3D
+ * @return {gb3d.edit.editingTool3D} 3D 모델 레코드 객체
+ */
+gb3d.tree.Three.prototype.getEditingTool3D = function(){
+	return typeof this.editingTool3D === "function" ? this.editingTool3D() : this.editingTool3D;
+};

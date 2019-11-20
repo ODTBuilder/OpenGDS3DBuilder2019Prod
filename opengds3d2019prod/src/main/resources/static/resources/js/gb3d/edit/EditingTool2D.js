@@ -144,6 +144,10 @@ gb3d.edit.EditingTool2D = function(obj) {
 		"requiredOption" : {
 			"ko" : "은 필수 입력항목입니다.",
 			"en" : "is a required field."
+		},
+		"attr2DTitle" : {
+			"ko" : "2D 객체 속성",
+			"en" : "2D Feature Attribute"
 		}
 	};
 	
@@ -255,7 +259,6 @@ gb3d.edit.EditingTool2D = function(obj) {
 		source : this.tempSource
 	});
 	this.tempVector.set("name", this.translation.tempLayer[this.locale]);
-	
 	
 // this.managed = new ol.layer.Vector({
 // renderMode: "vector",
@@ -1514,6 +1517,9 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 				});
 			}
 			
+			// ----- ThreeJS Object Create --------
+//			that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
+			
 			if(source.get("git") instanceof Object){
 				if(source.get("git").attribute instanceof Array){
 					var typeFormBody = $("<tbody>");
@@ -1565,6 +1571,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 							});
 					
 					var addPropModal = new gb.modal.ModalBase({
+						"title" : that.translation.attr2DTitle[that.locale],
 						"width" : 540,
 						"autoOpen" : source.get("git").attribute.length !== 0 ? true : false,
 						"body" : body,
@@ -1680,17 +1687,15 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						addPropModal.close();
 						
 						// ----- ThreeJS Object Create --------
-//						that.mapObj.createObjectByCoord(that.selectedSource.get("git").geometry, feature);
+						that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
 					});
-					addPropModal.modalHead.remove();
+					addPropModal.modalHead.find("button").remove();
 					
 					if(source.get("git").attribute.length === 0){
 						// ----- ThreeJS Object Create --------
-//						that.mapObj.createObjectByCoord(that.selectedSource.get("git").geometry, feature);
+						that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
 					}
 				}
-				// ----- ThreeJS Object Create --------
-				that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
 			}
 		});
 		this.deactiveIntrct_([ "select", "dragbox", "move", "modify", "rotate" ]);

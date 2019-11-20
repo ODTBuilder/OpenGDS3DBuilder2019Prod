@@ -273,11 +273,20 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
+		var epan3d;
 		var threeTree = new gb3d.tree.Three({
 			"target" : "#attrObject",
-			"map" : gb3dMap
+			"map" : gb3dMap,
+			"editingTool3D" : function(){
+				return epan3d;
+			},
 		});
 
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale
+		});
+		
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -343,14 +352,9 @@ html, body {
 			}
 		});
 		
-		var mrecord = new gb3d.edit.ModelRecord({
-			//id : "feature_id",
-			locale : locale
-		});
-		
 		var epan;
 		// editing Tool 3D
-		var epan3d = new gb3d.edit.EditingTool3D({
+		epan3d = new gb3d.edit.EditingTool3D({
 			targetElement : $(".area-3d")[0],
 			map : gb3dMap,
 			isDisplay : false,
