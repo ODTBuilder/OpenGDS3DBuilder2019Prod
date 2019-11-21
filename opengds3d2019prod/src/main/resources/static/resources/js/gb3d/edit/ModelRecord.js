@@ -569,11 +569,11 @@ gb3d.edit.ModelRecord.prototype.closeEditTool = function(editTool) {
 /**
  * 임시저장중인 편집이력을 JSON 형태로 반환한다.
  * 
- * @method gb3d.edit.ModelRecord#getStructure
+ * @method gb3d.edit.ModelRecord#getStructureToGLTF
  * @function
  * @return {Object} 현재 임시저장중인 편집이력
  */
-gb3d.edit.ModelRecord.prototype.getStructure = function() {
+gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
 	var exporter = new THREE.GLTFExporter();
 	var obj = {};
 	var cLayers = Object.keys(this.created);
@@ -648,6 +648,123 @@ gb3d.edit.ModelRecord.prototype.getStructure = function() {
 				exporter.parse( object, function(result){
 					obj[layer]["modified"][tile][feature] = result;					
 				} );
+			}
+		}
+	}
+	
+	var rLayers = Object.keys(this.removed);
+	for (var i = 0; i < rLayers.length; i++) {
+		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
+			continue;
+		}
+		// 레이어별 키를 만듬
+		obj[rLayers[i]] = {};
+	}
+	
+	for (var j = 0; j < rLayers.length; j++) {
+		var layer = rLayers[j];
+		// removed 키가 없으면
+		if (!obj[layer].hasOwnProperty("removed")) {
+			// 빈 객체로 키를 만듬
+			obj[layer]["removed"] = {};
+		}
+		var tileid = Object.keys(this.removed[layer]);
+		for (var k = 0; k < tileid.length; k++) {
+			var tile = tileid[k];
+			if (!Array.isArray(obj[layer]["removed"][tile])) {
+				obj[layer]["removed"][tile] = [];
+			}
+			var featureid = Object.keys(this.removed[layer][tile]);
+			for (var o = 0; o < featureid.length; o++) {
+				var feature = featureid[o]; 
+				obj[layer]["removed"][tile].push(feature);
+			}
+		}
+	}
+
+	return obj;
+}
+
+/**
+ * 임시저장중인 편집이력을 JSON 형태로 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getStructureToOBJ
+ * @function
+ * @return {Object} 현재 임시저장중인 편집이력
+ */
+gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
+	var exporter = new THREE.OBJExporter();
+	var obj = {};
+	var cLayers = Object.keys(this.created);
+	for (var i = 0; i < cLayers.length; i++) {
+		if (Object.keys(this.created[cLayers[i]]).length < 1) {
+			continue;
+		}
+		// 레이어별 키를 만듬
+		obj[cLayers[i]] = {};
+	}
+	
+	for (var j = 0; j < cLayers.length; j++) {
+		var layer = cLayers[j];
+		// created 키가 없으면
+		if (!obj[layer].hasOwnProperty("created")) {
+			// 빈 객체로 키를 만듬
+			obj[layer]["created"] = {};
+		}
+		var tileid = Object.keys(this.created[layer]);
+		for (var k = 0; k < tileid.length; k++) {
+			var tile = tileid[k];
+			obj[layer]["created"][tile] = {};
+			var featureid = Object.keys(this.created[layer][tile]);
+			for (var o = 0; o < featureid.length; o++) {
+				var feature = featureid[o]; 
+				var threeObject = this.created[layer][tile][feature];
+				
+				var object = threeObject.getObject().clone();
+				var center = threeObject.getCenter();
+				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+				
+				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+				
+				var result = exporter.parse( object );
+				obj[layer]["created"][tile][feature] = result;
+			}
+		}
+	}
+	
+	var mLayers = Object.keys(this.modified);
+	for (var i = 0; i < mLayers.length; i++) {
+		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
+			continue;
+		}
+		// 레이어별 키를 만듬
+		obj[mLayers[i]] = {};
+	}
+	
+	for (var j = 0; j < mLayers.length; j++) {
+		var layer = mLayers[j];
+		// modified 키가 없으면
+		if (!obj[layer].hasOwnProperty("modified")) {
+			// 빈 객체로 키를 만듬
+			obj[layer]["modified"] = {};
+		}
+		var tileid = Object.keys(this.modified[layer]);
+		for (var k = 0; k < tileid.length; k++) {
+			var tile = tileid[k];
+			obj[layer]["modified"][tile] = {};
+			var featureid = Object.keys(this.modified[layer][tile]);
+			for (var o = 0; o < featureid.length; o++) {
+				var feature = featureid[o]; 
+				var threeObject = this.modified[layer][tile][feature];
+				
+				var object = threeObject.getObject().clone();
+				var center = threeObject.getCenter();
+				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+				
+				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+				
+				var result = exporter.parse( object );
+				obj[layer]["modified"][tile][feature] = result;
 			}
 		}
 	}

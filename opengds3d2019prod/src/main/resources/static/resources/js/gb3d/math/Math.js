@@ -2977,3 +2977,4 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 //		object.setRotationFromQuaternion(quat);
 	}
 }
+ 

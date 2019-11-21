@@ -224,6 +224,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 	
 	// =====================================
 	
+	var widthSpan = $("<span>").addClass("Text").text("Width");
+	var widthInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row2 = $("<div>").addClass("gb-object-row").attr("data-val", "width").append(widthSpan).append(widthInput);
+	
+	var depthSpan = $("<span>").addClass("Text").text("Depth");
+	var depthInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row4 = $("<div>").addClass("gb-object-row").attr("data-val", "depth").append(depthSpan).append(depthInput);
+	
 	var textureSpan = $("<span>").addClass("Text").text("Texture");
 	var textureInput = $("<input>").addClass("form-control");
 	var row5 = $("<div>").addClass("gb-object-row").attr("data-val", "texture").append(textureSpan).append(textureInput);
@@ -280,6 +288,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 	});
 	
 	// =====================================
+	
+	var depthSpan = $("<span>").addClass("Text").text("Depth");
+	var depthInput = $("<input>").addClass("form-control").attr("value", 40);
+	var row4 = $("<div>").addClass("gb-object-row").attr("data-val", "depth").append(depthSpan).append(depthInput);
+	
+	var textureSpan = $("<span>").addClass("Text").text("Texture");
+	var textureInput = $("<input>").addClass("form-control");
+	var row5 = $("<div>").addClass("gb-object-row").attr("data-val", "texture").append(textureSpan).append(textureInput);
 	
 	var content = $("<div>").addClass("type-content").append(row4).append(row5);
 	
@@ -1672,7 +1688,8 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	latheMesh.position.copy(centerCart);
 	console.log(latheMesh.quaternion);
 	// 원점을 바라보도록 설정한다
-	latheMesh.lookAt(new THREE.Vector3(0, 0, 0));
+// latheMesh.lookAt(new THREE.Vector3(0, 0, 0));
+	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 	var quaternion = latheMesh.quaternion.clone();
 	// 쿼터니언각을 뒤집는다
@@ -1749,7 +1766,8 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 	// latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	// 원점을 바라보도록 설정한다
-	latheMesh.lookAt(new THREE.Vector3(0, 0, 0));
+// latheMesh.lookAt(new THREE.Vector3(0, 0, 0));
+	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 	// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
 	var quaternion = latheMesh.quaternion.clone();
 	// 쿼터니언각을 뒤집는다

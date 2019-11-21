@@ -375,9 +375,14 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
 
+		gb3d.io.ImporterThree.refreshFloorPlan(layer, obj3d);
+		that.gb3dMap.getThreeScene().add(that.object);
+		that.gb3dMap.addThreeObject(obj3d);
+		/*
 		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
 		var features = turf.featureCollection(floor);
 		var dissolved = undefined;
+		*/
 //		try {
 //			dissolved = turf.dissolve(features);
 //		} catch (e) {
@@ -438,8 +443,9 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 //		// gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
 //		// Cesium.Math.toRadians(bearing));
 //		that.object.rotateZ(Cesium.Math.toRadians(bearing));
-		that.gb3dMap.getThreeScene().add(that.object);
-		that.gb3dMap.addThreeObject(obj3d);
+//		
+//		that.gb3dMap.getThreeScene().add(that.object);
+//		that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
 		
 		var treeid = layer.get("treeid");
@@ -728,3 +734,78 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 	}
 	return result;
 }
+
+gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj){
+	var center = threeObj.getCenter();
+	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
+	var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+	
+	var floor = gb3d.io.ImporterThree.getFloorPlan(threeObj.getObject(), center, []);
+	var features = turf.featureCollection(floor);
+	var dissolved = undefined;
+	try {
+		dissolved = turf.dissolve(features);
+	} catch (e) {
+		// TODO: handle exception
+		console.error(e);
+		var bbox = turf.bbox(features);
+		var bboxPolygon = turf.bboxPolygon(bbox);
+		var geom = new ol.geom.Polygon(bboxPolygon.geometry.coordinates, "XY");
+		var feature = new ol.Feature(geom);
+		layer.getSource().addFeature(feature);
+		threeObj["feature"] = feature;
+		return;
+	}
+	var fea;
+	if (dissolved) {
+		if (dissolved.type === "FeatureCollection") {
+			fea = [];
+			for (var i = 0; i < dissolved.features.length; i++) {
+				if (dissolved.features[i].geometry.type === 'Polygon') {
+					if (layer.get("git").geometry === "Polygon") {
+						var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					} else if (layer.get("git").geometry === "MultiPolygon") {
+						var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					}
+				} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+					if (layer.get("git").geometry === "Polygon") {
+						var outer = dissolved.features[i].geometry.coordinates;
+						// for (var j = 0; j < 1; j++) {
+						var polygon = outer[0];
+						var geomPoly = new ol.geom.Polygon(polygon, "XY");
+						var feature = new ol.Feature(geomPoly);
+						feature.setId(threeObj.getObject().uuid);
+						fea.push(feature);
+						threeObj["feature"] = feature;
+						// }
+					} else if (layer.get("git").geometry === "MultiPolygon") {
+						var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					}
+				}
+
+			}
+			layer.getSource().addFeatures(fea);
+		}
+	}
+
+//	var axisy1 = turf.point([ 90, 0 ]);
+//	var pickPoint = turf.point(center);
+//	var bearing = bearing = turf.bearing(pickPoint, axisy1);
+//	console.log("y축 1과 객체 중점의 각도는: " + bearing);
+//	// var zaxis = new THREE.Vector3(0, 0, 1);
+//	// gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
+//	// Cesium.Math.toRadians(bearing));
+//	that.object.rotateZ(Cesium.Math.toRadians(bearing));
+};
