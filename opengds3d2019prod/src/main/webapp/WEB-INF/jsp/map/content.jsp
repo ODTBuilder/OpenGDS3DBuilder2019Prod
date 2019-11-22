@@ -18,20 +18,20 @@
 				<div class="col-md-12 gb-attribute-container">
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" class="active">
-							<a href="#attrObject" role="tab" data-toggle="tab"><spring:message code="lang.object" /></a>
+							<a href="#attrLayer" role="tab" data-toggle="tab"><spring:message code="lang.layer" /></a>
 						</li>
 						<li role="presentation">
-							<a href="#attrLayer" role="tab" data-toggle="tab"><spring:message code="lang.layer" /></a>
+							<a href="#attrObject" role="tab" data-toggle="tab"><spring:message code="lang.object" /></a>
 						</li>
 						<li role="presentation">
 							<a href="#attrDeclare" role="tab" data-toggle="tab"><spring:message code="lang.declare" /></a>
 						</li>
 					</ul>
 					<div class="tab-content gb-attribute-item">
-						<div role="tabpanel" class="tab-pane active" id="attrObject">
-						</div>
-						<div role="tabpanel" class="tab-pane" id="attrLayer">
+						<div role="tabpanel" class="tab-pane active" id="attrLayer">
 							<div class="builderLayerClientPanel"></div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="attrObject">
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrDeclare">
 							<!-- <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -113,10 +113,10 @@
 				<div class="col-md-12 gb-attribute-container">
 					<ul class="nav nav-tabs nav-justified" role="tablist">
 						<li role="presentation" class="active">
-							<a href="#attrAttr" role="tab" data-toggle="tab"><spring:message code="lang.attribute" /></a>
+							<a href="#attrAttr" role="tab" data-toggle="tab"><spring:message code="lang.objectinfo" /></a>
 						</li>
 						<li role="presentation">
-							<a href="#attrStyle" role="tab" data-toggle="tab"><spring:message code="lang.style" /></a>
+							<a href="#attrStyle" role="tab" data-toggle="tab"><spring:message code="lang.geometryinfo" /></a>
 						</li>
 						<li role="presentation">
 							<a href="#attrMaterial" role="tab" data-toggle="tab"><spring:message code="lang.material" /></a>
