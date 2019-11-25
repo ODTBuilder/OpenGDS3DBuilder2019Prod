@@ -21,7 +21,7 @@
 							<a href="#attrLayer" role="tab" data-toggle="tab"><spring:message code="lang.layer" /></a>
 						</li>
 						<li role="presentation">
-							<a href="#attrObject" role="tab" data-toggle="tab"><spring:message code="lang.object" /></a>
+							<a href="#attrObject" role="tab" data-toggle="tab"><spring:message code="lang.objectlist" /></a>
 						</li>
 						<li role="presentation">
 							<a href="#attrDeclare" role="tab" data-toggle="tab"><spring:message code="lang.declare" /></a>
