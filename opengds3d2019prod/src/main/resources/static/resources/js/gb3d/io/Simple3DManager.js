@@ -416,6 +416,7 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 		success : function(data,textStatus,jqXHR) {
 			console.log(data);
 			modal.close();
+			that.getTilesetManager().addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
 		}		
 	}).fail(function(xhr, status, errorThrown) {
 		modal.showSpinner(false);
