@@ -102,6 +102,10 @@ html, body {
 	overflow: hidden;
 	padding-right: 0 !important;
 }
+
+.cesium-viewer-timelineContainer, .cesium-viewer-bottom {
+	z-index: 1;
+}
 </style>
 </head>
 <body>
@@ -310,7 +314,8 @@ html, body {
 		var simple3d = new gb3d.io.Simple3DManager({
 			"url" : undefined,
 			"locale" : locale !== "" ? locale : "en",
-			"gb3dMap" : gb3dMap
+// 			"gb3dMap" : gb3dMap,
+			"tilesetManager" : tilesetManager
 		});
 
 		var multiobj = new gb3d.io.MultiOBJManager({

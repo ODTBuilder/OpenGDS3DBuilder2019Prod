@@ -1264,7 +1264,6 @@ gb3d.edit.EditingTool3D.updateStyleByInput = function(row, obj) {
 	if (!obj) {
 		return;
 	}
-
 	var row = row;
 	var pickedObject = obj ? obj.pickedObject_ : undefined;
 	var input = row.find("input");
@@ -1273,7 +1272,7 @@ gb3d.edit.EditingTool3D.updateStyleByInput = function(row, obj) {
 		return;
 	}
 
-	var threeObject = this.getMap().getThreeObjectByUuid(pickedObject.uuid);
+	var threeObject = obj.getMap().getThreeObjectByUuid(pickedObject.uuid);
 	if (!threeObject) {
 		return;
 	}
@@ -1798,7 +1797,8 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
 		"treeid" : this.objectAttr.treeid,
-		"layer" : this.objectAttr.layer
+		"layer" : this.objectAttr.layer,
+		"buffer" : option["width"] / 2
 	});
 
 	this.getMap().addThreeObject(obj3d);
@@ -2119,49 +2119,6 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 			object.scale.z = object.scale.z * evt.ratio_;
 		}
 		return;
-// var floor = gb3d.io.ImporterThree.getFloorPlan(object, center, []);
-// var features = turf.featureCollection(floor);
-// var dissolved = undefined;
-// try {
-// dissolved = turf.dissolve(features);
-// } catch (e) {
-// // TODO: handle exception
-// console.error(e);
-// return;
-// }
-// var fea;
-// if (dissolved) {
-// if (dissolved.type === "FeatureCollection") {
-// fea = [];
-// for (var i = 0; i < dissolved.features.length; i++) {
-// if (dissolved.features[i].geometry.type === 'Polygon') {
-// if (edit2d.getLayer().getSource().get("git").geometry ===
-// "Polygon") {
-// geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-// } else if (edit2d.getLayer().getSource().get("git").geometry ===
-// "MultiPolygon") {
-// geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates
-// ], "XY");
-// }
-// break;
-// } else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-// if (edit2d.getLayer().getSource().get("git").geometry ===
-// "Polygon") {
-// var outer = dissolved.features[i].geometry.coordinates;
-// var polygon = outer[0];
-// geom = new ol.geom.Polygon(polygon, "XY");
-// } else if (edit2d.getLayer().getSource().get("git").geometry ===
-// "MultiPolygon") {
-// geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates,
-// "XY");
-// }
-// break;
-// }
-// }
-// // source.addFeatures(fea);
-// }
-// }
-// return geom;
 	}
 	var recursive = function(obj, result){
 		if (obj instanceof THREE.Group) {
@@ -2179,34 +2136,15 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 		geometry = meshes[i].geometry;
 
 		if (opt.type === "MultiPoint" || opt.type === "Point") {
-			geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
-			geometry.vertices.forEach(function(vert, v){
-				vert.z += opt.depth/2;
-			});
-			object.geometry = geometry;
-// return;
-// } else if (opt.type === "MultiLineString" || opt.type === "LineString") {
-// var feature = threeObject.getFeature().clone();
-// if (feature.getGeometry() instanceof ol.geom.LineString) {
-// var beforeGeomTest = feature.getGeometry().clone();
-// console.log(beforeGeomTest.getCoordinates().length);
-// var beforeCoord = beforeGeomTest.getCoordinates();
+//			geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
+//			geometry.vertices.forEach(function(vert, v){
+//				vert.z += opt.depth/2;
+//			});
+//			object.geometry = geometry;
+			
+			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
+			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 
-// var tline = turf.lineString(beforeCoord);
-
-// var tbuffered = turf.buffer(tline, threeObject.getBuffer(), {units :
-// "meters"});
-// console.log(tbuffered);
-// var gjson = new ol.format.GeoJSON();
-// var bfeature = gjson.readFeature(tbuffered);
-
-// coord = bfeature.getGeometry().getCoordinates(true);
-// console.log(bfeature.getGeometry().getType());
-// console.log(coord);
-
-// } else if (feature.getGeometry() instanceof ol.geom.MultiLineString) {
-
-// }
 		} else {
 			var a, b, cp;
 			if(geometry instanceof THREE.Geometry){
@@ -2229,8 +2167,8 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 					if (!isFile) {
 						result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], threeObject.getBuffer(), center, parseFloat(opt.depth));
 						gb3d.Math.createUVVerticeOnLineString(geometry, result);
-						a = coord[0];
-						b = coord[1];
+						a = coord[0][0];
+						b = coord[0][1];
 					}
 				} else if(opt.type === "LineString"){
 					if (!isFile) {

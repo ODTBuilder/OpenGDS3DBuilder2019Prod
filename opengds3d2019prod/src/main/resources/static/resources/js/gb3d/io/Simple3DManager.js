@@ -18,8 +18,11 @@ if (!gb3d.io)
  */
 gb3d.io.Simple3DManager = function(obj) {
 	var options = obj;
-	this.url = obj.url ? obj.url : undefined;
+	
+	this.url = options.url ? options.url : undefined;
+	this.tilesetManager = options.tilesetManager ? options.tilesetManager : undefined;
 	this.locale = options.locale ? options.locale : "en";
+	
 	this.translation = {
 		"ok" : {
 			"ko" : "확인",
@@ -72,6 +75,38 @@ gb3d.io.Simple3DManager = function(obj) {
 		"pointto3d" : {
 			"ko" : "포인트 레이어 3차원 변환",
 			"en" : "Point to 3D Objects"
+		},
+		"lineto3d" : {
+			"ko" : "라인스트링 레이어 3차원 변환",
+			"en" : "LineString to 3D Objects"
+		},
+		"polygonto3d" : {
+			"ko" : "폴리곤 레이어 3차원 변환",
+			"en" : "Polygon to 3D Objects"
+		},
+		"building" : {
+			"ko" : "빌딩",
+			"en" : "Building"
+		},
+		"road" : {
+			"ko" : "도로",
+			"en" : "Road"
+		},
+		"pole" : {
+			"ko" : "전신주",
+			"en" : "Telegraph pole"
+		},
+		"callbox" : {
+			"ko" : "공중전화박스",
+			"en" : "Call box"
+		},
+		"notset" : {
+			"ko" : "선택안함",
+			"en" : "Not set"
+		},
+		"err" : {
+			"ko" : "오류",
+			"en" : "Error"
 		}
 	}
 }
@@ -82,7 +117,8 @@ gb3d.io.Simple3DManager = function(obj) {
  * @param {ol.layer.Layer}
  *            layer - 속성을 참조할 레이어
  */
-gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(layer) {
+gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store, layer) {
+	var that = this;
 	var typeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.type[this.locale]);
 
 	var box = $("<option>").attr({
@@ -131,20 +167,16 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(layer) {
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
-	var textureLabelTop = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale] + ":" + this.translation.top[this.locale]);
-	var textureTopSelect = $("<div>").addClass("gb-form");
-	var textureSelectTopArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureTopSelect);
+	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
+	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
+	var opt2 = $("<option>").attr("value", "callbox").text(this.translation.callbox[this.locale]);
+	var opt3 = $("<option>").attr("value", "pole").text(this.translation.pole[this.locale]);
+	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2).append(opt3);
+	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
-	var textureTopArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelTop).append(textureSelectTopArea);
+	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var textureLabelSide = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(
-			this.translation.texture[this.locale] + ":" + this.translation.side[this.locale]);
-	var textureSelectSide = $("<div>").addClass("gb-form");
-	var textureSelectSideArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelectSide);
-
-	var textureSideArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelSide).append(textureSelectSideArea);
-
-	var commonParamArea = $("<div>").append(depthArea).append(textureTopArea).append(textureSideArea);
+	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
 
 	var body = $("<div>").append(typeArea).append(boxParamArea).append(cylinderParamArea).append(commonParamArea);
 
@@ -166,6 +198,20 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(layer) {
 	});
 	$(okBtn).click(function() {
 		console.log("ok");
+		var type = $(typeSelect).val(); 
+		var geom = {
+			"geometry2d" : "Point",
+			"geometry3d" : type,
+			"depth" : $(depthInput).val(),
+			"texture" : $(textureSelect).val()
+		};
+		if (type === "box") {
+			geom["width"] = $(widthInput).val();
+			geom["height"] = $(heightInput).val();
+		} else if (type === "cylinder") {
+			geom["radius"] = $(radiusInput).val();
+		}
+		that.get3DTileset(geo, work, store, layer, geom, pointModal);
 	});
 
 	$(typeSelect).change(function() {
@@ -189,8 +235,9 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(layer) {
  * @param {ol.layer.Layer}
  *            layer - 속성을 참조할 레이어
  */
-gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(layer) {
-	var radiusLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.radius[this.locale]);
+gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, store, layer) {
+	var that = this;
+	var radiusLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.width[this.locale]);
 	var radiusInput = $("<input>").attr({
 		"type" : "number"
 	}).addClass("gb-form");
@@ -207,20 +254,16 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(layer) {
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
-	var textureLabelTop = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale] + ":" + this.translation.top[this.locale]);
-	var textureTopSelect = $("<div>").addClass("gb-form");
-	var textureSelectTopArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureTopSelect);
+	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
+	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
+	var opt2 = $("<option>").attr("value", "road1").text(this.translation.road[this.locale]+":"+this.translation.type1[this.locale]);
+	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale]+":"+this.translation.type1[this.locale]);
+	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2).append(opt3);
+	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
-	var textureTopArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelTop).append(textureSelectTopArea);
+	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var textureLabelSide = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(
-			this.translation.texture[this.locale] + ":" + this.translation.side[this.locale]);
-	var textureSelectSide = $("<div>").addClass("gb-form");
-	var textureSelectSideArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelectSide);
-
-	var textureSideArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelSide).append(textureSelectSideArea);
-
-	var commonParamArea = $("<div>").append(depthArea).append(textureTopArea).append(textureSideArea);
+	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
 
 	var body = $("<div>").append(cylinderParamArea).append(commonParamArea);
 
@@ -230,7 +273,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(layer) {
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 
 	var lineModal = new gb.modal.ModalBase({
-		"title" : this.translation.pointto3d[this.locale],
+		"title" : this.translation.lineto3d[this.locale],
 		"width" : 500,
 		"autoOpen" : true,
 		"body" : body,
@@ -242,6 +285,13 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(layer) {
 	});
 	$(okBtn).click(function() {
 		console.log("ok");
+		var geom = {
+			"geometry2d" : "LineString",
+			"depth" : $(depthInput).val(),
+			"texture" : $(textureSelect).val(),
+			"radius" : parseFloat($(radiusInput).val())/2
+		};
+		that.get3DTileset(geo, work, store, layer, geom, lineModal);
 	});
 };
 
@@ -252,8 +302,9 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(layer) {
  * @param {ol.layer.Layer}
  *            layer - 속성을 참조할 레이어
  */
-gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(layer) {
-
+gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, store, layer) {
+	var that = this;
+	
 	var depthLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.depth[this.locale]);
 	var depthInput = $("<input>").attr({
 		"type" : "number"
@@ -261,20 +312,15 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(layer) {
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
-	var textureLabelTop = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale] + ":" + this.translation.top[this.locale]);
-	var textureTopSelect = $("<div>").addClass("gb-form");
-	var textureSelectTopArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureTopSelect);
+	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
+	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
+	var opt2 = $("<option>").attr("value", "building").text(this.translation.building[this.locale]);
+	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2);
+	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
-	var textureTopArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelTop).append(textureSelectTopArea);
+	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var textureLabelSide = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(
-			this.translation.texture[this.locale] + ":" + this.translation.side[this.locale]);
-	var textureSelectSide = $("<div>").addClass("gb-form");
-	var textureSelectSideArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelectSide);
-
-	var textureSideArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabelSide).append(textureSelectSideArea);
-
-	var commonParamArea = $("<div>").append(depthArea).append(textureTopArea).append(textureSideArea);
+	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
 
 	var body = $("<div>").append(commonParamArea);
 
@@ -284,7 +330,7 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(layer) {
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 
 	var polygonModal = new gb.modal.ModalBase({
-		"title" : this.translation.pointto3d[this.locale],
+		"title" : this.translation.polygonto3d[this.locale],
 		"width" : 500,
 		"autoOpen" : true,
 		"body" : body,
@@ -295,7 +341,13 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(layer) {
 		polygonModal.close();
 	});
 	$(okBtn).click(function() {
-		console.log("ok");
+		console.log(geo, work, store, layer);
+		var geom = {
+			"geometry2d" : "Polygon",
+			"depth" : $(depthInput).val(),
+			"texture" : $(textureSelect).val()
+		};
+		that.get3DTileset(geo, work, store, layer, geom, polygonModal);
 	});
 };
 
@@ -311,22 +363,120 @@ gb3d.io.Simple3DManager.prototype.loadLayerInfo = function() {
 }
 
 /**
- * 2D 에서 3D로 변환을 요청한다
- * 
- * @method gb3d.io.Simple3DManager#load3DTiles
- * @param {ol.layer.Layer}
- *            layer - 속성을 참조할 레이어
- */
-gb3d.io.Simple3DManager.prototype.load3DTiles = function() {
-
-}
-
-/**
  * 업로드할 주소를 반환한다.
  * 
- * @method gb3d.io.Simple3DManager#getUploadURL
+ * @method gb3d.io.Simple3DManager#get3DTilesetURL
  * @return {String} 업로드 URL
  */
-gb3d.io.Simple3DManager.prototype.getUploadURL = function() {
+gb3d.io.Simple3DManager.prototype.get3DTilesetURL = function() {
 	return this.url;
 };
+
+/**
+ * 3D Tileset을 요청한다
+ * 
+ * @method gb3d.io.Simple3DManager#get3DTileset
+ */
+gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, layer, geom, modal) {
+	var that = this;
+	var url = this.get3DTilesetURL();
+	var params = {
+			"serverName" : geo,
+			"workspace" : work,
+			"datastore" : store,
+			"layer" : layer
+	};
+	params["geometry2d"] = geom["geometry2d"];
+	params["depth"] = geom["depth"];
+	params["texture"] = geom["texture"];
+	if (geom.geometry2d === "Point") {
+		params["geometry3d"] = geom["geometry3d"];
+		if(geom["geometry3d"] === "box"){
+			params["width"] = geom["width"];
+			params["height"] = geom["height"];
+		} else if(geom["geometry3d"] === "cylinder"){
+			params["radius"] = geom["radius"];
+		}
+	} else if (geom.geometry2d === "LineString") {
+		params["radius"] = geom["radius"];	
+	}
+	
+	$.ajax({
+		url : url + "&" + jQuery.param(params),
+		method : "POST",
+		contentType : "application/json; charset=UTF-8",
+		beforeSend : function() {
+			$("body").css("cursor", "wait");
+			modal.showSpinner(true);
+		},
+		complete : function() {
+			$("body").css("cursor", "auto");
+			modal.showSpinner(false);
+		},
+		success : function(data,textStatus,jqXHR) {
+			console.log(data);
+			modal.close();
+		}		
+	}).fail(function(xhr, status, errorThrown) {
+		modal.showSpinner(false);
+		$("body").css("cursor", "auto");
+		if (xhr.responseJSON) {
+			if (xhr.responseJSON.status) {
+				that.errorModal(xhr.responseJSON.status);		
+			}
+		} else {
+			that.messageModal(that.translation["err"][that.locale], xhr.status+" "+xhr.statusText);
+		}
+		
+	});
+};
+
+/**
+ * 에러 메세지를 표시한다
+ * 
+ * @method gb3d.io.Simple3DManager#errorModal
+ * @param {string}
+ *            code - 오류 코드
+ */
+gb3d.io.Simple3DManager.prototype.errorModal = function(code) {
+	var that = this;
+	that.messageModal(that.translation.err[that.locale], that.translation[code][that.locale]);
+};
+
+/**
+* 오류 메시지 창을 생성한다.
+* 
+* @method gb3d.io.Simple3DManager#messageModal
+* @param {string}
+*            title - 모달의 타이틀
+* @param {string}
+*            msg - 보여줄 메세지
+*/
+gb3d.io.Simple3DManager.prototype.messageModal = function(title, msg) {
+	var that = this;
+	var msg1 = $("<div>").append(msg).addClass("gb-geoserver-msgmodal-body");
+	var body = $("<div>").append(msg1);
+	var okBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text("OK");
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn);
+
+	var modal = new gb.modal.ModalBase({
+		"title" : title,
+		"width" : 310,
+		"autoOpen" : true,
+		"body" : body,
+		"footer" : buttonArea
+	});
+	$(okBtn).click(function() {
+		modal.close();
+	});
+};
+
+/**
+ * 타일셋 매니저 객체를 반환한다
+ * 
+ * @method gb3d.io.Simple3DManager#getTilesetManager
+ * @return {gb3d.edit.TilesetManager} - 타일셋 매니저 객체
+ */
+gb3d.io.Simple3DManager.prototype.getTilesetManager = function() {
+	return this.tilesetManager;
+}
