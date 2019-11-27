@@ -60,3 +60,39 @@
 	width: inherit;
 	height: inherit;
 }
+
+.gb-attribute-item * {
+	vertical-align: middle;
+}
+
+.gb-attribute-item .Row {
+	min-height: 20px;
+	margin-bottom: 10px;
+}
+
+input.Number {
+	color: #08f!important;
+	font-size: 12px;
+	border: 0px;
+	padding: 2px;
+	cursor: col-resize;
+}
+
+button.Button {
+	color: #555;
+	background-color: #ddd;
+	border: 0px;
+	padding: 5px 8px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}
+
+select.Select {
+	color: #666;
+	background-color: #ddd;
+	border: 0px;
+	text-transform: uppercase;
+	cursor: pointer;
+	outline: none;
+}

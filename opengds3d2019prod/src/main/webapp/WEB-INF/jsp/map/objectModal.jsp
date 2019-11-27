@@ -22,15 +22,15 @@
 				<div class="type-content">
 					<div class="gb-object-row" data-val="width">
 						<span class="Text">Width</span>
-						<input class="form-control" style="flex: 1;" placeholder="default 40">
+						<input class="form-control" style="flex: 1;" value="40">
 					</div>
 					<div class="gb-object-row" data-val="height">
 						<span class="Text">Height</span>
-						<input class="form-control" style="flex: 1;" placeholder="default 40">
+						<input class="form-control" style="flex: 1;" value="40">
 					</div>
 					<div class="gb-object-row" data-val="depth">
 						<span class="Text">Depth</span>
-						<input class="form-control" style="flex: 1;" placeholder="default 40">
+						<input class="form-control" style="flex: 1;" value="40">
 					</div>
 				</div>
 				<div class="gb-object-row" data-val="texture">

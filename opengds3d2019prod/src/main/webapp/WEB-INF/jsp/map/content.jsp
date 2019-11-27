@@ -34,7 +34,7 @@
 							<div class="builderLayerClientPanel"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrDeclare">
-							<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<!-- <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 								<div class="panel panel-default"  id="declareTemp" style="display: none;">
 									<div class="panel-heading" role="tab" id="headingOne">
 										<h4 class="panel-title gb-flex-between">
@@ -106,7 +106,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>
@@ -123,7 +123,7 @@
 						</li>
 					</ul>
 					<div class="tab-content gb-attribute-item">
-						<div role="tabpanel" class="tab-pane active" id="attrAttr">
+						<div role="tabpanel" class="tab-pane active" id="attrAttr" style="position: relative;">
 							<!-- <div class="gb-object-row" data-key="type">
 								<span class="Text">Type</span>
 								<span class="Text">Mesh</span>
@@ -133,7 +133,7 @@
 								<input class="Input" disabled="" style="padding: 2px; border: 1px solid transparent; width: 102px; font-size: 12px;">
 								<button class="Button" style="margin-left: 7px;">New</button>
 							</div> -->
-							<div class="gb-object-row" data-key="name">
+							<!-- <div class="gb-object-row" data-key="name">
 								<span class="Text">Name</span>
 								<input class="form-control" style="flex: 1;">
 							</div>
@@ -154,7 +154,7 @@
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
 								<input class="form-control gb-object-input">
-							</div>
+							</div> -->
 							<!-- <div class="gb-object-row">
 								<span class="Text">Shadow</span>
 								<span style="margin-right: 10px;">
@@ -167,17 +167,17 @@
 								</span>
 								<input class="gb-object-input" style="background-color: transparent; cursor: col-resize; display: none;">
 							</div> -->
-							<div class="gb-object-row" data-key="visible">
+							<!-- <div class="gb-object-row" data-key="visible">
 								<span class="Text">Visible</span>
 								<input class="Checkbox" type="checkbox">
 							</div>
 							<div class="gb-object-row" data-key="userData">
 								<span class="Text">User data</span>
-								<!-- <textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea> -->
-							</div>
+								<textarea class="TextArea" spellcheck="false" style="padding: 2px; width: 150px; height: 40px; font-size: 12px; border-color: transparent;"></textarea>
+							</div> -->
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrStyle">
-							<div class="gb-object-row">
+							<!-- <div class="gb-object-row">
 								<span class="Text">Opacity</span>
 								<input class="form-control" style="flex: 1;">
 							</div>
@@ -196,10 +196,10 @@
 							<div class="gb-object-row">
 								<span class="Text">Color</span>
 								<input id="styleColor" class="form-control" style="flex: 1;">
-							</div>
+							</div> -->
 						</div>
 						<div role="tabpanel" class="tab-pane" id="attrMaterial">
-							<div class="gb-object-row">
+							<!-- <div class="gb-object-row">
 								<span class="Text">Blending</span>
 								<select class="form-control" style="flex: 1;">
 									<option>hochul</option>
@@ -225,7 +225,7 @@
 							<div class="gb-object-row">
 								<span class="Text">Emissive</span>
 								<input id="textureEmissive" class="form-control" style="flex: 1;">
-							</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

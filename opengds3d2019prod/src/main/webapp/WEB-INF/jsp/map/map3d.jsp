@@ -181,6 +181,11 @@ html, body {
 
 		var gbMap = new gb.Map({
 			"target" : $(".area-2d")[0],
+			"view" : new ol.View({
+				projection : 'EPSG:4326',
+				center : [ 0, 0 ],
+				zoom : 2
+			}),
 			"upperMap" : {
 				"controls" : [],
 				"layers" : []
@@ -214,18 +219,30 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
+// 			"modelRecord" : mrecord,
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
 
-		var tiles = new gb3d.object.Tileset({
+		// ThreeJS Eidtor
+		var threeEditor = new Editor(gb3dMap.getThreeCamera(), gb3dMap.getThreeScene());
+		var threeSidebar = new Sidebar(threeEditor);
+		document.body.appendChild(threeSidebar.dom);
+
+		var tilesetManager = new gb3d.edit.TilesetManager({
+			map : gb3dMap
+		});
+		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
+		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
+		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
+		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
 			"cesiumTileset" : new Cesium.Cesium3DTileset({
-				url : "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json"
+				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
 			})
 		});
-		gb3dMap.addTileset(tiles);
+		gb3dMap.addTileset(tiles); */
 
 		var gbCam = gb3dMap.getCamera();
 
@@ -256,17 +273,24 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
+		var threeTree = new gb3d.tree.Three({
+			"target" : "#attrObject",
+			"map" : gb3dMap
+		});
+
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
 			"gb3dMap" : gb3dMap,
 			"map" : gbMap.getUpperMap(),
 			"frecord" : frecord,
+			"mrecord" : mrecord,
 			"uploadJSON" : uploadjson,
 			"token" : urlList.token,
 			"url" : {
 				"getLegend" : urlList.getLegend + urlList.token
-			}
+			},
+			"threeTree" : threeTree.jstree,
 		});
 
 		var uploadSHP = new gb.geoserver.UploadSHP({
@@ -285,11 +309,6 @@ html, body {
 			"url" : undefined,
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap
-		});
-
-		var threeTree = new gb3d.tree.Three({
-			"target" : "#attrObject",
-			"map" : gb3dMap
 		});
 
 		var importThree = new gb3d.io.ImporterThree({
@@ -323,24 +342,36 @@ html, body {
 				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
 			}
 		});
-
+		
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale
+		});
+		
+		var epan;
+		// editing Tool 3D
+		var epan3d = new gb3d.edit.EditingTool3D({
+			targetElement : $(".area-3d")[0],
+			map : gb3dMap,
+			isDisplay : false,
+			modelRecord : mrecord,
+			locale : locale || "en",
+			editingTool2D : function(){
+				return epan;
+			}
+		});
+		
 		// EditTool 활성화
-		var epan = new gb3d.edit.EditingTool2D({
+		epan = new gb3d.edit.EditingTool2D({
 			targetElement : gbMap.getLowerDiv()[0],
 			map : gb3dMap,
+			editingTool3D : epan3d,
 			featureRecord : frecord,
 			otree : otree,
 			wfsURL : urlList.getWFSFeature + urlList.token,
 			layerInfo : urlList.getLayerInfo + urlList.token,
 			locale : locale || "en",
 			isEditing : gb.module.isEditing
-		});
-
-		var epan3d = new gb3d.edit.EditingTool3D({
-			targetElement : $(".area-3d")[0],
-			map : gb3dMap,
-			isDisplay : false,
-			locale : locale || "en"
 		});
 
 		$("#editTool").click(function(e) {
@@ -361,6 +392,16 @@ html, body {
 			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			isDisplay : false
 		});
+
+		/* otree.getJSTreeElement().on('create_node.jstreeol3', function(e, data) {
+			var instance = threeTree.jstree;
+			var parent = data.parent;
+			var node = data.node;
+			
+			if(!instance.get_node(node.id)){
+				instance.create_node(parent, node.original, "last", false, false);
+			}
+		}); */
 
 		otree.getJSTreeElement().on('changed.jstreeol3', function(e, data) {
 			var treeid = data.selected[0];
@@ -450,15 +491,6 @@ html, body {
 		});
 
 		$("#textureImage").on("click", function() {
-
-		});
-
-		$(document).on("click", ".gb-declare-row > span > a", function() {
-			$("#declareTemp .gb-declare-row:last-child").clone().appendTo($(this).parent().parent().parent());
-		});
-
-		$(document).on("click", ".gb-declare-row > a", function() {
-			$(this).parent().remove();
 
 		});
 	</script>
