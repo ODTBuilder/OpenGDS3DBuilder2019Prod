@@ -44,6 +44,10 @@ import org.json.simple.JSONObject;
 import org.opengis.referencing.FactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,6 +68,7 @@ import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
 import com.gitrnd.gdsbuilder.geoserver.service.en.EnLayerBboxRecalculate;
+import com.gitrnd.gdsbuilder.net.impl.RestAPIRequestImpl;
 import com.gitrnd.gdsbuilder.parse.impl.DataConvertorImpl;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
 import com.vividsolutions.jts.geom.Geometry;
@@ -82,6 +87,8 @@ import it.geosolutions.geoserver.rest.manager.GeoServerRESTStyleManager;
  * @since 2017. 5. 12. 오전 2:22:14
  */
 @Service("geoService")
+@PropertySources({ @PropertySource(value = "classpath:application.yml", ignoreResourceNotFound = true),
+	@PropertySource(value = "file:./application.yml", ignoreResourceNotFound = true) })
 public class GeoserverServiceImpl implements GeoserverService {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -89,6 +96,15 @@ public class GeoserverServiceImpl implements GeoserverService {
 	private DTGeoserverReader dtReader;
 	private DTGeoserverPublisher dtPublisher;
 	private GeoServerRESTStyleManager restStyleManager;
+	
+	@Value("${gitrnd.node.protocol}")
+	private String protocol;
+	
+	@Value("${gitrnd.node.host}")
+	private String nodeHost;
+
+	@Value("${gitrnd.node.port}")
+	private String nodePort;
 
 	/**
 	 * @see com.gitrnd.qaproducer.geoserver.service.GeoserverService#shpLayerPublishGeoserver(com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager, java.lang.String, java.lang.String, java.lang.String, java.io.File, java.lang.String)
@@ -1120,6 +1136,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore, String srs, String layerName, double minVal, double maxVal){
 		int puFlag = 500;
@@ -1163,7 +1180,35 @@ public class GeoserverServiceImpl implements GeoserverService {
 							
 							
 							
+							//폴더경로
+							String folderPath = "";
 							
+							
+							
+							//tileset option 경로
+//							String tilesetPath = "";
+							
+							//API 요청 파라미터 생성
+							String nodeURL = protocol + "://"+nodeHost+":"+nodePort+"/local";
+							String userName = dtReader.getUsername();
+							
+							List<String> args = new ArrayList<String>();
+							args.add("b3dm");
+							boolean combineFlag = false;
+							
+							//body 
+							JSONObject bodyJson = new JSONObject();
+							bodyJson.put("uid", userName);
+							bodyJson.put("-m", folderPath);
+							bodyJson.put("combine", combineFlag);
+							bodyJson.put("args", args);
+							
+						
+							String bodyString = bodyJson.toJSONString();
+							
+							returnJSON = new RestAPIRequestImpl().requestRestAPI(HttpMethod.POST, nodeURL, bodyString);
+							
+							puFlag = 200;
 							//다 처리하고 임시폴더 삭제
 							deleteDirectory(tmp.toFile());
 						}else{
@@ -1182,7 +1227,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 			puFlag = 604;
 		}
 		returnJSON.put("status_code", puFlag);
-		return null;
+		return returnJSON;
 	}
 	
 	@Override

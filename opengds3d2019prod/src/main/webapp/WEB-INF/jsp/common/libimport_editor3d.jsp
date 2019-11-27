@@ -149,7 +149,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/label.js"></script>
 
 <!-- cesium -->
-<script src="${pageContext.request.contextPath}/resources/js/cesium/cesium.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/cesium/Cesium.js"></script>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium/Widgets/widgets.css" />
 <!-- three -->
 <script src="${pageContext.request.contextPath}/resources/js/three/three.js"></script>
