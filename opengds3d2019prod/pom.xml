@@ -239,9 +239,21 @@
 			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-grid</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>de.javagl</groupId>
+			<artifactId>obj</artifactId>
+			<version>0.3.0</version>
+		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
@@ -249,7 +261,6 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.9</version>
 		</dependency>
-
 
 	</dependencies>
 	<build>
