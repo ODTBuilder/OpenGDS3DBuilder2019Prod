@@ -96,26 +96,33 @@ public final class Earcut {
 		Node stop = ear;
 
 		// iterate through ears, slicing them one by one
-		while (ear.prev != ear.next) {
-			Node prev = ear.prev;
-			Node next = ear.next;
+		while (ear.next != ear.next.next) {
+//			Node prev = ear.prev;
+//			Node next = ear.next;
+
+			Node next1 = ear.next;
+			Node next2 = ear.next.next;
 
 			if (size != Double.MIN_VALUE ? isEarHashed(ear, minX, minY, size) : isEar(ear)) {
 				// cut off the triangle
-				triangles.add(prev.i / dim);
-				triangles.add(ear.i / dim);
-				triangles.add(next.i / dim);
+//				triangles.add(prev.i / dim);
+//				triangles.add(ear.i / dim);
+//				triangles.add(next.i / dim);
 
-				removeNode(ear);
+				triangles.add(next2.i / dim);
+				triangles.add(next1.i / dim);
+				triangles.add(ear.i / dim);			
+
+				removeNode(ear.next);
 
 				// skipping the next vertice leads to less sliver triangles
-				ear = next.next;
-				stop = next.next;
+				ear = next2;
+				stop = next2;
 
 				continue;
 			}
 
-			ear = next;
+			ear = next2;
 
 			// if we looped through the whole remaining polygon and can't find
 			// any more ears
@@ -227,7 +234,9 @@ public final class Earcut {
 	}
 
 	private static boolean isEar(Node ear) {
-		Node a = ear.prev, b = ear, c = ear.next;
+
+//		Node a = ear.prev, b = ear, c = ear.next;
+		Node a = ear, b = ear.next, c = ear.next.next;
 
 		if (area(a, b, c) >= 0)
 			return false; // reflex, can't be an ear
@@ -245,9 +254,13 @@ public final class Earcut {
 	}
 
 	private static boolean isEarHashed(Node ear, double minX, double minY, double size) {
-		Node a = ear.prev;
-		Node b = ear;
-		Node c = ear.next;
+//		Node a = ear.prev;
+//		Node b = ear;
+//		Node c = ear.next;
+
+		Node a = ear;
+		Node b = ear.next;
+		Node c = ear.next.next;
 
 		if (area(a, b, c) >= 0)
 			return false; // reflex, can't be an ear
