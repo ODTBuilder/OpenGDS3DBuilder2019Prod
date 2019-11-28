@@ -1028,10 +1028,10 @@ gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
 	
 	if( bool ){
 		obj["visible"] = true;
-		obj.userData.remove = false;
+//		obj.userData.remove = false;
 	} else {
 		obj["visible"] = false;
-		obj.userData.remove = true;
+//		obj.userData.remove = true;
 	}
 }
 

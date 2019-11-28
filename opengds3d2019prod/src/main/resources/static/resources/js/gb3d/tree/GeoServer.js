@@ -684,7 +684,13 @@ gb3d.tree.GeoServer = function(obj) {
 
 										console.log(obj);
 										console.log(nodes);
-										that.getSimple3DManager().showPointTo3DModal();
+										
+										var server = obj.id.split(":")[0];
+										var work = obj.id.split(":")[1];
+										var store = obj.id.split(":")[2];
+										var layer = obj.id.split(":")[3];
+										
+										that.getSimple3DManager().showPointTo3DModal(server, work, store, layer);
 									}
 							};
 							totalObj["importas3d"] = importObj;
@@ -709,7 +715,13 @@ gb3d.tree.GeoServer = function(obj) {
 
 										console.log(obj);
 										console.log(nodes);
-										that.getSimple3DManager().showLineStringTo3DModal();
+										
+										var server = obj.id.split(":")[0];
+										var work = obj.id.split(":")[1];
+										var store = obj.id.split(":")[2];
+										var layer = obj.id.split(":")[3];
+										
+										that.getSimple3DManager().showLineStringTo3DModal(server, work, store, layer);
 									}
 							};
 							totalObj["importas3d"] = importObj;
@@ -734,7 +746,13 @@ gb3d.tree.GeoServer = function(obj) {
 
 										console.log(obj);
 										console.log(nodes);
-										that.getSimple3DManager().showPolygonTo3DModal();
+										
+										var server = obj.id.split(":")[0];
+										var work = obj.id.split(":")[1];
+										var store = obj.id.split(":")[2];
+										var layer = obj.id.split(":")[3];
+										
+										that.getSimple3DManager().showPolygonTo3DModal(server, work, store, layer);
 									}
 							};
 							totalObj["importas3d"] = importObj;

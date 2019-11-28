@@ -80,9 +80,9 @@ gb3d.tree.Three = function(obj) {
 								var exporter = new THREE.OBJExporter();
 								var type = obj.type;
 								var id = obj.id;
-//								var threeObject = that.map.getThreeObjectByUuid( id );
-//								var center = threeObject.getCenter();
-//								var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+// var threeObject = that.map.getThreeObjectByUuid( id );
+// var center = threeObject.getCenter();
+// var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 								
 								var child, threeObject, object, center, centerHigh, result;
 								if(type === "Three"){
@@ -119,22 +119,22 @@ gb3d.tree.Three = function(obj) {
 									}
 								}
 								
-//								if(!threeObject){
-//									return;
-//								}
+// if(!threeObject){
+// return;
+// }
 								
-//								var object = threeObject.getObject().clone();
-//								object.lookAt(0, 0, 0);
-//								object.matrix.setPosition(new THREE.Vector3(0, 0, 0));
-//								object.matrixWorld.setPosition(new THREE.Vector3(0, 0, 0));
-//								object.matrix.makeRotationFromQuaternion(threeObject.getObject().quaternion);
-//								object.matrixWorld.makeRotationFromQuaternion(threeObject.getObject().quaternion);
+// var object = threeObject.getObject().clone();
+// object.lookAt(0, 0, 0);
+// object.matrix.setPosition(new THREE.Vector3(0, 0, 0));
+// object.matrixWorld.setPosition(new THREE.Vector3(0, 0, 0));
+// object.matrix.makeRotationFromQuaternion(threeObject.getObject().quaternion);
+// object.matrixWorld.makeRotationFromQuaternion(threeObject.getObject().quaternion);
 //								
-//								resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-//								object.applyQuaternion(threeObject.getObject().quaternion);
-//								object.rotation.copy(new THREE.Euler(0, 0, 0));
-//								var result = exporter.parse( object );
-//								downloadString( result, id + '.obj' );
+// resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+// object.applyQuaternion(threeObject.getObject().quaternion);
+// object.rotation.copy(new THREE.Euler(0, 0, 0));
+// var result = exporter.parse( object );
+// downloadString( result, id + '.obj' );
 							}
 						},
 						"dae" : {
@@ -455,6 +455,14 @@ gb3d.tree.Three = function(obj) {
 							
 							// Three Object 지구 평면에 맞게 회전
 							object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+							
+							if (threeObject.getIsFromFile()) {
+								var axisy1 = turf.point([ 90, 0 ]);
+								var pickPoint = turf.point(center);
+								var bearing = bearing = turf.bearing(pickPoint, axisy1);
+								console.log("y축 1과 객체 중점의 각도는: " + bearing);
+								object.rotateZ(Cesium.Math.toRadians(bearing));
+							}
 						} else {
 							for(var i in obj.children){
 								child = inst.get_node(obj.children[i]);
@@ -469,6 +477,14 @@ gb3d.tree.Three = function(obj) {
 								
 								// Three Object 지구 평면에 맞게 회전
 								object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+								
+								if (threeObject.getIsFromFile()) {
+									var axisy1 = turf.point([ 90, 0 ]);
+									var pickPoint = turf.point(center);
+									var bearing = bearing = turf.bearing(pickPoint, axisy1);
+									console.log("y축 1과 객체 중점의 각도는: " + bearing);
+									object.rotateZ(Cesium.Math.toRadians(bearing));
+								}
 							}
 						}
 					}
@@ -593,6 +609,8 @@ gb3d.tree.Three = function(obj) {
 		]
 	});
 	
+	this.editingTool3D = options.editingTool3D ? options.editingTool3D : undefined;
+	
 	this.jstree = $(this.panelBody).jstree(true);
 	
 	$(this.panelBody).on("select_node.jstree", function(evt, data){
@@ -609,8 +627,8 @@ gb3d.tree.Three = function(obj) {
 		}
 		
 		if(selected.length !== 0){
-			that.map.selectThree(selected[0]);
-			that.map.syncSelect(selected[0]);
+			that.getEditingTool3D().selectThree(selected[0]);
+			that.getEditingTool3D().syncSelect(selected[0]);
 		}
 	});
 	
@@ -652,30 +670,31 @@ gb3d.tree.Three = function(obj) {
 		var center = centerHigh;
 		var look = new THREE.Vector3(center.x, center.y, center.z);
 		look.negate();
-//		if(object.userData.type){
-//			return;
-//		}
+// if(object.userData.type){
+// return;
+// }
 		
 		if(!object.geometry){
 			if(object.children instanceof Array){
 				for(var i = 0; i < object.children.length; i++){
-					// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때 재귀함수 요청
+					// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
+					// 재귀함수 요청
 					object.position.copy(new THREE.Vector3(0, 0, 0));
 					quat = object.rotation.clone();
 					object.lookAt(new THREE.Vector3(0, 0, 1));
 					object.setRotationFromEuler(quat);
-//					object.matrix.makeRotationFromQuaternion(quat);
-//					object.matrixWorld.makeRotationFromQuaternion(quat);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
 					resetMatrixWorld(object.children[i], quat, center);
 				}
 			}
 		} else {
-//			object.position.copy(new THREE.Vector3(0, 0, 0));
+// object.position.copy(new THREE.Vector3(0, 0, 0));
 			object.lookAt(new THREE.Vector3(0, 0, 1));
 			object.setRotationFromEuler(quat);
-//			object.matrix.makeRotationFromQuaternion(quat);
-//			object.matrixWorld.makeRotationFromQuaternion(quat);
-//			object.setRotationFromQuaternion(quat);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
+// object.setRotationFromQuaternion(quat);
 		}
 	}
 	
@@ -732,3 +751,12 @@ gb3d.tree.Three = function(obj) {
 		}
 	}
 }
+/**
+ * 3D 모델 편집도구 객체를 반환한다.
+ * 
+ * @method gb3d.tree.Three#getEditingTool3D
+ * @return {gb3d.edit.editingTool3D} 3D 모델 레코드 객체
+ */
+gb3d.tree.Three.prototype.getEditingTool3D = function(){
+	return typeof this.editingTool3D === "function" ? this.editingTool3D() : this.editingTool3D;
+};

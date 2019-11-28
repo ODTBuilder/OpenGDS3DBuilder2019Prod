@@ -271,12 +271,24 @@ gb.modal.ModalBase.prototype.getHeight = function() {
  * @return {number} 최고 z-index
  */
 gb.modal.ModalBase.prototype.getMaxZIndex = function() {
-	var maxZ = Math.max.apply(null,$.map($('body > div'), function(e,n){
-		if($(e).css('position')=='absolute'){
-			return parseInt($(e).css('z-index'))||1 ;
+	var elems = document.getElementsByTagName("div");
+	var highest = 0;
+	for (var i = 0; i < elems.length; i++) {
+		var zindex = document.defaultView.getComputedStyle(elems[i], null)
+		.getPropertyValue("z-index");
+		if ((zindex > highest) && (zindex != 'auto')) {
+			highest = parseInt(zindex);
 		}
-	}));
-	return maxZ;
+	}
+	console.log("제일 높은 z index: " + highest);
+	return highest;
+	
+//	var maxZ = Math.max.apply(null,$.map($('body > div'), function(e,n){
+//		if($(e).css('position')=='absolute'){
+//			return parseInt($(e).css('z-index'))||1 ;
+//		}
+//	}));
+//	return maxZ;
 };
 
 /**
