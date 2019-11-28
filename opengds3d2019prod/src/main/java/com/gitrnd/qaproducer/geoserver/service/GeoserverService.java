@@ -353,9 +353,50 @@ public interface GeoserverService {
 	 * 스타일리스트 조회 
 	 * @author SG.Lee
 	 * @since 2018. 11. 21. 오후 6:00:41
-	 * @param geoserverManager
+	 * @param geoserverManager Geoserver 관리 클래스
 	 * @param workspace
 	 * @return List<String>
 	 * */
 	public List<String> getStyleList(DTGeoserverManager geoserverManager, String workspace);
+	
+	
+	/**
+	 * 높이조건이 랜덤인 GeoserverLayer 3Dtiles 생성
+	 * @author SG.LEE
+	 * @param geoserverManager Geoserver 관리 클래스
+	 * @param workspace 작업공간
+	 * @param datastore 저장소
+	 * @param srs 좌표계
+	 * @param layerName 레이어명
+	 * @param minVal 최소값
+	 * @param maxVal 최대값
+	 * @return
+	 */
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore, String srs, String layerName, double minVal, double maxVal);
+	
+	/**
+	 * 높이조건이 고정인 GeoserverLayer 3Dtiles 생성
+	 * @author SG.LEE
+	 * @param geoserverManager Geoserver 관리 클래스
+	 * @param workspace 작업공간
+	 * @param datastore 저장소
+	 * @param srs 좌표계
+	 * @param layerName 레이어명
+	 * @param defVal 기본값
+	 * @return
+	 */
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore, String srs, String layerName, double defVal);
+	
+	/**
+	 * 높이조건이 컬럼인 GeoserverLayer 3Dtiles 생성
+	 * @author SG.LEE
+	 * @param geoserverManager Geoserver 관리 클래스
+	 * @param workspace 작업공간
+	 * @param datastore 저장소
+	 * @param srs 좌표계
+	 * @param layerName 레이어명
+	 * @param attribute 컬럼명
+	 * @return
+	 */
+	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore, String srs, String layerName, String attribute);
 }

@@ -124,7 +124,7 @@
 <!-- gb.versioning.Feature -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/versioning/feature.js"></script>
 <!-- gb.edit -->
-<script src="${pageContext.request.contextPath}/resources/js/gb/edit/edithistory.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb/edit/featurerecord.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/undo.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/modifylayerprop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
@@ -149,7 +149,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/label.js"></script>
 
 <!-- cesium -->
-<script src="${pageContext.request.contextPath}/resources/js/cesium/cesium.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/cesium/Cesium.js"></script>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium/Widgets/widgets.css" />
 <!-- three -->
 <script src="${pageContext.request.contextPath}/resources/js/three/three.js"></script>
@@ -246,3 +246,4 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/TilesetManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/style/Declarative.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/importer/ImporterThree.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/ModelRecord.js"></script>

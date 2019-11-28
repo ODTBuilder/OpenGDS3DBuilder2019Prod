@@ -286,6 +286,12 @@ public class GeoserverController extends AbstractController {
 		} else {
 			proService.requestGetMap(dtGeoserverManager, workspace, request, response);
 		}
+		
+		/*String serverName = (String) request.getParameter("serverName");
+		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
+
+		
+		geoserverService.geolayerTo3DTiles(dtGeoserverManager, "osm", "osm_korea","EPSG:4326","gis_osm_buildings", 20, 100);*/
 	}
 
 	/**
@@ -792,10 +798,6 @@ public class GeoserverController extends AbstractController {
 	}
 	
 	
-	
-	
-	
-
 	/**
 	 * @author SG.LEE
 	 * @param request
@@ -814,8 +816,64 @@ public class GeoserverController extends AbstractController {
 			@RequestParam(value = "workspace", required = false) String workspace,
 			@RequestParam(value = "datastore", required = false) String datastore,
 			@RequestParam(value = "branch", required = false) String branch) throws JAXBException {
-
 		DTGeoserverManager geoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		return geoserverService.updateGeogigGsStore(geoserverManager, workspace, datastore, branch);
 	}
+	
+	
+	@RequestMapping(value = "/requestGeoLayerTo3DTiles.ajax", method = RequestMethod.POST)
+	@ResponseBody
+	public JSONObject requestGeoLayerTo3DTiles(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
+			@AuthenticationPrincipal LoginUser loginUser) throws IOException{
+		JSONObject returnJson = new JSONObject();
+		if (loginUser == null) {
+			response.sendError(600);
+			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
+		}
+		
+		//필수파라미터
+		String serverName = (String) request.getParameter("serverName");
+		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
+		String workspace = (String) request.getParameter("workspace");
+		String datastore = (String) request.getParameter("datastore");
+		String layerName = (String) request.getParameter("layerName");
+		String srs = (String) request.getParameter("srs");
+		String heightType = (String) request.getParameter("heightType");
+		
+		//조건에 따른 파라미터
+		String minVal = (String) request.getParameter("minVal");
+		String maxVal = (String) request.getParameter("maxVal");
+		String defVal = (String) request.getParameter("defVal");
+		String attribute = (String) request.getParameter("attribute");
+		
+		boolean iPFlag = false;
+		
+		if (dtGeoserverManager == null) {
+			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
+		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null || layerName.equals("") || layerName ==null|| heightType.equals("") || heightType ==null) {
+			response.sendError(601, "미입력 텍스트가 존재합니다.");
+		} else {
+			if(heightType.toLowerCase().equals("default")){
+				if(defVal.equals("") || defVal == null){
+					response.sendError(601, "미입력 텍스트가 존재합니다.");
+				}
+			}else if(heightType.toLowerCase().equals("random")){
+				if(minVal.equals("") || minVal == null || maxVal.equals("") || maxVal == null){
+					response.sendError(601, "미입력 텍스트가 존재합니다.");
+				}
+			}else if(heightType.toLowerCase().equals("fix")){
+				if(attribute.equals("") || attribute == null){
+					response.sendError(601, "미입력 텍스트가 존재합니다.");
+				}
+			}else{
+				response.sendError(601, "잘못입력한 정보가 있습니다.");
+			}
+			
+			
+		}
+		
+		
+		return returnJson;
+	}
+	
 }

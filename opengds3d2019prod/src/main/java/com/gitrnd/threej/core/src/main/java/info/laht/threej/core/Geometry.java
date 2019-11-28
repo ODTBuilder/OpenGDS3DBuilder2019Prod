@@ -55,6 +55,8 @@ public class Geometry implements IGeometry {
 		this.colors = new ArrayList<>();
 		this.faces = new ArrayList<>();
 		this.faceVertexUvs = new ArrayList<>();
+		this.faceVertexUvs = new ArrayList<>();
+
 		this.lineDistances = new ArrayList<>();
 
 		this.boundingBox = null;
@@ -303,9 +305,9 @@ public class Geometry implements IGeometry {
 
 			} else {
 
-				vertexNormals.set(0, face.normal.copy());
-				vertexNormals.set(1, face.normal.copy());
-				vertexNormals.set(2, face.normal.copy());
+				vertexNormals.add(0, face.normal.copy());
+				vertexNormals.add(1, face.normal.copy());
+				vertexNormals.add(2, face.normal.copy());
 
 			}
 
