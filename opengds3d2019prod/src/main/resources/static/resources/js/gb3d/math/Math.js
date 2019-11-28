@@ -2944,3 +2944,37 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 
 	geometry.uvsNeedUpdate = true;
 }
+
+gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
+	var object = obj;
+	var quat = object.rotation.clone();
+	var center = centerHigh;
+	var look = new THREE.Vector3(center.x, center.y, center.z);
+	look.negate();
+//	if(object.userData.type){
+//		return;
+//	}
+	
+	if(!object.geometry){
+		if(object.children instanceof Array){
+			for(var i = 0; i < object.children.length; i++){
+				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때 재귀함수 요청
+				object.position.copy(new THREE.Vector3(0, 0, 0));
+				quat = object.rotation.clone();
+				object.lookAt(new THREE.Vector3(0, 0, 1));
+				object.setRotationFromEuler(quat);
+//				object.matrix.makeRotationFromQuaternion(quat);
+//				object.matrixWorld.makeRotationFromQuaternion(quat);
+				resetMatrixWorld(object.children[i], quat, center);
+			}
+		}
+	} else {
+//		object.position.copy(new THREE.Vector3(0, 0, 0));
+		object.lookAt(new THREE.Vector3(0, 0, 1));
+		object.setRotationFromEuler(quat);
+//		object.matrix.makeRotationFromQuaternion(quat);
+//		object.matrixWorld.makeRotationFromQuaternion(quat);
+//		object.setRotationFromQuaternion(quat);
+	}
+}
+ 
