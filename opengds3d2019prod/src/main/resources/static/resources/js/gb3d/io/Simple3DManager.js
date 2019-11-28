@@ -107,6 +107,30 @@ gb3d.io.Simple3DManager = function(obj) {
 		"err" : {
 			"ko" : "오류",
 			"en" : "Error"
+		},
+		"dtype" : {
+			"ko" : "높이값 설정",
+			"en" : "Depth setting"
+		},
+		"featureattr" : {
+			"ko" : "피처 속성",
+			"en" : "Feature attribute"
+		},
+		"typevalue" : {
+			"ko" : "높이값 입력",
+			"en" : "Input depth"
+		},
+		"attrselect" : {
+			"ko" : "속성명 선택",
+			"en" : "Attribute"
+		},
+		"type1" : {
+			"ko" : "유형1",
+			"en" : "Type1"
+		},
+		"type2" : {
+			"ko" : "유형2",
+			"en" : "Type2"
 		}
 	}
 }
@@ -160,6 +184,13 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 
 	var cylinderParamArea = $("<div>").append(radiusArea);
 
+	var depthTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.dtype[this.locale]);
+	var depthOpt1 = $("<option>").attr("value", "default").text(this.translation.typevalue[this.locale]);
+	var depthOpt2 = $("<option>").attr("value", "fix").text(this.translation.featureattr[this.locale]);
+	var depthType = $("<select>").addClass("gb-form").append(depthOpt1).append(depthOpt2); 
+	var depthTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthType);
+	var depthTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthTypeLabel).append(depthTypeInputArea);
+	
 	var depthLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.depth[this.locale]);
 	var depthInput = $("<input>").attr({
 		"type" : "number"
@@ -167,6 +198,11 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
+	var attrLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
+	var attrKey = $("<select>").addClass("gb-form"); 
+	var attrKeyInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKey);
+	var attrKeyArea = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabel).append(attrKeyInputArea);
+	
 	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
 	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
 	var opt2 = $("<option>").attr("value", "callbox").text(this.translation.callbox[this.locale]);
@@ -176,7 +212,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 
 	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
+	var commonParamArea = $("<div>").append(depthTypeArea).append(depthArea).append(attrKeyArea).append(textureArea);
 
 	var body = $("<div>").append(typeArea).append(boxParamArea).append(cylinderParamArea).append(commonParamArea);
 
@@ -185,6 +221,18 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 
+	$(depthType).change(function(){
+		var val = $(this).val();
+		if (val === "default") {
+			$(depthArea).show();
+			$(attrKeyArea).hide();
+		} else if (val === "fix") {
+			$(depthArea).hide();
+			$(attrKeyArea).show();
+		}
+	});
+	$(depthType).trigger("change");
+	
 	var pointModal = new gb.modal.ModalBase({
 		"title" : this.translation.pointto3d[this.locale],
 		"width" : 500,
@@ -237,6 +285,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
  */
 gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, store, layer) {
 	var that = this;
+	
 	var radiusLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.width[this.locale]);
 	var radiusInput = $("<input>").attr({
 		"type" : "number"
@@ -247,6 +296,13 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 
 	var cylinderParamArea = $("<div>").append(radiusArea);
 
+	var depthTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.dtype[this.locale]);
+	var depthOpt1 = $("<option>").attr("value", "default").text(this.translation.typevalue[this.locale]);
+	var depthOpt2 = $("<option>").attr("value", "fix").text(this.translation.featureattr[this.locale]);
+	var depthType = $("<select>").addClass("gb-form").append(depthOpt1).append(depthOpt2); 
+	var depthTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthType);
+	var depthTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthTypeLabel).append(depthTypeInputArea);
+	
 	var depthLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.depth[this.locale]);
 	var depthInput = $("<input>").attr({
 		"type" : "number"
@@ -254,16 +310,21 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
+	var attrLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
+	var attrKey = $("<select>").addClass("gb-form"); 
+	var attrKeyInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKey);
+	var attrKeyArea = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabel).append(attrKeyInputArea);
+	
 	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
 	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
 	var opt2 = $("<option>").attr("value", "road1").text(this.translation.road[this.locale]+":"+this.translation.type1[this.locale]);
-	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale]+":"+this.translation.type1[this.locale]);
+	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale]+":"+this.translation.type2[this.locale]);
 	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2).append(opt3);
 	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
 	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
+	var commonParamArea = $("<div>").append(depthTypeArea).append(depthArea).append(attrKeyArea).append(textureArea);
 
 	var body = $("<div>").append(cylinderParamArea).append(commonParamArea);
 
@@ -272,6 +333,18 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 
+	$(depthType).change(function(){
+		var val = $(this).val();
+		if (val === "default") {
+			$(depthArea).show();
+			$(attrKeyArea).hide();
+		} else if (val === "fix") {
+			$(depthArea).hide();
+			$(attrKeyArea).show();
+		}
+	});
+	$(depthType).trigger("change");
+	
 	var lineModal = new gb.modal.ModalBase({
 		"title" : this.translation.lineto3d[this.locale],
 		"width" : 500,
@@ -305,6 +378,13 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, store, layer) {
 	var that = this;
 	
+	var depthTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.dtype[this.locale]);
+	var depthOpt1 = $("<option>").attr("value", "default").text(this.translation.typevalue[this.locale]);
+	var depthOpt2 = $("<option>").attr("value", "fix").text(this.translation.featureattr[this.locale]);
+	var depthType = $("<select>").addClass("gb-form").append(depthOpt1).append(depthOpt2); 
+	var depthTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthType);
+	var depthTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthTypeLabel).append(depthTypeInputArea);
+	
 	var depthLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.depth[this.locale]);
 	var depthInput = $("<input>").attr({
 		"type" : "number"
@@ -312,6 +392,11 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, sto
 	var depthInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(depthInput);
 	var depthArea = $("<div>").addClass("gb3d-modal-to3d-row").append(depthLabel).append(depthInputArea);
 
+	var attrLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
+	var attrKey = $("<select>").addClass("gb-form"); 
+	var attrKeyInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKey);
+	var attrKeyArea = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabel).append(attrKeyInputArea);
+	
 	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
 	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
 	var opt2 = $("<option>").attr("value", "building").text(this.translation.building[this.locale]);
@@ -320,7 +405,7 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, sto
 
 	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
 
-	var commonParamArea = $("<div>").append(depthArea).append(textureArea);
+	var commonParamArea = $("<div>").append(depthTypeArea).append(depthArea).append(attrKeyArea).append(textureArea);
 
 	var body = $("<div>").append(commonParamArea);
 
@@ -329,6 +414,17 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, sto
 
 	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
 
+	$(depthType).change(function(){
+		var val = $(this).val();
+		if (val === "default") {
+			$(depthArea).show();
+			$(attrKeyArea).hide();
+		} else if (val === "fix") {
+			$(depthArea).hide();
+			$(attrKeyArea).show();
+		}
+	});
+	$(depthType).trigger("change");
 	var polygonModal = new gb.modal.ModalBase({
 		"title" : this.translation.polygonto3d[this.locale],
 		"width" : 500,
