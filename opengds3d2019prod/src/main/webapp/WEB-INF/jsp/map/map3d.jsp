@@ -233,21 +233,6 @@ html, body {
 		var threeSidebar = new Sidebar(threeEditor);
 		document.body.appendChild(threeSidebar.dom);
 
-		var tilesetManager = new gb3d.edit.TilesetManager({
-			map : gb3dMap
-		});
-		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
-		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
-		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
-		/* var tiles = new gb3d.object.Tileset({
-			"layer" : "testLayer",
-			"tileId" : "testLayerTile1",
-			"cesiumTileset" : new Cesium.Cesium3DTileset({
-				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
-			})
-		});
-		gb3dMap.addTileset(tiles); */
-
 		var gbCam = gb3dMap.getCamera();
 
 		var uploadB3DM = new gb3d.io.B3DMManager({
@@ -291,7 +276,7 @@ html, body {
 			locale : locale
 		});
 		
-		otree = new gb3d.tree.OpenLayers({
+		var otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
 			"gb3dMap" : gb3dMap,
@@ -306,6 +291,23 @@ html, body {
 			"threeTree" : threeTree.jstree,
 		});
 
+		var tilesetManager = new gb3d.edit.TilesetManager({
+			map : gb3dMap,
+			clientTree : otree
+		});
+// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
+		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
+// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
+// 		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
+		/* var tiles = new gb3d.object.Tileset({
+			"layer" : "testLayer",
+			"tileId" : "testLayerTile1",
+			"cesiumTileset" : new Cesium.Cesium3DTileset({
+				url : "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json"
+			})
+		});
+		gb3dMap.addTileset(tiles); */
+		
 		var uploadSHP = new gb.geoserver.UploadSHP({
 			"url" : urlList.geoserverFileUpload + urlList.token,
 			"locale" : locale !== "" ? locale : "en"
@@ -315,7 +317,7 @@ html, body {
 			"url" : undefined,
 			"layerInfoUrl" : "geoserver/getGeoLayerInfoList.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"locale" : locale !== "" ? locale : "en",
-// 			"gb3dMap" : gb3dMap,
+			"gb3dMap" : gb3dMap,
 			"tilesetManager" : tilesetManager
 		});
 

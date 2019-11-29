@@ -752,7 +752,15 @@ gb3d.tree.GeoServer = function(obj) {
 										var store = obj.id.split(":")[2];
 										var layer = obj.id.split(":")[3];
 										
-										that.getSimple3DManager().showPolygonTo3DModal(server, work, store, layer);
+										var callback = function(id, callback2) {
+											console.log(that.getLoadingList());
+											var pnode = inst.get_node(id);
+											var duplication = false;
+											var isLast = false;
+											inst.recursive_node_load(pnode, that.map.getLayers(), duplication, isLast, callback2);
+										};
+										
+										that.getSimple3DManager().showPolygonTo3DModal(server, work, store, layer, callback);
 									}
 							};
 							totalObj["importas3d"] = importObj;

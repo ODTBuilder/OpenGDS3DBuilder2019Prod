@@ -1120,6 +1120,13 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		
 		var gitAttr = that.selectedSource.get("git");
 		
+		var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["layerID"]);
+		
+		var tileset = tLayer.get("git").tileset;
+		if (tileset) {
+			console.log("tile exist");
+		}
+		
 		if (that.features.getLength() > 1) {
 // vfeature.close();
 			that.featurePop.close();
