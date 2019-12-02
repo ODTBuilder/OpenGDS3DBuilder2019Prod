@@ -615,33 +615,35 @@ gb3d.tree.OpenLayers = function(obj) {
 				"contextmenu" : {
 					items : function(o, cb) { // Could be an object
 						var totalObj = {};
-
-						totalObj["download"] = {
-								"separator_before" : false,
-								"icon" : "fas fa-download",
-								"separator_after" : false,
-								"_disabled" : false, // (this.check("rename_node",
-								// data.reference,
-								// this.get_parent(data.reference),
-								// "")),
-								"label" : that.translation.downloadtiles[that.locale],
-								/*
-								 * ! "shortcut" : 113, "shortcut_label" : 'F2',
-								 * "icon" : "glyphicon glyphicon-leaf",
-								 */
-								"action" : function(data) {
-									var inst = $.jstreeol3
-									.reference(data.reference), obj = inst
-									.get_node(data.reference);
-									var layer = inst.get_LayerById(obj.id);
-									var lid = layer.get("id");
-									var server = lid.split(":")[0];
-									var work = lid.split(":")[1];
-									var store = lid.split(":")[2];
-									var layer = lid.split(":")[3];
-									
-								}
-						};
+						if (that.getTilesDownloader()) {
+							totalObj["download"] = {
+									"separator_before" : false,
+									"icon" : "fas fa-download",
+									"separator_after" : false,
+									"_disabled" : false, // (this.check("rename_node",
+									// data.reference,
+									// this.get_parent(data.reference),
+									// "")),
+									"label" : that.translation.downloadtiles[that.locale],
+									/*
+									 * ! "shortcut" : 113, "shortcut_label" : 'F2',
+									 * "icon" : "glyphicon glyphicon-leaf",
+									 */
+									"action" : function(data) {
+										var inst = $.jstreeol3
+										.reference(data.reference), obj = inst
+										.get_node(data.reference);
+										var layer = inst.get_LayerById(obj.id);
+										var lid = layer.get("id");
+										var server = lid.split(":")[0];
+										var work = lid.split(":")[1];
+										var store = lid.split(":")[2];
+										var layer = lid.split(":")[3];
+										var downloader = that.getTilesDownloader();
+										downloader.downloadTiles(server, work, store, layer);
+									}
+							};
+						}
 
 						totalObj["import3dfile"] = {
 								"separator_before" : false,
@@ -2336,7 +2338,7 @@ gb3d.tree.OpenLayers.prototype.addPropModal = function(obj) {
 
 
 /**
- * 레이어 속성값 추가 모달창을 생성한다.
+ * 3D Tiles 다운로더 객체를 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getTilesDownloader
  * @return {gb3d.io.TilesDownloader} 타일 다운로더 객체

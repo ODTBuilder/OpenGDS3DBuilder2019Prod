@@ -72,7 +72,7 @@ gb.edit.FeatureRecord = function(obj) {
 	if(!this.layerInfoURL){
 		console.error("gb.edit.FeatureRecord: " + this.translation.layerInfoUrlHint[this.locale]);
 	}
-	
+	this.modelRecord = obj.modelRecord ? obj.modelRecord : undefined; 
 	/**
 	 * gb.edit.EditingTool 객체
 	 * @protected
@@ -767,6 +767,11 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	var edit = editTool;
 	var format = new ol.format.WFS();
 	
+	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
+		console.log("just now!");
+		var mrecord = that.getModelRecord();
+		mrecord.save();
+	}
 	// 변경사항의 종류에 따라 저장 요청방식이 다르기 때문에 modified->removed->created 순으로 저장 요청을 한다.
 	if(Object.keys(this.modified).length !== 0){
 		layerid = Object.keys(this.modified)[0];
@@ -984,4 +989,22 @@ gb.edit.FeatureRecord.prototype.wfstCallback = function(array, type, options){
 		},
 		context: this
 	});
+}
+
+/**
+ * ModelRecord 객체를 반환한다.
+ * 
+ * @method gb.edit.FeatureRecord#getModelRecord
+ */
+gb.edit.FeatureRecord.prototype.getModelRecord = function(){
+	return this.modelRecord;
+}
+
+/**
+ * ModelRecord 객체를 할당한다.
+ * 
+ * @method gb.edit.FeatureRecord#setModelRecord
+ */
+gb.edit.FeatureRecord.prototype.setModelRecord = function(mrecord){
+	this.modelRecord = mrecord;
 }

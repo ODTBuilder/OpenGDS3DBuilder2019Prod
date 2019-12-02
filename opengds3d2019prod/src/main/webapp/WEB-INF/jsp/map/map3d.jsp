@@ -244,13 +244,6 @@ html, body {
 			uploadB3DM.open();
 		});
 
-		var frecord = new gb.edit.FeatureRecord({
-			//id : "feature_id",
-			locale : locale,
-			wfstURL : urlList.wfst + urlList.token,
-			layerInfoURL : urlList.getLayerInfo + urlList.token
-		});
-
 		var uploadjson = new gb.geoserver.UploadGeoJSON({
 			"url" : "geoserver/jsonUpload.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"epsg" : function() {
@@ -273,7 +266,21 @@ html, body {
 
 		var mrecord = new gb3d.edit.ModelRecord({
 			//id : "feature_id",
-			locale : locale
+			locale : locale,
+			saveURL : "geoserver/tilesave.ajax?${_csrf.parameterName}=${_csrf.token}"
+		});
+		
+		var frecord = new gb.edit.FeatureRecord({
+			//id : "feature_id",
+			locale : locale,
+			wfstURL : urlList.wfst + urlList.token,
+			layerInfoURL : urlList.getLayerInfo + urlList.token,
+			modelRecord : mrecord
+		});
+		
+		var tilesDownloader = new gb3d.io.TilesDownloader({
+			"locale" : locale || "en",
+			"downloadTilesUrl" : "geoserver/tilesdownload.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
 		
 		var otree = new gb3d.tree.OpenLayers({
@@ -285,6 +292,7 @@ html, body {
 			"mrecord" : mrecord,
 			"uploadJSON" : uploadjson,
 			"token" : urlList.token,
+			"tilesDownloader" : tilesDownloader,
 			"url" : {
 				"getLegend" : urlList.getLegend + urlList.token
 			},

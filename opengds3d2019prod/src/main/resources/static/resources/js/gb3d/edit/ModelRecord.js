@@ -57,6 +57,7 @@ gb3d.edit.ModelRecord = function(obj) {
 
 	this.locale = obj.locale || "en";
 	this.id = obj.id ? obj.id : false;
+	this.saveUrl = obj.url ? obj.url : undefined;
 };
 
 /**
@@ -456,69 +457,23 @@ gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, tileId, m
  * @param {gb.edit.EditingTool}
  *            editTool - gb.edit.EditingTool 객체
  */
-gb3d.edit.ModelRecord.prototype.save = function(editTool) {
+gb3d.edit.ModelRecord.prototype.save = function() {
 	var that = this;
-	var edit = editTool;
-	this.editTool = editTool;
-
-	var row2 = $("<div>").addClass("row").append(this.translation.saveHint[this.locale])
-
-	var well = $("<div>").addClass("well").append(row2);
-
-	var closeBtn = $("<button>").css({
-		"float" : "right"
-	}).addClass("gb-button").addClass("gb-button-default").text(this.translation.cancel[this.locale]);
-	var okBtn = $("<button>").css({
-		"float" : "right"
-	}).addClass("gb-button").addClass("gb-button-primary").text(this.translation.save[this.locale]);
-	var discardBtn = $("<button>").css({
-		"float" : "right",
-		"background" : "#e0e1e2 none"
-	}).addClass("gb-button").addClass("gb-button-default").text(this.translation.discard[this.locale]);
-
-	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(discardBtn).append(okBtn).append(closeBtn);
-	var modalFooter = $("<div>").append(buttonArea);
-
-	var gBody = $("<div>").append(well).css({
-		"display" : "table",
-		"width" : "100%"
-	});
-	var openSaveModal = new gb.modal.ModalBase({
-		"title" : this.translation.save[this.locale],
-		"width" : 540,
-		"height" : 250,
-		"autoOpen" : true,
-		"body" : gBody,
-		"footer" : modalFooter
-	});
-
-	$(closeBtn).click(function() {
-		openSaveModal.close();
-	});
-
-	$(okBtn).click(function() {
-
-		// loading div 생성
-		$("body").append($("<div id='shp-upload-loading' class='gb-body-loading'>").append($("<i>").addClass("gb-body-loading-icon").addClass("fas fa-spinner fa-spin fa-5x")));
-
-		that.sendWFSTTransaction(edit);
-
-		if (gb.undo) {
-			gb.undo.invalidateAll();
+	var url = this.getSaveURL();
+	var history = this.getStructureToGLTF();
+	
+	$.ajax({
+		type: "POST",
+		url: url,
+		data: JSON.stringify(history),
+		contentType: 'application/json; charset=utf-8',
+		success: function(data) {
+			console.log(data);
+		},
+		error: function(e) {
+			var errorMsg = e? (e.status + ' ' + e.statusText) : "";
+			console.log(errorMsg);
 		}
-
-		openSaveModal.close();
-	});
-
-	$(discardBtn).click(function() {
-		that.created = {};
-		that.modified = {};
-		that.removed = {};
-		edit.editToolClose();
-		if (gb.undo) {
-			gb.undo.invalidateAll();
-		}
-		openSaveModal.close();
 	});
 }
 /**
@@ -800,4 +755,14 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 	}
 
 	return obj;
+}
+
+/**
+ * 3D 저장 URL을 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getSaveURL
+ * @return {String} 3D 편집이력을 보낼 URL
+ */
+gb3d.edit.ModelRecord.prototype.getSaveURL = function() {
+	return this.saveUrl;	
 }
