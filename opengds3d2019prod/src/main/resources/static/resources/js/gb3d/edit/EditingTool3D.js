@@ -2375,3 +2375,88 @@ gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
 		}
 	});
 };
+
+/**
+ * tileset feature를 선택한다
+ * 
+ * @method gb3d.edit.EditingTool3D#selectTilesetFeature
+ * @param {Cesium.Cesium3DTileFeature} feature - 피처
+ */
+gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
+	var that = this;
+	var cviewer = this.map.getCesiumViewer();
+	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
+
+			// If a feature was previously selected, undo the highlight
+			that.silhouetteGreen.selected = [];
+
+			// Pick a new feature
+//			var pickedFeature = cviewer.scene.pick(movement.position);
+			var pickedFeature = feature;
+//			var oneOfThem; 
+//			if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
+//				oneOfThem = 
+//			}
+			if (!Cesium.defined(pickedFeature)) {
+				clickHandler(movement);
+				return;
+			}
+
+			// Select the feature if it's not already selected
+			if (that.silhouetteGreen.selected[0] === pickedFeature) {
+				return;
+			}
+
+			// Save the selected feature's original color
+			var highlightedFeature = that.silhouetteBlue.selected[0];
+			if (pickedFeature === highlightedFeature) {
+				that.silhouetteBlue.selected = [];
+			}
+
+			// Highlight newly selected feature
+			that.silhouetteGreen.selected = [ pickedFeature ];
+
+			// Set feature infobox description
+			var propNames = pickedFeature.getPropertyNames();
+			var featureName = pickedFeature.getProperty('name');
+			that.selectedEntity.name = featureName;
+			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
+			cviewer.selectedEntity = that.selectedEntity;
+			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
+			for ( var i in propNames) {
+				that.selectedEntity.description += '<tr><th>' + propNames[i] + '</th><td>' + pickedFeature.getProperty(propNames[i]) + '</td></tr>';
+			}
+			that.selectedEntity.description += '</tbody></table>';
+		
+	} else {
+
+			// If a feature was previously selected, undo the highlight
+			if (Cesium.defined(that.selected.feature)) {
+				that.selected.feature.color = that.selected.originalColor;
+				that.selected.feature = undefined;
+			}
+			
+			// Pick a new feature
+			//var pickedFeature = cviewer.scene.pick(movement.position);
+			var pickedFeature = feature;
+			if (!Cesium.defined(pickedFeature)) {
+				clickHandler(movement);
+				return;
+			}
+			// Select the feature if it's not already selected
+			if (that.selected.feature === pickedFeature) {
+				return;
+			}
+			that.selected.feature = pickedFeature;
+			// Save the selected feature's original color
+			if (pickedFeature === highlighted.feature) {
+				Cesium.Color.clone(highlighted.originalColor, that.selected.originalColor);
+				highlighted.feature = undefined;
+			} else {
+				Cesium.Color.clone(pickedFeature.color, that.selected.originalColor);
+			}
+			pickedFeature.color = Cesium.Color.LIME;
+			cviewer.selectedEntity = that.selectedEntity;
+			
+	}
+}

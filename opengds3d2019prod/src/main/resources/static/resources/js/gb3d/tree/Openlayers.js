@@ -272,7 +272,6 @@ gb3d.tree.OpenLayers = function(obj) {
 				"en" : "more"
 			}
 	};
-
 	/**
 	 * 현재 선택된 레이어
 	 * 
@@ -479,6 +478,10 @@ gb3d.tree.OpenLayers = function(obj) {
 	if(this.map === undefined){
 		console.error("gb3d.tree.OpenLayers: 'map' is a required field.");
 	}
+	/**
+	 * 타일 다운로더 객체
+	 */
+	this.tilesDownloader = options.tilesDownloader ? options.tilesDownloader : undefined;
 	this.editingTool = options.editingTool || undefined;
 	this.threeTree = options.threeTree || undefined;
 	this.token = options.token || "";
@@ -631,6 +634,12 @@ gb3d.tree.OpenLayers = function(obj) {
 									.reference(data.reference), obj = inst
 									.get_node(data.reference);
 									var layer = inst.get_LayerById(obj.id);
+									var lid = layer.get("id");
+									var server = lid.split(":")[0];
+									var work = lid.split(":")[1];
+									var store = lid.split(":")[2];
+									var layer = lid.split(":")[3];
+									
 								}
 						};
 
@@ -2323,4 +2332,15 @@ gb3d.tree.OpenLayers.prototype.addPropModal = function(obj) {
 	});
 
 	attrTable.find("a").click();
+}
+
+
+/**
+ * 레이어 속성값 추가 모달창을 생성한다.
+ * 
+ * @method gb3d.tree.OpenLayers#getTilesDownloader
+ * @return {gb3d.io.TilesDownloader} 타일 다운로더 객체
+ */
+gb3d.tree.OpenLayers.prototype.getTilesDownloader = function() {
+	return this.tilesDownloader;
 }

@@ -1125,6 +1125,11 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		var tileset = tLayer.get("git").tileset;
 		if (tileset) {
 			console.log("tile exist");
+			var ctileset = tileset.getCesiumTileset();
+			var root = ctileset.root;
+			var content = root.content;
+			var feature = content.getFeature(22);
+			that.getEditingTool3D().selectTilesetFeature(feature);
 		}
 		
 		if (that.features.getLength() > 1) {
