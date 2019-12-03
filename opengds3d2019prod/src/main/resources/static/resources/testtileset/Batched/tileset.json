@@ -1,0 +1,92 @@
+{
+  "asset": {
+    "version": "0.0",
+    "tilesetVersion": "1.0.0-obj23dtiles",
+    "gltfUpAxis": "Z"
+  },
+  "geometricError": 500,
+  "root": {
+    "boundingVolume": {
+      "region": [
+        2.2175802873180057,
+        0.6252113313690082,
+        2.219231254114454,
+        0.6256219708353347,
+        0,
+        100
+      ]
+    },
+    "refine": "ADD",
+    "geometricError": 500,
+    "children": [
+      {
+        "boundingVolume": {
+          "region": [
+            2.2177009172801574,
+            0.6254885739285879,
+            2.217719717532978,
+            0.6254969703761626,
+            0,
+            100
+          ]
+        },
+        "geometricError": 200,
+        "refine": "ADD",
+        "content": {
+          "url": "Batched1/tileset.json"
+        }
+      },
+      {
+        "boundingVolume": {
+          "region": [
+            2.2175802873180057,
+            0.6255008203084119,
+            2.21758679874687,
+            0.6255076712903153,
+            0,
+            100
+          ]
+        },
+        "geometricError": 200,
+        "refine": "ADD",
+        "content": {
+          "url": "Batched2/tileset.json"
+        }
+      },
+      {
+        "boundingVolume": {
+          "region": [
+            2.2191678176172958,
+            0.6256151398271396,
+            2.219176526154059,
+            0.6256219708353347,
+            0,
+            100
+          ]
+        },
+        "geometricError": 200,
+        "refine": "ADD",
+        "content": {
+          "url": "Batched3/tileset.json"
+        }
+      },
+      {
+        "boundingVolume": {
+          "region": [
+            2.2192233045786014,
+            0.6252113313690082,
+            2.219231254114454,
+            0.6252186417461996,
+            0,
+            100
+          ]
+        },
+        "geometricError": 200,
+        "refine": "ADD",
+        "content": {
+          "url": "Batched4/tileset.json"
+        }
+      }
+    ]
+  }
+}

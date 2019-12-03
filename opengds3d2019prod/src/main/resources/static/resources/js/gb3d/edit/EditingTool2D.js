@@ -1129,7 +1129,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			var root = ctileset.root;
 			var content = root.content;
 			var feature = content.getFeature(22);
-			that.getEditingTool3D().selectTilesetFeature(feature);
+			if (feature) {
+				that.getEditingTool3D().selectTilesetFeature(feature);
+			}
 		}
 		
 		if (that.features.getLength() > 1) {

@@ -844,8 +844,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			// Set feature infobox description
 			var propNames = pickedFeature.getPropertyNames();
-			var featureName = pickedFeature.getProperty('name');
-			that.selectedEntity.name = featureName;
+//			var featureName = pickedFeature.getProperty('name');
+//			that.selectedEntity.name = featureName;
 			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
 			cviewer.selectedEntity = that.selectedEntity;
 			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';

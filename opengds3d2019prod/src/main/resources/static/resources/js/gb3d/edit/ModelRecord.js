@@ -28,7 +28,15 @@ gb3d.edit.ModelRecord = function(obj) {
 		"saveHint" : {
 			"ko" : "변경사항을 저장하시겠습니까?",
 			"en" : "Do you want to save your changes?"
-		}
+		},
+		"retrymsg" : {
+			"ko" : "3차원 객체의 저장에 실패했습니다. 다시 시도 하시겠습니까?",
+			"en" : "Saving 3D object failed. Do you want to try again?"
+		},
+		"err" : {
+			"ko" : "오류",
+			"en" : "Error"
+		},
 	};
 
 	/**
@@ -58,6 +66,9 @@ gb3d.edit.ModelRecord = function(obj) {
 	this.locale = obj.locale || "en";
 	this.id = obj.id ? obj.id : false;
 	this.saveUrl = obj.url ? obj.url : undefined;
+	
+	// 편집이력 임시 저장 변수 - 2D만 성공하고 3D 저장에 실패했을때 이 변수에 저장해서 재시도
+	this.history = undefined;
 };
 
 /**
@@ -457,22 +468,24 @@ gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, tileId, m
  * @param {gb.edit.EditingTool}
  *            editTool - gb.edit.EditingTool 객체
  */
-gb3d.edit.ModelRecord.prototype.save = function() {
+gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var that = this;
-	var url = this.getSaveURL();
-	var history = this.getStructureToGLTF();
+	var url = self.getSaveURL();
+	self.history = self.getStructureToGLTF();
 	
 	$.ajax({
 		type: "POST",
 		url: url,
-		data: JSON.stringify(history),
+		data: JSON.stringify(self.history),
 		contentType: 'application/json; charset=utf-8',
 		success: function(data) {
 			console.log(data);
+			self.history = undefined;
 		},
 		error: function(e) {
 			var errorMsg = e? (e.status + ' ' + e.statusText) : "";
 			console.log(errorMsg);
+			self.retryModal(self);
 		}
 	});
 }
@@ -766,3 +779,75 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 gb3d.edit.ModelRecord.prototype.getSaveURL = function() {
 	return this.saveUrl;	
 }
+
+/**
+ * 에러 메세지를 표시한다
+ * 
+ * @method gb3d.edit.ModelRecord#errorModal
+ * @param {string}
+ *            code - 오류 코드
+ */
+gb3d.edit.ModelRecord.prototype.errorModal = function(code) {
+	var that = this;
+	that.messageModal(that.translation.err[that.locale], that.translation[code][that.locale]);
+};
+
+/**
+ * 오류 메시지 창을 생성한다.
+ * 
+ * @method gb3d.edit.ModelRecord#messageModal
+ * @param {string}
+ *            title - 모달의 타이틀
+ * @param {string}
+ *            msg - 보여줄 메세지
+ */
+gb3d.edit.ModelRecord.prototype.messageModal = function(title, msg) {
+	var that = this;
+	var msg1 = $("<div>").append(msg).addClass("gb-geoserver-msgmodal-body");
+	var body = $("<div>").append(msg1);
+	var okBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text("OK");
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn);
+
+	var modal = new gb.modal.ModalBase({
+		"title" : title,
+		"width" : 310,
+		"autoOpen" : true,
+		"body" : body,
+		"footer" : buttonArea
+	});
+	$(okBtn).click(function() {
+		modal.close();
+	});
+};
+
+/**
+ * 재시도 창을 생성한다.
+ * 
+ * @method gb3d.edit.ModelRecord#retryModal
+ * @param {string}
+ *            func - 수행함수
+ */
+gb3d.edit.ModelRecord.prototype.retryModal = function(self) {
+	var that = this;
+	var msg1 = $("<div>").append(self.translation.retrymsg[self.locale]).addClass("gb-geoserver-msgmodal-body");
+	var body = $("<div>").append(msg1);
+	var okBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-primary").text("OK");
+	var closeBtn = $("<button>").addClass("gb-button-float-right").addClass("gb-button").addClass("gb-button-default").text("Cancel");
+	var buttonArea = $("<span>").addClass("gb-modal-buttons").append(okBtn).append(closeBtn);
+
+	var modal = new gb.modal.ModalBase({
+		"title" : self.translation.err[self.locale],
+		"width" : 310,
+		"autoOpen" : true,
+		"body" : body,
+		"footer" : buttonArea
+	});
+	$(okBtn).click(function() {
+		modal.close();
+		self.save(self);
+	});
+	
+	$(closeBtn).click(function() {
+		modal.close();
+	});
+};

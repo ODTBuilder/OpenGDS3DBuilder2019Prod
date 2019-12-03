@@ -770,7 +770,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
 		var mrecord = that.getModelRecord();
-		mrecord.save();
+		mrecord.save(mrecord);
 	}
 	// 변경사항의 종류에 따라 저장 요청방식이 다르기 때문에 modified->removed->created 순으로 저장 요청을 한다.
 	if(Object.keys(this.modified).length !== 0){
