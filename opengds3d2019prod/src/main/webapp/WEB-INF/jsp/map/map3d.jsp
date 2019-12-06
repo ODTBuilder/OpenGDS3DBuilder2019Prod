@@ -313,6 +313,7 @@ html, body {
 
 		var simple3d = new gb3d.io.Simple3DManager({
 			"url" : undefined,
+			"layerInfoUrl" : "geoserver/getGeoLayerInfoList.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"locale" : locale !== "" ? locale : "en",
 // 			"gb3dMap" : gb3dMap,
 			"tilesetManager" : tilesetManager
