@@ -47,16 +47,15 @@ public class UploadService {
 
 	@Value("${server.port}")
 	private String serverPort;
-	
+
 	@Value("${server.context-path}")
 	private String context;
 
 	@Value("${gitrnd.apache.host}")
 	private String apachehost;
-	
+
 	@Value("${gitrnd.apache.port}")
 	private String apacheport;
-	
 
 	@Autowired
 	private FileStatusService fileStatusService;
@@ -140,16 +139,16 @@ public class UploadService {
 	public JSONObject save3dtilesFile(MultipartHttpServletRequest request) throws Exception {
 
 		boolean succ = true;
-		
 		JSONObject obj = new JSONObject();
-		
-
 		String user = request.getParameter("user");
 		String time = request.getParameter("time");
 
-		String basePath = apachehost + ":" + apacheport;
+		String basePath = baseDrive + ":/" + baseDir;
 		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
 				+ File.separator + "3dtiles";
+
+		String apachePath = "http://" + apachehost + ":" + apacheport + File.separator + user + File.separator
+				+ "upload" + File.separator + time + File.separator + "3dtiles" + File.separator + "tileset.json";
 
 		File path = new File(uploadPath);
 		if (!path.exists()) {
@@ -186,11 +185,12 @@ public class UploadService {
 				succ = false;
 			}
 		}
-		
+
 		obj.put("succ", succ);
-		obj.put("path", uploadPath);
-		
+		obj.put("path", apachePath);
+
 		return obj;
+
 	}
 
 	public void SaveErrorFile(MultipartHttpServletRequest request) throws Exception {

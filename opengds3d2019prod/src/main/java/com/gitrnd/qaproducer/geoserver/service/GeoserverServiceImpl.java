@@ -1243,12 +1243,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// API 요청 파라미터 생성
 						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/net"; // 압축폴더 업로드 경로
-						String userName = dtReader.getUsername();
 				
 						// body
 						JSONObject bodyJson = new JSONObject();
 
-						bodyJson.put("user", userName);
+						bodyJson.put("user", user);
 						bodyJson.put("time", timeStr);
 						bodyJson.put("file", zipfile);
 						bodyJson.put("path", path);
@@ -1360,12 +1359,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// API 요청 파라미터 생성
 						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/net"; // 압축폴더 업로드 경로
-						String userName = dtReader.getUsername();
 				
 						// body
 						JSONObject bodyJson = new JSONObject();
 
-						bodyJson.put("user", userName);
+						bodyJson.put("user", user);
 						bodyJson.put("time", timeStr);
 						bodyJson.put("file", zipfile);
 						bodyJson.put("path", path);
