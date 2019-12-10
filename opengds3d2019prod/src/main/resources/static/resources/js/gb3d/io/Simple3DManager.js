@@ -786,7 +786,7 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 				var success = data.succ;
 				var path = data.path;
 				if (success) {
-					that.getTilesetManager().addTileset(apache, "temp", layerid);					
+					that.getTilesetManager().addTileset(path, "temp", layerid);					
 				}
 			}
 		}).fail(function(xhr, status, errorThrown) {
