@@ -1165,7 +1165,9 @@ $.jstree.plugins.geoserver = function(options, parent) {
 							} else {
 								console.error("no collection to push");
 							}
-							callback();
+							if (typeof callback === "function") {
+								callback();	
+							}
 						}
 					}
 				}

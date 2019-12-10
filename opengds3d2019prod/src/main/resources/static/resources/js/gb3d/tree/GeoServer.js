@@ -1922,7 +1922,7 @@ gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, m
 			"pw" : password
 	};
 	$.ajax({
-		url : this.getAddGeoServerURL() + "&" + jQuery.param(params),
+		url : this.getAddGeoServerURL() + (this.getAddGeoServerURL().indexOf("?") !== -1 ? "&" : "?") + jQuery.param(params),
 		method : "POST",
 		contentType : "application/json; charset=UTF-8",
 		beforeSend : function() {
