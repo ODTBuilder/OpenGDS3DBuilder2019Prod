@@ -846,6 +846,7 @@ public class GeoserverController extends AbstractController {
 		String workspace = (String) jsonObject.get("workspace");
 		String datastore = (String) jsonObject.get("datastore");
 		String layerName = (String) jsonObject.get("layerName");
+		String geom = (String) jsonObject.get("geometry2d");
 		// String srs = (String) request.getParameter("srs");
 		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
 		String paramStr = (String) jsonObject.get("depthValue");
@@ -854,20 +855,20 @@ public class GeoserverController extends AbstractController {
 //		String defVal = (String) request.getParameter("defVal"); // 입력값
 //		String attribute = (String) request.getParameter("attribute"); // shp 컬럼명
 
-		if (dtGeoserverManager == null) {
-			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
-		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null
-				|| layerName.equals("") || layerName == null || heightType.equals("") || heightType == null) {
-			response.sendError(601, "미입력 텍스트가 존재합니다.");
-		} else {
-			if (heightType == null) {
-				response.sendError(601, "미입력 텍스트가 존재합니다.");
-			} else if (paramStr.equals("") || paramStr == null) {
-				response.sendError(601, "미입력 텍스트가 존재합니다.");
-			} else {
-				response.sendError(601, "잘못입력한 정보가 있습니다.");
-			}
-		}
+//		if (dtGeoserverManager == null) {
+//			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
+//		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null
+//				|| layerName.equals("") || layerName == null || heightType.equals("") || heightType == null) {
+//			response.sendError(601, "미입력 텍스트가 존재합니다.");
+//		} else {
+//			if (heightType == null) {
+//				response.sendError(601, "미입력 텍스트가 존재합니다.");
+//			} else if (paramStr.equals("") || paramStr == null) {
+//				response.sendError(601, "미입력 텍스트가 존재합니다.");
+//			} else {
+//				response.sendError(601, "잘못입력한 정보가 있습니다.");
+//			}
+//		}
 		JSONObject returnJson = new JSONObject();
 		if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
 			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
