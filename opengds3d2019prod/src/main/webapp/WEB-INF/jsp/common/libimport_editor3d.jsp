@@ -238,6 +238,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/Simple3DManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/MultiOBJManager.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/B3DMManager.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/io/TilesDownloader.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/GeoServer.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Openlayers.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/EditingToolBase.js"></script>

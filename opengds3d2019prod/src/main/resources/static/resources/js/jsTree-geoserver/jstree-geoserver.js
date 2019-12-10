@@ -620,7 +620,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 	 * @param {ol.Collection}
 	 *            collection - 레이어를 주입할 콜렉션
 	 */
-	this.recursive_node_load = function(node, collection, duplication, isLast) {
+	this.recursive_node_load = function(node, collection, duplication, isLast, callback) {
 		var that = this;
 		if (node.type === "workspace") {
 			var dupLayer = that._data.geoserver.clientTree.get_LayerByOLId(node.id);
@@ -1164,6 +1164,9 @@ $.jstree.plugins.geoserver = function(options, parent) {
 								}
 							} else {
 								console.error("no collection to push");
+							}
+							if (typeof callback === "function") {
+								callback();	
 							}
 						}
 					}

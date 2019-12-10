@@ -604,7 +604,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
  * @param {ol.layer.Layer}
  *            layer - 속성을 참조할 레이어
  */
-gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, store, layer) {
+gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, store, layer, callback) {
 	var that = this;
 
 	var depthTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.dtype[this.locale]);
@@ -671,12 +671,13 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, sto
 			"geometry2d" : "Polygon",
 			"texture" : $(textureSelect).val()
 		};
+		geom["depthType"] = $(depthType).val(); 
 		if ($(depthType).val() === "default") {
-			geom["depth"] = $(depthInput).val();
+			geom["depthValue"] = $(depthInput).val();
 		} else if ($(depthType).val() === "fix") {
-			geom["depthAttr"] = $(attrKey).val();
+			geom["depthValue"] = $(attrKey).val();
 		}
-		that.get3DTileset(geo, work, store, layer, geom, polygonModal);
+		that.get3DTileset(geo, work, store, layer, geom, polygonModal, callback);
 	});
 
 	this.getLayerInfo(geo, work, layer, attrKey, polygonModal);
@@ -697,21 +698,24 @@ gb3d.io.Simple3DManager.prototype.get3DTilesetURL = function() {
  * 
  * @method gb3d.io.Simple3DManager#get3DTileset
  */
-gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, layer, geom, modal) {
+gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, layer, geom, modal, callback) {
 	var that = this;
+	var layerid = geo+":"+work+":"+store+":"+layer;
+	
 	var url = this.get3DTilesetURL();
 	var params = {
 		"serverName" : geo,
 		"workspace" : work,
 		"datastore" : store,
-		"layer" : layer
+		"layerName" : layer
 	};
+	
 	params["geometry2d"] = geom["geometry2d"];
-	if (geom["depth"]) {
-		params["depth"] = geom["depth"] ? geom["depth"] : undefined;	
+	if (geom["depthType"]) {
+		params["depthType"] = geom["depthType"] ? geom["depthType"] : undefined;	
 	}
-	if (geom["depthAttr"]) {
-		params["depthAttr"] = geom["depthAttr"] ? geom["depthAttr"] : undefined;	
+	if (geom["depthValue"]) {
+		params["depthValue"] = geom["depthValue"] ? geom["depthValue"] : undefined;	
 	}
 	params["texture"] = geom["texture"];
 	if (geom.geometry2d === "Point") {
@@ -745,37 +749,64 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 			params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;	
 		}
 	}
-	var layerid = geo+":"+work+":"+store+":"+layer;
 	console.log(layerid);
-	$.ajax({
-		url : url + "&" + jQuery.param(params),
-		method : "POST",
-		contentType : "application/json; charset=UTF-8",
-		beforeSend : function() {
-			$("body").css("cursor", "wait");
-			modal.showSpinner(true);
-		},
-		complete : function() {
-			$("body").css("cursor", "auto");
-			modal.showSpinner(false);
-		},
-		success : function(data, textStatus, jqXHR) {
-			console.log(data);
-			modal.close();
-			that.getTilesetManager().addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", layerid);
-		}
-	}).fail(function(xhr, status, errorThrown) {
-		modal.showSpinner(false);
-		$("body").css("cursor", "auto");
-		if (xhr.responseJSON) {
-			if (xhr.responseJSON.status) {
-				that.errorModal(xhr.responseJSON.status);
-			}
+	var callback2 = function(){
+//		var url = "http://localhost:8081/geodt/resources/testtileset/Batched1/tileset.json";
+//		var tileid = "testLayerTile1";
+//		that.getTilesetManager().addTileset( url, tileid, layerid );
+		modal.close();
+		
+		var tranURL = url;
+		if (tranURL.indexOf("?") !== -1) {
+			tranURL += "&";
+			tranURL += jQuery.param(params);
 		} else {
-			that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
+			tranURL += "?";
+			tranURL += jQuery.param(params);
 		}
-
-	});
+		
+		$.ajax({
+//			url : url + "&" + jQuery.param(params),
+//			url : tranURL,
+			url : url,
+			method : "POST",
+			data : JSON.stringify(params),
+			contentType : "application/json; charset=UTF-8",
+			beforeSend : function() {
+				$("body").css("cursor", "wait");
+				modal.showSpinner(true);
+			},
+			complete : function() {
+				$("body").css("cursor", "auto");
+				modal.showSpinner(false);
+			},
+			success : function(data, textStatus, jqXHR) {
+				console.log(data);
+				modal.close();
+				var success = data.succ;
+				var path = data.path;
+				if (success) {
+					that.getTilesetManager().addTileset(apache, "temp", layerid);					
+				}
+			}
+		}).fail(function(xhr, status, errorThrown) {
+			modal.showSpinner(false);
+			$("body").css("cursor", "auto");
+			if (xhr.responseJSON) {
+				if (xhr.responseJSON.status) {
+					that.errorModal(xhr.responseJSON.status);
+				}
+			} else {
+				that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
+			}
+		});
+	};
+	
+	// 2d============
+	if(typeof callback === "function"){
+		callback(layerid, callback2);
+	}
+	// 2d============
 };
 
 /**
