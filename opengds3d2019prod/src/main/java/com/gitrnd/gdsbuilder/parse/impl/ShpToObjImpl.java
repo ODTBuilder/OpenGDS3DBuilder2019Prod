@@ -23,23 +23,25 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.grid.Grids;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.util.NullProgressListener;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
-import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+import org.poly2tri.Poly2Tri;
+import org.poly2tri.geometry.polygon.PolygonPoint;
+import org.poly2tri.triangulation.TriangulationPoint;
+import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 
-import com.gitrnd.gdsbuilder.create3d.Triangler;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
@@ -48,18 +50,12 @@ import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.TopologyException;
 
 public class ShpToObjImpl {
 
 	private double defaultHeight = 5;
 	private static BufferedWriter writer;
-
-	private double minVal;
-	private double maxVal;
 
 	private static double centerX;
 	private static double centerY;
@@ -77,7 +73,57 @@ public class ShpToObjImpl {
 	private int vtIdx;
 	private int vnIdx;
 
+	private int objfilenum = 0;
+
 	EnShpToObjHeightType hType = null;
+
+	public int getObjfilenum() {
+		return objfilenum;
+	}
+
+	public void setObjfilenum(int objfilenum) {
+		this.objfilenum = objfilenum;
+	}
+
+	public double getDefaultHeight() {
+		return defaultHeight;
+	}
+
+	public void setDefaultHeight(double defaultHeight) {
+		this.defaultHeight = defaultHeight;
+	}
+
+	public String getAttribute() {
+		return attribute;
+	}
+
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
+	}
+
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public EnShpToObjHeightType gethType() {
+		return hType;
+	}
+
+	public void sethType(EnShpToObjHeightType hType) {
+		this.hType = hType;
+	}
 
 	/**
 	 * Shp 출력 타입
@@ -85,7 +131,7 @@ public class ShpToObjImpl {
 	 * @author SG.LEE
 	 */
 	public enum EnShpToObjHeightType {
-		DEFAULT("default"), RANDOM("random"), FIX("fix"), UNKNOWN(null);
+		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
 
 		String type;
 
@@ -129,32 +175,12 @@ public class ShpToObjImpl {
 	 * @param outputPath
 	 * @throws Exception
 	 */
-	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) throws Exception {
+	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) {
 		hType = EnShpToObjHeightType.DEFAULT;
 		this.file = file;
 		this.filter = filter;
 		this.outputPath = outputPath;
 		this.defaultHeight = defVal;
-	}
-
-	/**
-	 * 높이 min ~ max 사이 랜던값
-	 * 
-	 * @author SG.LEE
-	 * @param file
-	 * @param filter
-	 * @param minVal
-	 * @param maxVal
-	 * @param outputPath
-	 * @throws Exception
-	 */
-	public ShpToObjImpl(File file, Filter filter, double minVal, double maxVal, String outputPath) throws Exception {
-		hType = EnShpToObjHeightType.RANDOM;
-		this.file = file;
-		this.filter = filter;
-		this.outputPath = outputPath;
-		this.minVal = minVal;
-		this.maxVal = maxVal;
 	}
 
 	/**
@@ -183,10 +209,7 @@ public class ShpToObjImpl {
 
 		if (!geomType.equals("Polygon") || !geomType.equals("MultiPolygon")) {
 
-			// 최상위 폴더 생성
-			// D:\node\objTo3d-tiles-master\bin\shptoobj\obj
 			createFileDirectory(this.outputPath);
-
 			Map<String, Object> sfcMap = new HashMap<>();
 
 			// 대용량 처리
@@ -218,7 +241,7 @@ public class ShpToObjImpl {
 
 				// filter
 				FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
-				int defaultS = 100;
+				int defaultS = 150;
 				int tmp = 1;
 				for (Envelope envelope : gridEnvs) {
 					List items = quad.query(envelope);
@@ -255,11 +278,17 @@ public class ShpToObjImpl {
 							Envelope innerEnv = (Envelope) envs.get(0);
 							if (en == 0) {
 								if (dfcSize < defaultS) {
+									objfilenum++;
+
 									// obj file
 									ReferencedEnvelope reEnv = dfc.getBounds();
 									Coordinate center = reEnv.centre();
 									centerX = center.x;
 									centerY = center.y;
+
+									// batch table file
+									JSONObject batchTable = new JSONObject();
+									JSONArray batchIdArr = new JSONArray();
 									try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 											new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 											"utf-8"))) {
@@ -273,33 +302,43 @@ public class ShpToObjImpl {
 											writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
 											while (features.hasNext()) {
 												SimpleFeature feature = features.next();
-												buildingFeatureToObjGroup(feature);
+												List<String> idlist = buildingFeatureToObjGroup(feature);
+												for (String id : idlist) {
+													batchIdArr.add(id);
+												}
 											}
 										}
 									}
+									batchTable.put("batchId", batchIdArr);
+									try (FileWriter file = new FileWriter(
+											enPath + File.separator + halftmp + "batch.json")) {
+										file.write(batchTable.toJSONString());
+									}
+
+									// tileset option file
 									double maxX = reEnv.getMaxX(); // east
 									double maxY = reEnv.getMaxY(); // north
 									double minX = reEnv.getMinX(); // west
 									double minY = reEnv.getMinY(); // south
-									// tileset option file
-									JSONObject obj = new JSONObject();
-									obj.put("longitude", Math.toRadians(centerX));
-									obj.put("latitude", Math.toRadians(centerY));
-									obj.put("west", Math.toRadians(minX));
-									obj.put("south", Math.toRadians(minY));
-									obj.put("east", Math.toRadians(maxX));
-									obj.put("north", Math.toRadians(maxY));
-									obj.put("transHeight", 0);
-									obj.put("region", true);
-									obj.put("box", false);
-									obj.put("sphere", false);
-									obj.put("gltfUpAxis", "Z");
-									obj.put("minHeight", 0);
-									obj.put("maxHeight", 100);
+
+									JSONObject tileOption = new JSONObject();
+									tileOption.put("longitude", Math.toRadians(centerX));
+									tileOption.put("latitude", Math.toRadians(centerY));
+									tileOption.put("west", Math.toRadians(minX));
+									tileOption.put("south", Math.toRadians(minY));
+									tileOption.put("east", Math.toRadians(maxX));
+									tileOption.put("north", Math.toRadians(maxY));
+									tileOption.put("transHeight", 0);
+									tileOption.put("region", true);
+									tileOption.put("box", false);
+									tileOption.put("sphere", false);
+									tileOption.put("gltfUpAxis", "Z");
+									tileOption.put("minHeight", 0);
+									tileOption.put("maxHeight", 100);
 
 									try (FileWriter file = new FileWriter(
-											enPath + File.separator + halftmp + ".json")) {
-										file.write(obj.toJSONString());
+											enPath + File.separator + halftmp + "tile.json")) {
+										file.write(tileOption.toJSONString());
 									}
 									break;
 								}
@@ -333,12 +372,17 @@ public class ShpToObjImpl {
 											}
 										}
 										if (tfc.size() > 0) {
+											objfilenum++;
+
 											// obj file
 											ReferencedEnvelope reEnv = halfSfc.getBounds();
 											Coordinate center = reEnv.centre();
 											centerX = center.x;
 											centerY = center.y;
 
+											// batch table file
+											JSONObject batchTable = new JSONObject();
+											JSONArray batchIdArr = new JSONArray();
 											try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 													new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 													"utf-8"))) {
@@ -348,40 +392,49 @@ public class ShpToObjImpl {
 												vIdx = 0;
 												vtIdx = 1;
 												vnIdx = 1;
-												writer.write("mtllib barrel.mtl" + "\n");
 												try (FeatureIterator<SimpleFeature> features = tfc.features()) {
 													writer.write(
 															"o " + buildingCollection.getSchema().getTypeName() + "\n");
 													while (features.hasNext()) {
 														SimpleFeature feature = features.next();
-														buildingFeatureToObjGroup(feature);
+														List<String> idlist = buildingFeatureToObjGroup(feature);
+														for (String id : idlist) {
+															batchIdArr.add(id);
+														}
 													}
 												}
 											}
 
+											batchTable.put("batchId", batchIdArr);
+											try (FileWriter file = new FileWriter(
+													enPath + File.separator + halftmp + "batch.json")) {
+												file.write(batchTable.toJSONString());
+											}
+
+											// tileset option file
 											double maxX = reEnv.getMaxX(); // east
 											double maxY = reEnv.getMaxY(); // north
 											double minX = reEnv.getMinX(); // west
 											double minY = reEnv.getMinY(); // south
-											// tileset option file
-											JSONObject obj = new JSONObject();
-											obj.put("longitude", Math.toRadians(centerX));
-											obj.put("latitude", Math.toRadians(centerY));
-											obj.put("west", Math.toRadians(minX));
-											obj.put("south", Math.toRadians(minY));
-											obj.put("east", Math.toRadians(maxX));
-											obj.put("north", Math.toRadians(maxY));
-											obj.put("transHeight", 0);
-											obj.put("region", true);
-											obj.put("box", false);
-											obj.put("sphere", false);
-											obj.put("gltfUpAxis", "Z");
-											obj.put("minHeight", 0);
-											obj.put("maxHeight", 100);
+
+											JSONObject tileOption = new JSONObject();
+											tileOption.put("longitude", Math.toRadians(centerX));
+											tileOption.put("latitude", Math.toRadians(centerY));
+											tileOption.put("west", Math.toRadians(minX));
+											tileOption.put("south", Math.toRadians(minY));
+											tileOption.put("east", Math.toRadians(maxX));
+											tileOption.put("north", Math.toRadians(maxY));
+											tileOption.put("transHeight", 0);
+											tileOption.put("region", true);
+											tileOption.put("box", false);
+											tileOption.put("sphere", false);
+											tileOption.put("gltfUpAxis", "Z");
+											tileOption.put("minHeight", 0);
+											tileOption.put("maxHeight", 100);
 
 											try (FileWriter file = new FileWriter(
-													enPath + File.separator + halftmp + ".json")) {
-												file.write(obj.toJSONString());
+													enPath + File.separator + halftmp + "tile.json")) {
+												file.write(tileOption.toJSONString());
 											}
 											halftmp++;
 										}
@@ -396,12 +449,17 @@ public class ShpToObjImpl {
 					}
 				}
 			} else {
+				objfilenum++;
+
 				// obj file
 				ReferencedEnvelope reEnv = buildingCollection.getBounds();
 				Coordinate center = reEnv.centre();
 				centerX = center.x;
 				centerY = center.y;
 
+				// batch table file
+				JSONObject batchTable = new JSONObject();
+				JSONArray batchIdArr = new JSONArray();
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 						new FileOutputStream(outputPath + File.separator + 1 + ".obj"), "utf-8"))) {
 					ShpToObjImpl.writer = writer;
@@ -415,32 +473,41 @@ public class ShpToObjImpl {
 						vnIdx = 1;
 						while (features.hasNext()) {
 							SimpleFeature feature = features.next();
-							buildingFeatureToObjGroup(feature);
+							List<String> idlist = buildingFeatureToObjGroup(feature);
+							for (String id : idlist) {
+								batchIdArr.add(id);
+							}
 						}
 					}
 				}
+				batchTable.put("batchId", batchIdArr);
+				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "batch.json")) {
+					file.write(batchTable.toJSONString());
+				}
+
+				// tileset option file
 				double maxX = reEnv.getMaxX(); // east
 				double maxY = reEnv.getMaxY(); // north
 				double minX = reEnv.getMinX(); // west
 				double minY = reEnv.getMinY(); // south
-				// tileset option file
-				JSONObject obj = new JSONObject();
-				obj.put("longitude", Math.toRadians(centerX));
-				obj.put("latitude", Math.toRadians(centerY));
-				obj.put("west", Math.toRadians(minX));
-				obj.put("south", Math.toRadians(minY));
-				obj.put("east", Math.toRadians(maxX));
-				obj.put("north", Math.toRadians(maxY));
-				obj.put("transHeight", 0);
-				obj.put("region", true);
-				obj.put("box", false);
-				obj.put("sphere", false);
-				obj.put("gltfUpAxis", "Z");
-				obj.put("minHeight", 0);
-				obj.put("maxHeight", 100);
 
-				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + ".json")) {
-					file.write(obj.toJSONString());
+				JSONObject tileOption = new JSONObject();
+				tileOption.put("longitude", Math.toRadians(centerX));
+				tileOption.put("latitude", Math.toRadians(centerY));
+				tileOption.put("west", Math.toRadians(minX));
+				tileOption.put("south", Math.toRadians(minY));
+				tileOption.put("east", Math.toRadians(maxX));
+				tileOption.put("north", Math.toRadians(maxY));
+				tileOption.put("transHeight", 0);
+				tileOption.put("region", true);
+				tileOption.put("box", false);
+				tileOption.put("sphere", false);
+				tileOption.put("gltfUpAxis", "Z");
+				tileOption.put("minHeight", 0);
+				tileOption.put("maxHeight", 100);
+
+				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "tile.json")) {
+					file.write(tileOption.toJSONString());
 				}
 			}
 		} else {
@@ -465,7 +532,7 @@ public class ShpToObjImpl {
 		return collection;
 	}
 
-	private void buildingFeatureToObjGroup(SimpleFeature feature)
+	private List<String> buildingFeatureToObjGroup(SimpleFeature feature)
 			throws FactoryException, TransformException, IOException {
 
 		// 높이값 설정
@@ -480,26 +547,25 @@ public class ShpToObjImpl {
 				// TODO: handle exception
 				height = defaultHeight;
 			}
-		} else if (this.hType == EnShpToObjHeightType.RANDOM) {
-			double rdNum = minVal + (int) (Math.random() * maxVal);
-			height = rdNum;
 		}
 
 		if (height < 1) {
 			height = defaultHeight;
 		}
 
-		GeometryAttribute featureDefaultGeometryProperty = feature.getDefaultGeometryProperty();
-		MultiPolygon multipolygon = (MultiPolygon) featureDefaultGeometryProperty.getValue();
+		List<String> idList = new ArrayList<>();
+
+		Geometry multipolygon = (Geometry) feature.getDefaultGeometry();
 		int numGeom = multipolygon.getNumGeometries();
 		for (int g = 0; g < numGeom; g++) {
 			// String featureID = "g " + feature.getID();
-			String featureID = "g " + feature.getAttribute("osm_id");
+			String featureID = "g " + feature.getID();
 			if (numGeom > 1) {
 				featureID += "_" + (g + 1) + "\n";
 			} else {
 				featureID += "\n";
 			}
+			idList.add(featureID);
 			writer.write(featureID);
 
 			Geometry geom = multipolygon.getGeometryN(g);
@@ -510,6 +576,8 @@ public class ShpToObjImpl {
 			// threeGeom
 			List<Face3> faces = new ArrayList<>();
 			StringBuilder vBuilder = new StringBuilder();
+
+			List<PolygonPoint> points = new ArrayList<>();
 
 			// 바닥
 			List<Vector3d> coorList = new ArrayList<>();
@@ -535,6 +603,9 @@ public class ShpToObjImpl {
 				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
 
 				vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
+
+				// tri
+				points.add(new PolygonPoint(xDistance, yDistance, 0));
 			}
 
 			int bottomStart;
@@ -558,32 +629,37 @@ public class ShpToObjImpl {
 			}
 			writer.write(vBuilder.toString());
 
-			// face
-			// coorList.add(coorList.get(0));
-			Triangler tri = new Triangler(coorList);
-			tri.triangify();
-			// tri.triangify(holeList); // actual algo call
-			List<Integer> faceIndice = tri.getFaceIndices();
+			// Prepare input data
+			org.poly2tri.geometry.polygon.Polygon polygon = new org.poly2tri.geometry.polygon.Polygon(points);
+
+			// Launch tessellation
+			Poly2Tri.triangulate(polygon);
+			// Gather triangles
+			List<DelaunayTriangle> triangles = polygon.getTriangles();
+
 			// 바닥 face
 			bottomStart = faces.size();
-			for (int m = 0; m < faceIndice.size(); m += 3) {
-				int fFirIdx = vIdx + faceIndice.get(m);
-				int fSecIdx = vIdx + faceIndice.get(m + 1);
-				int fThrIdx = vIdx + faceIndice.get(m + 2);
-
+			for (int m = 0; m < triangles.size(); m++) {
+				DelaunayTriangle tri = triangles.get(m);
+				TriangulationPoint[] pts = tri.points;
+				int fFirIdx = vIdx + points.indexOf(pts[0]);
+				int fSecIdx = vIdx + points.indexOf(pts[1]);
+				int fThrIdx = vIdx + points.indexOf(pts[2]);
 				// threeGeom
 				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
 			}
 			bottomEnd = faces.size();
+
 			// 천장 face
 			topStart = faces.size();
-			for (int m = 0; m < faceIndice.size(); m += 3) {
-				int fFirIdx = vIdx + s + faceIndice.get(m);
-				int fSecIdx = vIdx + s + faceIndice.get(m + 1);
-				int fThrIdx = vIdx + s + faceIndice.get(m + 2);
-
+			for (int m = 0; m < triangles.size(); m++) {
+				DelaunayTriangle tri = triangles.get(m);
+				TriangulationPoint[] pts = tri.points;
+				int fFirIdx = vIdx + s + points.indexOf(pts[0]);
+				int fSecIdx = vIdx + s + points.indexOf(pts[1]);
+				int fThrIdx = vIdx + s + points.indexOf(pts[2]);
 				// threeGeom
-				faces.add(new Face3(fThrIdx, fSecIdx, fFirIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
 			}
 			topEnd = faces.size();
 
@@ -693,6 +769,8 @@ public class ShpToObjImpl {
 			threeGeom.computeFaceNormals();
 			writeThreeGeometry(threeGeom);
 		}
+
+		return idList;
 	}
 
 	public void writeThreeGeometry(com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom)
@@ -735,17 +813,8 @@ public class ShpToObjImpl {
 				vnIdx++;
 			}
 			writer.write(vnBuilder.toString());
-			writer.write("usemtl wood" + "\n");
 			writer.write(fBuilder.toString());
 		}
-	}
-
-	public void createUVVerticeOnPolygon(Geometry geom, Object result) {
-
-	}
-
-	private String coordinateToVertexdescription(Vector3d vertice) {
-		return new String("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
 	}
 
 	public String coordinateToVertexdescription(Coordinate coordinate) {
@@ -778,25 +847,6 @@ public class ShpToObjImpl {
 			c2.z = 0.0;
 		}
 		return (c1.x == c2.x && c1.y == c2.y && c1.z == c2.z);
-	}
-
-	private SimpleFeature getIntersection(Envelope envelope, SimpleFeature sf) {
-
-		GeometryFactory f = new GeometryFactory();
-		SimpleFeature resultSF = SimpleFeatureBuilder.copy(sf);
-		Geometry envelpoeGeom = f.toGeometry(envelope);
-		Geometry sfGeom = (Geometry) sf.getDefaultGeometry();
-		Geometry interGeom = null;
-		try {
-			interGeom = envelpoeGeom.intersection(sfGeom);
-			if (interGeom != null) {
-				resultSF.setDefaultGeometry(interGeom);
-			}
-		} catch (TopologyException e) {
-			return resultSF;
-		} finally {
-			return resultSF;
-		}
 	}
 
 	private List<Envelope> getGrids(Envelope envelope, double quadIndexWidth) {
