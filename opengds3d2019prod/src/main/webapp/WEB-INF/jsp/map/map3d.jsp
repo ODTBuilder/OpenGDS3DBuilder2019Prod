@@ -102,6 +102,10 @@ html, body {
 	overflow: hidden;
 	padding-right: 0 !important;
 }
+
+.cesium-viewer-timelineContainer, .cesium-viewer-bottom {
+	z-index: 1;
+}
 </style>
 </head>
 <body>
@@ -273,11 +277,20 @@ html, body {
 			"locale" : locale !== "" ? locale : "en"
 		});
 
+		var epan3d;
 		var threeTree = new gb3d.tree.Three({
 			"target" : "#attrObject",
-			"map" : gb3dMap
+			"map" : gb3dMap,
+			"editingTool3D" : function(){
+				return epan3d;
+			},
 		});
 
+		var mrecord = new gb3d.edit.ModelRecord({
+			//id : "feature_id",
+			locale : locale
+		});
+		
 		otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -300,8 +313,10 @@ html, body {
 
 		var simple3d = new gb3d.io.Simple3DManager({
 			"url" : undefined,
+			"layerInfoUrl" : "geoserver/getGeoLayerInfoList.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"locale" : locale !== "" ? locale : "en",
-			"gb3dMap" : gb3dMap
+// 			"gb3dMap" : gb3dMap,
+			"tilesetManager" : tilesetManager
 		});
 
 		var multiobj = new gb3d.io.MultiOBJManager({
@@ -343,14 +358,9 @@ html, body {
 			}
 		});
 		
-		var mrecord = new gb3d.edit.ModelRecord({
-			//id : "feature_id",
-			locale : locale
-		});
-		
 		var epan;
 		// editing Tool 3D
-		var epan3d = new gb3d.edit.EditingTool3D({
+		epan3d = new gb3d.edit.EditingTool3D({
 			targetElement : $(".area-3d")[0],
 			map : gb3dMap,
 			isDisplay : false,
