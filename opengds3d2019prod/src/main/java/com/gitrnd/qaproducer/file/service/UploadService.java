@@ -47,12 +47,15 @@ public class UploadService {
 
 	@Value("${server.port}")
 	private String serverPort;
+	
+	@Value("${server.context-path}")
+	private String context;
 
 	@Value("${gitrnd.apache.host}")
 	private String apachehost;
 	
 	@Value("${gitrnd.apache.port}")
-	private String context;
+	private String apacheport;
 	
 
 	@Autowired
@@ -144,7 +147,7 @@ public class UploadService {
 		String user = request.getParameter("user");
 		String time = request.getParameter("time");
 
-		String basePath = baseDrive + ":" + File.separator + baseDir;
+		String basePath = apachehost + ":" + apacheport;
 		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
 				+ File.separator + "3dtiles";
 
