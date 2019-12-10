@@ -101,60 +101,6 @@ public class MainController {
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
 	public ModelAndView mainView(HttpServletRequest request, HttpServletResponse response,
 			@AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException {
-		
-//		
-//		JSONObject bodyJson = new JSONObject();
-//
-//		bodyJson.put("user", "admin");
-//		bodyJson.put("time", "20191202_174155");
-//		bodyJson.put("file", "20191202_174155_obj.zip");
-//		bodyJson.put("path", "http:\\175.116.181.32:8081\\geodt\\downloadzip.do?user=admin&time=20191202_174155&file=20191202_174155_obj.zip");
-//
-//		String bodyString = bodyJson.toJSONString();
-//
-//		
-//		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-//		factory.setReadTimeout(5000);
-//		factory.setConnectTimeout(3000);
-//		CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
-//				.setMaxConnPerRoute(5).build();
-//		factory.setHttpClient(httpClient);
-//		RestTemplate restTemplate = new RestTemplate(factory);
-//
-//		// header
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//		HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
-//		restTemplate.exchange("http://localhost:3000/convert/net", HttpMethod.POST, requestEntity, String.class);
-//		
-//		
-		
-		
-		
-		
-		
-		
-		
-		
-		DTGeoserverManager geoserverManager = new DTGeoserverManager("http://175.116.181.32:9999/geoserver", "admin", "geoserver");
-		
-		try {
-			geoserverService.geolayerTo3DTiles(geoserverManager, "node", "nodetest", "gis_osm_buildings_3052", "admin", 50);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
-		
-		
-		
-		
-		
-		
-	
-
 		LOGGER.info("access: /main.do");
 		ModelAndView mav = new ModelAndView();
 		if (loginUser != null) {

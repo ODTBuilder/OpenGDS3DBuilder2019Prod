@@ -322,7 +322,7 @@ html, body {
 		});
 
 		var simple3d = new gb3d.io.Simple3DManager({
-			"url" : undefined,
+			"url" : "geoserver/requestGeoLayerTo3DTiles.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"layerInfoUrl" : "geoserver/getGeoLayerInfoList.ajax?${_csrf.parameterName}=${_csrf.token}",
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap,

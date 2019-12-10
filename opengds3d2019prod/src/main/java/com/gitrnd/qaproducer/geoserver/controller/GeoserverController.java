@@ -841,14 +841,14 @@ public class GeoserverController extends AbstractController {
 		}
 
 		// 필수파라미터
-		String serverName = request.getParameter("serverName");
+		String serverName = (String) jsonObject.get("serverName");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		String workspace = request.getParameter("workspace");
-		String datastore = request.getParameter("datastore");
-		String layerName = request.getParameter("layerName");
+		String workspace = (String) jsonObject.get("workspace");
+		String datastore = (String) jsonObject.get("datastore");
+		String layerName = (String) jsonObject.get("layerName");
 		// String srs = (String) request.getParameter("srs");
-		String heightType = request.getParameter("heightType"); // shp 컬럼명(fix) or 입력값(default)
-		String paramStr = request.getParameter(heightType);
+		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+		String paramStr = (String) jsonObject.get("depthValue");
 
 		// 조건에 따른 파라미터
 //		String defVal = (String) request.getParameter("defVal"); // 입력값
