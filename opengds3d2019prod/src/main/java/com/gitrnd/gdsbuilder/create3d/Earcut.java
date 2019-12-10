@@ -96,33 +96,26 @@ public final class Earcut {
 		Node stop = ear;
 
 		// iterate through ears, slicing them one by one
-		while (ear.next != ear.next.next) {
-//			Node prev = ear.prev;
-//			Node next = ear.next;
-
-			Node next1 = ear.next;
-			Node next2 = ear.next.next;
+		while (ear.prev != ear.next) {
+			Node prev = ear.prev;
+			Node next = ear.next;
 
 			if (size != Double.MIN_VALUE ? isEarHashed(ear, minX, minY, size) : isEar(ear)) {
 				// cut off the triangle
-//				triangles.add(prev.i / dim);
-//				triangles.add(ear.i / dim);
-//				triangles.add(next.i / dim);
+				triangles.add(prev.i / dim);
+				triangles.add(ear.i / dim);
+				triangles.add(next.i / dim);
 
-				triangles.add(next2.i / dim);
-				triangles.add(next1.i / dim);
-				triangles.add(ear.i / dim);			
-
-				removeNode(ear.next);
+				removeNode(ear);
 
 				// skipping the next vertice leads to less sliver triangles
-				ear = next2;
-				stop = next2;
+				ear = next.next;
+				stop = next.next;
 
 				continue;
 			}
 
-			ear = next2;
+			ear = next;
 
 			// if we looped through the whole remaining polygon and can't find
 			// any more ears
@@ -146,6 +139,64 @@ public final class Earcut {
 				break;
 			}
 		}
+
+//		// interlink polygon nodes in z-order
+//		if (pass == Integer.MIN_VALUE && size != Double.MIN_VALUE)
+//			indexCurve(ear, minX, minY, size);
+//
+//		Node stop = ear;
+//
+//		// iterate through ears, slicing them one by one
+//		while (ear.next != ear.next.next) {
+////			Node prev = ear.prev;
+////			Node next = ear.next;
+//
+//			Node next1 = ear.next;
+//			Node next2 = ear.next.next;
+//
+//			if (size != Double.MIN_VALUE ? isEarHashed(ear, minX, minY, size) : isEar(ear)) {
+//				// cut off the triangle
+////				triangles.add(prev.i / dim);
+////				triangles.add(ear.i / dim);
+////				triangles.add(next.i / dim);
+//
+//				triangles.add(next2.i / dim);
+//				triangles.add(next1.i / dim);
+//				triangles.add(ear.i / dim);			
+//
+//				removeNode(ear.next);
+//
+//				// skipping the next vertice leads to less sliver triangles
+//				ear = next2;
+//				stop = next2;
+//
+//				continue;
+//			}
+//
+//			ear = next2;
+//
+//			// if we looped through the whole remaining polygon and can't find
+//			// any more ears
+//			if (ear == stop) {
+//				// try filtering points and slicing again
+//				if (pass == Integer.MIN_VALUE) {
+//					earcutLinked(filterPoints(ear, null), triangles, dim, minX, minY, size, 1);
+//
+//					// if this didn't work, try curing all small
+//					// self-intersections locally
+//				} else if (pass == 1) {
+//					ear = cureLocalIntersections(ear, triangles, dim);
+//					earcutLinked(ear, triangles, dim, minX, minY, size, 2);
+//
+//					// as a last resort, try splitting the remaining polygon
+//					// into two
+//				} else if (pass == 2) {
+//					splitEarcut(ear, triangles, dim, minX, minY, size);
+//				}
+//
+//				break;
+//			}
+//		}
 	}
 
 	private static void splitEarcut(Node start, List<Integer> triangles, int dim, double minX, double minY,

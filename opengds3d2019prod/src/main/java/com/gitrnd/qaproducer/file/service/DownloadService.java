@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import com.gitrnd.qaproducer.common.security.LoginUser;
 
-
 @Service
 @PropertySources({ @PropertySource(value = "classpath:application.yml", ignoreResourceNotFound = true),
 		@PropertySource(value = "file:./application.yml", ignoreResourceNotFound = true) })

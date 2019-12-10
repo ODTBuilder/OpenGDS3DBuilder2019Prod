@@ -248,12 +248,27 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 
+		<!-- gltf to obj -->
 		<dependency>
 			<groupId>de.javagl</groupId>
 			<artifactId>obj</artifactId>
 			<version>0.3.0</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.orbisgis/poly2tri -->
+		<dependency>
+			<groupId>org.orbisgis</groupId>
+			<artifactId>poly2tri</artifactId>
+			<version>0.1.2</version>
+			<type>pom</type>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.orbisgis/poly2tri-core -->
+		<dependency>
+			<groupId>org.orbisgis</groupId>
+			<artifactId>poly2tri-core</artifactId>
+			<version>0.1.2</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 		<dependency>
