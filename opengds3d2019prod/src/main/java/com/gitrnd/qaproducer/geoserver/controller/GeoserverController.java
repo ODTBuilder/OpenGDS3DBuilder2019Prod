@@ -870,10 +870,10 @@ public class GeoserverController extends AbstractController {
 		}
 		JSONObject returnJson = new JSONObject();
 		if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
-			geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
+			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), Double.valueOf(paramStr));
 		} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-			geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName, paramStr);
+			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName, paramStr);
 		} else {
 
 		}
