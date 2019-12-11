@@ -147,8 +147,8 @@ public class UploadService {
 		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
 				+ File.separator + "3dtiles";
 
-		String apachePath = "http://" + apachehost + ":" + apacheport + File.separator + user + File.separator
-				+ "upload" + File.separator + time + File.separator + "3dtiles" + File.separator + "tileset.json";
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
+				+ "3dtiles" + "/" + "tileset.json";
 
 		File path = new File(uploadPath);
 		if (!path.exists()) {
