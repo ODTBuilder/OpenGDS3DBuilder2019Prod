@@ -150,6 +150,8 @@ public class UploadService {
 		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
 				+ "3dtiles" + "/" + "tileset.json";
 
+//		String apachePath = "http://" + apachehost + ":" + apacheport + "/guest/upload/20191211_100931/3dtiles/tileset.json";
+		
 		File path = new File(uploadPath);
 		if (!path.exists()) {
 			path.mkdirs();
