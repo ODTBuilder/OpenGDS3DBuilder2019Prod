@@ -756,15 +756,6 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 //		that.getTilesetManager().addTileset( url, tileid, layerid );
 		modal.close();
 		
-		var tranURL = url;
-		if (tranURL.indexOf("?") !== -1) {
-			tranURL += "&";
-			tranURL += jQuery.param(params);
-		} else {
-			tranURL += "?";
-			tranURL += jQuery.param(params);
-		}
-		
 		$.ajax({
 //			url : url + "&" + jQuery.param(params),
 //			url : tranURL,

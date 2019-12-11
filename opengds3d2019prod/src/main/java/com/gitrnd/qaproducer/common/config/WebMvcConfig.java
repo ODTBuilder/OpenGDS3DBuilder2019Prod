@@ -2,6 +2,7 @@ package com.gitrnd.qaproducer.common.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return messageResource;
 	}
 
+	@Value("${gitrnd.apache.host}")
+	private String apacheHost;
+
+	@Value("${gitrnd.apache.port}")
+	private String apachePort;
+	
 	// To solver URL like:
 	// /SomeContextPath/en/login2
 	// /SomeContextPath/vi/login2
@@ -53,6 +60,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	}
 
 	@Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedOrigins("http://"+apacheHost+":"+apachePort);
+    }
+	
+	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 
 		UrlLocaleInterceptor localeInterceptor = new UrlLocaleInterceptor();
@@ -62,12 +74,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void addCorsMappings(CorsRegistry arg0) {
 		// TODO Auto-generated method stub
 
 	}
