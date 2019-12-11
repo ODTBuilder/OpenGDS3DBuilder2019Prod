@@ -751,23 +751,9 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 	}
 	console.log(layerid);
 	var callback2 = function(){
-//		var url = "http://localhost:8081/geodt/resources/testtileset/Batched1/tileset.json";
-//		var tileid = "testLayerTile1";
-//		that.getTilesetManager().addTileset( url, tileid, layerid );
 		modal.close();
 		
-		var tranURL = url;
-		if (tranURL.indexOf("?") !== -1) {
-			tranURL += "&";
-			tranURL += jQuery.param(params);
-		} else {
-			tranURL += "?";
-			tranURL += jQuery.param(params);
-		}
-		
 		$.ajax({
-//			url : url + "&" + jQuery.param(params),
-//			url : tranURL,
 			url : url,
 			method : "POST",
 			data : JSON.stringify(params),
