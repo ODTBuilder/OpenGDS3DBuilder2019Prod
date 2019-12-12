@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -23,6 +24,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.grid.Grids;
 import org.geotools.referencing.GeodeticCalculator;
@@ -42,6 +44,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 
+import com.gitrnd.gdsbuilder.fileread.shp.SHPFileWriter;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
@@ -50,6 +53,7 @@ import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class ShpToObjImpl {
@@ -289,6 +293,7 @@ public class ShpToObjImpl {
 									// batch table file
 									JSONObject batchTable = new JSONObject();
 									JSONArray batchIdArr = new JSONArray();
+
 									try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 											new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 											"utf-8"))) {
@@ -565,7 +570,7 @@ public class ShpToObjImpl {
 			} else {
 				featureID += "\n";
 			}
-			idList.add(featureID);
+			idList.add(feature.getID());
 			writer.write(featureID);
 
 			Geometry geom = multipolygon.getGeometryN(g);
