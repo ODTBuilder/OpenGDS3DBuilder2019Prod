@@ -525,7 +525,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 				e.upModCount();
 				
 				var record = that.getModelRecord();
-				record.update(e.getLayer(), undefined, e);
+				record.update(e.getLayer(), e);
 			}
 		});
 	});
@@ -1656,7 +1656,7 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(obj3d.getLayer(), undefined, obj3d);
+	record.create(obj3d.getLayer(), obj3d);
 
 	return obj3d;
 }
@@ -1730,7 +1730,7 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(obj3d.getLayer(), undefined, obj3d);
+	record.create(obj3d.getLayer(), obj3d);
 
 	return obj3d;
 }
@@ -1806,7 +1806,7 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
-	record.create(obj3d.getLayer(), undefined, obj3d);
+	record.create(obj3d.getLayer(), obj3d);
 
 	return obj3d;
 
@@ -2063,7 +2063,7 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);
 	var record = that.getModelRecord();
-	record.update(threeObject.getLayer(), undefined, threeObject);
+	record.update(threeObject.getLayer(), threeObject);
 }
 
 gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, event) {
@@ -2274,7 +2274,7 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 		threeObject.upModCount();
 		threeObject.setCenter(center);
 		var record = that.getModelRecord();
-		record.update(threeObject.getLayer(), undefined, threeObject);
+		record.update(threeObject.getLayer(), threeObject);
 	}
 	return geom;
 };

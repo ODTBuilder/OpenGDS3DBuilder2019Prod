@@ -772,7 +772,8 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 				var success = data.succ;
 				var path = data.path;
 				if (success) {
-					that.getTilesetManager().addTileset(path, "temp", layerid);					
+//					var path = "http://175.116.181.34:8888/guest/upload/20191211_094727/3dtiles/tileset.json";
+					that.getTilesetManager().addTileset(path, layerid);					
 				}
 			}
 		}).fail(function(xhr, status, errorThrown) {
