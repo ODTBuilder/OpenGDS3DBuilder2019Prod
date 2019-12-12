@@ -293,6 +293,7 @@ public class ShpToObjImpl {
 									// batch table file
 									JSONObject batchTable = new JSONObject();
 									JSONArray batchIdArr = new JSONArray();
+
 									try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 											new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 											"utf-8"))) {
@@ -569,7 +570,7 @@ public class ShpToObjImpl {
 			} else {
 				featureID += "\n";
 			}
-			idList.add(featureID);
+			idList.add(feature.getID());
 			writer.write(featureID);
 
 			Geometry geom = multipolygon.getGeometryN(g);
