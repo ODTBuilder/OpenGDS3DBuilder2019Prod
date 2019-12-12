@@ -100,7 +100,7 @@ gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 		var panel = $( "<div class='panel panel-default'>" );
 		this.accordion.append( panel );
 		
-		var heading = $( "<div class='panel-heading' role='tab'>" ).attr( "id", t.getTileId() );
+		var heading = $( "<div class='panel-heading' role='tab'>" ).attr( "id", t.getLayer() );
 		panel.append( heading );
 		
 		var title = $( "<h4 class='panel-title gb-flex-between'>" );
@@ -108,10 +108,10 @@ gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 		
 		var titleButton = 
 			$( "<a role='button' data-toggle='collapse' href='#collapse1' aria-expanded='true'>" )
-				.text( t.getTileId() )
+				.text( t.getLayer() )
 				.attr( "data-parent", "#" + this.mainId )
-				.attr( "aria-controls", "collapse-" + t.getTileId() )
-				.attr( "href", "#collapse-" + t.getTileId() );
+				.attr( "aria-controls", "collapse-" + t.getLayer() )
+				.attr( "href", "#collapse-" + t.getLayer() );
 		title.append( titleButton );
 		
 		var keySelect = $( "<select class='form-control' style='flex: 0 0 90px;'>" );
@@ -130,8 +130,8 @@ gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 		
 		var collapse = 
 			$( "<div class='panel-collapse collapse in' role='tabpanel'>" )
-			.attr( "id", "collapse-" + t.getTileId() )
-			.attr( "aria-labelledby", t.getTileId() );
+			.attr( "id", "collapse-" + t.getLayer() )
+			.attr( "aria-labelledby", t.getLayer() );
 		panel.append( collapse );
 		
 		var body = $( "<div class='panel-body'>" );

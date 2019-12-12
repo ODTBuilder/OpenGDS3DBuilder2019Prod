@@ -202,7 +202,7 @@ gb3d.edit.ModelRecord.prototype.isEditing = function(layer) {
  *            model - 편집이력(삭제)에서 확인할 Model 객체
  * @return {Boolean} 해당 Model의 편집이력(삭제) 존재 여부
  */
-gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, tileId, model) {
+gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, model) {
 	var isRemoved = false;
 	var lid;
 	if (typeof model.getLayer() === "string") {
@@ -212,11 +212,9 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, tileId, model) {
 	// lid = model.getLayer().get("id");
 	// }
 	if (this.removed.hasOwnProperty(lid)) {
-		if (this.removed[lid].hasOwnProperty(tileId)) {
-			if (this.removed[lid][tileId].hasOwnProperty(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
+			if (this.removed[lid].hasOwnProperty(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
 				isRemoved = true;
 			}
-		}
 	}
 	return isRemoved;
 };
@@ -227,14 +225,11 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, tileId, model) {
  * @function
  * @param {String}
  *            layer - 편집이력에 임시저장할 layer id
- * @param {String}
- *            tileId - 편집이력에 임시저장할 tileset id
  * @param {gb3d.object.ThreeObject}
  *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
+gb3d.edit.ModelRecord.prototype.create = function(layer, model) {
 	var id = layer;
-	var tileId = !tileId ? "temp" : tileId;
 
 	if (!id) {
 		return;
@@ -255,10 +250,7 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
 		// this.requestLayerInfo(id.split(":")[0], id.split(":")[1],
 		// id.split(":")[3], this.created[id]);
 	}
-	if (!this.created[id][tileId]) {
-		this.created[id][tileId] = {};
-	}
-	this.created[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
+	this.created[id][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
 	console.log("model created");
 }
 /**
@@ -271,9 +263,8 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, tileId, model) {
  * @param {gb3d.object.ThreeObject}
  *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.remove = function(layer, tileId, model) {
+gb3d.edit.ModelRecord.prototype.remove = function(layer, model) {
 	var id = layer;
-	var tileId = !tileId ? "temp" : tileId;
 
 	if (!id) {
 		return;
@@ -296,20 +287,18 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, tileId, model) {
 		// id.split(":")[3], this.removed[id]);
 	}
 	if ((this.id ? model.getFeature().get(this.id) : model.getFeature().getId()).search(".new") !== -1) {
-		var keys = Object.keys(this.created[id][tileId]);
+		var keys = Object.keys(this.created[id]);
 		for (var i = 0; i < keys.length; i++) {
 			if (keys[i] === (this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
-				delete this.created[id][tileId][keys[i]];
+				delete this.created[id][keys[i]];
 				break;
 			}
 		}
 	} else {
-		this.removed[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
+		this.removed[id][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
 		if (this.modified.hasOwnProperty(id)) {
-			if (this.modified[id].hasOwnProperty(tileId)) {
-				if (this.modified[id][tileId].hasOwnProperty(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
-					delete this.modified[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()];
-				}
+			if (this.modified[id].hasOwnProperty(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
+				delete this.modified[id][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()];
 			}
 		}
 	}
@@ -344,9 +333,8 @@ gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
  * @param {gb3d.object.ThreeObject}
  *            model - 편집이력에 임시저장할 model 객체
  */
-gb3d.edit.ModelRecord.prototype.update = function(layer, tileId, model) {
+gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 	var id = layer;
-	var tileId = !tileId ? "temp" : tileId;
 
 	if (!id) {
 		return;
@@ -370,17 +358,17 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, tileId, model) {
 		return;
 	}
 	if (((this.id ? model.getFeature().get(this.id) : model.getFeature().getId())).search(".new") !== -1) {
-		this.created[id][tileId][(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())] = model;
+		this.created[id][(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())] = model;
 	} else {
 		if (!this.modified[id]) {
 			this.modified[id] = {};
 			// this.requestLayerInfo(id.split(":")[0], id.split(":")[1],
 			// id.split(":")[3], this.modified[id]);
 		}
-		if (!this.modified[id][tileId]) {
-			this.modified[id][tileId] = {};
+		if (!this.modified[id]) {
+			this.modified[id] = {};
 		}
-		this.modified[id][tileId][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
+		this.modified[id][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
 	}
 	console.log("model updated");
 }
@@ -392,18 +380,16 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, tileId, model) {
  * @function
  * @param {String}
  *            layerId - Layer ID
- * @param {String}
- *            modelId - Model ID
  * @return {gb3d.object.ThreeObject} 생성 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
  *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, tileId, modelId) {
+gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, modelId) {
 	var model = undefined;
 	if (!!this.created[layerId]) {
-		if (!!this.created[layerId][tileId]) {
-			if (this.created[layerId][tileId][modelId] instanceof gb3d.object.ThreeObject) {
-				model = this.created[layerId][tileId][modelId];
-				delete this.created[layerId][tileId][modelId];
+		if (!!this.created[layerId]) {
+			if (this.created[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+				model = this.created[layerId][modelId];
+				delete this.created[layerId][modelId];
 			}
 		}
 	}
@@ -422,14 +408,12 @@ gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, tileId, m
  * @return {gb3d.object.ThreeObject} 편집 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
  *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, tileId, modelId) {
+gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, modelId) {
 	var model = undefined;
 	if (!!this.modified[layerId]) {
-		if (!!this.modified[layerId][tileId]) {
-			if (this.modified[layerId][tileId][modelId] instanceof gb3d.object.ThreeObject) {
-				model = this.modified[layerId][tileId][modelId];
-				delete this.modified[layerId][tileId][modelId];
-			}
+		if (this.modified[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+			model = this.modified[layerId][modelId];
+			delete this.modified[layerId][modelId];
 		}
 	}
 	return model;
@@ -447,14 +431,12 @@ gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, tileId, 
  * @return {gb3d.object.ThreeObject} 삭제 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
  *         객체
  */
-gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, tileId, modelId) {
+gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) {
 	var model = undefined;
 	if (!!this.removed[layerId]) {
-		if (!!this.removed[layerId][tileId]) {
-			if (this.removed[layerId][tileId][modelId] instanceof gb3d.object.ThreeObject) {
-				model = this.removed[layerId][tileId][modelId];
-				delete this.removed[layerId][tileId][modelId];
-			}
+		if (this.removed[layerId][modelId] instanceof gb3d.object.ThreeObject) {
+			model = this.removed[layerId][modelId];
+			delete this.removed[layerId][modelId];
 		}
 	}
 	return model;
@@ -471,7 +453,7 @@ gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, tileId, m
 gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var that = this;
 	var url = self.getSaveURL();
-	self.history = self.getStructureToGLTF();
+	self.history = self.getStructureToOBJ();
 	
 	$.ajax({
 		type: "POST",
@@ -560,25 +542,20 @@ gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["created"] = {};
 		}
-		var tileid = Object.keys(this.created[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			obj[layer]["created"][tile] = {};
-			var featureid = Object.keys(this.created[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				var threeObject = this.created[layer][tile][feature];
-				
-				var object = threeObject.getObject().clone();
-				var center = threeObject.getCenter();
-				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-				
-				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-				
-				exporter.parse( object, function(result){
-					obj[layer]["created"][tile][feature] = result;					
-				} );
-			}
+		var featureid = Object.keys(this.created[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			var threeObject = this.created[layer][feature];
+			
+			var object = threeObject.getObject().clone();
+			var center = threeObject.getCenter();
+			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+			
+			gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+			
+			exporter.parse( object, function(result){
+				obj[layer]["created"][feature] = result;					
+			} );
 		}
 	}
 	
@@ -598,25 +575,20 @@ gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["modified"] = {};
 		}
-		var tileid = Object.keys(this.modified[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			obj[layer]["modified"][tile] = {};
-			var featureid = Object.keys(this.modified[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				var threeObject = this.modified[layer][tile][feature];
-				
-				var object = threeObject.getObject().clone();
-				var center = threeObject.getCenter();
-				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-				
-				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-				
-				exporter.parse( object, function(result){
-					obj[layer]["modified"][tile][feature] = result;					
-				} );
-			}
+		var featureid = Object.keys(this.modified[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			var threeObject = this.modified[layer][feature];
+			
+			var object = threeObject.getObject().clone();
+			var center = threeObject.getCenter();
+			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+			
+			gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+			
+			exporter.parse( object, function(result){
+				obj[layer]["modified"][feature] = result;					
+			} );
 		}
 	}
 	
@@ -636,20 +608,15 @@ gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["removed"] = {};
 		}
-		var tileid = Object.keys(this.removed[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			if (!Array.isArray(obj[layer]["removed"][tile])) {
-				obj[layer]["removed"][tile] = [];
-			}
-			var featureid = Object.keys(this.removed[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				obj[layer]["removed"][tile].push(feature);
-			}
+		if (!Array.isArray(obj[layer]["removed"])) {
+			obj[layer]["removed"] = [];
+		}
+		var featureid = Object.keys(this.removed[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			obj[layer]["removed"].push(feature);
 		}
 	}
-
 	return obj;
 }
 
@@ -679,24 +646,26 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["created"] = {};
 		}
-		var tileid = Object.keys(this.created[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			obj[layer]["created"][tile] = {};
-			var featureid = Object.keys(this.created[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				var threeObject = this.created[layer][tile][feature];
-				
-				var object = threeObject.getObject().clone();
-				var center = threeObject.getCenter();
-				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-				
-				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-				
-				var result = exporter.parse( object );
-				obj[layer]["created"][tile][feature] = result;
-			}
+		var featureid = Object.keys(this.created[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			var threeObject = this.created[layer][feature];
+			
+			var object = threeObject.getObject().clone();
+			var center = threeObject.getCenter();
+			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+			
+			gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+			
+			obj[layer]["created"][feature] = {
+					"obj" : undefined,
+					"texture" : undefined,
+					"mbr" : undefined,
+					"tileCenter" : undefined,
+					"modelCenter" : undefined
+			};
+			var result = exporter.parse( object );
+			obj[layer]["created"][feature]["obj"] = result;
 		}
 	}
 	
@@ -716,24 +685,19 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["modified"] = {};
 		}
-		var tileid = Object.keys(this.modified[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			obj[layer]["modified"][tile] = {};
-			var featureid = Object.keys(this.modified[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				var threeObject = this.modified[layer][tile][feature];
-				
-				var object = threeObject.getObject().clone();
-				var center = threeObject.getCenter();
-				var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-				
-				gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-				
-				var result = exporter.parse( object );
-				obj[layer]["modified"][tile][feature] = result;
-			}
+		var featureid = Object.keys(this.modified[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			var threeObject = this.modified[layer][feature];
+			
+			var object = threeObject.getObject().clone();
+			var center = threeObject.getCenter();
+			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+			
+			gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+			
+			var result = exporter.parse( object );
+			obj[layer]["modified"][feature] = result;
 		}
 	}
 	
@@ -753,17 +717,13 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 			// 빈 객체로 키를 만듬
 			obj[layer]["removed"] = {};
 		}
-		var tileid = Object.keys(this.removed[layer]);
-		for (var k = 0; k < tileid.length; k++) {
-			var tile = tileid[k];
-			if (!Array.isArray(obj[layer]["removed"][tile])) {
-				obj[layer]["removed"][tile] = [];
-			}
-			var featureid = Object.keys(this.removed[layer][tile]);
-			for (var o = 0; o < featureid.length; o++) {
-				var feature = featureid[o]; 
-				obj[layer]["removed"][tile].push(feature);
-			}
+		if (!Array.isArray(obj[layer]["removed"])) {
+			obj[layer]["removed"] = [];
+		}
+		var featureid = Object.keys(this.removed[layer]);
+		for (var o = 0; o < featureid.length; o++) {
+			var feature = featureid[o]; 
+			obj[layer]["removed"].push(feature);
 		}
 	}
 

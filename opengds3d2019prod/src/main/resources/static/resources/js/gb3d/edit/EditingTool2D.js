@@ -1118,22 +1118,6 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		that.features = that.interaction.select.getFeatures();
 		$(that.featureTB).empty();
 		
-		var gitAttr = that.selectedSource.get("git");
-		
-		var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["layerID"]);
-		
-		var tileset = tLayer.get("git").tileset;
-		if (tileset) {
-			console.log("tile exist");
-			var ctileset = tileset.getCesiumTileset();
-			var root = ctileset.root;
-			var content = root.content;
-			var feature = content.getFeature(22);
-			if (feature) {
-				that.getEditingTool3D().selectTilesetFeature(feature);
-			}
-		}
-		
 		if (that.features.getLength() > 1) {
 // vfeature.close();
 			that.featurePop.close();
@@ -1245,9 +1229,6 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			var git = source.get("git");
 			var props = git.attribute || [];
 			var layer = source.get("git").tempLayer;
-			
-			// threeJS Object Select
-			that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 			
 			if (1) {
 				for (var i = 0; i < props.length; i++) {
@@ -1386,6 +1367,51 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 					"of" : that.headerTag,
 					"collision" : "fit"
 				});
+				
+				// threeJS Object Select
+				var fid = that.features.item(0).getId();
+				
+//				that.getEditingTool3D().syncSelect(that.features.item(0).getId());
+				
+				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
+				
+				var gitAttr = that.selectedSource.get("git");
+				
+				var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["layerID"]);
+				
+				var tileset = tLayer.get("git").tileset;
+				if (tileset) {
+					console.log("tile exist");
+//					ctileset.root.children[0].children[0].content.getFeature(1717);
+					var ctileset = tileset.getCesiumTileset();
+					var root = ctileset.root;
+					
+					var recursiveSearch = function(tile, bid){
+						var result;
+						if (tile instanceof Cesium.Cesium3DTile) {
+							var content = tile.content;
+							var feature = content.getFeature(bid);
+							if (feature) {
+								result = feature;
+							} else if (tile.children.length > 0) {
+								for (var i = 0; i < tile.children.length; i++) {
+									var ctile = tile.children[i];
+									var feature = recursiveSearch(ctile, bid);
+									if (feature) {
+										result = feature;
+										break;
+									}
+								}
+							}
+						}
+						return result;
+					};
+					
+					var feature = recursiveSearch(root, fidnum);
+					if (feature) {
+						that.getEditingTool3D().selectTilesetFeature(feature);
+					}
+				}
 			} else {
 				that.attrPop.close();
 			}
