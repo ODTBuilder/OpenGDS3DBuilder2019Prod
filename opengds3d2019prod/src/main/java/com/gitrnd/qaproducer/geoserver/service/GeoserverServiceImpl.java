@@ -1242,7 +1242,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 
 						// API 요청 파라미터 생성
-						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/net"; // 압축폴더 업로드 경로
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더 업로드 경로
 				
 						// body
 						JSONObject bodyJson = new JSONObject();
@@ -1358,7 +1358,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 
 						// API 요청 파라미터 생성
-						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/net"; // 압축폴더 업로드 경로
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더 업로드 경로
 				
 						// body
 						JSONObject bodyJson = new JSONObject();

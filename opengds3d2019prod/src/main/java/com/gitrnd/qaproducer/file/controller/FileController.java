@@ -90,13 +90,13 @@ public class FileController extends AbstractController {
 		}
 		return flag;
 	}
-
-//	@RequestMapping(value = "/downloadzip.do", method = RequestMethod.GET)
-//	public void downloadProcess(HttpServletRequest request, HttpServletResponse response,
-//			@RequestParam("time") String time, @RequestParam("file") String file, @RequestParam("user") String user)
-//			throws IOException {
-//		downloadService.downloadZip(response, time, file, user);
-//	}
+	
+	@RequestMapping(value = "/downloadObj.do", method = RequestMethod.GET)
+	public void downloadObj(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("time") String time, @RequestParam("file") String file, @RequestParam("user") String user)
+			throws IOException {
+		downloadService.downloadObj(response, time, file, user);
+	}
 
 	@RequestMapping(value = "/downloadzip.do", method = RequestMethod.GET)
 	public void downloadProcess(HttpServletRequest request, HttpServletResponse response,
@@ -122,12 +122,18 @@ public class FileController extends AbstractController {
 		}
 	}
 	
+	@RequestMapping(value = "/uploadGltf.do", method = RequestMethod.POST)
+	@ResponseBody
+	public JSONObject uploadGltf(MultipartHttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		return uploadService.saveGltfFile(request);
+	}
+
 	@RequestMapping(value = "/upload3dtiles.do", method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject upload3dtiles(MultipartHttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+	public JSONObject upload3dtiles(MultipartHttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		return uploadService.save3dtilesFile(request);
-					
 	}
 
 	@RequestMapping(value = "/uploadGsError.do", method = RequestMethod.POST)

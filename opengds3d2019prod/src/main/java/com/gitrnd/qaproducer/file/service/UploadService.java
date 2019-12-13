@@ -136,6 +136,52 @@ public class UploadService {
 		return files;
 	}
 
+	public JSONObject saveGltfFile(MultipartHttpServletRequest request) {
+
+		JSONObject obj = new JSONObject();
+		boolean succ = true;
+
+		String user = request.getParameter("user");
+		String time = request.getParameter("time");
+
+		String basePath = baseDrive + ":/" + baseDir;
+		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
+				+ File.separator + "gltf";
+
+		File path = new File(uploadPath);
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+
+		// 1. build an iterator
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile mpf = null;
+
+		String filename = null;
+		// 2. get each file
+		while (itr.hasNext()) {
+			// 2.1 get next MultipartFile
+			mpf = request.getFile(itr.next());
+			filename = mpf.getOriginalFilename();
+			LOGGER.info("{} uploaded!", mpf.getOriginalFilename());
+			try {
+				String gltfFile = path + File.separator + mpf.getOriginalFilename();
+				LOGGER.info("저장 파일 경로:{}", gltfFile);
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(gltfFile));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				succ = false;
+			}
+		}
+
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
+				+ "gltf" + "/" + filename;
+		obj.put("succ", succ);
+		obj.put("path", apachePath);
+		return obj;
+	}
+
 	public JSONObject save3dtilesFile(MultipartHttpServletRequest request) throws Exception {
 
 		boolean succ = true;
@@ -151,7 +197,7 @@ public class UploadService {
 				+ "3dtiles" + "/" + "tileset.json";
 
 //		String apachePath = "http://" + apachehost + ":" + apacheport + "/guest/upload/20191211_100931/3dtiles/tileset.json";
-		
+
 		File path = new File(uploadPath);
 		if (!path.exists()) {
 			path.mkdirs();

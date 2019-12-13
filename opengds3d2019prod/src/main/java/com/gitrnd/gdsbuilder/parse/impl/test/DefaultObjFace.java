@@ -56,7 +56,7 @@ public class DefaultObjFace implements ObjFace {
 	 * @param texCoordIndices The texture coordinate indices
 	 * @param normalIndices   The normal indices
 	 */
-	DefaultObjFace(int vertexIndices[], int texCoordIndices[], int normalIndices[]) {
+	public DefaultObjFace(int vertexIndices[], int texCoordIndices[], int normalIndices[]) {
 		this.vertexIndices = vertexIndices;
 		this.texCoordIndices = texCoordIndices;
 		this.normalIndices = normalIndices;
@@ -169,4 +169,5 @@ public class DefaultObjFace implements ObjFace {
 		DefaultObjFace result = new DefaultObjFace(v, vt, vn);
 		return result;
 	}
+
 }
