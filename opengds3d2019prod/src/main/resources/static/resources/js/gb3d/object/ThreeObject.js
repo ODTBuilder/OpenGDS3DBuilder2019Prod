@@ -65,7 +65,7 @@ gb3d.object.ThreeObject.prototype.getTreeid = function() {
  * @param {string}
  *            treeid - jstree id
  */
-gb3d.object.ThreeObject.prototype.setTreeid = function( treeid ) {
+gb3d.object.ThreeObject.prototype.setTreeid = function(treeid) {
 	this.treeid = treeid;
 };
 
@@ -86,7 +86,7 @@ gb3d.object.ThreeObject.prototype.getLayer = function() {
  * @param {ol.layer.Layer}
  *            layer - Layer
  */
-gb3d.object.ThreeObject.prototype.setLayer = function( layer ) {
+gb3d.object.ThreeObject.prototype.setLayer = function(layer) {
 	this.layer = layer;
 };
 
@@ -107,7 +107,7 @@ gb3d.object.ThreeObject.prototype.getTileId = function() {
  * @param {String}
  *            id - Tileset ID
  */
-gb3d.object.ThreeObject.prototype.setTileId = function( id ) {
+gb3d.object.ThreeObject.prototype.setTileId = function(id) {
 	this.tileId = id;
 };
 
@@ -151,6 +151,16 @@ gb3d.object.ThreeObject.prototype.getCenter = function() {
  */
 gb3d.object.ThreeObject.prototype.setCenter = function(center) {
 	this.center = center;
+};
+
+/**
+ * Extent 반환
+ * 
+ * @method gb3d.object.ThreeObject#getExtent
+ * @return {Array.<Number>}
+ */
+gb3d.object.ThreeObject.prototype.updateExtent = function() {
+	this.extent = this.getFeature().getGeometry().getExtent();
 };
 
 /**

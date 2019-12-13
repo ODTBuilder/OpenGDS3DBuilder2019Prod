@@ -223,7 +223,7 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-// 			"modelRecord" : mrecord,
+			// 			"modelRecord" : mrecord,
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
@@ -259,7 +259,7 @@ html, body {
 		var threeTree = new gb3d.tree.Three({
 			"target" : "#attrObject",
 			"map" : gb3dMap,
-			"editingTool3D" : function(){
+			"editingTool3D" : function() {
 				return epan3d;
 			},
 		});
@@ -269,7 +269,7 @@ html, body {
 			locale : locale,
 			saveURL : "geoserver/tilesave.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
-		
+
 		var frecord = new gb.edit.FeatureRecord({
 			//id : "feature_id",
 			locale : locale,
@@ -277,12 +277,12 @@ html, body {
 			layerInfoURL : urlList.getLayerInfo + urlList.token,
 			modelRecord : mrecord
 		});
-		
+
 		var tilesDownloader = new gb3d.io.TilesDownloader({
 			"locale" : locale || "en",
 			"downloadTilesUrl" : "geoserver/tilesdownload.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
-		
+
 		var otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -303,10 +303,10 @@ html, body {
 			map : gb3dMap,
 			clientTree : otree
 		});
-// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
+		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
-// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
-// 		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
+		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
+		// 		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -315,7 +315,7 @@ html, body {
 			})
 		});
 		gb3dMap.addTileset(tiles); */
-		
+
 		var uploadSHP = new gb.geoserver.UploadSHP({
 			"url" : urlList.geoserverFileUpload + urlList.token,
 			"locale" : locale !== "" ? locale : "en"
@@ -367,7 +367,7 @@ html, body {
 				"geoserverInfo" : "geoserver/getDTGeoserverInfo.ajax?${_csrf.parameterName}=${_csrf.token}"
 			}
 		});
-		
+
 		var epan;
 		// editing Tool 3D
 		epan3d = new gb3d.edit.EditingTool3D({
@@ -376,11 +376,11 @@ html, body {
 			isDisplay : false,
 			modelRecord : mrecord,
 			locale : locale || "en",
-			editingTool2D : function(){
+			editingTool2D : function() {
 				return epan;
 			}
 		});
-		
+
 		// EditTool 활성화
 		epan = new gb3d.edit.EditingTool2D({
 			targetElement : gbMap.getLowerDiv()[0],
