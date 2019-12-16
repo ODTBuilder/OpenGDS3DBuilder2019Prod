@@ -1,23 +1,30 @@
 package com.gitrnd.qaproducer.controller;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.qaproducer.common.security.LoginUser;
 import com.gitrnd.qaproducer.file.service.DeleteFileService;
 import com.gitrnd.qaproducer.file.service.DownloadService;
 import com.gitrnd.qaproducer.file.service.RequestService;
 import com.gitrnd.qaproducer.file.service.UploadService;
+import com.gitrnd.qaproducer.geoserver.service.GeoserverService;
 import com.gitrnd.qaproducer.preset.domain.Preset;
 import com.gitrnd.qaproducer.preset.service.PresetService;
 import com.gitrnd.qaproducer.qa.service.ValidationResultService;
@@ -44,6 +51,24 @@ public class MainController {
 
 	@Autowired
 	ValidationResultService validationResultService;
+	
+	
+	@Autowired
+	@Qualifier("geoService")
+	private GeoserverService geoserverService;
+	
+
+	@Value("${gitrnd.apache.basedrive}")
+	private String basedrive;
+
+	@Value("${gitrnd.apache.basedir}")
+	private String basedir;
+
+	@Value("${gitrnd.apache.host}")
+	private String apacheHost;
+
+	@Value("${gitrnd.apache.port}")
+	private String apachePort;
 
 	@RequestMapping(value = "/{locale:en|ko}/locale.do", method = RequestMethod.GET)
 	public String localeMainView(HttpServletRequest request, @AuthenticationPrincipal LoginUser loginUser) {
@@ -52,7 +77,6 @@ public class MainController {
 		return redir;
 	}
 
-	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView main(HttpServletRequest request, @AuthenticationPrincipal LoginUser loginUser) {
 		LOGGER.info("access: /main.do");
@@ -62,7 +86,7 @@ public class MainController {
 			mav.addObject("fname", loginUser.getFname());
 			mav.addObject("lname", loginUser.getLname());
 			mav.setViewName("redirect:map.do");
-		}else{
+		} else {
 			mav.setViewName("/user/signin");
 		}
 		String header = request.getHeader("User-Agent");
@@ -73,9 +97,10 @@ public class MainController {
 		}
 		return mav;
 	}
-	
+
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
-	public ModelAndView mainView(HttpServletRequest request, @AuthenticationPrincipal LoginUser loginUser) {
+	public ModelAndView mainView(HttpServletRequest request, HttpServletResponse response,
+			@AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException {
 		LOGGER.info("access: /main.do");
 		ModelAndView mav = new ModelAndView();
 		if (loginUser != null) {
@@ -83,7 +108,7 @@ public class MainController {
 			mav.addObject("fname", loginUser.getFname());
 			mav.addObject("lname", loginUser.getLname());
 			mav.setViewName("redirect:map.do");
-		}else{
+		} else {
 			mav.setViewName("/user/signin");
 		}
 		String header = request.getHeader("User-Agent");
@@ -198,7 +223,8 @@ public class MainController {
 				mav.addObject("browser", "MSIE");
 			}
 		}
-		// LinkedList<ValidationResult> list = validationResultService.retrieveValidationResultByUidx(loginUser.getIdx());
+		// LinkedList<ValidationResult> list =
+		// validationResultService.retrieveValidationResultByUidx(loginUser.getIdx());
 		// mav.addObject("list", list);
 		mav.setViewName("/user/list");
 		return mav;

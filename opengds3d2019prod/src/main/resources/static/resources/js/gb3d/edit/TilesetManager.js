@@ -10,6 +10,8 @@ if ( !gb3d.edit )
 gb3d.edit.TilesetManager = function( obj ) {
 	var options = obj || {};
 	this.map = options.map || undefined;
+	this.clientTree = options.clientTree ? options.clientTree : undefined;
+	
 	if( !this.map ){
 		console.error( "gb3d.edit.TilesetManager: map is required." );
 	}
@@ -104,18 +106,26 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function( element, til
 	} );
 }
 
-gb3d.edit.TilesetManager.prototype.addTileset = function( url, id, name ) {
+gb3d.edit.TilesetManager.prototype.addTileset = function( url, layerid ) {
 	var that = this;
 	var url = url;
 	var tileset = new Cesium.Cesium3DTileset( { url : url } );
 	var tilesetVO = new gb3d.object.Tileset( {
-		"layer" : name,
-		"tileId" : id,
+		"layer" : layerid,
 		"cesiumTileset" : tileset
 	} );
 	
+	var targetLayer = that.getClientTree().getJSTree().get_LayerByOLId(layerid);
+	if (targetLayer) {
+		var git = targetLayer.get("git");
+		if (!git.hasOwnProperty("tileset")) {
+			git["tileset"] = {};
+		}
+		git["tileset"] = tilesetVO;
+	}
+	
 	this.viewer.scene.primitives.add( tileset );
-	this.viewer.zoomTo( tileset );
+//	this.viewer.zoomTo( tileset );
 	
 	tileset.allTilesLoaded.addEventListener(function() {
 		that.tilesetUI.addTilesPanel( tilesetVO );
@@ -141,4 +151,8 @@ gb3d.edit.TilesetManager.prototype.addTileset = function( url, id, name ) {
 			that.update3DTilesetStyle( this, tileset );
 		} );
 	});
+}
+
+gb3d.edit.TilesetManager.prototype.getClientTree = function() {
+	return this.clientTree;	
 }

@@ -47,6 +47,7 @@ import com.gitrnd.gdsbuilder.geoserver.data.DTGeoserverManagerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
 import com.gitrnd.qaproducer.common.security.LoginUser;
 import com.gitrnd.qaproducer.controller.AbstractController;
 import com.gitrnd.qaproducer.geoserver.service.GeoserverLayerProxyService;
@@ -54,6 +55,7 @@ import com.gitrnd.qaproducer.geoserver.service.GeoserverService;
 
 /**
  * Geoserver 관련된 요청을 처리한다.
+ * 
  * @author JY.Kim
  * @since 2017. 4. 3. 오후 2:16:03
  * 
@@ -62,9 +64,8 @@ import com.gitrnd.qaproducer.geoserver.service.GeoserverService;
 @RequestMapping("/geoserver")
 public class GeoserverController extends AbstractController {
 
-	
 	static final JSONParser jsonP = new JSONParser();
-	
+
 	/**
 	 * Geoserver 관련 요청 처리 Service 인터페이스
 	 */
@@ -81,9 +82,10 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver정보 세션에 추가
+	 * 
 	 * @author SG.LEE
-	 * @param request {@link HttpServletRequest}
-	 * @param response {@link HttpServletResponse}
+	 * @param request   {@link HttpServletRequest}
+	 * @param response  {@link HttpServletResponse}
 	 * @param loginUser 사용자 정보
 	 * @return 추가여부 {@code true} or {@code false}
 	 * @throws IOException
@@ -96,11 +98,11 @@ public class GeoserverController extends AbstractController {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
-		}else{
+		} else {
 			int nFlag = super.addGeoserverToSession(request, loginUser);
-			if(nFlag==200){
+			if (nFlag == 200) {
 				flag = true;
-			}else{
+			} else {
 				response.sendError(nFlag);
 			}
 		}
@@ -109,9 +111,10 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver 정보 세션에서 삭제
+	 * 
 	 * @author SG.LEE
-	 * @param request {@link HttpServletRequest}
-	 * @param response {@link HttpServletResponse}
+	 * @param request   {@link HttpServletRequest}
+	 * @param response  {@link HttpServletResponse}
 	 * @param loginUser 사용자 정보
 	 * @return 삭제 {@code true} or {@code false}
 	 * @throws IOException
@@ -124,11 +127,11 @@ public class GeoserverController extends AbstractController {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
-		}else{
+		} else {
 			int nFlag = super.removeGeoserverToSession(request, loginUser);
-			if(nFlag==200){
+			if (nFlag == 200) {
 				flag = true;
-			}else{
+			} else {
 				response.sendError(nFlag);
 			}
 		}
@@ -137,19 +140,20 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * 로그인한 계정에 대한 Geoserver 트리요청(serverName 조건부)
+	 * 
 	 * @author SG.Lee
 	 * @since 2018. 7. 13. 오후 5:00:28
-	 * @param request {@link HttpServletRequest}
+	 * @param request   {@link HttpServletRequest}
 	 * @param loginUser 사용자 정보
 	 * @param workspace 작업공간
 	 * @return JSONArray Workspace단위 트리 조회
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "static-access" })
 	@RequestMapping(value = "/getGeolayerCollectionTree.ajax")
 	@ResponseBody
-	public JSONArray getGeolayerCollectionTree(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal LoginUser loginUser,
-			@RequestParam(value = "node", required = false) String parent,
+	public JSONArray getGeolayerCollectionTree(HttpServletRequest request, HttpServletResponse response,
+			@AuthenticationPrincipal LoginUser loginUser, @RequestParam(value = "node", required = false) String parent,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "serverName", required = false) String serverName) throws IOException {
 		if (loginUser == null) {
@@ -164,11 +168,11 @@ public class GeoserverController extends AbstractController {
 	 * @Description 로그인한 계정에 대한 Geoserver 전체 트리 요청
 	 * @author SG.Lee
 	 * @since 2018. 7. 13. 오후 5:00:28
-	 * @param request {@link HttpServletRequest}
+	 * @param request   {@link HttpServletRequest}
 	 * @param loginUser 사용자 정보
 	 * @param workspace 작업공간
 	 * @return JSONArray 세션에 저장된 Geoserver 전체 트리 jsTree(https://www.jstree.com/)
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "static-access" })
 	@RequestMapping(value = "/getGeolayerCollectionTrees.ajax")
@@ -186,18 +190,19 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver WFST요청 처리
+	 * 
 	 * @author SG.Lee
 	 * @since 2018. 7. 20. 오후 2:59:37
-	 * @param request {@link HttpServletRequest}
+	 * @param request   {@link HttpServletRequest}
 	 * @param loginUser 사용자 정보
 	 * @return String WFST 요청 결과
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "unchecked", "static-access" })
 	@RequestMapping(value = "/geoserverWFSTransaction.ajax", method = RequestMethod.POST)
 	@ResponseBody
-	public String geoserverWFSTransaction(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
+	public String geoserverWFSTransaction(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
@@ -211,12 +216,13 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver Layer update요청 처리
+	 * 
 	 * @author SG.Lee
 	 * @since 2018. 7. 20. 오후 2:59:37
-	 * @param request {@link HttpServletRequest}
-	 * @param response {@link HttpServletResponse}
+	 * @param request    {@link HttpServletRequest}
+	 * @param response   {@link HttpServletResponse}
 	 * @param jsonObject 요청 파라미터
-	 * @param loginUser 사용자 정보
+	 * @param loginUser  사용자 정보
 	 * @return boolean 업데이트 성공여부
 	 * @throws IOException
 	 */
@@ -286,12 +292,16 @@ public class GeoserverController extends AbstractController {
 		} else {
 			proService.requestGetMap(dtGeoserverManager, workspace, request, response);
 		}
-		
-		/*String serverName = (String) request.getParameter("serverName");
-		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 
-		
-		geoserverService.geolayerTo3DTiles(dtGeoserverManager, "osm", "osm_korea","EPSG:4326","gis_osm_buildings", 20, 100);*/
+		/*
+		 * String serverName = (String) request.getParameter("serverName");
+		 * DTGeoserverManager dtGeoserverManager =
+		 * super.getGeoserverManagerToSession(request, loginUser, serverName);
+		 * 
+		 * 
+		 * geoserverService.geolayerTo3DTiles(dtGeoserverManager, "osm",
+		 * "osm_korea","EPSG:4326","gis_osm_buildings", 20, 100);
+		 */
 	}
 
 	/**
@@ -413,10 +423,10 @@ public class GeoserverController extends AbstractController {
 		}
 		return result;
 	}
-	
-	
+
 	/**
 	 * 단일 Geoserver 스타일리스트 조회
+	 * 
 	 * @author SG.Lee
 	 * @since 2018. 11. 21. 오후 5:17:54
 	 * @param request
@@ -425,8 +435,8 @@ public class GeoserverController extends AbstractController {
 	 * @return List<String> 스타일 리스트
 	 * @throws ServletException
 	 * @throws IOException
-	 * @throws Exception List<String>
-	 * */
+	 * @throws Exception        List<String>
+	 */
 	@RequestMapping(value = "/getStyleList.ajax")
 	@ResponseBody
 	public List<String> getStyleList(HttpServletRequest request, HttpServletResponse response,
@@ -442,17 +452,17 @@ public class GeoserverController extends AbstractController {
 		if (dtGeoserverManager == null) {
 			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
 			return styles;
-		} 
-		
-		if(workspace==null){
+		}
+
+		if (workspace == null) {
 			styles = geoserverService.getStyleList(dtGeoserverManager);
-		}else{
+		} else {
 			styles = geoserverService.getStyleList(dtGeoserverManager, workspace);
 		}
-		
+
 		return styles;
 	}
-	
+
 	/**
 	 * Geoserver Layer 조회
 	 * 
@@ -468,8 +478,8 @@ public class GeoserverController extends AbstractController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getGeoLayerInfoList.ajax")
 	@ResponseBody
-	public DTGeoLayerList getGeoLayerList(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws Exception {
+	public DTGeoLayerList getGeoLayerList(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws Exception {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
@@ -493,10 +503,10 @@ public class GeoserverController extends AbstractController {
 	}
 
 	/**
-	 * Geoserver 레이어 중복체크 
+	 * Geoserver 레이어 중복체크
 	 * 
 	 * @author SG.LEE
-	 * @since 2017. 5 
+	 * @since 2017. 5
 	 * @param request
 	 * @param response
 	 * @param jsonObject
@@ -507,8 +517,8 @@ public class GeoserverController extends AbstractController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/layerDuplicateCheck.ajax")
 	@ResponseBody
-	public JSONObject duplicateCheck(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
+	public JSONObject duplicateCheck(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
@@ -532,20 +542,21 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver 레이어 삭제
+	 * 
 	 * @author SG.Lee
 	 * @since 2018. 8. 2. 오전 10:14:37
 	 * @param request
 	 * @param jsonObject
 	 * @param loginUser
 	 * @return boolean Geoserver 삭제여부
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/geoserverRemoveLayers.ajax", method = RequestMethod.POST)
 	@ResponseBody
-	public boolean geoserverRemoveLayers(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
-		boolean resultFlag = false; 
+	public boolean geoserverRemoveLayers(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException {
+		boolean resultFlag = false;
 		if (loginUser == null) {
 			response.sendError(600);
 		}
@@ -559,16 +570,15 @@ public class GeoserverController extends AbstractController {
 			String workspace = (String) jsonObject.get("workspace");
 			String datastore = (String) jsonObject.get("datastore");
 			int nFlag = geoserverService.removeDTGeoserverLayers(dtGeoserverManager, workspace, datastore, layerList);
-			if(nFlag!=200){
+			if (nFlag != 200) {
 				response.sendError(nFlag);
-			}else{
+			} else {
 				resultFlag = true;
 			}
 		}
 		return resultFlag;
 	}
 
-	
 	/**
 	 * {@link DTGeoGroupLayer} 리스트조회
 	 * 
@@ -583,8 +593,8 @@ public class GeoserverController extends AbstractController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getGeoGroupLayerInfoList.ajax")
 	@ResponseBody
-	public DTGeoGroupLayerList getGeoGroupLayerInfoList(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
+	public DTGeoGroupLayerList getGeoGroupLayerInfoList(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
@@ -668,6 +678,7 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * Geoserver Layer Style SLD 조회
+	 * 
 	 * @author SG.LEE
 	 * @param request
 	 * @param response
@@ -680,7 +691,8 @@ public class GeoserverController extends AbstractController {
 	 */
 	@RequestMapping(value = "/getLayerStyleSld.ajax")
 	@ResponseBody
-	public String getLayerStyleSld(HttpServletRequest request, HttpServletResponse response, @AuthenticationPrincipal LoginUser loginUser,
+	public String getLayerStyleSld(HttpServletRequest request, HttpServletResponse response,
+			@AuthenticationPrincipal LoginUser loginUser,
 			@RequestParam(value = "serverName", required = false) String serverName,
 			@RequestParam(value = "workspace", required = false) String workspace,
 			@RequestParam(value = "layerName", required = false) String layerName) throws IOException {
@@ -694,6 +706,7 @@ public class GeoserverController extends AbstractController {
 
 	/**
 	 * 검수파일(zip) 업로드 및 검수 요청
+	 * 
 	 * @author SG.LEE
 	 * @param request
 	 * @param response
@@ -703,8 +716,7 @@ public class GeoserverController extends AbstractController {
 	@RequestMapping(value = "/upload.do", method = RequestMethod.POST)
 	public void uploadProcess(MultipartHttpServletRequest request, HttpServletResponse response,
 			@AuthenticationPrincipal LoginUser loginUser) throws Exception {
-		
-		
+
 		PrintWriter out = response.getWriter();
 		JSONObject returnJson = new JSONObject();
 		if (loginUser == null) {
@@ -716,32 +728,31 @@ public class GeoserverController extends AbstractController {
 		String workspace = (String) request.getParameter("workspace");
 		String datastore = (String) request.getParameter("datastore");
 		String ignorePublication = (String) request.getParameter("ignorePublication");
-		
-		
+
 		boolean iPFlag = false;
-		
+
 		if (dtGeoserverManager == null) {
 			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
-		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null || ignorePublication.equals("") || ignorePublication ==null) {
-				response.sendError(601, "미입력 텍스트가 존재합니다.");
+		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null
+				|| ignorePublication.equals("") || ignorePublication == null) {
+			response.sendError(601, "미입력 텍스트가 존재합니다.");
 		} else {
-			if(ignorePublication.toLowerCase().equals("true")){
+			if (ignorePublication.toLowerCase().equals("true")) {
 				iPFlag = true;
-			}else if(ignorePublication.toLowerCase().equals("false")){
+			} else if (ignorePublication.toLowerCase().equals("false")) {
 				iPFlag = false;
-			}else{
+			} else {
 				iPFlag = false;
 			}
-            returnJson = geoserverService.shpCollectionPublishGeoserver(request, dtGeoserverManager, workspace, datastore, iPFlag);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            out.print(returnJson);
-            out.flush();   
+			returnJson = geoserverService.shpCollectionPublishGeoserver(request, dtGeoserverManager, workspace,
+					datastore, iPFlag);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			out.print(returnJson);
+			out.flush();
 		}
 	}
-	
-	
-	
+
 	/**
 	 * @author SG.LEE
 	 * @param request
@@ -764,16 +775,14 @@ public class GeoserverController extends AbstractController {
 			returnJson.put("status Code", 600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
 		}
-		
-		 
+
 		try {
 			jsonObject = (JSONObject) jsonP.parse(jsonObject.toJSONString());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 		String serverName = (String) jsonObject.get("serverName");
 		String workspace = (String) jsonObject.get("workspace");
 		String datastore = (String) jsonObject.get("datastore");
@@ -789,15 +798,15 @@ public class GeoserverController extends AbstractController {
 		}
 
 		if (serverName == null || serverName.isEmpty() || workspace == null || workspace.isEmpty() || datastore == null
-				|| datastore.isEmpty() || epsg == null || epsg.isEmpty()|| uploadJson == null) {
+				|| datastore.isEmpty() || epsg == null || epsg.isEmpty() || uploadJson == null) {
 			returnJson.put("status Code", 601);
 		} else {
-				returnJson = geoserverService.geojsonPublishGeoserver(dtGeoserverManager, workspace, datastore, epsg, uploadJson, ignorePublication);
+			returnJson = geoserverService.geojsonPublishGeoserver(dtGeoserverManager, workspace, datastore, epsg,
+					uploadJson, ignorePublication);
 		}
 		return returnJson;
 	}
-	
-	
+
 	/**
 	 * @author SG.LEE
 	 * @param request
@@ -819,61 +828,56 @@ public class GeoserverController extends AbstractController {
 		DTGeoserverManager geoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		return geoserverService.updateGeogigGsStore(geoserverManager, workspace, datastore, branch);
 	}
-	
-	
+
 	@RequestMapping(value = "/requestGeoLayerTo3DTiles.ajax", method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject requestGeoLayerTo3DTiles(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException{
-		JSONObject returnJson = new JSONObject();
+	public JSONObject requestGeoLayerTo3DTiles(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser)
+			throws IOException, NumberFormatException, ParseException {
+
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
 		}
-		
-		//필수파라미터
-		String serverName = (String) request.getParameter("serverName");
+
+		// 필수파라미터
+		String serverName = (String) jsonObject.get("serverName");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		String workspace = (String) request.getParameter("workspace");
-		String datastore = (String) request.getParameter("datastore");
-		String layerName = (String) request.getParameter("layerName");
-		String srs = (String) request.getParameter("srs");
-		String heightType = (String) request.getParameter("heightType");
-		
-		//조건에 따른 파라미터
-		String minVal = (String) request.getParameter("minVal");
-		String maxVal = (String) request.getParameter("maxVal");
-		String defVal = (String) request.getParameter("defVal");
-		String attribute = (String) request.getParameter("attribute");
-		
-		boolean iPFlag = false;
-		
-		if (dtGeoserverManager == null) {
-			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
-		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null || layerName.equals("") || layerName ==null|| heightType.equals("") || heightType ==null) {
-			response.sendError(601, "미입력 텍스트가 존재합니다.");
+		String workspace = (String) jsonObject.get("workspace");
+		String datastore = (String) jsonObject.get("datastore");
+		String layerName = (String) jsonObject.get("layerName");
+		String geom = (String) jsonObject.get("geometry2d");
+		// String srs = (String) request.getParameter("srs");
+		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+		String paramStr = (String) jsonObject.get("depthValue");
+
+		// 조건에 따른 파라미터
+//		String defVal = (String) request.getParameter("defVal"); // 입력값
+//		String attribute = (String) request.getParameter("attribute"); // shp 컬럼명
+
+//		if (dtGeoserverManager == null) {
+//			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
+//		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null
+//				|| layerName.equals("") || layerName == null || heightType.equals("") || heightType == null) {
+//			response.sendError(601, "미입력 텍스트가 존재합니다.");
+//		} else {
+//			if (heightType == null) {
+//				response.sendError(601, "미입력 텍스트가 존재합니다.");
+//			} else if (paramStr.equals("") || paramStr == null) {
+//				response.sendError(601, "미입력 텍스트가 존재합니다.");
+//			} else {
+//				response.sendError(601, "잘못입력한 정보가 있습니다.");
+//			}
+//		}
+		JSONObject returnJson = new JSONObject();
+		if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
+			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
+					loginUser.getUsername(), Double.valueOf(paramStr));
+		} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
+			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName, paramStr);
 		} else {
-			if(heightType.toLowerCase().equals("default")){
-				if(defVal.equals("") || defVal == null){
-					response.sendError(601, "미입력 텍스트가 존재합니다.");
-				}
-			}else if(heightType.toLowerCase().equals("random")){
-				if(minVal.equals("") || minVal == null || maxVal.equals("") || maxVal == null){
-					response.sendError(601, "미입력 텍스트가 존재합니다.");
-				}
-			}else if(heightType.toLowerCase().equals("fix")){
-				if(attribute.equals("") || attribute == null){
-					response.sendError(601, "미입력 텍스트가 존재합니다.");
-				}
-			}else{
-				response.sendError(601, "잘못입력한 정보가 있습니다.");
-			}
-			
-			
+
 		}
-		
-		
 		return returnJson;
 	}
-	
 }
