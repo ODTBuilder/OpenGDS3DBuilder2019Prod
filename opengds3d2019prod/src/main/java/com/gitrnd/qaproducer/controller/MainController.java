@@ -1,11 +1,13 @@
 package com.gitrnd.qaproducer.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.qaproducer.common.security.LoginUser;
+import com.gitrnd.qaproducer.edit3d.service.Edit3dService;
 import com.gitrnd.qaproducer.file.service.DeleteFileService;
 import com.gitrnd.qaproducer.file.service.DownloadService;
 import com.gitrnd.qaproducer.file.service.RequestService;
@@ -51,12 +53,13 @@ public class MainController {
 
 	@Autowired
 	ValidationResultService validationResultService;
-	
-	
+
+	@Autowired
+	Edit3dService edit3dSevice;
+
 	@Autowired
 	@Qualifier("geoService")
 	private GeoserverService geoserverService;
-	
 
 	@Value("${gitrnd.apache.basedrive}")
 	private String basedrive;
@@ -101,6 +104,7 @@ public class MainController {
 	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
 	public ModelAndView mainView(HttpServletRequest request, HttpServletResponse response,
 			@AuthenticationPrincipal LoginUser loginUser) throws MalformedURLException {
+
 		LOGGER.info("access: /main.do");
 		ModelAndView mav = new ModelAndView();
 		if (loginUser != null) {

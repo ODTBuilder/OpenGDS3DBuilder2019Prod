@@ -68,8 +68,8 @@ public class Edit3dService {
 			throws ParseException, IOException {
 
 		// 원본 obj read "20191212_173635/obj/1.obj"
-		String originPath = basedir + File.separator + basedir + File.separator + user + File.separator + "upload"
-				+ File.separator + objPath;
+		String originPath = basedrive + ":" + File.separator + basedir + File.separator + user + File.separator
+				+ "upload" + File.separator + objPath;
 
 		File originFile = new File(originPath);
 		String fileDir = originFile.getAbsoluteFile().getParent();
@@ -119,7 +119,7 @@ public class Edit3dService {
 		}
 		// Write an OBJ file
 		OutputStream objOutputStream = null;
-		String fileName = featureId + "_edit.obj";
+		String fileName = featureId + ".obj";
 		String newObjpath = fileDir + File.separator + fileName;
 		try {
 			objOutputStream = new FileOutputStream(newObjpath);
@@ -138,8 +138,8 @@ public class Edit3dService {
 		String timeStr = splitArr[0];
 
 		// web path
-		String webPath = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?" + "user=" + user
-				+ "&time=" + timeStr + "&file=" + newObjpath;
+		String webPath = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?" + "user=" + user
+				+ "&time=" + timeStr + "&file=" + fileName;
 
 		// obj to gltf
 		// API 요청 파라미터 생성
@@ -169,9 +169,7 @@ public class Edit3dService {
 		ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity, String.class);
 
 		JSONParser parser = new JSONParser();
-		Object obj = parser.parse(res.getBody());
-
-		return null;
+		return (JSONObject) parser.parse(res.getBody());
 	}
 
 }

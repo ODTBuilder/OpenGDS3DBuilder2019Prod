@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +29,11 @@ public class Edit3dController extends AbstractController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Edit3dController.class);
 
 	@RequestMapping(value = "/objToGltf.do", method = RequestMethod.GET)
-	public void convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
+	public JSONObject convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("featureId") String featureId, @RequestParam("objPath") String objPath,
 			@AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {
 
-		edit3dSevice.convertObjToGltf(featureId, loginUser.getFname(), objPath);
+		return edit3dSevice.convertObjToGltf(featureId, loginUser.getFname(), objPath);
 
 	}
 }
