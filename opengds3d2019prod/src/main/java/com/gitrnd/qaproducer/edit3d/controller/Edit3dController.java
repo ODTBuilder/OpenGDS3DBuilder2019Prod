@@ -33,6 +33,10 @@ public class Edit3dController extends AbstractController {
 			@RequestParam("featureId") String featureId, @RequestParam("objPath") String objPath,
 			@AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {
 
+//		@param featureId 편집 객체 id 
+//		@param objPath 원본 obj 파일 경로
+//		@reature {"path":"175.116.181.32:8888/guest/upload/20191213_185342/gltf/featureId.gltf", "succ": true}
+		
 		return edit3dSevice.convertObjToGltf(featureId, loginUser.getFname(), objPath);
 
 	}
