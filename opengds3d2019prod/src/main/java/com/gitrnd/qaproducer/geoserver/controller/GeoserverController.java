@@ -265,6 +265,44 @@ public class GeoserverController extends AbstractController {
 		return flag;
 	}
 
+	
+	/**
+	 * Geoserver WMS API 요청
+	 * 
+	 * @author SG.Lee
+	 * @since 2019. 12.17
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/geoserverWMS.ajax", method = RequestMethod.GET)
+	@ResponseBody
+	public void geoserverWMS(HttpServletRequest request, HttpServletResponse response,
+			@AuthenticationPrincipal LoginUser loginUser) throws Exception {
+		if (loginUser == null) {
+			response.sendError(600);
+			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
+		}
+		String serverName = (String) request.getParameter("serverName");
+		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
+		String workspace = (String) request.getParameter("workspace");
+		String geoRequest =  (String) request.getParameter("request");
+		if (dtGeoserverManager == null) {
+			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
+		} else if (workspace.equals("") || workspace == null || geoRequest.equals("") || geoRequest == null) {
+			response.sendError(601, "workspace를 입력하지 않았습니다.");
+		} else {
+			if(geoRequest.toLowerCase().equals("getmap")){
+				proService.requestGetMap(dtGeoserverManager, workspace, request, response);
+			}else if(geoRequest.toLowerCase().equals("getfeatureinfo")){
+				proService.requestGetFeatureInfo(dtGeoserverManager, workspace, request, response);
+			}else if(geoRequest.toLowerCase().equals("getlegendgraphic")){
+				proService.requestWMSGetLegendGraphic(dtGeoserverManager, workspace, request, response);
+			}
+		}
+	}
+	
+	
 	/**
 	 * Geoserver WMS GetMap API 요청
 	 * 
@@ -292,16 +330,6 @@ public class GeoserverController extends AbstractController {
 		} else {
 			proService.requestGetMap(dtGeoserverManager, workspace, request, response);
 		}
-
-		/*
-		 * String serverName = (String) request.getParameter("serverName");
-		 * DTGeoserverManager dtGeoserverManager =
-		 * super.getGeoserverManagerToSession(request, loginUser, serverName);
-		 * 
-		 * 
-		 * geoserverService.geolayerTo3DTiles(dtGeoserverManager, "osm",
-		 * "osm_korea","EPSG:4326","gis_osm_buildings", 20, 100);
-		 */
 	}
 
 	/**
