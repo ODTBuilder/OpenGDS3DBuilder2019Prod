@@ -819,10 +819,6 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
-//			var oneOfThem; 
-//			if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
-//				oneOfThem = 
-//			}
 			if (!Cesium.defined(pickedFeature)) {
 				clickHandler(movement);
 				return;
@@ -2393,10 +2389,6 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 			// Pick a new feature
 //			var pickedFeature = cviewer.scene.pick(movement.position);
 			var pickedFeature = feature;
-//			var oneOfThem; 
-//			if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
-//				oneOfThem = 
-//			}
 			if (!Cesium.defined(pickedFeature)) {
 				clickHandler(movement);
 				return;

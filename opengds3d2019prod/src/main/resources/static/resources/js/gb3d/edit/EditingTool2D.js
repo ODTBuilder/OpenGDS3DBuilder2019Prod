@@ -438,7 +438,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	} else {
 		this.mapObj.tools.edit2d = this;
 	}
-	this.map = options.map ? options.map.getGbMap().getUpperMap() : undefined;
+	this.map = options.map instanceof gb3d.Map ? options.map.getGbMap().getUpperMap() : undefined;
 	if(!this.map){
 		console.error("gb3d.edit.EditingTool2D: 'map'" + this.translation.requiredOption[this.locale]);
 	}
@@ -460,6 +460,32 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.isEditing = options.isEditing instanceof Object ? options.isEditing : undefined;
 	
 	this.otree.setEditingTool(this);
+	
+	var view = this.map.getView(); 
+	this.map.on('singleclick', function(evt) {
+		if (!that.getActiveTool()) {
+			var viewResolution = (view.getResolution());
+			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+			if (slayers.length === 1) {
+				var slayer = slayers[0] 
+				if (slayer instanceof ol.layer.Tile) {
+					var wmsSource = slayer.getSource();
+					var url = wmsSource.getGetFeatureInfoUrl(
+							evt.coordinate, viewResolution, 'EPSG:4326',
+							{'INFO_FORMAT': 'application/json'});
+					if (url) {
+						fetch(url)
+						.then(function (response) { 
+							console.log(response);
+							return response.text(); 
+						}).then(function (html) {
+							console.log(html);
+						});
+					}				
+				}
+			}
+		}
+	});
 	
 	// EditingTool 작업 표시줄 기본 항목
 	var defaultList = [
@@ -593,8 +619,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 		"overflow-y" : "auto"
 	});
 	
-//	$("#attrAttr").find(".gb-table").remove();
-//	$("#attrAttr").append(atb);
+// $("#attrAttr").find(".gb-table").remove();
+// $("#attrAttr").append(atb);
 
 	this.map.on('postcompose', function(evt) {
 		that.map.getInteractions().forEach(function(interaction) {
@@ -1371,7 +1397,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				// threeJS Object Select
 				var fid = that.features.item(0).getId();
 				
-//				that.getEditingTool3D().syncSelect(that.features.item(0).getId());
+// that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 				
 				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
 				
@@ -1382,7 +1408,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				var tileset = tLayer.get("git").tileset;
 				if (tileset) {
 					console.log("tile exist");
-//					ctileset.root.children[0].children[0].content.getFeature(1717);
+// ctileset.root.children[0].children[0].content.getFeature(1717);
 					var ctileset = tileset.getCesiumTileset();
 					var root = ctileset.root;
 					
@@ -1418,7 +1444,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		} else {
 			that.featurePop.close();
 			that.attrPop.close();
-//			vfeature.close();
+// vfeature.close();
 		}
 
 	});
@@ -1558,7 +1584,8 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 			}
 			
 			// ----- ThreeJS Object Create --------
-//			that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
+// that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry,
+// feature, source.get("git").treeID, layer.get("id"));
 			
 			if(source.get("git") instanceof Object){
 				if(source.get("git").attribute instanceof Array){
@@ -2986,12 +3013,12 @@ gb3d.edit.EditingTool2D.prototype.zoomToFit = function(layer) {
 /**
  * EditingTool에 새로운 Interaction을 추가한다.
  * 
- * @example // EditingTool 객체 선언 var edit = new gb.header.EditingTool({ ... });
- *  // 홀 폴리곤 그리기 객체 선언 var hole = new gb.interaction.HoleDraw({
- * selected : epan.selected });
- *  // EditingTool에 홀 폴리곤 그리기 기능 추가 edit.addInteraction({ icon : "fab
- * fa-bitbucket", content : "Hole", interaction : hole, selectActive : true,
- * "float" : "right", clickEvent : function() { console.log("Hole draw"); } });
+ * @example // EditingTool 객체 선언 var edit = new gb.header.EditingTool({ ... }); //
+ *          홀 폴리곤 그리기 객체 선언 var hole = new gb.interaction.HoleDraw({ selected :
+ *          epan.selected }); // EditingTool에 홀 폴리곤 그리기 기능 추가
+ *          edit.addInteraction({ icon : "fab fa-bitbucket", content : "Hole",
+ *          interaction : hole, selectActive : true, "float" : "right",
+ *          clickEvent : function() { console.log("Hole draw"); } });
  * @method gb3d.edit.EditingTool2D#addInteraction
  * @function
  * @param {Object}
