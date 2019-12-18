@@ -2951,30 +2951,49 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 	var center = centerHigh;
 	var look = new THREE.Vector3(center.x, center.y, center.z);
 	look.negate();
-//	if(object.userData.type){
-//		return;
-//	}
+// if(object.userData.type){
+// return;
+// }
 	
 	if(!object.geometry){
 		if(object.children instanceof Array){
 			for(var i = 0; i < object.children.length; i++){
-				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때 재귀함수 요청
+				// Three Object가 Geometry 인자를 가지고 있지않고 Children 속성을 가지고 있을 때
+				// 재귀함수 요청
 				object.position.copy(new THREE.Vector3(0, 0, 0));
 				quat = object.rotation.clone();
 				object.lookAt(new THREE.Vector3(0, 0, 1));
 				object.setRotationFromEuler(quat);
-//				object.matrix.makeRotationFromQuaternion(quat);
-//				object.matrixWorld.makeRotationFromQuaternion(quat);
-				resetMatrixWorld(object.children[i], quat, center);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
+				gb3d.Math.resetMatrixWorld(object.children[i], quat, center);
 			}
 		}
 	} else {
-//		object.position.copy(new THREE.Vector3(0, 0, 0));
+// object.position.copy(new THREE.Vector3(0, 0, 0));
 		object.lookAt(new THREE.Vector3(0, 0, 1));
 		object.setRotationFromEuler(quat);
-//		object.matrix.makeRotationFromQuaternion(quat);
-//		object.matrixWorld.makeRotationFromQuaternion(quat);
-//		object.setRotationFromQuaternion(quat);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
+// object.setRotationFromQuaternion(quat);
 	}
-}
+};
  
+/**
+ * 3D 객체의 위치와 회전을 원점으로 되돌린다.
+ * 
+ * @method gb3d.Math.#resetRotationAndPosition
+ * @param {THREE.Object3D}
+ *            object - 원점으로 되돌릴 3D 객체
+ */
+gb3d.Math.resetRotationAndPosition = function(object) {
+	if (object instanceof THREE.Object3D) {
+		var pos = new THREE.Vector3();
+		object.position.copy(pos);
+		var eu = new THREE.Euler();
+		object.setRotationFromEuler(eu);
+		object.lookAt(new THREE.Vector3(0, 0, 1));
+		object.updateMatrixWorld(true);
+	}
+	return object;
+};

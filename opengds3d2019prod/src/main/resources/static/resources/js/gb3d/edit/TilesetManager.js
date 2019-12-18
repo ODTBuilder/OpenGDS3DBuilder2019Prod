@@ -125,7 +125,7 @@ gb3d.edit.TilesetManager.prototype.addTileset = function( url, layerid ) {
 	}
 	
 	this.viewer.scene.primitives.add( tileset );
-//	this.viewer.zoomTo( tileset );
+	this.viewer.zoomTo( tileset );
 	
 	tileset.allTilesLoaded.addEventListener(function() {
 		that.tilesetUI.addTilesPanel( tilesetVO );

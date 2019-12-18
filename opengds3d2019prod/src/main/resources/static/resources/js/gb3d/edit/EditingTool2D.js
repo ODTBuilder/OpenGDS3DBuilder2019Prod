@@ -1345,26 +1345,26 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			if (slayer !== undefined) {
 				git = slayer.get("git");	
 			}
-			
+
 			if (that.getVersioningFeature() instanceof gb.versioning.Feature && features.getLength() === 1 && git.hasOwnProperty("geogigRepo") && git.hasOwnProperty("geogigBranch")) {
 				console.log($(that.treeElement).jstreeol3("get_selected_layer"));
 				var feature = features.item(0);
 				that.updateFeatureHistoryModal(feature);
 			} else {
 				var vfeature = that.getVersioningFeature();
-// vfeature.close();
+//				vfeature.close();
 			}
 			// 피처 버저닝 이력 끝
-			
+
 			that.featurePop.close();
 			$(that.attrTB).empty();
 			that.feature = that.features.item(0);
-			
+
 			var source = that.selectedSource;
 			var git = source.get("git");
 			var props = git.attribute || [];
 			var layer = source.get("git").tempLayer;
-			
+
 			if (1) {
 				for (var i = 0; i < props.length; i++) {
 					var td1 = $("<td>").text(props[i].fieldName);
@@ -1375,7 +1375,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						"width" : "100%",
 						"border" : "none"
 					}).val(that.feature.get(props[i].fieldName)).on("input", function(e) {
-// var attrTemp = attrInfo[$(this).parent().prev().text()];
+//						var attrTemp = attrInfo[$(this).parent().prev().text()];
 						var key = $(this).parent().prev().prev().text();
 						var source = that.selectedSource;
 						var git = source.get("git");
@@ -1383,7 +1383,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						var layer = source.get("git").tempLayer;
 						var obj = {};
 						var unique, nullable, type;
-						
+
 						for(var i = 0; i < props.length; i++){
 							if(key === props[i].fieldName){
 								unique = props[i].isUnique || false;
@@ -1392,15 +1392,15 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 								break;
 							}
 						}
-						
-// obj[$(this).parent().prev().text()] = $(this).val();
-// that.feature.setProperties(obj);
-// that.featureRecord.update(layer, that.feature);
-						
+
+//						obj[$(this).parent().prev().text()] = $(this).val();
+//						that.feature.setProperties(obj);
+//						that.featureRecord.update(layer, that.feature);
+
 						if(!nullable && $(this).val() === ""){
 							return;
 						}
-						
+
 						switch (type) { 
 						case "String":
 							if(that.isString($(this).val()) || ($(this).val() === "")){ 
@@ -1501,31 +1501,23 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 					that.attrPop.setPositionY(5);
 				}
 				that.attrPop.open();
-// that.attrPop.getPanel().position({
-// "my" : "left top",
-// "at" : "left bottom",
-// "of" : that.headerTag,
-// "collision" : "fit"
-// });
-				
+
 				// threeJS Object Select
 				var fid = that.features.item(0).getId();
-				
-// that.getEditingTool3D().syncSelect(that.features.item(0).getId());
-				
+
 				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
-				
+
 				var gitAttr = that.selectedSource.get("git");
-				
+
 				var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["layerID"]);
-				
+
 				var tileset = tLayer.get("git").tileset;
 				if (tileset) {
 					console.log("tile exist");
-// ctileset.root.children[0].children[0].content.getFeature(1717);
+//					ctileset.root.children[0].children[0].content.getFeature(1717);
 					var ctileset = tileset.getCesiumTileset();
 					var root = ctileset.root;
-					
+
 					var recursiveSearch = function(tile, bid){
 						var result;
 						if (tile instanceof Cesium.Cesium3DTile) {
@@ -1546,11 +1538,15 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						}
 						return result;
 					};
-					
+
 					var feature = recursiveSearch(root, fidnum);
 					if (feature) {
 						that.getEditingTool3D().selectTilesetFeature(feature);
+					} else {
+						that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 					}
+				} else {
+					that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 				}
 			} else {
 				that.attrPop.close();
@@ -1559,9 +1555,8 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			that.featurePop.close();
 			that.attrPop.close();
 			that.getEditingTool3D().unselectCesium();
-// vfeature.close();
+//			vfeature.close();
 		}
-
 	});
 
 	this.deactiveAnotherInteraction(this.interaction.select);

@@ -125,16 +125,22 @@ gb3d.Map = function(obj) {
 //	this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
 //	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
+	var initp;
+	if (options.initPosition) {
+		initp = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
+	} else {
+		initp = [0, 0];
+	}
 	// 초기 위치
-	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
+	this.initPosition = initp; 
 	if (this.initPosition.length === 2) {
-		this.initPosition.push(15000);
+		this.initPosition.push(30000);
 	}
 //	Cesium.Cartesian3.fromDegrees(options.initPosition[0],
 //	options.initPosition[1] - 1, 200000) : this.center;
 
 
-	this.gbMap.getView().setCenter([options.initPosition[0],options.initPosition[1]]);
+	this.gbMap.getView().setCenter([this.initPosition[0],this.initPosition[1]]);
 	// cesium 카메라를 지도 중심으로 이동
 
 	this.cesiumViewer.camera.flyTo({
@@ -436,7 +442,7 @@ gb3d.Map.prototype.getCamera = function() {
 gb3d.Map.prototype.addThreeObject = function(object){
 	if(object instanceof gb3d.object.ThreeObject){
 		this.threeObjects.push(object);
-
+//		this.getThreeScene().add(object.getObject());
 		// Three Object add event
 		this.threeScene.dispatchEvent({type: "addObject", object: object});
 	} else {

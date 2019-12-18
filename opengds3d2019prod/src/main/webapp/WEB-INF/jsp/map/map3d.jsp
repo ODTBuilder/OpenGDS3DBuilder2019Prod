@@ -306,7 +306,7 @@ html, body {
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
-		// 		tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayerTile3", "testLayer");
+// 				tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayer");
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -375,6 +375,7 @@ html, body {
 			map : gb3dMap,
 			isDisplay : false,
 			modelRecord : mrecord,
+			otree : otree,
 			locale : locale || "en",
 			editingTool2D : function() {
 				return epan;
