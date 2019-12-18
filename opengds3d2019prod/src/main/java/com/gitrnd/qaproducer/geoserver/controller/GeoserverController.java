@@ -287,6 +287,11 @@ public class GeoserverController extends AbstractController {
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		String workspace = (String) request.getParameter("workspace");
 		String geoRequest =  (String) request.getParameter("request");
+		
+		if(geoRequest==null){
+			geoRequest =  (String) request.getParameter("REQUEST");
+		}
+		
 		if (dtGeoserverManager == null) {
 			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
 		} else if (workspace.equals("") || workspace == null || geoRequest.equals("") || geoRequest == null) {

@@ -555,17 +555,17 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 	this.attrPop_ = new gb.panel.PanelBase({
 		"target" : ".area-3d",
-		"width" : "300px",
+		"width" : 300,
 		"positionX" : 5,
 		"positionY" : 55,
 		"autoOpen" : false,
 		"body" : atb
 	});
 
-	$(this.attrPop_.getPanel()).find(".gb-panel-body").css({
-		"max-height" : "400px",
-		"overflow-y" : "auto"
-	});
+//	$(this.attrPop_.getPanel()).find(".gb-panel-body").css({
+//		"max-height" : "400px",
+//		"overflow-y" : "auto"
+//	});
 
 	function onDocumentMouseClick(event) {
 		// that.isDown = false;
@@ -652,8 +652,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 // }
 			var userData = object.userData;
 			that.updateAttributePopup(userData);
+			if (that.getActiveTool()) {
+				that.attrPop_.setPositionY(55);
+			} else {
+				that.attrPop_.setPositionY(5);	
+			}
 			that.attrPop_.open();
-
+			
 			if (object.userData.object !== undefined) {
 				// helper
 				threeEditor.select(object.userData.object);
@@ -724,7 +729,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.silhouetteGreen = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
 	// Get default left click handler for when a feature is not picked on left
 	// click
-	var clickHandler = cviewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+	this.clickHandler = cviewer.screenSpaceEventHandler.getInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
 		// Silhouettes are supported
 
@@ -752,8 +757,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// that.updateAttributeTab(undefined);
 				// that.updateStyleTab(undefined);
 				// that.updateMaterialTab(undefined);
-				that.pickedObject_ = undefined;
-				return;
+//				that.pickedObject_ = undefined;
+//				return;
 			}
 
 			// 카메라의 위치
@@ -806,8 +811,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// that.updateAttributeTab(undefined);
 				// that.updateStyleTab(undefined);
 				// that.updateMaterialTab(undefined);
-				that.pickedObject_ = undefined;
-				return;
+//				that.pickedObject_ = undefined;
+//				return;
 			}
 
 			if (event.ctrlKey) {
@@ -820,7 +825,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
 			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
+				that.clickHandler(movement);
+				that.attrPop_.close();
 				return;
 			}
 
@@ -840,15 +846,20 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			// Set feature infobox description
 			var propNames = pickedFeature.getPropertyNames();
-//			var featureName = pickedFeature.getProperty('name');
-//			that.selectedEntity.name = featureName;
-			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
 			cviewer.selectedEntity = that.selectedEntity;
-			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
+			var obj = {};
 			for ( var i in propNames) {
-				that.selectedEntity.description += '<tr><th>' + propNames[i] + '</th><td>' + pickedFeature.getProperty(propNames[i]) + '</td></tr>';
+				obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
 			}
-			that.selectedEntity.description += '</tbody></table>';
+			console.log(obj);
+			that.updateAttributePopup(obj);
+			if (that.getActiveTool()) {
+				that.attrPop_.setPositionY(55);
+			} else {
+				that.attrPop_.setPositionY(5);	
+			}
+			that.attrPop_.open();
+			
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	} else {
 		// Silhouettes are not supported. Instead, change the feature color.
@@ -866,8 +877,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// that.updateAttributeTab(undefined);
 				// that.updateStyleTab(undefined);
 				// that.updateMaterialTab(undefined);
-				that.pickedObject_ = undefined;
-				return;
+//				that.pickedObject_ = undefined;
+//				return;
 			}
 
 			// 카메라의 위치
@@ -914,8 +925,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// that.updateAttributeTab(undefined);
 				// that.updateStyleTab(undefined);
 				// that.updateMaterialTab(undefined);
-				that.pickedObject_ = undefined;
-				return;
+//				that.pickedObject_ = undefined;
+//				return;
 			}
 
 			if (event.ctrlKey) {
@@ -930,7 +941,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
 			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
+				that.clickHandler(movement);
+				that.attrPop_.close();
 				return;
 			}
 			// Select the feature if it's not already selected
@@ -964,9 +976,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 	that.clickOutlinePass.visibleEdgeColor.set("#00FF00");
 	that.clickOutlinePass.hiddenEdgeColor.set("#00FF00");
 	that.map.getThreeComposer().addPass(that.clickOutlinePass);
-//	 var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-//	 effectFXAA.uniforms[ 'resolution' ].value.set( 1 /eventDiv[0].clientWidth, 1/ eventDiv[0].clientHeight );
-//	 that.map.getThreeComposer().addPass( effectFXAA );
+// var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+// effectFXAA.uniforms[ 'resolution' ].value.set( 1 /eventDiv[0].clientWidth, 1/
+// eventDiv[0].clientHeight );
+// that.map.getThreeComposer().addPass( effectFXAA );
 
 	var recursiveSelect = function(obj, uuid) {
 		var result = false;
@@ -1337,8 +1350,10 @@ gb3d.edit.EditingTool3D.prototype.editToolOpen = function() {
 gb3d.edit.EditingTool3D.prototype.editToolToggle = function() {
 	if (this.getActiveTool()) {
 		this.editToolClose();
+		this.attrPop_.setPositionY(5);
 	} else {
 		this.editToolOpen();
+		this.attrPop_.setPositionY(55);
 	}
 }
 
@@ -1869,6 +1884,15 @@ gb3d.edit.EditingTool3D.prototype.selectFeature = function(id){
 	}
 }
 
+gb3d.edit.EditingTool3D.prototype.unselectCesium = function(){
+	var that = this;
+	that.silhouetteBlue.selected = [];
+	that.silhouetteGreen.selected = [];
+	that.getMap().getCesiumViewer().selectedEntity = undefined;
+	that.attrPop_.close();
+};
+
+
 gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
 	var that = this;
 	var threeObject = this.getMap().getThreeObjectByUuid(uuid);
@@ -2134,11 +2158,12 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 		geometry = meshes[i].geometry;
 
 		if (opt.type === "MultiPoint" || opt.type === "Point") {
-//			geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height), parseInt(opt.depth));
-//			geometry.vertices.forEach(function(vert, v){
-//				vert.z += opt.depth/2;
-//			});
-//			object.geometry = geometry;
+// geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height),
+// parseInt(opt.depth));
+// geometry.vertices.forEach(function(vert, v){
+// vert.z += opt.depth/2;
+// });
+// object.geometry = geometry;
 			
 			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
 			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
@@ -2335,7 +2360,8 @@ gb3d.edit.EditingTool3D.prototype.setModelRecord = function(record){
  * 편집을 위한 객체의 obj를 요청한다
  * 
  * @method gb3d.edit.EditingTool3D#getOBJObjectFromB3DM
- * @param {string} fid - 파일 이름
+ * @param {string}
+ *            fid - 파일 이름
  */
 gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
 	var url = this.getOBJURL();
@@ -2362,11 +2388,12 @@ gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
 		$("body").css("cursor", "auto");
 		if (xhr.responseJSON) {
 			if (xhr.responseJSON.status) {
-//				that.errorModal(xhr.responseJSON.status);
+// that.errorModal(xhr.responseJSON.status);
 				alert(xhr.responseJSON.status);
 			}
 		} else {
-//			that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
+// that.messageModal(that.translation["err"][that.locale], xhr.status + " " +
+// xhr.statusText);
 			alert(xhr.statusText);
 		}
 	});
@@ -2376,7 +2403,8 @@ gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
  * tileset feature를 선택한다
  * 
  * @method gb3d.edit.EditingTool3D#selectTilesetFeature
- * @param {Cesium.Cesium3DTileFeature} feature - 피처
+ * @param {Cesium.Cesium3DTileFeature}
+ *            feature - 피처
  */
 gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 	var that = this;
@@ -2387,10 +2415,10 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 			that.silhouetteGreen.selected = [];
 
 			// Pick a new feature
-//			var pickedFeature = cviewer.scene.pick(movement.position);
+// var pickedFeature = cviewer.scene.pick(movement.position);
 			var pickedFeature = feature;
 			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
+				that.clickHandler(movement);
 				return;
 			}
 
@@ -2410,15 +2438,19 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 
 			// Set feature infobox description
 			var propNames = pickedFeature.getPropertyNames();
-			var featureName = pickedFeature.getProperty('name');
-			that.selectedEntity.name = featureName;
-			that.selectedEntity.description = 'Loading <div class="cesium-infoBox-loading"></div>';
 			cviewer.selectedEntity = that.selectedEntity;
-			that.selectedEntity.description = '<table class="cesium-infoBox-defaultTable"><tbody>';
+			var obj = {};
 			for ( var i in propNames) {
-				that.selectedEntity.description += '<tr><th>' + propNames[i] + '</th><td>' + pickedFeature.getProperty(propNames[i]) + '</td></tr>';
+				obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
 			}
-			that.selectedEntity.description += '</tbody></table>';
+			console.log(obj);
+			that.updateAttributePopup(obj);
+			if (that.getActiveTool()) {
+				that.attrPop_.setPositionY(55);
+			} else {
+				that.attrPop_.setPositionY(5);	
+			}
+			that.attrPop_.open();
 		
 	} else {
 
@@ -2429,10 +2461,10 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 			}
 			
 			// Pick a new feature
-			//var pickedFeature = cviewer.scene.pick(movement.position);
+			// var pickedFeature = cviewer.scene.pick(movement.position);
 			var pickedFeature = feature;
 			if (!Cesium.defined(pickedFeature)) {
-				clickHandler(movement);
+				that.clickHandler(movement);
 				return;
 			}
 			// Select the feature if it's not already selected
@@ -2450,5 +2482,20 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 			pickedFeature.color = Cesium.Color.LIME;
 			cviewer.selectedEntity = that.selectedEntity;
 			
+			// Set feature infobox description
+			var propNames = pickedFeature.getPropertyNames();
+			cviewer.selectedEntity = that.selectedEntity;
+			var obj = {};
+			for ( var i in propNames) {
+				obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
+			}
+			console.log(obj);
+			that.updateAttributePopup(obj);
+			if (that.getActiveTool()) {
+				that.attrPop_.setPositionY(55);
+			} else {
+				that.attrPop_.setPositionY(5);	
+			}
+			that.attrPop_.open();
 	}
 }
