@@ -377,6 +377,7 @@ html, body {
 			modelRecord : mrecord,
 			otree : otree,
 			locale : locale || "en",
+			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			editingTool2D : function() {
 				return epan;
 			}

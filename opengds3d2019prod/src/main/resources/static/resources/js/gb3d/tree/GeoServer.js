@@ -515,11 +515,11 @@ gb3d.tree.GeoServer = function(obj) {
 				},
 				"geoserver" : {
 					"map" : this.map instanceof ol.Map ? this.map : undefined,
-							"getMapWMS" : this.getMapWMS,
-							"getLayerInfo" : this.getLayerInfo,
-							"clientTree" : this.clientTree,
-							"serverTree" : that,
-							"getWFSFeature" : this.getWFSFeature
+					"getMapWMS" : this.getMapWMS,
+					"getLayerInfo" : this.getLayerInfo,
+					"clientTree" : this.clientTree,
+					"serverTree" : that,
+					"getWFSFeature" : this.getWFSFeature
 				},
 				"search" : {
 					show_only_matches : true

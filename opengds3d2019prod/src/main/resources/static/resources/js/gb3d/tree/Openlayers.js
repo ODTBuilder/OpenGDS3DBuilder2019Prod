@@ -626,8 +626,9 @@ gb3d.tree.OpenLayers = function(obj) {
 									// "")),
 									"label" : that.translation.downloadtiles[that.locale],
 									/*
-									 * ! "shortcut" : 113, "shortcut_label" : 'F2',
-									 * "icon" : "glyphicon glyphicon-leaf",
+									 * ! "shortcut" : 113, "shortcut_label" :
+									 * 'F2', "icon" : "glyphicon
+									 * glyphicon-leaf",
 									 */
 									"action" : function(data) {
 										var inst = $.jstreeol3
@@ -695,6 +696,16 @@ gb3d.tree.OpenLayers = function(obj) {
 									var layer = inst.get_LayerById(obj.id);
 									if(layer instanceof ol.layer.Image){
 										layer = layer.get("vectorLayer");
+									}
+									var git = layer.get("git");
+									if (git) {
+										var tileset = git.tileset;
+										if (tileset) {
+											var ctileset = tileset.getCesiumTileset();
+											if (ctileset instanceof Cesium.Cesium3DTileset) {
+												that.gb3dMap.getCesiumViewer().zoomTo(ctileset);												
+											}
+										}
 									}
 									var extent = ol.extent.createEmpty();
 									// inst._data.layerproperties.editingTool.zoomToFit(layer);
