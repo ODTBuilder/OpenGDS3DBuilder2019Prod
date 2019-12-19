@@ -263,12 +263,12 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 	var widthType = $("<select>").addClass("gb-form").append(widthOpt1).append(widthOpt2);
 	var widthTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(widthType);
 	var widthTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(widthTypeLabel).append(widthTypeInputArea);
-	
+
 	var attrLabelWidth = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
 	var attrKeyWidth = $("<select>").addClass("gb-form");
 	var attrKeyInputAreaWidth = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKeyWidth);
 	var attrKeyAreaWidth = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabelWidth).append(attrKeyInputAreaWidth);
-	
+
 	var widthLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.width[this.locale]);
 	var widthInput = $("<input>").attr({
 		"type" : "number"
@@ -282,19 +282,19 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 	var heightType = $("<select>").addClass("gb-form").append(heightOpt1).append(heightOpt2);
 	var heightTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(heightType);
 	var heightTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(heightTypeLabel).append(heightTypeInputArea);
-	
+
 	var attrLabelHeight = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
 	var attrKeyHeight = $("<select>").addClass("gb-form");
 	var attrKeyInputAreaHeight = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKeyHeight);
 	var attrKeyAreaHeight = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabelHeight).append(attrKeyInputAreaHeight);
-	
+
 	var heightLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.height[this.locale]);
 	var heightInput = $("<input>").attr({
 		"type" : "number"
 	}).addClass("gb-form");
 	var heightInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(heightInput);
 	var heightArea = $("<div>").addClass("gb3d-modal-to3d-row").append(heightLabel).append(heightInputArea);
-	
+
 	var boxParamArea = $("<div>").append(widthTypeArea).append(widthArea).append(attrKeyAreaWidth).append(heightTypeArea).append(heightArea).append(attrKeyAreaHeight);
 
 	var radiusTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.rtype[this.locale]);
@@ -303,12 +303,12 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 	var radiusType = $("<select>").addClass("gb-form").append(radiusOpt1).append(radiusOpt2);
 	var radiusTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(radiusType);
 	var radiusTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(radiusTypeLabel).append(radiusTypeInputArea);
-	
+
 	var attrLabelRadius = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.attrselect[this.locale]);
 	var attrKeyRadius = $("<select>").addClass("gb-form");
 	var attrKeyInputAreaRadius = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKeyRadius);
 	var attrKeyAreaRadius = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabelRadius).append(attrKeyInputAreaRadius);
-	
+
 	var radiusLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.radius[this.locale]);
 	var radiusInput = $("<input>").attr({
 		"type" : "number"
@@ -378,7 +378,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 		}
 	});
 	$(widthType).trigger("change");
-	
+
 	$(heightType).change(function() {
 		var val = $(this).val();
 		if (val === "default") {
@@ -390,7 +390,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 		}
 	});
 	$(heightType).trigger("change");
-	
+
 	$(radiusType).change(function() {
 		var val = $(this).val();
 		if (val === "default") {
@@ -402,7 +402,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 		}
 	});
 	$(radiusType).trigger("change");
-	
+
 	var pointModal = new gb.modal.ModalBase({
 		"title" : this.translation.pointto3d[this.locale],
 		"width" : 500,
@@ -428,13 +428,13 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 			} else if ($(widthType).val() === "fix") {
 				geom["widthAttr"] = $(attrKeyWidth).val();
 			}
-			
+
 			if ($(heightType).val() === "default") {
 				geom["height"] = $(heightInput).val();
 			} else if ($(heightType).val() === "fix") {
 				geom["heightAttr"] = $(attrKeyHeight).val();
 			}
-			
+
 			if ($(depthType).val() === "default") {
 				geom["depth"] = $(depthInput).val();
 			} else if ($(depthType).val() === "fix") {
@@ -462,7 +462,7 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 	});
 
 	$(typeSelect).trigger("change");
-	
+
 	this.getLayerInfo(geo, work, layer, attrKey, pointModal);
 	this.getLayerInfo(geo, work, layer, attrKeyWidth, pointModal);
 	this.getLayerInfo(geo, work, layer, attrKeyHeight, pointModal);
@@ -485,7 +485,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 	var radiusType = $("<select>").addClass("gb-form").append(radiusOpt1).append(radiusOpt2);
 	var radiusTypeInputArea = $("<span>").addClass("gb3d-modal-to3d-value").append(radiusType);
 	var radiusTypeArea = $("<div>").addClass("gb3d-modal-to3d-row").append(radiusTypeLabel).append(radiusTypeInputArea);
-	
+
 	var radiusLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.width[this.locale]);
 	var radiusInput = $("<input>").attr({
 		"type" : "number"
@@ -497,7 +497,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 	var attrKeyRadius = $("<select>").addClass("gb-form");
 	var attrKeyInputAreaRadius = $("<span>").addClass("gb3d-modal-to3d-value").append(attrKeyRadius);
 	var attrKeyAreaRadius = $("<div>").addClass("gb3d-modal-to3d-row").append(attrLabelRadius).append(attrKeyInputAreaRadius);
-	
+
 	var cylinderParamArea = $("<div>").append(radiusTypeArea).append(radiusArea).append(attrKeyAreaRadius);
 
 	var depthTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.dtype[this.locale]);
@@ -560,7 +560,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 		}
 	});
 	$(radiusType).trigger("change");
-	
+
 	var lineModal = new gb.modal.ModalBase({
 		"title" : this.translation.lineto3d[this.locale],
 		"width" : 500,
@@ -578,7 +578,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 			"geometry2d" : "LineString",
 			"texture" : $(textureSelect).val()
 		};
-		
+
 		if ($(radiusType).val() === "default") {
 			geom["radius"] = $(radiusInput).val();
 		} else if ($(radiusType).val() === "fix") {
@@ -591,10 +591,10 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 		}
 		that.get3DTileset(geo, work, store, layer, geom, lineModal);
 	});
-	
+
 	this.getLayerInfo(geo, work, layer, attrKey, lineModal);
 	this.getLayerInfo(geo, work, layer, attrKeyRadius, lineModal);
-	
+
 };
 
 /**
@@ -671,7 +671,7 @@ gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, sto
 			"geometry2d" : "Polygon",
 			"texture" : $(textureSelect).val()
 		};
-		geom["depthType"] = $(depthType).val(); 
+		geom["depthType"] = $(depthType).val();
 		if ($(depthType).val() === "default") {
 			geom["depthValue"] = $(depthInput).val();
 		} else if ($(depthType).val() === "fix") {
@@ -700,8 +700,8 @@ gb3d.io.Simple3DManager.prototype.get3DTilesetURL = function() {
  */
 gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, layer, geom, modal, callback) {
 	var that = this;
-	var layerid = geo+":"+work+":"+store+":"+layer;
-	
+	var layerid = geo + ":" + work + ":" + store + ":" + layer;
+
 	var url = this.get3DTilesetURL();
 	var params = {
 		"serverName" : geo,
@@ -709,88 +709,88 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 		"datastore" : store,
 		"layerName" : layer
 	};
-	
+
 	params["geometry2d"] = geom["geometry2d"];
 	if (geom["depthType"]) {
-		params["depthType"] = geom["depthType"] ? geom["depthType"] : undefined;	
+		params["depthType"] = geom["depthType"] ? geom["depthType"] : undefined;
 	}
 	if (geom["depthValue"]) {
-		params["depthValue"] = geom["depthValue"] ? geom["depthValue"] : undefined;	
+		params["depthValue"] = geom["depthValue"] ? geom["depthValue"] : undefined;
 	}
 	params["texture"] = geom["texture"];
 	if (geom.geometry2d === "Point") {
 		params["geometry3d"] = geom["geometry3d"];
 		if (geom["geometry3d"] === "box") {
 			if (geom["width"]) {
-				params["width"] = geom["width"] ? geom["width"] : undefined;	
+				params["width"] = geom["width"] ? geom["width"] : undefined;
 			}
 			if (geom["height"]) {
-				params["height"] = geom["height"] ? geom["height"] : undefined;	
+				params["height"] = geom["height"] ? geom["height"] : undefined;
 			}
 			if (geom["widthAttr"]) {
-				params["widthAttr"] = geom["widthAttr"] ? geom["widthAttr"] : undefined;	
+				params["widthAttr"] = geom["widthAttr"] ? geom["widthAttr"] : undefined;
 			}
 			if (geom["heightAttr"]) {
-				params["heightAttr"] = geom["heightAttr"] ? geom["heightAttr"] : undefined;	
+				params["heightAttr"] = geom["heightAttr"] ? geom["heightAttr"] : undefined;
 			}
 		} else if (geom["geometry3d"] === "cylinder") {
 			if (geom["radius"]) {
-				params["radius"] = geom["radius"] ? geom["radius"] : undefined;	
+				params["radius"] = geom["radius"] ? geom["radius"] : undefined;
 			}
 			if (geom["radiusAttr"]) {
-				params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;	
+				params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;
 			}
 		}
 	} else if (geom.geometry2d === "LineString") {
 		if (geom["radius"]) {
-			params["radius"] = geom["radius"] ? geom["radius"] : undefined;	
+			params["radius"] = geom["radius"] ? geom["radius"] : undefined;
 		}
 		if (geom["radiusAttr"]) {
-			params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;	
+			params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;
 		}
 	}
 	console.log(layerid);
-	var callback2 = function(){
+	var callback2 = function() {
 		modal.close();
-		
-		$.ajax({
-			url : url,
-			method : "POST",
-			data : JSON.stringify(params),
-			contentType : "application/json; charset=UTF-8",
-			beforeSend : function() {
-				$("body").css("cursor", "wait");
-				modal.showSpinner(true);
-			},
-			complete : function() {
-				$("body").css("cursor", "auto");
-				modal.showSpinner(false);
-			},
-			success : function(data, textStatus, jqXHR) {
-				console.log(data);
-				modal.close();
-				var success = data.succ;
-				var path = data.path;
-				if (success) {
-//					var path = "http://175.116.181.34:8888/guest/upload/20191212_172014/3dtiles/tileset.json";
-					that.getTilesetManager().addTileset(path, layerid);					
-				}
-			}
-		}).fail(function(xhr, status, errorThrown) {
-			modal.showSpinner(false);
-			$("body").css("cursor", "auto");
-			if (xhr.responseJSON) {
-				if (xhr.responseJSON.status) {
-					that.errorModal(xhr.responseJSON.status);
-				}
-			} else {
-				that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
-			}
-		});
+
+//		$.ajax({
+//			url : url,
+//			method : "POST",
+//			data : JSON.stringify(params),
+//			contentType : "application/json; charset=UTF-8",
+//			beforeSend : function() {
+//				$("body").css("cursor", "wait");
+//				modal.showSpinner(true);
+//			},
+//			complete : function() {
+//				$("body").css("cursor", "auto");
+//				modal.showSpinner(false);
+//			},
+//			success : function(data, textStatus, jqXHR) {
+//				console.log(data);
+//				modal.close();
+//				var success = data.succ;
+//				var path = data.path;
+//				if (success) {
+					var path = "http://175.116.181.34:8888/guest/upload/20191217_164658/3dtiles/tileset.json";
+					that.getTilesetManager().addTileset(path, layerid);
+//				}
+//			}
+//		}).fail(function(xhr, status, errorThrown) {
+//			modal.showSpinner(false);
+//			$("body").css("cursor", "auto");
+//			if (xhr.responseJSON) {
+//				if (xhr.responseJSON.status) {
+//					that.errorModal(xhr.responseJSON.status);
+//				}
+//			} else {
+//				that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
+//			}
+//		});
 	};
-	
+
 	// 2d============
-	if(typeof callback === "function"){
+	if (typeof callback === "function") {
 		callback(layerid, callback2);
 	}
 	// 2d============
@@ -871,13 +871,11 @@ gb3d.io.Simple3DManager.prototype.getLayerInfo = function(geo, work, layer, sele
 		// "datastore" : store,
 		"geoLayerList" : typeof layer === "string" ? [ layer ] : Array.isArray(layer) ? layer : undefined
 	};
-	
-	
-	
+
 	$.ajax({
-//		url : url + "&" + jQuery.param(params),
-//		method : "POST",
-//		contentType : "application/json; charset=UTF-8",
+		// url : url + "&" + jQuery.param(params),
+		// method : "POST",
+		// contentType : "application/json; charset=UTF-8",
 		url : url,
 		method : "POST",
 		contentType : "application/json; charset=UTF-8",

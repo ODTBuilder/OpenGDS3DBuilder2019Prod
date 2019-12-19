@@ -175,7 +175,7 @@ html, body {
 			token : "?${_csrf.parameterName}=${_csrf.token}",
 			wfst : "${pageContext.request.contextPath}/geoserver/geoserverWFSTransaction.ajax",
 			getLayerInfo : "geoserver/getGeoLayerInfoList.ajax",
-			getMapWMS : "geoserver/geoserverWMSGetMap.ajax",
+			getMapWMS : "geoserver/geoserverWMS.ajax",
 			getFeatureInfo : "geoserver/geoserverWFSGetFeature.ajax",
 			getWFSFeature : "geoserver/geoserverWFSGetFeature.ajax",
 			getLegend : "geoserver/geoserverWMSGetLegendGraphic.ajax",
@@ -397,7 +397,7 @@ html, body {
 		$("#editTool").click(function(e) {
 			e.preventDefault();
 			epan.editToolToggle();
-			epan3d.toggleTool();
+			epan3d.editToolToggle();
 		});
 
 		// feature list

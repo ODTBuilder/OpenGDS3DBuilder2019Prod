@@ -73,7 +73,7 @@ gb3d.Map = function(obj) {
 		selectionIndicator : false,
 		homeButton : true,
 		sceneModePicker : false,
-		infoBox : true,
+		infoBox : false,
 		navigationHelpButton : false,
 		navigationInstructionsInitiallyVisible : false,
 		animation : false,
@@ -123,7 +123,7 @@ gb3d.Map = function(obj) {
 	this.center = Cesium.Cartesian3.fromDegrees((this.minCRS[0] + this.maxCRS[0]) / 2, ((this.minCRS[1] + this.maxCRS[1]) / 2) - 1, 200000);
 
 //	this.cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
-	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+//	this.cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
 
 	// 초기 위치
 	this.initPosition = Array.isArray(options.initPosition) ? options.initPosition : [0, 0];
