@@ -1279,7 +1279,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						returnJSON = (JSONObject) obj;
 
 						logger.info(returnJSON.toString());
-						
+
 						puFlag = 200;
 						// 다 처리하고 zip 삭제
 						File zipFile = new File(zipPath);
@@ -1401,10 +1401,13 @@ public class GeoserverServiceImpl implements GeoserverService {
 						JSONParser parser = new JSONParser();
 						Object obj = parser.parse(res.getBody());
 						returnJSON = (JSONObject) obj;
-
+						logger.info(returnJSON.toString());
 						puFlag = 200;
-						// 다 처리하고 임시폴더 삭제
-						// deleteDirectory(tmp.toFile());
+						// 다 처리하고 zip 삭제
+						File zipFile = new File(zipPath);
+						if (zipFile.exists()) {
+							zipFile.delete();
+						}
 					} else {
 						logger.warn("다운로드 실패");
 					}

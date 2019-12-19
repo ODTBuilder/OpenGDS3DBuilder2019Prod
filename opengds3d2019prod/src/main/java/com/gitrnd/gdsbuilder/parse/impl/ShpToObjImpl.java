@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +36,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
@@ -212,6 +216,14 @@ public class ShpToObjImpl {
 			createFileDirectory(this.outputPath);
 			Map<String, Object> sfcMap = new HashMap<>();
 
+			// 높이값 설정
+			double height = 0.0;
+			double maxHeight = 0.0;
+			if (this.hType == EnShpToObjHeightType.DEFAULT) {
+				height = defaultHeight;
+				maxHeight = defaultHeight;
+			}
+
 			// 대용량 처리
 			int totalSize = buildingCollection.size();
 			if (totalSize > 5000) { // tmp
@@ -288,29 +300,71 @@ public class ShpToObjImpl {
 
 									// batch table file
 									JSONObject batchTable = new JSONObject();
-									JSONArray batchIdArr = new JSONArray();
-
+									// tile propertiles
+									JSONObject tilesPropeties = new JSONObject();
 									try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 											new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 											"utf-8"))) {
 										ShpToObjImpl.writer = writer;
+
 										vertices = new ArrayList<>();
 										vCoordinates = new ArrayList<>();
 										vIdx = 0;
 										vtIdx = 1;
 										vnIdx = 1;
-										try (FeatureIterator<SimpleFeature> features = dfc.features()) {
-											writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
-											while (features.hasNext()) {
-												SimpleFeature feature = features.next();
-												List<String> idlist = buildingFeatureToObjGroup(feature);
-												for (String id : idlist) {
-													batchIdArr.add(id);
+
+										// featureId
+										JSONArray batchIdArr = new JSONArray();
+										// properties
+										Collection<PropertyDescriptor> properties = dfc.getSchema().getDescriptors();
+										for (PropertyDescriptor property : properties) {
+											String name = property.getName().toString();
+											String type = property.getType().getBinding().getSimpleName();
+											if (type.equals("Double") || type.equals("Integer")) {
+												batchTable.put(name, new JSONArray());
+											}
+										}
+										FeatureIterator<SimpleFeature> features = dfc.features();
+										while (features.hasNext()) {
+											SimpleFeature feature = features.next();
+											if (this.hType == EnShpToObjHeightType.FIX) {
+												try {
+													height = (double) feature.getAttribute(attribute);
+												} catch (Exception e) {
+													height = defaultHeight;
+												}
+											}
+											if (height > maxHeight) {
+												maxHeight = height;
+											}
+											List<String> idlist = buildingFeatureToObjGroup(feature, height);
+											for (String id : idlist) {
+												// featureId
+												batchIdArr.add(id);
+												// properties
+												Iterator batchIter = batchTable.keySet().iterator();
+												while (batchIter.hasNext()) {
+													String batchKey = (String) batchIter.next();
+													JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
+													propertiesArr.add(feature.getAttribute(batchKey));
+													batchTable.put(batchKey, propertiesArr);
 												}
 											}
 										}
+										Iterator batchIter = batchTable.keySet().iterator();
+										while (batchIter.hasNext()) {
+											String batchKey = (String) batchIter.next();
+											JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
+											Double max = (Double) Collections.max(propertiesArr);
+											Double min = (Double) Collections.min(propertiesArr);
+											JSONObject minmaxObj = new JSONObject();
+											minmaxObj.put("minimum", min);
+											minmaxObj.put("maximum", max);
+											tilesPropeties.put(batchKey, minmaxObj);
+										}
+										batchTable.put("featureId", batchIdArr);
 									}
-									batchTable.put("featureId", batchIdArr);
+
 									try (FileWriter file = new FileWriter(
 											enPath + File.separator + halftmp + "batch.json")) {
 										file.write(batchTable.toJSONString());
@@ -335,8 +389,9 @@ public class ShpToObjImpl {
 									tileOption.put("sphere", false);
 									tileOption.put("gltfUpAxis", "Z");
 									tileOption.put("minHeight", 0);
-									tileOption.put("maxHeight", 100);
-
+									tileOption.put("maxHeight", maxHeight);
+									tileOption.put("properties", tilesPropeties);
+									
 									try (FileWriter file = new FileWriter(
 											enPath + File.separator + halftmp + "tile.json")) {
 										file.write(tileOption.toJSONString());
@@ -383,30 +438,74 @@ public class ShpToObjImpl {
 
 											// batch table file
 											JSONObject batchTable = new JSONObject();
-											JSONArray batchIdArr = new JSONArray();
+											// tile propertiles
+											JSONObject tilesPropeties = new JSONObject();
 											try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 													new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 													"utf-8"))) {
 												ShpToObjImpl.writer = writer;
+
 												vertices = new ArrayList<>();
 												vCoordinates = new ArrayList<>();
+
 												vIdx = 0;
 												vtIdx = 1;
 												vnIdx = 1;
-												try (FeatureIterator<SimpleFeature> features = tfc.features()) {
-													writer.write(
-															"o " + buildingCollection.getSchema().getTypeName() + "\n");
-													while (features.hasNext()) {
-														SimpleFeature feature = features.next();
-														List<String> idlist = buildingFeatureToObjGroup(feature);
-														for (String id : idlist) {
-															batchIdArr.add(id);
+
+												// featureId
+												JSONArray batchIdArr = new JSONArray();
+												// properties
+												Collection<PropertyDescriptor> properties = tfc.getSchema()
+														.getDescriptors();
+												for (PropertyDescriptor property : properties) {
+													String name = property.getName().toString();
+													String type = property.getType().getBinding().getSimpleName();
+													if (type.equals("Double") || type.equals("Integer")) {
+														batchTable.put(name, new JSONArray());
+													}
+												}
+												FeatureIterator<SimpleFeature> features = tfc.features();
+												while (features.hasNext()) {
+													SimpleFeature feature = features.next();
+													if (this.hType == EnShpToObjHeightType.FIX) {
+														try {
+															height = (double) feature.getAttribute(attribute);
+														} catch (Exception e) {
+															height = defaultHeight;
+														}
+													}
+													if (height > maxHeight) {
+														maxHeight = height;
+													}
+													List<String> idlist = buildingFeatureToObjGroup(feature, height);
+													for (String id : idlist) {
+														// featureId
+														batchIdArr.add(id);
+														// properties
+														Iterator batchIter = batchTable.keySet().iterator();
+														while (batchIter.hasNext()) {
+															String batchKey = (String) batchIter.next();
+															JSONArray propertiesArr = (JSONArray) batchTable
+																	.get(batchKey);
+															propertiesArr.add(feature.getAttribute(batchKey));
+															batchTable.put(batchKey, propertiesArr);
 														}
 													}
 												}
+												Iterator batchIter = batchTable.keySet().iterator();
+												while (batchIter.hasNext()) {
+													String batchKey = (String) batchIter.next();
+													JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
+													Double max = (Double) Collections.max(propertiesArr);
+													Double min = (Double) Collections.min(propertiesArr);
+													JSONObject minmaxObj = new JSONObject();
+													minmaxObj.put("minimum", min);
+													minmaxObj.put("maximum", max);
+													tilesPropeties.put(batchKey, minmaxObj);
+												}
+												batchTable.put("featureId", batchIdArr);
 											}
 
-											batchTable.put("featureId", batchIdArr);
 											try (FileWriter file = new FileWriter(
 													enPath + File.separator + halftmp + "batch.json")) {
 												file.write(batchTable.toJSONString());
@@ -431,8 +530,9 @@ public class ShpToObjImpl {
 											tileOption.put("sphere", false);
 											tileOption.put("gltfUpAxis", "Z");
 											tileOption.put("minHeight", 0);
-											tileOption.put("maxHeight", 100);
-
+											tileOption.put("maxHeight", maxHeight);
+											tileOption.put("properties", tilesPropeties);
+											
 											try (FileWriter file = new FileWriter(
 													enPath + File.separator + halftmp + "tile.json")) {
 												file.write(tileOption.toJSONString());
@@ -460,28 +560,73 @@ public class ShpToObjImpl {
 
 				// batch table file
 				JSONObject batchTable = new JSONObject();
-				JSONArray batchIdArr = new JSONArray();
+				// tile propertiles
+				JSONObject tilesPropeties = new JSONObject();
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 						new FileOutputStream(outputPath + File.separator + 1 + ".obj"), "utf-8"))) {
 					ShpToObjImpl.writer = writer;
-					try (FeatureIterator<SimpleFeature> features = buildingCollection.features()) {
-						writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
-						ShpToObjImpl.writer = writer;
-						vertices = new ArrayList<>();
-						vCoordinates = new ArrayList<>();
-						vIdx = 0;
-						vtIdx = 1;
-						vnIdx = 1;
-						while (features.hasNext()) {
-							SimpleFeature feature = features.next();
-							List<String> idlist = buildingFeatureToObjGroup(feature);
-							for (String id : idlist) {
-								batchIdArr.add(id);
+					writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
+					ShpToObjImpl.writer = writer;
+
+					vertices = new ArrayList<>();
+					vCoordinates = new ArrayList<>();
+					vIdx = 0;
+					vtIdx = 1;
+					vnIdx = 1;
+
+					// featureId
+					JSONArray batchIdArr = new JSONArray();
+					// properties
+					Collection<PropertyDescriptor> properties = buildingCollection.getSchema().getDescriptors();
+					for (PropertyDescriptor property : properties) {
+						String name = property.getName().toString();
+						String type = property.getType().getBinding().getSimpleName();
+						if (type.equals("Double") || type.equals("Integer")) {
+							batchTable.put(name, new JSONArray());
+						}
+					}
+					FeatureIterator<SimpleFeature> features = buildingCollection.features();
+					while (features.hasNext()) {
+						SimpleFeature feature = features.next();
+						if (this.hType == EnShpToObjHeightType.FIX) {
+							try {
+								height = (double) feature.getAttribute(attribute);
+							} catch (Exception e) {
+								height = defaultHeight;
+							}
+						}
+						if (height > maxHeight) {
+							maxHeight = height;
+						}
+						List<String> idlist = buildingFeatureToObjGroup(feature, height);
+						for (String id : idlist) {
+							// featureId
+							batchIdArr.add(id);
+							// properties
+							Iterator batchIter = batchTable.keySet().iterator();
+							while (batchIter.hasNext()) {
+								String batchKey = (String) batchIter.next();
+								JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
+								propertiesArr.add(feature.getAttribute(batchKey));
+								batchTable.put(batchKey, propertiesArr);
 							}
 						}
 					}
+					
+					Iterator batchIter = batchTable.keySet().iterator();
+					while (batchIter.hasNext()) {
+						String batchKey = (String) batchIter.next();
+						JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
+						Double max = (Double) Collections.max(propertiesArr);
+						Double min = (Double) Collections.min(propertiesArr);
+						JSONObject minmaxObj = new JSONObject();
+						minmaxObj.put("minimum", min);
+						minmaxObj.put("maximum", max);
+						tilesPropeties.put(batchKey, minmaxObj);
+					}
+					batchTable.put("featureId", batchIdArr);
 				}
-				batchTable.put("featureId", batchIdArr);
+
 				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "batch.json")) {
 					file.write(batchTable.toJSONString());
 				}
@@ -505,7 +650,8 @@ public class ShpToObjImpl {
 				tileOption.put("sphere", false);
 				tileOption.put("gltfUpAxis", "Z");
 				tileOption.put("minHeight", 0);
-				tileOption.put("maxHeight", 100);
+				tileOption.put("maxHeight", maxHeight);
+				tileOption.put("properties", tilesPropeties);
 
 				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "tile.json")) {
 					file.write(tileOption.toJSONString());
@@ -533,26 +679,8 @@ public class ShpToObjImpl {
 		return collection;
 	}
 
-	private List<String> buildingFeatureToObjGroup(SimpleFeature feature)
+	private List<String> buildingFeatureToObjGroup(SimpleFeature feature, double height)
 			throws FactoryException, TransformException, IOException {
-
-		// 높이값 설정
-		double height = 0.0;
-
-		if (this.hType == EnShpToObjHeightType.DEFAULT) {
-			height = defaultHeight;
-		} else if (this.hType == EnShpToObjHeightType.FIX) {
-			try {
-				height = (double) feature.getAttribute(attribute);
-			} catch (Exception e) {
-				// TODO: handle exception
-				height = defaultHeight;
-			}
-		}
-
-		if (height < 1) {
-			height = defaultHeight;
-		}
 
 		List<String> idList = new ArrayList<>();
 
@@ -568,10 +696,10 @@ public class ShpToObjImpl {
 			}
 			idList.add(feature.getID());
 			writer.write(featureID);
-
 			Geometry geom = multipolygon.getGeometryN(g);
 			geom.normalize();
 			Polygon pg = (Polygon) geom;
+
 			Coordinate[] coordinates = deleteInnerPoints(pg.getCoordinates());
 
 			// threeGeom
