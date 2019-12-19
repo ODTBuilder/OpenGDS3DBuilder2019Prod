@@ -874,7 +874,8 @@ public class GeoserverController extends AbstractController {
 			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), Double.valueOf(paramStr));
 		} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName, paramStr);
+			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
+					loginUser.getUsername(), paramStr);
 		} else {
 
 		}

@@ -1221,12 +1221,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 							shpToObj.exec();
 						} catch (Exception e) {
 							e.printStackTrace();
-
 						}
 
 						boolean combineFlag = false;
 						int objnum = shpToObj.getObjfilenum();
-						if(objnum > 1) {
+						if (objnum > 1) {
 							combineFlag = true;
 						}
 
@@ -1242,8 +1241,10 @@ public class GeoserverServiceImpl implements GeoserverService {
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 
 						// API 요청 파라미터 생성
-						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더 업로드 경로
-				
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더
+																													// 업로드
+																													// 경로
+
 						// body
 						JSONObject bodyJson = new JSONObject();
 
@@ -1277,9 +1278,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 						Object obj = parser.parse(res.getBody());
 						returnJSON = (JSONObject) obj;
 
+						logger.info(returnJSON.toString());
+						
 						puFlag = 200;
-						// 다 처리하고 임시폴더 삭제
-						// deleteDirectory(tmp.toFile());
+						// 다 처리하고 zip 삭제
+						File zipFile = new File(zipPath);
+						if (zipFile.exists()) {
+							zipFile.delete();
+						}
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1291,6 +1297,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 		return returnJSON;
 	}
 
+	@Override
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
 			String layerName, String user, String attribute) throws ParseException {
 
@@ -1342,7 +1349,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						boolean combineFlag = false;
 						int objnum = shpToObj.getObjfilenum();
-						if(objnum > 1) {
+						if (objnum > 1) {
 							combineFlag = true;
 						}
 
@@ -1358,8 +1365,10 @@ public class GeoserverServiceImpl implements GeoserverService {
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 
 						// API 요청 파라미터 생성
-						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더 업로드 경로
-				
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더
+																													// 업로드
+																													// 경로
+
 						// body
 						JSONObject bodyJson = new JSONObject();
 
@@ -1414,13 +1423,6 @@ public class GeoserverServiceImpl implements GeoserverService {
 		}
 	}
 
-	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore,
-			String layerName, String fix) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public void createZipFile(String path, String toPath) {
 
 		File dir = new File(path);
@@ -1439,12 +1441,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 		try {
 			ZipOutputStream zip_out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(toPath), 2048));
-
 			for (int i = 0; i < len; i++)
 				zip_folder(path, "", new File(_path + list[i]), zip_out);
-
 			zip_out.close();
-
 		} catch (FileNotFoundException e) {
 			e.getMessage();
 		} catch (IOException e) {

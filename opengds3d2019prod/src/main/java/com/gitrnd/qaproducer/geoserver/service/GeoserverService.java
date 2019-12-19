@@ -379,7 +379,7 @@ public interface GeoserverService {
 	 * @return
 	 */
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore,
-			String layerName, String fix) throws ParseException;
+			String layerName, String user, String fix) throws ParseException;
 
 	/**
 	 * 높이조건이 고정인 GeoserverLayer 3Dtiles 생성
@@ -392,7 +392,7 @@ public interface GeoserverService {
 	 * @param layerName        레이어명
 	 * @param defVal           기본값
 	 * @return
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
 			String layerName, String user, double defalut) throws ParseException;
