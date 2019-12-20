@@ -1,3 +1,43 @@
+
+.gb3d-declare-row, .gb3d-declare-row-header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	text-align: center;
+	margin-bottom: 2px;
+}
+
+.gb3d-declare-row:first-child, .gb3d-declare-row-header:first-child {
+	border-bottom: 1px solid #ccc;
+}
+
+.gb3d-declare-row>span, .gb3d-declare-row-header>span {
+	flex: 0 0 20%;
+}
+
+.gb3d-declare-row>span:first-child, .gb3d-declare-row-header>span:first-child {
+	flex: 0 0 30%;
+}
+
+.gb3d-declare-row>span:last-child, .gb3d-declare-row-header>span:last-child {
+	flex: 0 0 10%;
+}
+
+.gb3d-declare-row>.gb-declare-item, .gb3d-declare-row-header>.gb-declare-item {
+	flex: 0 0 20%;
+	padding: 0px 4px;
+	margin: auto 0px;
+}
+
+.gb3d-declare-row>div:first-child, .gb3d-declare-row-header>div:first-child {
+	flex: 0 0 30%;
+}
+
+.gb3d-declare-row>a, .gb3d-declare-row-header>a {
+	flex: 0 0 10%;
+	margin: auto 0px;
+}
+
 .gb3d-modal-to3d-row {
 	padding: 5px;
 }

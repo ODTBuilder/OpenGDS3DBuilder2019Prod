@@ -2309,45 +2309,6 @@ input[type=radio][disabled], input[type=checkbox][disabled], input[type=radio].d
 	font-size: 12px;
 }
 
-.gb-declare-row {
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	text-align: center;
-	margin-bottom: 2px;
-}
-
-.gb-declare-row:first-child {
-	border-bottom: 1px solid #ccc;
-}
-
-.gb-declare-row>span {
-	flex: 0 0 20%;
-}
-
-.gb-declare-row>span:first-child {
-	flex: 0 0 30%;
-}
-
-.gb-declare-row>span:last-child {
-	flex: 0 0 10%;
-}
-
-.gb-declare-row>.gb-declare-item {
-	flex: 0 0 20%;
-	padding: 0px 4px;
-	margin: auto 0px;
-}
-
-.gb-declare-row>div:first-child {
-	flex: 0 0 30%;
-}
-
-.gb-declare-row>a {
-	flex: 0 0 10%;
-	margin: auto 0px;
-}
-
 .gb-flex-between {
 	display: flex;
 	justify-content: space-between;
