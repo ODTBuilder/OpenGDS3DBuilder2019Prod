@@ -1286,6 +1286,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 						if (zipFile.exists()) {
 							zipFile.delete();
 						}
+						// shp 삭제
+						deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1408,6 +1410,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 						if (zipFile.exists()) {
 							zipFile.delete();
 						}
+						// shp 삭제
+						deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1580,6 +1584,23 @@ public class GeoserverServiceImpl implements GeoserverService {
 		}
 		dir.delete();
 	}
+
+	private void deleteDirectory(String path) {
+
+		File dir = new File(path);
+		if (dir.exists()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					file.delete();
+				}
+			}
+		}
+		dir.delete();
+	}
+
 }
 
 /**
