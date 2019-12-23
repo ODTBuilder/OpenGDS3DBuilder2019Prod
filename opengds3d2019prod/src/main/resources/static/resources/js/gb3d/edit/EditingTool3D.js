@@ -134,6 +134,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 	
 	this.getFeatureURL = obj.getFeatureURL ? obj.getFeatureURL : undefined;
 	
+	// 드래그 시작, 끝 위치
+	this.dragStart = undefined;
+	this.dragEnd = undefined;
+	
 	// 2D 피처 요청 정보
 	this.parameters2d = {
 		"request" : "GetFeature",
@@ -723,13 +727,15 @@ gb3d.edit.EditingTool3D = function(obj) {
 	cviewer.screenSpaceEventHandler.setInputAction(function onLeftDown(movement) {
 		that.isDragging = false;
 		that.isDown = true;
-		// console.log("왼다운 다운: "+that.isDown+", 드래그: "+that.isDragging);
+		that.dragStart = Cesium.Cartesian2.clone(movement.position);
+		 console.log("왼클릭 눌림 다운: "+that.isDown+", 드래그: "+that.isDragging);
 		console.log(movement);
+		
 	}, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
 	cviewer.screenSpaceEventHandler.setInputAction(function onLeftUp(movement) {
 		that.isDown = false;
-		// console.log("왼업 다운: "+that.isDown+", 드래그: "+that.isDragging);
+		 console.log("왼클릭 땜 다운: "+that.isDown+", 드래그: "+that.isDragging);
 	}, Cesium.ScreenSpaceEventType.LEFT_UP);
 
 	// Information about the currently selected feature
@@ -763,7 +769,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 		// Silhouette a feature blue on hover.
 		cviewer.screenSpaceEventHandler.setInputAction(function onMouseMove(movement) {
 			if (that.isDown) {
-				that.isDragging = true;
+				that.dragEnd = Cesium.Cartesian2.clone(movement.endPosition);
+				var dist = Cesium.Cartesian2.distance(that.dragStart, that.dragEnd);
+				if (dist > 1) {
+					that.isDragging = true;	
+				}
 				// console.log("왼다운 인식 됨 커서이동중 다운: "+that.isDown+", 드래그:
 				// "+that.isDragging);
 				// console.log(movement);

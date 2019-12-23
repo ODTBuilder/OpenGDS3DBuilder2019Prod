@@ -19,9 +19,9 @@ gb3d.style.Declarative = function ( obj ) {
 	function getConditionRow ( ) {
 		var options = [ "<=", ">=", "<", ">", "=", "!=" ];
 		
-		var row = $( "<div class='gb-declare-row'>" );
+		var row = $( "<div class='gb3d-declare-row'>" );
 		var item = $( "<div class='gb-declare-item'>" );
-		var select = $( "<select class='form-control'>" );
+		var select = $( "<select class='form-control gb-declare-condition'>" );
 		var option;
 		for( var i = 0; i < options.length; i++ ) {
 			option = $( "<option>" ).text( options[i] ).val( options[i] );
@@ -50,7 +50,7 @@ gb3d.style.Declarative = function ( obj ) {
 		item.append( input );
 		row.append( item );
 		
-		var a = $( "<a href='#'>" );
+		var a = $( "<a href='#'>" ).addClass("gb-declare-item-del");
 		var i = $( "<i class='far fa-trash-alt'>");
 		a.append( i );
 		row.append( a );
@@ -58,14 +58,15 @@ gb3d.style.Declarative = function ( obj ) {
 		return row;
 	}
 	
-	$( document ).on( "click", ".gb-declare-row > span > a", function() {
+	$( document ).on( "click", ".gb3d-declare-row-header > span > .gb3d-declare-row-add", function() {
 		var row = getConditionRow();
 		
 		$( this ).parent().parent().parent().append( row );
 	} );
 
-	$( document ).on( "click", ".gb-declare-row > a", function() {
-		$( this ).parent().remove();
+	$( document ).on( "click", ".gb3d-declare-row > .gb-declare-item-del", function(e) {
+//		$( this ).parent().remove();
+		console.log("delete");
 	});
 }
 
@@ -74,7 +75,7 @@ gb3d.style.Declarative.prototype.deleteEvent = function ( callback ) {
 }
 
 gb3d.style.Declarative.prototype.conditionEvent = function ( callback ) {
-	$( document ).on( "change", "#" + this.mainId + " .gb-declare-item select.form-control", callback );
+	$( document ).on( "change", "#" + this.mainId + " .gb-declare-item .gb-declare-condition", callback );
 }
 
 gb3d.style.Declarative.prototype.inputValueEvent = function ( callback ) {
@@ -139,7 +140,7 @@ gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 		var body = $( "<div class='panel-body'>" );
 		collapse.append( body );
 		
-		var row = $( "<div class='gb-declare-row'>" );
+		var row = $( "<div class='gb3d-declare-row-header'>" );
 		body.append( row );
 		
 		var span;
@@ -149,7 +150,7 @@ gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 		}
 		
 		span = $( "<span class='Text'>" );
-		var a = $( "<a href='#'>" );
+		var a = $( "<a href='#'>" ).addClass("gb3d-declare-row-add");
 		var i = $( "<i class='fas fa-plus'></i>" );
 		a.append( i );
 		span.append( a );

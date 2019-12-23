@@ -98,7 +98,7 @@ gb3d.tree.Three = function(obj) {
 									
 									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
 									var resetObj = gb3d.Math.resetRotationAndPosition(object);
-									result = exporter.parse( object );
+									result = exporter.parse(resetObj);
 									downloadString( result, id + '.obj' );
 								} else {
 									for(var i in obj.children){
@@ -108,33 +108,17 @@ gb3d.tree.Three = function(obj) {
 											continue;
 										}
 										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-										
-										result = exporter.parse( object );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
+										result = exporter.parse(resetObj);
 										downloadString( result, id + '.obj' );
 									}
 								}
-								
-// if(!threeObject){
-// return;
-// }
-								
-// var object = threeObject.getObject().clone();
-// object.lookAt(0, 0, 0);
-// object.matrix.setPosition(new THREE.Vector3(0, 0, 0));
-// object.matrixWorld.setPosition(new THREE.Vector3(0, 0, 0));
-// object.matrix.makeRotationFromQuaternion(threeObject.getObject().quaternion);
-// object.matrixWorld.makeRotationFromQuaternion(threeObject.getObject().quaternion);
-//								
-// resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-// object.applyQuaternion(threeObject.getObject().quaternion);
-// object.rotation.copy(new THREE.Euler(0, 0, 0));
-// var result = exporter.parse( object );
-// downloadString( result, id + '.obj' );
 							}
 						},
 						"dae" : {
@@ -155,14 +139,14 @@ gb3d.tree.Three = function(obj) {
 									if(!threeObject){
 										return;
 									}
-									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-									
-									result = exporter.parse( object );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
+									result = exporter.parse(resetObj);
 									downloadString( result, id + '.dae' );
 								} else {
 									for(var i in obj.children){
@@ -171,14 +155,14 @@ gb3d.tree.Three = function(obj) {
 										if(!threeObject){
 											continue;
 										}
-										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
-										
-										result = exporter.parse( object );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
+										result = exporter.parse(resetObj);
 										downloadString( result, id + '.dae' );
 									}
 								}
@@ -202,14 +186,16 @@ gb3d.tree.Three = function(obj) {
 									if(!threeObject){
 										return;
 									}
-									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
+									result = exporter.parse(resetObj);
 									
-									exporter.parse( object, function( result ){
+									exporter.parse( resetObj, function( result ){
 										
 										downloadArrayBuffer( result, id + '.glb' );
 										
@@ -221,14 +207,16 @@ gb3d.tree.Three = function(obj) {
 										if(!threeObject){
 											continue;
 										}
-										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
+										result = exporter.parse(resetObj);
 										
-										exporter.parse( object, function( result ){
+										exporter.parse( resetObj, function( result ){
 											
 											downloadArrayBuffer( result, id + '.glb' );
 											
@@ -255,14 +243,16 @@ gb3d.tree.Three = function(obj) {
 									if(!threeObject){
 										return;
 									}
-									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
+									result = exporter.parse(resetObj);
 									
-									exporter.parse( object, function(result){
+									exporter.parse( resetObj, function(result){
 										var output = JSON.stringify( result, null, 2 );
 										downloadString( output, id + '.gltf' );
 									} );
@@ -273,14 +263,16 @@ gb3d.tree.Three = function(obj) {
 										if(!threeObject){
 											continue;
 										}
-										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
+										result = exporter.parse(resetObj);
 										
-										exporter.parse( object, function(result){
+										exporter.parse( resetObj, function(result){
 											var output = JSON.stringify( result, null, 2 );
 											downloadString( output, id + '.gltf' );
 										} );
@@ -307,13 +299,15 @@ gb3d.tree.Three = function(obj) {
 										return;
 									}
 									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
 									
-									result = exporter.parse( object.geometry );
+									result = exporter.parse( resetObj.geometry );
 									downloadString( result, id + '.drc' );
 								} else {
 									for(var i in obj.children){
@@ -323,13 +317,15 @@ gb3d.tree.Three = function(obj) {
 											continue;
 										}
 										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
 										
-										result = exporter.parse( object.geometry );
+										result = exporter.parse( resetObj.geometry );
 										downloadString( result, id + '.drc' );
 									}
 								}
@@ -354,13 +350,15 @@ gb3d.tree.Three = function(obj) {
 										return;
 									}
 									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
 									
-									result = exporter.parse( object );
+									result = exporter.parse( resetObj );
 									downloadString( result, id + '.ply' );
 								} else {
 									for(var i in obj.children){
@@ -370,13 +368,15 @@ gb3d.tree.Three = function(obj) {
 											continue;
 										}
 										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
 										
-										result = exporter.parse( object );
+										result = exporter.parse( resetObj );
 										downloadString( result, id + '.ply' );
 									}
 								}
@@ -401,13 +401,15 @@ gb3d.tree.Three = function(obj) {
 										return;
 									}
 									
+									threeObject.updateExtent();
 									object = threeObject.getObject().clone();
 									center = threeObject.getCenter();
 									centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 									
-									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+									var resetObj = gb3d.Math.resetRotationAndPosition(object);
 									
-									result = exporter.parse( object );
+									result = exporter.parse( resetObj );
 									downloadString( result, id + '.stl' );
 								} else {
 									for(var i in obj.children){
@@ -417,13 +419,15 @@ gb3d.tree.Three = function(obj) {
 											continue;
 										}
 										
+										threeObject.updateExtent();
 										object = threeObject.getObject().clone();
 										center = threeObject.getCenter();
 										centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 										
-										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										gb3d.Math.resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
+										var resetObj = gb3d.Math.resetRotationAndPosition(object);
 										
-										result = exporter.parse( object );
+										result = exporter.parse( resetObj );
 										downloadString( result, id + '.stl' );
 									}
 								}

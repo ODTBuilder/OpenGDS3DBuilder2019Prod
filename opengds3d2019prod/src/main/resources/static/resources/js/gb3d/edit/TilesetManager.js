@@ -1,62 +1,71 @@
 var gb3d;
-if ( !gb3d )
+if (!gb3d)
 	gb3d = {};
-if ( !gb3d.edit )
+if (!gb3d.edit)
 	gb3d.edit = {};
 
 /**
  * @classdesc Cesium 3D Tileset 관리자
  */
-gb3d.edit.TilesetManager = function( obj ) {
+gb3d.edit.TilesetManager = function(obj) {
 	var options = obj || {};
 	this.map = options.map || undefined;
 	this.clientTree = options.clientTree ? options.clientTree : undefined;
-	
-	if( !this.map ){
-		console.error( "gb3d.edit.TilesetManager: map is required." );
+
+	if (!this.map) {
+		console.error("gb3d.edit.TilesetManager: map is required.");
 	}
 	this.element = options.element || "#attrDeclare"
-	
+
 	this.viewer = this.map.getCesiumViewer();
-	
-	this.tilesetUI = new gb3d.style.Declarative( {
-		element: this.element
-	} );
-	
+
+	this.tilesetUI = new gb3d.style.Declarative({
+		element : this.element
+	});
+
 	this.tilesetList = [];
 }
 
-gb3d.edit.TilesetManager.prototype.pushTilesetList = function( tilesetVO ) {
-	this.tilesetList.push( tilesetVO );
+gb3d.edit.TilesetManager.prototype.pushTilesetList = function(tilesetVO) {
+	this.tilesetList.push(tilesetVO);
 }
 
-gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function( element, tileset ) {
-	var key = $( element ).parent().parent().parent().parent().parent().find( ".panel-heading select" ).val();
-	
-	if( !tileset.style ) {
+gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tileset, del) {
+	if ($(element).hasClass("gb3d-declare-row-add")) {
+		return;
+	}
+	var isDel = false;
+	if ($(element).hasClass("gb-declare-item-del") && del) {
+		isDel = true;
+	}
+	var key = $(element).parent().parent().parent().parent().parent().find(".panel-heading select").val();
+
+	if (!tileset.style) {
 		tileset.style = new Cesium.Cesium3DTileStyle();
 	}
-	
-	var rows = $( element ).parent().parent().parent().find( ".gb-declare-row" );
-	
-	var conditions = [],
-		show;
-	
-	rows.each( function ( index ) {
-		if( index === 0 ) {
-			return;
+
+	var rows = $(element).parent().parent().parent().find(".gb3d-declare-row");
+
+	var delrow = $(element).parents().eq(0);
+	var delidx = $(delrow).index(".gb3d-declare-row");
+
+	var conditions = [], show;
+
+	for (var index = 0; index < rows.length; index++) {
+		if (index === delidx) {
+			continue;
 		}
-		
-		var li = $( this ).find( ".gb-declare-item" );
-		
-		var sign = $( li[0] ).find( "select" ).val();
-		var value = $( li[1] ).find( "input" ).val();
-		var color = $( li[2] ).find( "input" ).spectrum( "get" ).toHexString();
-		var bool = $( li[3] ).find( "input" ).prop( "checked" );
-		
-		if( bool ) {
+
+		var li = $(rows[index]).find(".gb-declare-item");
+
+		var sign = $(li[0]).find("select").val();
+		var value = $(li[1]).find("input").val();
+		var color = $(li[2]).find("input").spectrum("get").toHexString();
+		var bool = $(li[3]).find("input").prop("checked");
+
+		if (bool) {
 			var res;
-			switch( sign ) {
+			switch (sign) {
 			case ">=":
 				res = "<";
 				break;
@@ -76,12 +85,12 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function( element, til
 				res = "===";
 				break;
 			}
-			
-			show = "(${" + key + "} " + res + " " + value + ")";
+
+			show = "${" + key + "} " + res + " " + value;
 		}
-		
+
 		var res;
-		switch( sign ) {
+		switch (sign) {
 		case "=":
 			res = "===";
 			break;
@@ -92,29 +101,46 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function( element, til
 			res = sign;
 		}
 		
-		conditions.push( [ "(${" + key + "} " + res + " " + value + ")", "color('" + color.toUpperCase() + "')"] );
-	} );
-	
+		if (value === "") {
+//			return;
+//			value
+			continue;
+		} else {
+			conditions.push([ "${" + key + "} " + res + " " + value, "color('" + color.toUpperCase() + "')" ]);			
+		}
+		
+	}
+
+	if (isDel) {
+		$(delrow).remove();
+	}
+
 	// tileset color condition 기본값 설정. 기본값 미설정시 에러 발생
-	conditions.push( [ "true", "color('#FFFFFF')" ] );
-	
-	tileset.style = new Cesium.Cesium3DTileStyle( {
-		color: {
-			conditions: conditions
-		},
-		show: show
-	} );
+	conditions.push([ "true", "color('#FFFFFF')" ]);
+
+	var styleObj = {};
+	if (conditions.length > 0) {
+		styleObj["color"] = {};
+		styleObj["color"]["conditions"] = conditions;
+	}
+	if (show) {
+		styleObj["show"] = show;
+	}
+	console.log(styleObj);
+	tileset.style = new Cesium.Cesium3DTileStyle(styleObj);
 }
 
-gb3d.edit.TilesetManager.prototype.addTileset = function( url, layerid ) {
+gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	var that = this;
 	var url = url;
-	var tileset = new Cesium.Cesium3DTileset( { url : url } );
-	var tilesetVO = new gb3d.object.Tileset( {
+	var tileset = new Cesium.Cesium3DTileset({
+		url : url
+	});
+	var tilesetVO = new gb3d.object.Tileset({
 		"layer" : layerid,
 		"cesiumTileset" : tileset
-	} );
-	
+	});
+
 	var targetLayer = that.getClientTree().getJSTree().get_LayerByOLId(layerid);
 	if (targetLayer) {
 		var git = targetLayer.get("git");
@@ -123,36 +149,40 @@ gb3d.edit.TilesetManager.prototype.addTileset = function( url, layerid ) {
 		}
 		git["tileset"] = tilesetVO;
 	}
-	
-	this.viewer.scene.primitives.add( tileset );
-//	this.viewer.zoomTo( tileset );
-	
+
+	this.viewer.scene.primitives.add(tileset);
+	// this.viewer.zoomTo( tileset );
+
 	tileset.allTilesLoaded.addEventListener(function() {
-		that.tilesetUI.addTilesPanel( tilesetVO );
-		that.pushTilesetList( tilesetVO );
-		
-		that.tilesetUI.deleteEvent( function ( e ) {
-			that.update3DTilesetStyle( this, tileset );
-		} );
-		
-		that.tilesetUI.conditionEvent( function ( e ) {
-			that.update3DTilesetStyle( this, tileset );
-		} );
-		
-		that.tilesetUI.inputValueEvent( function ( e ) {
-			that.update3DTilesetStyle( this, tileset );
-		} );
-		
-		that.tilesetUI.inputColorEvent( function ( e ) {
-			that.update3DTilesetStyle( this, tileset );
-		} );
-		
-		that.tilesetUI.checkEvent( function ( e ) {
-			that.update3DTilesetStyle( this, tileset );
-		} );
+		that.tilesetUI.addTilesPanel(tilesetVO);
+		that.pushTilesetList(tilesetVO);
+
+		that.tilesetUI.deleteEvent(function(e) {
+			that.update3DTilesetStyle(this, tileset, true);
+		});
+
+		that.tilesetUI.conditionEvent(function(e) {
+			if ($(e.target).parents().eq(1).find(".gb-declare-value").val() === "") {
+				return;
+			} else {
+				that.update3DTilesetStyle(this, tileset);	
+			}
+		});
+
+		that.tilesetUI.inputValueEvent(function(e) {
+			that.update3DTilesetStyle(this, tileset);
+		});
+
+		that.tilesetUI.inputColorEvent(function(e) {
+			that.update3DTilesetStyle(this, tileset);
+		});
+
+		that.tilesetUI.checkEvent(function(e) {
+			that.update3DTilesetStyle(this, tileset);
+		});
 	});
 }
 
 gb3d.edit.TilesetManager.prototype.getClientTree = function() {
-	return this.clientTree;	
+	return this.clientTree;
 }
