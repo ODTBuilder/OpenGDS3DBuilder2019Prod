@@ -42,9 +42,9 @@ server:
     whitelabel:
       enabled: false
 gitrnd:
-  serverhost: localhost
+  serverhost: 175.116.181.42
   apache:
-    host: localhost
+    host: 175.116.181.42
     port: 8888
     basedir: gdofiles
     basedrive: C
