@@ -1,6 +1,6 @@
 spring:
   rabbitmq:
-    host: 175.116.181.42
+    host: localhost
     port: 5672
     virtual-host: only_opengds
     username: qaproducer
@@ -11,7 +11,7 @@ spring:
       routing-key-mobile: opengds_mobile_qa_key
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://175.116.181.42:5432/opengds_2018?charSet=UTF-8&prepareThreshold=1
+    url: jdbc:postgresql://localhost:5432/opengds_2018?charSet=UTF-8&prepareThreshold=1
     username: opensource
     password: opensource
     driver-class-name: org.postgresql.Driver
@@ -30,7 +30,7 @@ spring:
       max-file-size: 10485760KB
       max-request-size: 10485760KB
 server:
-  port: 8081
+  port: 8089
   context-path: /geodt
   servlet:
     session:
@@ -42,15 +42,15 @@ server:
     whitelabel:
       enabled: false
 gitrnd:
-  serverhost: 175.116.181.32
+  serverhost: localhost
   apache:
-    host: 175.116.181.32
+    host: localhost
     port: 8888
     basedir: gdofiles
     basedrive: C
   node:
     protocol: http
-    host: 127.0.0.1
+    host: localhost
     port: 3000
 mybatis:
   config-location: classpath:config/mybatis.xml
