@@ -77,87 +77,87 @@ gb.edit.ACTIVEAREA = 7.75;
 gb3d.edit.EditingTool2D = function(obj) {
 	var that = this;
 	this.translation = {
-		"notSupportHistory" : {
-			"en" : "This layer is not support feature history",
-			"ko" : "피처 이력을 지원하지 않는 레이어 입니다."
-		},
-		"alertSelectFeature" : {
-			"en" : "you should select Feature",
-			"ko" : "피처를 선택해 주세요."
-		},
-		"alertSelectOneLayer" : {
-			"en" : "you must select only one Layer",
-			"ko" : "레이어는 하나만 선택해야 합니다."
-		},
-		"returnMustArray" : {
-			"en" : "The return type must be an array",
-			"ko" : "리턴 객체는 배열이어야 합니다"
-		},
-		"editToolHint" : {
-			"en" : "Please zoom in to edit",
-			"ko" : "편집하시려면 확대해주세요"
-		},
-		"changes" : {
-			"en" : "Changes",
-			"ko" : "변경이력"
-		},
-		"add" : {
-			"ko" : "추가",
-			"en" : "Add"
-		},
-		"cancel" : {
-			"ko" : "취소",
-			"en" : "Cancel"
-		},
-		"delete" : {
-			"ko" : "삭제",
-			"en" : "Delete"
-		},
-		"deleteFeature" : {
-			"ko" : "객체 삭제",
-			"en" : "Delete Feature"
-		},
-		"notNullHint" : {
-			"ko" : "빈 값이 허용되지않습니다.",
-			"en" : "null values ​​are not allowed."
-		},
-		"valueHint" : {
-			"ko" : "타입에 맞게 값을 입력해야합니다.",
-			"en" : "You must enter a value for the type."
-		},
-		"tempLayer" : {
-			"ko" : "Move 임시레이어",
-			"en" : "Move temporary layer"
-		},
-		"deleteFeaturesHint" : {
-			"ko" : "선택한 객체들을 정말로 삭제하시겠습니까?",
-			"en" : "Are you sure you want to delete the selected features?"
-		},
-		"selectFeatureNum" : {
-			"ko" : "선택된 객체 수",
-			"en" : "Number of selected features"
-		},
-		"transformPointHint" : {
-			"ko" : "Point객체는 변환 기능을 사용할 수 없습니다.",
-			"en" : "Point objects can not use the transform function."
-		},
-		"requiredOption" : {
-			"ko" : "은 필수 입력항목입니다.",
-			"en" : "is a required field."
-		},
-		"attr2DTitle" : {
-			"ko" : "2D 객체 속성",
-			"en" : "2D Feature Attribute"
-		}
+			"notSupportHistory" : {
+				"en" : "This layer is not support feature history",
+				"ko" : "피처 이력을 지원하지 않는 레이어 입니다."
+			},
+			"alertSelectFeature" : {
+				"en" : "you should select Feature",
+				"ko" : "피처를 선택해 주세요."
+			},
+			"alertSelectOneLayer" : {
+				"en" : "you must select only one Layer",
+				"ko" : "레이어는 하나만 선택해야 합니다."
+			},
+			"returnMustArray" : {
+				"en" : "The return type must be an array",
+				"ko" : "리턴 객체는 배열이어야 합니다"
+			},
+			"editToolHint" : {
+				"en" : "Please zoom in to edit",
+				"ko" : "편집하시려면 확대해주세요"
+			},
+			"changes" : {
+				"en" : "Changes",
+				"ko" : "변경이력"
+			},
+			"add" : {
+				"ko" : "추가",
+				"en" : "Add"
+			},
+			"cancel" : {
+				"ko" : "취소",
+				"en" : "Cancel"
+			},
+			"delete" : {
+				"ko" : "삭제",
+				"en" : "Delete"
+			},
+			"deleteFeature" : {
+				"ko" : "객체 삭제",
+				"en" : "Delete Feature"
+			},
+			"notNullHint" : {
+				"ko" : "빈 값이 허용되지않습니다.",
+				"en" : "null values ​​are not allowed."
+			},
+			"valueHint" : {
+				"ko" : "타입에 맞게 값을 입력해야합니다.",
+				"en" : "You must enter a value for the type."
+			},
+			"tempLayer" : {
+				"ko" : "Move 임시레이어",
+				"en" : "Move temporary layer"
+			},
+			"deleteFeaturesHint" : {
+				"ko" : "선택한 객체들을 정말로 삭제하시겠습니까?",
+				"en" : "Are you sure you want to delete the selected features?"
+			},
+			"selectFeatureNum" : {
+				"ko" : "선택된 객체 수",
+				"en" : "Number of selected features"
+			},
+			"transformPointHint" : {
+				"ko" : "Point객체는 변환 기능을 사용할 수 없습니다.",
+				"en" : "Point objects can not use the transform function."
+			},
+			"requiredOption" : {
+				"ko" : "은 필수 입력항목입니다.",
+				"en" : "is a required field."
+			},
+			"attr2DTitle" : {
+				"ko" : "2D 객체 속성",
+				"en" : "2D Feature Attribute"
+			}
 	};
-	
+
 	gb3d.edit.EditingToolBase.call(this, obj);
-	
+
 	/**
 	 * editing tool 3d 객체
 	 */
 	this.editingTool3D = obj.editingTool3D instanceof gb3d.edit.EditingTool3D ? obj.editingTool3D : undefined; 
-	
+
 	/**
 	 * 현재 편집중인 레이어
 	 * 
@@ -165,7 +165,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {ol.layer.Base}
 	 */
 	this.layer = undefined;
-	
+
 	/**
 	 * 선택된 객체들의 집합
 	 * 
@@ -173,7 +173,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {ol.Collection.<ol.Feature>}
 	 */
 	this.selected = undefined;
-	
+
 	/**
 	 * 현재 편집중인 레이어의 Source 객체
 	 * 
@@ -181,7 +181,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {ol.source.TileSource|ol.source.Vector}
 	 */
 	this.selectedSource = undefined;
-	
+
 	/**
 	 * 현재 편집중인 Source 객체들의 집합
 	 * 
@@ -189,7 +189,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {ol.Collection.<ol.source.Vector>}
 	 */
 	this.selectSources = new ol.Collection();
-	
+
 	/**
 	 * Geoserver로부터 import된 레이어들의 Vector Source 객체 집합
 	 * 
@@ -197,7 +197,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {Object.<string, ol.source.Vector>}
 	 */
 	this.vectorSourcesOfServer_ = {};
-	
+
 	/**
 	 * 벡터 레이어들의 Vector Source 객체 집합
 	 * 
@@ -205,7 +205,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {Object.<string, ol.source.Vector>}
 	 */
 	this.vectorSourcesOfVector_ = {};
-	
+
 	/**
 	 * 객체 복사, 붙여넣기 기능 모듈
 	 * 
@@ -213,7 +213,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {gb.interaction.Copypaste}
 	 */
 	this.copyPaste_ = undefined;
-	
+
 	/**
 	 * Snap 기능 활성화를 위한 Vector Source 객체
 	 * 
@@ -237,7 +237,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {ol.Collection.<ol.Feature>}
 	 */
 	this.features = new ol.Collection();
-	
+
 	/**
 	 * Move 기능 활성화를 위한 Vector Source 객체
 	 * 
@@ -247,7 +247,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.tempSource = new ol.source.Vector({
 		features : this.features
 	});
-	
+
 	/**
 	 * Move 기능 활성화를 위한 Vector Layer 객체
 	 * 
@@ -259,14 +259,14 @@ gb3d.edit.EditingTool2D = function(obj) {
 		source : this.tempSource
 	});
 	this.tempVector.set("name", this.translation.tempLayer[this.locale]);
-	
+
 // this.managed = new ol.layer.Vector({
 // renderMode: "vector",
 // source : this.tempSource
 // });
 // this.managed.set("name", "temp_vector");
 // this.managed.set("id", "temp_vector");
-	
+
 	/**
 	 * Feature 객체 강조 표시를 위한 Openlayers Style 객체 배열
 	 * 
@@ -356,7 +356,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			return geom;
 		}
 	}) ];
-	
+
 	/**
 	 * Interval 함수의 ID
 	 * 
@@ -364,7 +364,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {number}
 	 */
 	this.interval = undefined;
-	
+
 	/**
 	 * Interval 함수의 지연시간을 위한 변수
 	 * 
@@ -372,7 +372,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {number}
 	 */
 	this.count = 1;
-	
+
 	/**
 	 * EditingTool 작업표시줄에 표현될 HTMLElement 객체들의 집합
 	 * 
@@ -387,7 +387,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			modiBtn : undefined,
 			delBtn : undefined
 	};
-	
+
 	/**
 	 * EditingTool 작업 상태 집합
 	 * 
@@ -403,7 +403,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			rotate : false,
 			snap : false
 	};
-	
+
 	/**
 	 * EditingTool 기본 interaction 집합
 	 * 
@@ -421,7 +421,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			snap : undefined,
 			remove : undefined
 	};
-	
+
 	/**
 	 * 사용자가 추가한 Interaction 객체의 집합
 	 * 
@@ -429,7 +429,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * @type {Array.<Object>}
 	 */
 	this.customInteractions = [];
-	
+
 	var options = obj ? obj : {};
 	this.locale = options.locale || "en";
 	this.mapObj = options.map ? options.map : undefined;
@@ -458,9 +458,9 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.featureRecord = options.featureRecord ? options.featureRecord : undefined;
 	this.versioningFeature = options.versioning instanceof gb.versioning.Feature ? options.versioning : undefined; 
 	this.isEditing = options.isEditing instanceof Object ? options.isEditing : undefined;
-	
+
 	this.otree.setEditingTool(this);
-	
+
 	var view = this.map.getView(); 
 	this.map.on('singleclick', function(evt) {
 		if (!that.getActiveTool()) {
@@ -495,11 +495,11 @@ gb3d.edit.EditingTool2D = function(obj) {
 									style : that.selectedStyles
 								});
 								that.interaction.select.getFeatures().push(features[0]);
-								
+
 								that.selected = that.interaction.select.getFeatures();
 								that.map.addInteraction(that.interaction.select);
 								that.map.removeInteraction(that.interaction.dragbox);
-								
+
 // var source = that.selectedSource;
 								var git = slayer.get("git");
 								var props = git.attribute || [];
@@ -539,22 +539,22 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 								// threeJS Object Select
 								var fid = that.interaction.select.getFeatures().item(0).getId();
-								
-				// that.getEditingTool3D().syncSelect(that.features.item(0).getId());
-								
+
+								// that.getEditingTool3D().syncSelect(that.features.item(0).getId());
+
 								var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
-								
+
 								var gitAttr = slayer.get("git");
-								
+
 // var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["layerID"]);
-								
+
 								var tileset = gitAttr.tileset;
 								if (tileset) {
 									console.log("tile exist");
-				// ctileset.root.children[0].children[0].content.getFeature(1717);
+									// ctileset.root.children[0].children[0].content.getFeature(1717);
 									var ctileset = tileset.getCesiumTileset();
 									var root = ctileset.root;
-									
+
 									var recursiveSearch = function(tile, bid){
 										var result;
 										if (tile instanceof Cesium.Cesium3DTile) {
@@ -577,16 +577,17 @@ gb3d.edit.EditingTool2D = function(obj) {
 										}
 										return result;
 									};
-									
+
 									var feature = recursiveSearch(root, fidnum);
 									if (feature) {
 										that.getEditingTool3D().selectTilesetFeature(feature);
 									}
 								}
 							} else {
-								that.getEditingTool3D().unselectCesium();
-								$(that.attrTB).empty();
-								that.attrPop.close();
+// that.getEditingTool3D().unselectCesium();
+// $(that.attrTB).empty();
+// that.attrPop.close();
+								that.unselectFeature();
 							}
 						});
 					}				
@@ -594,7 +595,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			}
 		}
 	});
-	
+
 	// EditingTool 작업 표시줄 기본 항목
 	var defaultList = [
 		{
@@ -705,7 +706,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 		"max-height" : "300px",
 		"overflow-y" : "auto"
 	});
-	
+
 	var ath1 = $("<th>").text("Name");
 	var ath2 = $("<th>").text("Type");
 	var ath3 = $("<th>").text("Value");
@@ -713,7 +714,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	var ahd = $("<thead>").append(atr);
 	this.attrTB = $("<tbody>");
 	var atb = $("<table>").addClass("gb-table").append(ahd).append(this.attrTB);
-	
+
 	this.attrPop = new gb.panel.PanelBase({
 		"target" : ".area-2d",
 		"width" : 300,
@@ -722,12 +723,12 @@ gb3d.edit.EditingTool2D = function(obj) {
 		"autoOpen" : false,
 		"body" : atb
 	});
-	
+
 	$(this.attrPop.getPanel()).find(".gb-panel-body").css({
 		"max-height" : "400px",
 		"overflow-y" : "auto"
 	});
-	
+
 // $("#attrAttr").find(".gb-table").remove();
 // $("#attrAttr").append(atb);
 
@@ -759,7 +760,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 				preventReload = true;
 				firstLoad = false;
 			}
-			
+
 			if(that.checkActiveTool() && !preventReload){
 				that.loadWFS_();
 				that.loadVector_();
@@ -794,7 +795,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 			source.clear();
 			delete that.vectorSourcesOfServer_[id];
 		}
-		
+
 		source = that.getVectorSourceOfVector(id);
 		if(!!source){
 			source.get("git").tempLayer.setMap(null);
@@ -1242,7 +1243,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			})
 		}
 	});
-	
+
 	// ThreeJS Object unselect
 	this.interaction.select.getFeatures().on("remove", function(evt) {
 		that.getEditingTool3D().syncUnselect( evt.element.getId() );
@@ -1252,7 +1253,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		var vfeature = that.getVersioningFeature();
 		that.features = that.interaction.select.getFeatures();
 		$(that.featureTB).empty();
-		
+
 		if (that.features.getLength() > 1) {
 // vfeature.close();
 			that.featurePop.close();
@@ -1352,7 +1353,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				that.updateFeatureHistoryModal(feature);
 			} else {
 				var vfeature = that.getVersioningFeature();
-//				vfeature.close();
+// vfeature.close();
 			}
 			// 피처 버저닝 이력 끝
 
@@ -1375,7 +1376,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						"width" : "100%",
 						"border" : "none"
 					}).val(that.feature.get(props[i].fieldName)).on("input", function(e) {
-//						var attrTemp = attrInfo[$(this).parent().prev().text()];
+// var attrTemp = attrInfo[$(this).parent().prev().text()];
 						var key = $(this).parent().prev().prev().text();
 						var source = that.selectedSource;
 						var git = source.get("git");
@@ -1393,9 +1394,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 							}
 						}
 
-//						obj[$(this).parent().prev().text()] = $(this).val();
-//						that.feature.setProperties(obj);
-//						that.featureRecord.update(layer, that.feature);
+// obj[$(this).parent().prev().text()] = $(this).val();
+// that.feature.setProperties(obj);
+// that.featureRecord.update(layer, that.feature);
 
 						if(!nullable && $(this).val() === ""){
 							return;
@@ -1514,7 +1515,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				var tileset = tLayer.get("git").tileset;
 				if (tileset) {
 					console.log("tile exist");
-//					ctileset.root.children[0].children[0].content.getFeature(1717);
+// ctileset.root.children[0].children[0].content.getFeature(1717);
 					var ctileset = tileset.getCesiumTileset();
 					var root = ctileset.root;
 
@@ -1553,9 +1554,10 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 			}
 		} else {
 			that.featurePop.close();
-			that.attrPop.close();
-			that.getEditingTool3D().unselectCesium();
-//			vfeature.close();
+			that.unselectFeature();
+// that.attrPop.close();
+// that.getEditingTool3D().unselectCesium();
+// vfeature.close();
 		}
 	});
 
@@ -1577,15 +1579,15 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 
 	// if (this.isOn.draw) {
-		if (!!this.interaction.draw || !!this.interaction.updateDraw) {
-			if (this.interaction.draw.getActive()){
-				this.deactiveIntrct_("snap");
-				this.deactiveIntrct_("draw");
-				this.deactiveBtn_("drawBtn");
+	if (!!this.interaction.draw || !!this.interaction.updateDraw) {
+		if (this.interaction.draw.getActive()){
+			this.deactiveIntrct_("snap");
+			this.deactiveIntrct_("draw");
+			this.deactiveBtn_("drawBtn");
 // this.map.removeLayer(this.managed);
-				return;
-			}
+			return;
 		}
+	}
 	// }
 // this.map.removeLayer(this.managed);
 	var that = this;
@@ -1643,17 +1645,17 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 		this.interaction.draw.on("drawend", function(evt) {
 			console.log(evt);
 			gb.undo.setActive(true);
-			
+
 			var feature = evt.feature;
 			var source = that.selectedSource;
 			var layer = source.get("git").tempLayer;
 			var arr = that.selectedSource.getFeatures() instanceof Array ? that.selectedSource.getFeatures() : [];
 			var item = arr[0];
 			var prop, notNull = {}, setProp = {};
-			
+
 			if (!!source) {
 				var l = source.getFeatureById(source.get("git").treeID + ".new0")
-				
+
 				if (!l) {
 					var fid = source.get("git").treeID + ".new0";
 					feature.setId(fid);
@@ -1667,20 +1669,20 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				}
-				
+
 				gb.undo.pushAction({
 					undo: function(data){
 						data.layer.getSource().removeFeature(data.feature);
 						data.that.featureRecord.deleteFeatureCreated(data.layer.get("id"), data.feature.getId());
-						
+
 						// ThreeObject remove
 						var threeObject = that.mapObj.getThreeObjectById(data.feature.getId());
-                        that.mapObj.removeThreeObject( threeObject );
+						that.mapObj.removeThreeObject( threeObject );
 					},
 					redo: function(data){
 						data.layer.getSource().addFeature(data.feature);
 						data.that.featureRecord.create(data.layer, data.feature);
-						
+
 						// ThreeObject remove cancel
 						var threeObject = that.mapObj.getThreeObjectById(data.feature.getId());
 						that.mapObj.removeThreeObject( threeObject, true );
@@ -1692,18 +1694,18 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 					}
 				});
 			}
-			
+
 			// ----- ThreeJS Object Create --------
 // that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry,
 // feature, source.get("git").treeID, layer.get("id"));
-			
+
 			if(source.get("git") instanceof Object){
 				if(source.get("git").attribute instanceof Array){
 					var typeFormBody = $("<tbody>");
 					for(var i = 0; i < source.get("git").attribute.length; i++){
 						prop = source.get("git").attribute[i];
 						notNull[prop.fieldName] = prop.nullable;
-						
+
 						var td1 = $("<td>").text(prop.fieldName);
 						var td2 = $("<td>").text(prop.type);
 						var input = $("<input>").addClass("form-control").attr({
@@ -1720,56 +1722,56 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 					var htd2 = $("<td>").text("Type");
 					var htd3 = $("<td>").text("Value");
 					var thd = $("<thead>").append(htd1).append(htd2).append(htd3);
-					
+
 					var table = $("<table>").addClass("table").addClass("text-center").append(thd).append(typeFormBody);
-					
+
 					var okBtn = 
 						$("<button>")
-							.css({
-								"float" : "right"
-							})
-							.addClass("gb-button")
-							.addClass("gb-button-primary")
-							.text(that.translation.add[that.locale]);
-					
+						.css({
+							"float" : "right"
+						})
+						.addClass("gb-button")
+						.addClass("gb-button-primary")
+						.text(that.translation.add[that.locale]);
+
 					var buttonArea = 
 						$("<span>")
-							.addClass("gb-modal-buttons")
-							.append(okBtn);
-					
+						.addClass("gb-modal-buttons")
+						.append(okBtn);
+
 					var modalFooter = $("<div>").append(buttonArea);
 
 					var body = 
 						$("<div>")
-							.append(table)
-							.css({
-								"max-height" : "300px",
-								"overflow-y" : "auto"
-							});
-					
+						.append(table)
+						.css({
+							"max-height" : "300px",
+							"overflow-y" : "auto"
+						});
+
 					var addPropModal = new gb.modal.ModalBase({
 						"title" : that.translation.attr2DTitle[that.locale],
 						"width" : 540,
 						"autoOpen" : source.get("git").attribute.length !== 0 ? true : false,
-						"body" : body,
-						"footer" : modalFooter
+								"body" : body,
+								"footer" : modalFooter
 					});
-					
+
 					okBtn.click(function(){
 						var nullCheck = true;
 						var check = true;
-						
+
 						typeFormBody.children().each(function(){
 							var key = $(this).children().eq(0).text();
 							var type = $(this).children().eq(1).text();
 							var input = $(this).children().eq(2).find("input:text");
 							var value = input.val().replace(/(\s*)/g, '');
 							var valueCheck = true;
-							
+
 							if(!notNull[key] && value === ''){
 								nullCheck = false;
 							}
-							
+
 							switch (type) { 
 							case "String":
 								if(that.isString(value) || value === ''){ 
@@ -1841,7 +1843,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 								break;
 							default: break;
 							}
-							
+
 							if(!valueCheck){
 								check = false;
 								input.css("background-color", "#ccc");
@@ -1849,25 +1851,25 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 								input.css("background-color", "#fff");
 							}
 						});
-						
+
 						if(!nullCheck){
 							alert(that.translation.notNullHint[that.locale]);
 							return;
 						}
-						
+
 						if(!check){
 							alert(that.translation.valueHint[that.locale]);
 							return;
 						}
-						
+
 						feature.setProperties(setProp);
 						addPropModal.close();
-						
+
 						// ----- ThreeJS Object Create --------
 						that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
 					});
 					addPropModal.modalHead.find("button").remove();
-					
+
 					if(source.get("git").attribute.length === 0){
 						// ----- ThreeJS Object Create --------
 						that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry, feature, source.get("git").treeID, layer.get("id"));
@@ -1978,7 +1980,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 		this.interaction.move.on("translatestart", function(evt) {
 			lastCoord = evt.coordinate;
 		});
-		
+
 		this.interaction.move.on("translateend", function(evt) {
 
 			// 선택된 feature 객체들을 저장
@@ -1987,14 +1989,14 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 			for (var i = 0; i < features.getLength(); i++) {
 				that.featureRecord.update(selectSource.get("git").tempLayer, features.item(i));
 				featureList.push(features.item(i));
-				
+
 				var extent = features.item(i).getGeometry().getExtent();
 				var x = extent[0] + (extent[2] - extent[0]) / 2;
 				var y = extent[1] + (extent[3] - extent[1]) / 2;
 				// ThreeJS move
 				that.getEditingTool3D().moveObject3Dfrom2D(features.item(i).getId(), [x,y], features.item(i).getGeometry().getCoordinates(true));
 			}
-			
+
 			gb.undo.pushAction({
 				undo: function(data){
 					var deltaX = data.lastCoord[0] - data.newCoord[0];
@@ -2005,7 +2007,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						geom.translate(deltaX, deltaY);
 						data.features[i].setGeometry(geom);
 						data.that.featureRecord.update(data.layer, data.features[i]);
-						
+
 						// ThreeJS move
 						var ext = geom.getExtent();
 						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
@@ -2022,7 +2024,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 						geom.translate(deltaX, deltaY);
 						data.features[i].setGeometry(geom);
 						data.that.featureRecord.update(data.layer, data.features[i]);
-						
+
 						// ThreeJS move
 						var ext = geom.getExtent();
 						var centerX = ext[0] + (ext[2] - ext[0]) / 2;
@@ -2065,14 +2067,14 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 		return;
 	}
 	// if (this.isOn.rotate) {
-		if (!!this.interaction.rotate) {
-			if (this.interaction.rotate.getActive()){
-				this.interaction.select.getFeatures().clear();
-				this.deactiveIntrct_("rotate");
-				this.deactiveBtn_("rotateBtn");
-				return;
-			}
+	if (!!this.interaction.rotate) {
+		if (this.interaction.rotate.getActive()){
+			this.interaction.select.getFeatures().clear();
+			this.deactiveIntrct_("rotate");
+			this.deactiveBtn_("rotateBtn");
+			return;
 		}
+	}
 	// }
 
 	var that = this;
@@ -2116,19 +2118,19 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			if(!feature){
 				return;
 			}
-			
+
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
 			// ThreeJS vertex modify
 			var floor = that.getEditingTool3D().modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent(), evt);
 // feature.setGeometry(floor);
-			
+
 			gb.undo.pushAction({
 				undo: function(data){
 					var geom = data.feature.getGeometry();
 					geom.setCoordinates(data.lastCoord);
 					data.feature.setGeometry(geom);
 					data.that.featureRecord.update(data.layer, data.feature);
-					
+
 					// ThreeJS vertex modify
 					that.getEditingTool3D().modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(),
 							data.feature.getGeometry().getExtent());
@@ -2138,7 +2140,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 					geom.setCoordinates(data.newCoord);
 					data.feature.setGeometry(geom);
 					data.that.featureRecord.update(data.layer, data.feature);
-					
+
 					// ThreeJS vertex modify
 					that.getEditingTool3D().modify3DVertices(data.feature.getGeometry().getCoordinates(true), data.feature.getId(), 
 							data.feature.getGeometry().getExtent());
@@ -2173,15 +2175,15 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 		return;
 	}
 	// if (this.isOn.modify) {
-		if (!!this.interaction.modify) {
-			if (this.interaction.modify.getActive()) {
-				this.interaction.select.getFeatures().clear();
-				this.deactiveIntrct_("modify");
-				this.deactiveIntrct_("snap");
-				this.deactiveBtn_("modiBtn");
-				return;
-			}
+	if (!!this.interaction.modify) {
+		if (this.interaction.modify.getActive()) {
+			this.interaction.select.getFeatures().clear();
+			this.deactiveIntrct_("modify");
+			this.deactiveIntrct_("snap");
+			this.deactiveBtn_("modiBtn");
+			return;
 		}
+	}
 	// }
 	var that = this;
 
@@ -2193,7 +2195,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 	console.log(selectSource.get("git").tempLayer);
 	that.setLayer(selectSource.get("git").tempLayer);
 	var git = selectSource.get("git");
-	
+
 	if (this.interaction.select.getFeatures().getLength() > 0) {
 
 		if(git instanceof Object){
@@ -2202,7 +2204,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 				return;
 			}
 		}
-		
+
 		this.interaction.modify = new ol.interaction.Modify({
 			features : this.interaction.select.getFeatures()
 		});
@@ -2229,12 +2231,12 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 					id: features.item(i).getId(),
 					coord: features.item(i).getGeometry().getCoordinates()
 				});
-				
+
 				// ThreeJS vertex modify
 				that.getEditingTool3D().modify3DVertices(features.item(i).getGeometry().getCoordinates(true), features.item(i).getId(), 
 						features.item(i).getGeometry().getExtent());
 			}
-			
+
 			gb.undo.pushAction({
 				undo: function(data){
 					console.log("modify undo");
@@ -2246,7 +2248,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								geom.setCoordinates(data.lastCoord[j].coord);
 								data.features[i].setGeometry(geom);
 								data.that.featureRecord.update(data.layer, data.features[i]);
-								
+
 								// ThreeJS vertex modify
 								that.getEditingTool3D().modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
 										data.features[i].getGeometry().getExtent());
@@ -2265,7 +2267,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 								geom.setCoordinates(data.newCoord[j].coord);
 								data.features[i].setGeometry(geom);
 								data.that.featureRecord.update(data.layer, data.features[i]);
-								
+
 								// ThreeJS vertex modify
 								that.getEditingTool3D().modify3DVertices(data.features[i].getGeometry().getCoordinates(true), data.features[i].getId(), 
 										data.features[i].getGeometry().getExtent());
@@ -2320,7 +2322,7 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 	}
 
 	var length = this.interaction.select.getFeatures().getLength();
-	
+
 	if (length > 0) {
 		var features = this.interaction.select.getFeatures();
 		var fill = new ol.style.Fill({
@@ -2342,19 +2344,19 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 			fill : undefined,
 			stroke : undefined
 		});
-		
+
 		var msg1 = $("<div>").css({
 			"text-align" : "center",
 			"font-size" : "16px"
 		}).text(this.translation.deleteFeaturesHint[this.locale]);
-		
+
 		var todel = this.translation.selectFeatureNum[this.locale] + " : " + length;
 		var msg2 = $("<div>").text(todel).css({
 			"text-align" : "center",
 			"font-size" : "24px",
 			"word-break" : "break-word"
 		});
-		
+
 		var body = $("<div>").append(msg1).append(msg2);
 		var closeBtn = $("<button>").css({
 			"float" : "right"
@@ -2383,11 +2385,11 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 						features.item(i).setStyle(style);
 					}
 					that.featureRecord.remove(selectSource.get("git").tempLayer, features.item(i));
-					
+
 					// ThreeObject remove
 					var threeObject = that.mapObj.getThreeObjectById(features.item(i).getId());
 					that.mapObj.removeThreeObject( threeObject );
-					
+
 					var record = that.getEditingTool3D().getModelRecord();
 					record.remove(threeObject.getLayer(), threeObject);
 				}
@@ -2404,7 +2406,7 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 								feature.setStyle(data.defaultStyle);
 							}
 							data.that.featureRecord.deleteFeatureRemoved(data.source.get("git").tempLayer.get("id"), data.features[i].getId());
-							
+
 							// ThreeObject remove cancel
 							var threeObject = that.mapObj.getThreeObjectById(data.features[i].getId());
 							that.mapObj.removeThreeObject( threeObject, true );
@@ -2421,7 +2423,7 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 								feature.setStyle(data.removeStyle);
 							}
 							data.that.featureRecord.remove(data.source.get("git").tempLayer, data.features[i]);
-							
+
 							// ThreeObject remove
 							var threeObject = that.mapObj.getThreeObjectById(data.features[i].getId());
 							that.mapObj.removeThreeObject( threeObject );
@@ -2464,7 +2466,7 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 	var source = undefined;
 	var tree = this.otree.getJSTree();
-	
+
 	var selectedLayer = $(this.treeElement).jstreeol3("get_selected_layer");
 	var treeId;
 	if (selectedLayer.length === 1) {
@@ -2472,28 +2474,28 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 	} else {
 		return;
 	}
-	
+
 	if(tree.get_node(treeId).state.hiding){
 		return;
 	}
-	
+
 	var layer = tree.get_LayerById(treeId);
-	
+
 	// 현재 편집중인 레이어의 zindex를 최상위로
 	this.moveUpEditingLayer_();
-	
+
 	// 선택한 노드가 그룹레이어 또는 이미지 레이어일 때 작업 중단
 	if(layer instanceof ol.layer.Group || layer instanceof ol.layer.Image){
 		return this.selectedSource || source;
 	}
-	
+
 	// 선택한 노드가 묶음 타일 레이어일 때 작업 중단
 	if(layer instanceof ol.layer.Tile){
 		if(layer.get("git").fake === "parent"){
 			return this.selectedSource || source;
 		} 
 	}
-	
+
 	var prevSelected = this.selectedSource;
 	var prevTreeid;
 	if(prevSelected !== undefined){
@@ -2501,17 +2503,17 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 			prevTreeid = prevSelected.get("git").treeID || "";
 		}
 	}
-	
+
 	// 이전에 선택된 Openlayer Tree Node의 Editing 아이콘을 삭제
 	if(tree.get_node(prevTreeid)){
 		tree.set_flag(tree.get_node(prevTreeid), "editing", false);
 	}
-	
+
 	// 현재 선택된 Openlayer Tree Node에 Editing 아이콘을 생성
 	if(tree.get_node(treeId)){
 		tree.set_flag(tree.get_node(treeId), "editing", true);
 	}
-	
+
 	if(this.getVectorSourceOfServer(treeId)){
 		source = this.getVectorSourceOfServer(treeId);
 	} else if(this.getVectorSourceOfVector(treeId)){
@@ -2531,13 +2533,13 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 // geometry: layer.get("git").geometry
 // });
 // }
-//			
+
 // if(!this.customVector_[layer.get("treeid")]){
 // this.customVector_[layer.get("treeid")] = source;
 // }
 // }
 	}
-	
+
 	this.selectedSource = source;
 	if(source !== undefined){
 		this.selectSources.clear();
@@ -2688,7 +2690,7 @@ gb3d.edit.EditingTool2D.prototype.clearUnmanaged = function() {
 // "geoLayerList" : [ sourceLayer.get("id") ]
 // }
 // var names = [];
-//
+
 // $.ajax({
 // url : this.layerInfo,
 // method : "POST",
@@ -2906,13 +2908,13 @@ gb3d.edit.EditingTool2D.prototype.addSnappingLayer = function(layer) {
 	var array = undefined;
 	var git = undefined;
 	var jstree = this.otree ? this.otree.getJSTree() : undefined;
-	
+
 	if(layer instanceof ol.layer.Base){
 		if(layer.get("git") instanceof Object){
 			git = layer.get("git");
 		}
 	}
-	
+
 	if (layer instanceof ol.layer.Group) {
 		array = layer.getLayers();
 		for (var i = 0; i < array.getLength(); i++) {
@@ -2934,7 +2936,7 @@ gb3d.edit.EditingTool2D.prototype.addSnappingLayer = function(layer) {
 		}
 	} else if (layer instanceof ol.layer.Tile) {
 		var treeid = layer.get("treeid");
-		
+
 		if(git !== undefined){
 			if(git.fake === "parent"){
 				array = git.layers.getArray();
@@ -2944,7 +2946,7 @@ gb3d.edit.EditingTool2D.prototype.addSnappingLayer = function(layer) {
 				return success;
 			}
 		}
-		
+
 		if(!!this.vectorSourcesOfServer_[treeid]){
 			if(!jstree.get_node(treeid).state.snapping){
 				this.snapVector.push(this.vectorSourcesOfServer_[treeid].get("git").tempLayer);
@@ -2968,20 +2970,20 @@ gb3d.edit.EditingTool2D.prototype.removeSnappingLayer = function(layer) {
 	var that = this;
 	var success = false;
 	var jstree = this.otree ? this.otree.getJSTree() : undefined;
-	
+
 	var treeid = layer.get("treeid");
 	var node = jstree.get_node(treeid);
 	var parents = node.parents;
 
 	var array = undefined;
 	var git = undefined;
-	
+
 	if(layer instanceof ol.layer.Base){
 		if(layer.get("git") instanceof Object){
 			git = layer.get("git");
 		}
 	}
-	
+
 	if (layer instanceof ol.layer.Group) {
 		array = layer.getLayers();
 		for (var i = 0; i < array.getLength(); i++) {
@@ -3007,26 +3009,26 @@ gb3d.edit.EditingTool2D.prototype.removeSnappingLayer = function(layer) {
 				return success;
 			}
 		}
-		
+
 		if(!!this.vectorSourcesOfServer_[treeid]){
 			this.snapVector.remove(this.vectorSourcesOfServer_[treeid].get("git").tempLayer);
 			success = true;
 			jstree.set_flag(jstree.get_node(treeid), "snapping", false);
 		}
 	}
-	
+
 	if(success){
 		for(var i = 0; i < parents.length; i++){
 			if(parents[i] === "#"){
 				continue;
 			}
-			
+
 			if(jstree.get_node(parents[i]).state.snapping){
 				jstree.set_flag(jstree.get_node(parents[i]), "snapping", false);
 			}
 		}
 	}
-	
+
 	return success;
 }
 /**
@@ -3217,12 +3219,12 @@ gb3d.edit.EditingTool2D.prototype.addInteraction = function(options){
 						prevTreeid = prevSelected.get("git").treeID || "";
 					}
 				}
-				
+
 				if(that.otree.getJSTree().get_node(prevTreeid)){
 					that.otree.getJSTree().set_flag(that.otree.getJSTree().get_node(prevTreeid), "editing", false);
 				}
 			}
-			
+
 			interaction.setActive(true);
 			that.activeBtn_(content);
 		}
@@ -3314,14 +3316,14 @@ gb3d.edit.EditingTool2D.prototype.deactiveAnotherInteraction = function(interact
 gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
 	var tileLayers = [];
 	var wmsLayers;
-	
+
 	// wms 성능 고도화 시작
 	map.getLayers().forEach(function(e){
 		var layer, git, layers, temp;
-		
+
 		layer = e;
 		git = layer.get("git");
-		
+
 		if(layer instanceof ol.layer.Tile){
 			if(git instanceof Object){
 				if(git.fake === "parent"){
@@ -3341,7 +3343,7 @@ gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
 					temp = layer.getLayersArray();
 					for(var i = 0; i < temp.length; i++){
 						git = temp[i].get("git");
-						
+
 						if(git instanceof Object){
 							if(git.fake === "parent"){
 								if(git.layers instanceof ol.Collection){
@@ -3360,7 +3362,7 @@ gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
 		}
 	});
 	// wms 성능 고도화 끝
-	
+
 	// 이전 코드 시작
 // map.getLayers().forEach(function(layer){
 // if(layer instanceof ol.layer.Tile){
@@ -3466,7 +3468,7 @@ gb3d.edit.EditingTool2D.prototype.loadWFS_ = function(){
 	var tree = this.otree.getJSTree();
 	var selectedLayer;
 	var vectorSource;
-	
+
 	for(var i in tileLayers){
 		if(typeof tileLayers[i].get("git") === "object"){
 			if(!this.getVectorSourceOfServer(tileLayers[i].get("treeid"))){
@@ -3474,7 +3476,7 @@ gb3d.edit.EditingTool2D.prototype.loadWFS_ = function(){
 				if(tileLayers[i] instanceof ol.layer.Group){
 					continue;
 				}
-				
+
 				// Vector source를 새로 요청하여
 				// gb3d.edit.EditingTool2D~vectorSourcesOfServer_ 변수에 저장
 				vectorSource = this.setVectorSourceOfServer(tileLayers[i].get("git"), tileLayers[i].get("id"), 
@@ -3486,25 +3488,25 @@ gb3d.edit.EditingTool2D.prototype.loadWFS_ = function(){
 						this.select(vectorSource);
 					}
 				}
-				
+
 				if(!!tree.get_node(tileLayers[i].get("treeid"))){
 					if(!tree.get_node(tileLayers[i].get("treeid")).state.hiding){
 						vectorSource.get("git").tempLayer.setMap(this.map);
 					} else {
 						vectorSource.get("git").tempLayer.setMap(null);
 					}
-					
+
 					if(tree.get_node(tileLayers[i].get("treeid")).state.snapping){
 						this.snapVector.push(vectorSource.get("git").tempLayer);
 					}
 				}
 			} else {
 				if(!!tree.get_node(tileLayers[i].get("treeid"))){
-					
+
 					if(!this.getVectorSourceOfServer(tileLayers[i].get("treeid")).get("git")){
 						continue;
 					}
-					
+
 					if(!tree.get_node(tileLayers[i].get("treeid")).state.hiding){
 						this.getVectorSourceOfServer(tileLayers[i].get("treeid")).get("git").tempLayer.setMap(this.map);
 					} else {
@@ -3514,16 +3516,16 @@ gb3d.edit.EditingTool2D.prototype.loadWFS_ = function(){
 			}
 		}
 	}
-	
+
 	var ext = 
 		this.getMap()
-			.getView()
-			.calculateExtent(
+		.getView()
+		.calculateExtent(
 				this.getMap().getSize()
-			);
-	
+		);
+
 	this.loadSnappingLayer(ext);
-	
+
 // for(var i in this.customVector_){
 // this.customVector_[i].get("git").tempLayer.setVisible(true);
 // }
@@ -3584,7 +3586,7 @@ gb3d.edit.EditingTool2D.prototype.loadVector_ = function(){
 						this.select(vectorSource);
 					}
 				}
-				
+
 				if(!!tree.get_node(vecLayers[i].get("treeid"))){
 					if(!tree.get_node(vecLayers[i].get("treeid")).state.hiding){
 						zidx = vecLayers[i].getZIndex();
@@ -3611,7 +3613,7 @@ gb3d.edit.EditingTool2D.prototype.loadVector_ = function(){
 			}
 		}
 	}
-	
+
 // for(var i in this.customVector_){
 // this.customVector_[i].get("git").tempLayer.setVisible(true);
 // }
@@ -3671,7 +3673,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWFS = function(bool){
 gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
 // var tileLayers = this.getTileLayersInMap(this.map);
 	var tree = this.otree.getJSTree();
-//	
+
 // for(var i = 0; i < tileLayers.length; i++){
 // if(!!tree.get_node(tileLayers[i].get("treeid"))){
 // if(!tree.get_node(tileLayers[i].get("treeid")).state.hiding){
@@ -3689,14 +3691,14 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
 // }
 // }
 // }
-	
+
 	// wms 성능 고도화 시작
 	this.map.getLayers().forEach(function(e){
 		var layer, git, temp, zidx, tlayer;
-		
+
 		layer = e;
 		git = layer.get("git");
-		
+
 		if(layer instanceof ol.layer.Tile){
 			if(git instanceof Object){
 				if(git.fake !== "child"){
@@ -3720,7 +3722,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
 					temp = layer.getLayersArray();
 					for(var i = 0; i < temp.length; i++){
 						git = temp[i].get("git");
-						
+
 						if(git instanceof Object){
 							if(git.fake !== "child"){
 								if(!!tree.get_node(temp[i].get("treeid"))){
@@ -3765,7 +3767,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleVectorVector = function(bool){
 	} else {
 		set = null;
 	}
-	
+
 	for(var i = 0; i < vecLayers.length; i++){
 		source = vecLayers[i].getSource();
 		if(!source){
@@ -3794,7 +3796,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleImageVector = function(bool){
 	var dish = [];
 	var vecLayers = this.getImageVectorLayersInMap(rootLayers, dish);
 	var tree = this.otree.getJSTree();
-	
+
 	for(var i = 0; i < vecLayers.length; i++){
 		if(!!tree.get_node(vecLayers[i].get("treeid"))){
 			if(!tree.get_node(vecLayers[i].get("treeid")).state.hiding){
@@ -3874,12 +3876,12 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfServer = function(obj, layerI
 			loader: function(extent, resolution, projection){
 
 				params = {
-					"serverName": git.geoserver,
-					"workspace": git.workspace,
-					"version" : gb.module.serviceVersion.WFS,
-					"typeName" : layername,
-					"bbox" : extent.join(","),
-					"outputformat" : "application/json"
+						"serverName": git.geoserver,
+						"workspace": git.workspace,
+						"version" : gb.module.serviceVersion.WFS,
+						"typeName" : layername,
+						"bbox" : extent.join(","),
+						"outputformat" : "application/json"
 				};
 
 				$.ajax({
@@ -3924,15 +3926,15 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfServer = function(obj, layerI
 				}),
 				"image": new ol.style.Circle({
 					"radius": !!symbol.pointSize ? parseFloat(symbol.pointSize)/2 : null,
-					"fill": new ol.style.Fill({
-						"color": !!symbol.fillRGBA ? ol.color.asArray(symbol.fillRGBA) : null
-					}),
-					"stroke": new ol.style.Stroke({
-						"color": !!symbol.strokeRGBA ? ol.color.asArray(symbol.strokeRGBA) : null,
-						"width": symbol.strokeWidth || null,
-						"lineDash": symbol.strokeDashArray || null,
-						"lineCap": "butt"
-					})
+							"fill": new ol.style.Fill({
+								"color": !!symbol.fillRGBA ? ol.color.asArray(symbol.fillRGBA) : null
+							}),
+							"stroke": new ol.style.Stroke({
+								"color": !!symbol.strokeRGBA ? ol.color.asArray(symbol.strokeRGBA) : null,
+										"width": symbol.strokeWidth || null,
+										"lineDash": symbol.strokeDashArray || null,
+										"lineCap": "butt"
+							})
 				})
 			});
 			layer.setStyle(style);
@@ -4071,7 +4073,7 @@ gb3d.edit.EditingTool2D.prototype.getVectorSourcesOfVector = function(){
 gb3d.edit.EditingTool2D.prototype.editToolOpen = function(){
 	// openlayers tree wms layer 보기/숨김 기능 비활성화
 	this.otree.getJSTree().setDisplayIndex(false);
-	
+
 	// editing tool 활성화 변수 설정
 	this.setActiveTool(true);
 	if(this.isEditing !== undefined){
@@ -4079,13 +4081,13 @@ gb3d.edit.EditingTool2D.prototype.editToolOpen = function(){
 			this.isEditing.set(true);
 		}
 	}
-	
+
 	// WMS 레이어 숨김
 	this.setVisibleWMS(false);
-	
+
 	// 이미지 벡터 레이어 숨김
 	this.setVisibleImageVector(false);
-	
+
 	// 줌 레벨에 따른 실행 함수 결정
 	if(this.checkActiveTool()){
 		// 화면확대 요구 메세지창 숨김
@@ -4115,7 +4117,7 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
 		this.featureRecord.save(this);
 		return;
 	}
-	
+
 	// 현재 선택된 layer node의 편집 아이콘 삭제
 	var prevSelected = this.selectedSource;
 	var prevTreeid;
@@ -4127,10 +4129,10 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
 	if(this.otree.getJSTree().get_node(prevTreeid)){
 		this.otree.getJSTree().set_flag(this.otree.getJSTree().get_node(prevTreeid), "editing", false);
 	}
-	
+
 	// openlayers tree wms layer 보기/숨김 기능 활성화
 	this.otree.getJSTree().setDisplayIndex(true);
-	
+
 	// editing tool 활성화 변수 설정
 	this.setActiveTool(false);
 	if(this.isEditing !== undefined){
@@ -4138,34 +4140,34 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
 			this.isEditing.set(false);
 		}
 	}
-	
+
 	// WMS 레이어 활성화
 	this.setVisibleWMS(true);
-	
+
 	// 이미지 벡터 활성화
 	this.setVisibleImageVector(true);
-	
+
 	// 벡터 벡터 활성화
 	this.setVisibleVectorVector(false);
-	
+
 	// WFS 레이어 숨김
 	this.setVisibleWFS(false);
-	
+
 	// 화면확대 요구 메세지창 숨김
 	this.displayEditZoomHint(false);
-	
+
 	// 모든 interaction 비활성화
 	this.deactiveAnotherInteraction();
-	
+
 	// 모든 interaction 버튼 비활성화
 	this.deactiveAllBtn_();
-	
+
 	// WMS refresh
 	this.refreshTileLayer();
-	
+
 	// WFS refresh
 	this.refreshSources();
-	
+
 	this.selectSources.clear();
 	this.selectedSource = undefined;
 	this.vectorSourcesOfServer_ = {};
@@ -4212,30 +4214,29 @@ gb3d.edit.EditingTool2D.prototype.displayEditZoomHint = function(bool){
 			editZoomHintTag.append(icon);
 			editZoomHintTag.append(text);
 			this.headerTag.append(editZoomHintTag);
-			
+
 			var that = this;
 			var icon = $("<i class='fas fa-plus'>");
 			var span = $("<span class='label'>").append(icon).append(this.translation.editToolHint[this.locale]);
-			
+
 			var btn = $("<button class='gb-editingtool-zoomin-btn'>")
-				.append(span)
-				/*
-				 * .click(function(){ var view = that.map.getView(); var extent =
-				 * view.calculateExtent(); var coordinates = [[[extent[0],
-				 * extent[1]], [extent[2], extent[1]], [extent[2], extent[3]],
-				 * [extent[0], extent[3]], [extent[0], extent[1]]]]; var geom =
-				 * new ol.geom.Polygon(coordinates); var area =
-				 * ol.sphere.getArea(geom, {projection:
-				 * view.getProjection().getCode()}); area =
-				 * Math.round(area/1000000*100)/100;
-				 * 
-				 * var zoomSqrt = Math.sqrt((gb.edit.ACTIVEAREA)/area); var
-				 * zoomExtent = [extent[0]*zoomSqrt, extent[1]*zoomSqrt,
-				 * extent[2]*zoomSqrt, extent[3]*zoomSqrt];
-				 * 
-				 * view.fit(zoomExtent); });
-				 */
-			
+			.append(span)
+			/*
+			 * .click(function(){ var view = that.map.getView(); var extent =
+			 * view.calculateExtent(); var coordinates = [[[extent[0],
+			 * extent[1]], [extent[2], extent[1]], [extent[2], extent[3]],
+			 * [extent[0], extent[3]], [extent[0], extent[1]]]]; var geom = new
+			 * ol.geom.Polygon(coordinates); var area = ol.sphere.getArea(geom,
+			 * {projection: view.getProjection().getCode()}); area =
+			 * Math.round(area/1000000*100)/100;
+			 * 
+			 * var zoomSqrt = Math.sqrt((gb.edit.ACTIVEAREA)/area); var
+			 * zoomExtent = [extent[0]*zoomSqrt, extent[1]*zoomSqrt,
+			 * extent[2]*zoomSqrt, extent[3]*zoomSqrt];
+			 * 
+			 * view.fit(zoomExtent); });
+			 */
+
 			var notice = $("<div id='zoomNotice' class='gb-editingtool-zoom-notice'>").append(btn);
 			this.targetElement.append(notice);
 		}
@@ -4282,7 +4283,7 @@ gb3d.edit.EditingTool2D.prototype.checkActiveTool = function(){
 	} else {
 		active = false;
 	}
-	
+
 	return active;
 }
 
@@ -4291,4 +4292,113 @@ gb3d.edit.EditingTool2D.prototype.checkActiveTool = function(){
  */
 gb3d.edit.EditingTool2D.prototype.getEditingTool3D = function(){
 	return this.editingTool3D;
+};
+
+/**
+ * WMS 피처를 선택 해제한다.
+ */
+gb3d.edit.EditingTool2D.prototype.unselectFeature = function(){
+	var that = this;
+	if (that.interaction.select instanceof ol.interaction.Select) {
+		that.interaction.select.getFeatures().clear();
+	}
+	that.getEditingTool3D().unselectCesium();
+	$(that.attrTB).empty();
+	that.attrPop.close();
+};
+
+/**
+ * ID를 통해 WFS 피처를 선택한다.
+ * 
+ * @method
+ * @param {String}
+ *            fid - feature id
+ */
+gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
+	var that = this;
+
+	var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+	// that.updateSelected();
+	var slayer;
+	if (slayers.length === 1) {
+		slayer = slayers[0];
+	}
+	console.log(slayer);
+	if (slayer) {
+		var git = slayer.get("git");
+		if (that.getActiveTool()) {
+			// 편집이 활성화 되어 있으면
+
+		} else {
+			// 편집이 비활성화 되어 있으면
+			var url = this.wfsURL;
+
+			params = {
+				"serverName": git.geoserver,
+				"workspace": git.workspace,
+				"version" : gb.module.serviceVersion.WFS,
+				"typeName" : git.layers.split(",")[0],
+				"featureID" : fid,
+				"outputformat" : "application/json"
+			};
+
+			$.ajax({
+				url : url,
+				type : "GET",
+				contentType : "application/json; charset=UTF-8",
+				data : params,
+				dataType : "JSON",
+				success : function(data) {
+					console.log(data);
+					var gjson = new ol.format.GeoJSON();
+					var features = gjson.readFeatures(data);
+					
+					if (features.length > 0) {
+						if (that.interaction.select instanceof ol.interaction.Select) {
+							that.interaction.select.getFeatures().clear();
+						}
+
+						that.map.removeInteraction(that.interaction.select);
+						that.interaction.select = new ol.interaction.Select({
+							toggleCondition : ol.events.condition.platformModifierKeyOnly,
+							style : that.selectedStyles
+						});
+						that.interaction.select.getFeatures().push(features[0]);
+
+						that.selected = that.interaction.select.getFeatures();
+						that.map.addInteraction(that.interaction.select);
+						that.map.removeInteraction(that.interaction.dragbox);
+
+						var props = git.attribute || [];
+
+						$(that.attrTB).empty();
+						for (var i = 0; i < props.length; i++) {
+							var td1 = $("<td>").text(props[i].fieldName);
+							var td2 = $("<td>").text(props[i].type);
+							var tform = $("<input>").addClass("gb-edit-sel-alist").attr({
+								"type" : "text"
+							}).prop("readonly", true).css({
+								"width" : "100%",
+								"border" : "none"
+							}).val(features[0].get(props[i].fieldName));
+							var td3 = $("<td>").append(tform);
+							var tr = $("<tr>").append(td1).append(td2).append(td3);
+							that.attrTB.append(tr);
+						}
+						if (props.length > 0) {
+							if (that.getActiveTool()) {
+								that.attrPop.setPositionY(55);
+							} else {
+								that.attrPop.setPositionY(5);
+							}
+							that.attrPop.open();
+						}
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown){
+					console.log(errorThrown);
+				}
+			});
+		}
+	}
 };

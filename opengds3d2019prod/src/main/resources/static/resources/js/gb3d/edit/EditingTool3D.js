@@ -903,6 +903,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (!Cesium.defined(pickedFeature)) {
 				that.clickHandler(movement);
 				that.attrPop_.close();
+				that.getEditingTool2D().unselectFeature();
 				return;
 			}
 
@@ -935,6 +936,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 				that.attrPop_.setPositionY(5);	
 			}
 			that.attrPop_.open();
+			// 2D 피처 선택
+			if (obj.hasOwnProperty("featureId")) {
+				var fid = obj["featureId"];
+				var edit2d = that.getEditingTool2D();
+				edit2d.selectFeatureById(fid);
+			}
 			
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	} else {
@@ -1069,6 +1076,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (!Cesium.defined(pickedFeature)) {
 				that.clickHandler(movement);
 				that.attrPop_.close();
+				that.getEditingTool2D().unselectFeature();
 				return;
 			}
 			// Select the feature if it's not already selected
