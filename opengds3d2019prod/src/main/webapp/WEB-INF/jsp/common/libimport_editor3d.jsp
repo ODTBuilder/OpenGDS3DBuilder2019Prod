@@ -186,8 +186,174 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetScaleCommand.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetUuidCommand.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/SetValueCommand.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryCommand.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryValueCommand.js"></script>
+
+<!-- setGeometryCommand.js -->
+<script>
+/**
+ * @author dforrer / https://github.com/dforrer
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
+ */
+
+/**
+ * @param editor Editor
+ * @param object THREE.Object3D
+ * @param newGeometry THREE.Geometry
+ * @constructor
+ */
+
+var SetGeometryCommand = function ( editor, object, newGeometry ) {
+
+	Command.call( this, editor );
+
+	this.type = 'SetGeometryCommand';
+	this.name = 'Set Geometry';
+	this.updatable = true;
+
+	this.object = object;
+	this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
+	this.newGeometry = newGeometry;
+
+};
+
+SetGeometryCommand.prototype = {
+
+	execute: function () {
+
+		this.object.geometry.dispose();
+		this.object.geometry = this.newGeometry;
+		this.object.geometry.computeBoundingSphere();
+
+		this.editor.signals.geometryChanged.dispatch( this.object );
+		this.editor.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	undo: function () {
+
+		this.object.geometry.dispose();
+		this.object.geometry = this.oldGeometry;
+		this.object.geometry.computeBoundingSphere();
+
+		this.editor.signals.geometryChanged.dispatch( this.object );
+		this.editor.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	update: function ( cmd ) {
+
+		this.newGeometry = cmd.newGeometry;
+
+	},
+
+	toJSON: function () {
+
+		var output = Command.prototype.toJSON.call( this );
+
+		output.objectUuid = this.object.uuid;
+		output.oldGeometry = this.object.geometry.toJSON();
+		output.newGeometry = this.newGeometry.toJSON();
+
+		return output;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Command.prototype.fromJSON.call( this, json );
+
+		this.object = this.editor.objectByUuid( json.objectUuid );
+
+		this.oldGeometry = parseGeometry( json.oldGeometry );
+		this.newGeometry = parseGeometry( json.newGeometry );
+
+		function parseGeometry ( data ) {
+
+			var loader = new THREE.ObjectLoader();
+			return loader.parseGeometries( [ data ] )[ data.uuid ];
+
+		}
+
+	}
+
+};
+</script>
+<!-- setGeometryValueCommand.js -->
+<script>
+/**
+ * @author dforrer / https://github.com/dforrer
+ * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
+ */
+
+/**
+ * @param editor Editor
+ * @param object THREE.Object3D
+ * @param attributeName string
+ * @param newValue number, string, boolean or object
+ * @constructor
+ */
+
+var SetGeometryValueCommand = function ( editor, object, attributeName, newValue ) {
+
+	Command.call( this, editor );
+
+	this.type = 'SetGeometryValueCommand';
+	this.name = 'Set Geometry.' + attributeName;
+
+	this.object = object;
+	this.attributeName = attributeName;
+	this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
+	this.newValue = newValue;
+
+};
+
+SetGeometryValueCommand.prototype = {
+
+	execute: function () {
+
+		this.object.geometry[ this.attributeName ] = this.newValue;
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.geometryChanged.dispatch();
+		this.editor.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	undo: function () {
+
+		this.object.geometry[ this.attributeName ] = this.oldValue;
+		this.editor.signals.objectChanged.dispatch( this.object );
+		this.editor.signals.geometryChanged.dispatch();
+		this.editor.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	toJSON: function () {
+
+		var output = Command.prototype.toJSON.call( this );
+
+		output.objectUuid = this.object.uuid;
+		output.attributeName = this.attributeName;
+		output.oldValue = this.oldValue;
+		output.newValue = this.newValue;
+
+		return output;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		Command.prototype.fromJSON.call( this, json );
+
+		this.object = this.editor.objectByUuid( json.objectUuid );
+		this.attributeName = json.attributeName;
+		this.oldValue = json.oldValue;
+		this.newValue = json.newValue;
+
+	}
+
+};
+</script>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryCommand.js"></script> --%>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setGeometryValueCommand.js"></script> --%>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialColorCommand.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialCommand.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeCommand/setMaterialMapCommand.js"></script>
