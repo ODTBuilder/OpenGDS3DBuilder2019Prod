@@ -99,7 +99,8 @@ gb3d.tree.Three = function(obj) {
 									resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
 									
 									result = exporter.parse( object );
-									downloadString( result, id + '.obj' );
+									downloadString( result.obj, id + '.obj' );
+									downloadString( result.mtl, id + '.mtl' );
 								} else {
 									for(var i in obj.children){
 										child = inst.get_node(obj.children[i]);
@@ -115,7 +116,8 @@ gb3d.tree.Three = function(obj) {
 										resetMatrixWorld( object, threeObject.getObject().rotation, centerHigh );
 										
 										result = exporter.parse( object );
-										downloadString( result, id + '.obj' );
+										downloadString( result.obj, id + '.obj' );
+										downloadString( result.mtl, id + '.mtl' );
 									}
 								}
 								
