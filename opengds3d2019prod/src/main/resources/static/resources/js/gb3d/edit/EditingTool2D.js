@@ -505,37 +505,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 								var props = git.attribute || [];
 // var layer = source.get("git").tempLayer;
 
-								$(that.attrTB).empty();
-								for (var i = 0; i < props.length; i++) {
-									var td1 = $("<td>").text(props[i].fieldName);
-									var td2 = $("<td>").text(props[i].type);
-									var tform = $("<input>").addClass("gb-edit-sel-alist").attr({
-										"type" : "text"
-									}).prop("readonly", true).css({
-										"width" : "100%",
-										"border" : "none"
-									}).val(features[0].get(props[i].fieldName));
-									var td3 = $("<td>").append(tform);
-									var tr = $("<tr>").append(td1).append(td2).append(td3);
-									that.attrTB.append(tr);
-								}
-								if (props.length > 0) {
-									if (that.getActiveTool()) {
-										that.attrPop.setPositionY(55);
-									} else {
-										that.attrPop.setPositionY(5);
-									}
-									that.attrPop.open();
-// that.attrPop.getPanel().position({
-// "my" : "left top",
-// "at" : "left top",
-// "of" : $(that.map.getTarget())
-// });
-// that.attrPop.getPanel().css({
-// "top" : "105px",
-// "left" : "5px"
-// });
-								}
+								that.showAttributePopup(props, features[0]);
 
 								// threeJS Object Select
 								var fid = that.interaction.select.getFeatures().item(0).getId();
@@ -584,9 +554,6 @@ gb3d.edit.EditingTool2D = function(obj) {
 									}
 								}
 							} else {
-// that.getEditingTool3D().unselectCesium();
-// $(that.attrTB).empty();
-// that.attrPop.close();
 								that.unselectFeature();
 							}
 						});
@@ -4181,6 +4148,7 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
  * @function
  */
 gb3d.edit.EditingTool2D.prototype.editToolToggle = function(){
+	this.attrPop.close();
 	if(this.getActiveTool()){
 		this.editToolClose();
 		this.attrPop.setPositionY(5);
@@ -4328,7 +4296,15 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 		var git = slayer.get("git");
 		if (that.getActiveTool()) {
 			// 편집이 활성화 되어 있으면
-
+			var tempLayer = git.tempLayer;
+			if (tempLayer) {
+				var tempSource = tempLayer.getSource();
+				if (tempSource instanceof ol.source.Vector) {
+					console.log(tempSource);
+					var sfeature = tempSource.getFeatureById(fid);
+					
+				}
+			}
 		} else {
 			// 편집이 비활성화 되어 있으면
 			var url = this.wfsURL;
@@ -4370,29 +4346,8 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 						that.map.removeInteraction(that.interaction.dragbox);
 
 						var props = git.attribute || [];
-
-						$(that.attrTB).empty();
-						for (var i = 0; i < props.length; i++) {
-							var td1 = $("<td>").text(props[i].fieldName);
-							var td2 = $("<td>").text(props[i].type);
-							var tform = $("<input>").addClass("gb-edit-sel-alist").attr({
-								"type" : "text"
-							}).prop("readonly", true).css({
-								"width" : "100%",
-								"border" : "none"
-							}).val(features[0].get(props[i].fieldName));
-							var td3 = $("<td>").append(tform);
-							var tr = $("<tr>").append(td1).append(td2).append(td3);
-							that.attrTB.append(tr);
-						}
-						if (props.length > 0) {
-							if (that.getActiveTool()) {
-								that.attrPop.setPositionY(55);
-							} else {
-								that.attrPop.setPositionY(5);
-							}
-							that.attrPop.open();
-						}
+						var feature = features[0];
+						that.showAttributePopup(props, feature);
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown){
@@ -4400,5 +4355,37 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 				}
 			});
 		}
+	}
+};
+
+/**
+ * attribute 객체와 feature 객체를 통해 속성창을 표시한다.
+ * 
+ * @method
+ * @param {String}
+ */
+gb3d.edit.EditingTool2D.prototype.showAttributePopup = function(props, feature){
+	var that = this;
+	$(that.attrTB).empty();
+	for (var i = 0; i < props.length; i++) {
+		var td1 = $("<td>").text(props[i].fieldName);
+		var td2 = $("<td>").text(props[i].type);
+		var tform = $("<input>").addClass("gb-edit-sel-alist").attr({
+			"type" : "text"
+		}).prop("readonly", true).css({
+			"width" : "100%",
+			"border" : "none"
+		}).val(feature.get(props[i].fieldName));
+		var td3 = $("<td>").append(tform);
+		var tr = $("<tr>").append(td1).append(td2).append(td3);
+		that.attrTB.append(tr);
+	}
+	if (props.length > 0) {
+		if (that.getActiveTool()) {
+			that.attrPop.setPositionY(55);
+		} else {
+			that.attrPop.setPositionY(5);
+		}
+		that.attrPop.open();
 	}
 };

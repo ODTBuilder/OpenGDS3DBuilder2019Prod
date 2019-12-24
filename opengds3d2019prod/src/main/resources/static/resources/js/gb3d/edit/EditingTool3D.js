@@ -542,6 +542,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		that.getMap().getThreeObjects().forEach(function(e) {
 			if (e.getObject().uuid === object.uuid) {
+				// 평면도 수정
+				
 				// 선택된 객체의 수정횟수를 증가시킨다.
 				e.upModCount();
 				
@@ -943,6 +945,12 @@ gb3d.edit.EditingTool3D = function(obj) {
 				edit2d.selectFeatureById(fid);
 			}
 			
+			if (that.getActiveTool()) {
+				// 편집이 활성화되어 있는 경우 glb 요청 후 완료시 b3dm 숨김
+//				var extras = pickedFeature.content.tile.extras;
+//				2d feature, 3d feature 가져오기
+//				that.getGLBfromServer();
+			}
 		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 	} else {
 		// Silhouettes are not supported. Instead, change the feature color.
@@ -2662,4 +2670,114 @@ gb3d.edit.EditingTool3D.prototype.getFeatureByIdFromServer = function(server, wo
 			console.log(errorThrown);
 		}
 	});
-}
+};
+
+/**
+ * 3D 객체 편집시 평면도를 업데이트
+ * @method
+ * @param {ol.Feature} selectedFeature - selected fearure
+ * @param {gb3d.object.ThreeObject} threeObj - 업데이트할 객체
+ */
+gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
+	var center = threeObj.getCenter();
+	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
+	var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+
+	var floor = gb3d.io.ImporterThree.getFloorPlan(threeObj.getObject(), center, []);
+	var features = turf.featureCollection(floor);
+	var dissolved = undefined;
+	try {
+		dissolved = turf.dissolve(features);
+	} catch (e) {
+		// TODO: handle exception
+		console.error(e);
+		var bbox = turf.bbox(features);
+		var bboxPolygon = turf.bboxPolygon(bbox);
+		var geom = new ol.geom.Polygon(bboxPolygon.geometry.coordinates, "XY");
+		var feature = new ol.Feature(geom);
+//		layer.getSource().addFeature(feature);
+//		threeObj["feature"] = feature;
+		return;
+	}
+	var fea;
+	if (dissolved) {
+		if (dissolved.type === "FeatureCollection") {
+			fea = [];
+			for (var i = 0; i < dissolved.features.length; i++) {
+				if (dissolved.features[i].geometry.type === 'Polygon') {
+					if (layer.get("git").geometry === "Polygon") {
+						var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					} else if (layer.get("git").geometry === "MultiPolygon") {
+						var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					}
+				} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+					if (layer.get("git").geometry === "Polygon") {
+						var outer = dissolved.features[i].geometry.coordinates;
+						// for (var j = 0; j < 1; j++) {
+						var polygon = outer[0];
+						var geomPoly = new ol.geom.Polygon(polygon, "XY");
+						var feature = new ol.Feature(geomPoly);
+						feature.setId(threeObj.getObject().uuid);
+						fea.push(feature);
+						threeObj["feature"] = feature;
+						// }
+					} else if (layer.get("git").geometry === "MultiPolygon") {
+						var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+						var feature = new ol.Feature(geom);
+						feature.setId(threeObj.getObject().uuid);
+						threeObj["feature"] = feature;
+						fea.push(feature);
+					}
+				}
+
+			}
+			layer.getSource().addFeatures(fea);
+		}
+	}
+
+	// var axisy1 = turf.point([ 90, 0 ]);
+	// var pickPoint = turf.point(center);
+	// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+	// console.log("y축 1과 객체 중점의 각도는: " + bearing);
+	// // var zaxis = new THREE.Vector3(0, 0, 1);
+	// // gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
+	// // Cesium.Math.toRadians(bearing));
+	// that.object.rotateZ(Cesium.Math.toRadians(bearing));
+};
+
+/**
+ * 선택한 b3dm을 glb로 변환하여 편집화면에 불러온다
+ * 
+ * @method gb3d.edit.EditingTool3D#getGLBfromServer
+ * @param
+ */
+gb3d.edit.EditingTool3D.prototype.getGLBfromServer = function(layerFeature, tileFeature){
+	var that = this;
+	var params = {
+		"featureId" : layerFeature.getId(),
+		"objPath" : undefined
+	};
+	
+	$.ajax({
+		url : this.getGLBURL,
+		type : "GET",
+		contentType : "application/json; charset=UTF-8",
+		data : params,
+		dataType : "JSON",
+		success : function(data, textStatus, jqXHR) {
+			console.log(data);
+			
+		},
+		error: function(jqXHR, textStatus, errorThrown){
+			console.log(errorThrown);
+		}
+	});
+};
