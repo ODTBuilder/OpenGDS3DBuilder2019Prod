@@ -5,8 +5,26 @@ if (!gb3d.edit)
 	gb3d.edit = {};
 
 /**
- * @classdesc 3차원 객체 편집 기능을 정의한다. 필수 라이브러리: jQuery, fontawesome, openlayers,
+ * @classdesc 3차원 객체 편집 기능을 정의한다. 필수 라이브러리: jQuery, threeJS, Cesium,
  *            {@link gb3d.edit.EditingToolBase}
+ * @class gb3d.edit.EditingTool3D
+ * @requires {@link gb3d.edit.EditingToolBase}
+ * @memberof gb3d.edit
+ * @param {Object}
+ *            obj - 생성자 옵션
+ * @param {gb3d.edit.EditingTool2D}
+ *            obj.editingTool2D - 2D 편집 관리 객체
+ * @param {gb3d.edit.ModelRecord}
+ *            [obj.modelRecord] - Model 객체 편집 이력을 관리하는 객체
+ * @param {gb3d.tree.OpenLayers}
+ *            obj.otree - 레이어 관리 jstree 객체
+ * @param {string}
+ *            obj.getFeatureURL - Feature 객체 요청 url
+ * @param {string}
+ *            [obj.locale="en"] - 언어 코드
+ * @author KIM HOCHUL
+ * @date 2019. 12. 24
+ * @version 0.01
  */
 
 gb3d.edit.EditingTool3D = function(obj) {
@@ -505,15 +523,28 @@ gb3d.edit.EditingTool3D = function(obj) {
 		that.map.renderThreeObj();
 	}
 
-	// transform 컨트롤 선언
+	/**
+	 * transform 컨트롤 선언
+	 * 
+	 * @private
+	 * @type {THREE.TransformControls}
+	 */
 	this.threeTransformControls = new THREE.TransformControls(this.map.threeCamera, this.map.threeRenderer.domElement);
-	// 변경시 렌더링 함수 수행
+	
+	/**
+	 * 변경시 렌더링 함수 수행
+	 * 
+	 * @private
+	 * @type {THREE.TransformControls}
+	 */
 	this.threeTransformControls.addEventListener('change', transformRender);
-	// 드래그 시
+	
+	// 드래그 이벤트 발생 시 수행
 	this.threeTransformControls.addEventListener('dragging-changed', function(event) {
 		that.updateAttributeTab(event.target.object);
 	});
 
+	// 3d 객체 변경 시 수행
 	this.threeTransformControls.addEventListener('objectChange', function(e) {
 		var object = e.target.object, mode = that.threeTransformControls.getMode();
 		
@@ -1264,204 +1295,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 			threeEventDiv.css("pointer-events", "none");
 		}
 	});
-
-	$(document).on("keypress", "#attrAttr input", function(e) {
-		if (e.keyCode == 13) {
-			var input = $(this);
-			var parent = input.parent();
-
-			if (input.prop("type") === "checkbox") {
-				return;
-			}
-
-			gb3d.edit.EditingTool3D.updateAttributeByInput(parent, that.pickedObject_);
-		}
-	});
-
-	$(document).on("focusout", "#attrAttr input", function(e) {
-		var input = $(this);
-		var parent = input.parent();
-
-		if (input.prop("type") === "checkbox") {
-			return;
-		}
-
-		gb3d.edit.EditingTool3D.updateAttributeByInput(parent, that.pickedObject_);
-	});
-
-	$(document).on("change", "#attrAttr input", function(e) {
-		var input = $(this);
-		var parent = input.parent();
-
-		if (!that.pickedObject_) {
-			return;
-		}
-
-		if (input.prop("type") === "checkbox") {
-			that.pickedObject_[parent.data("key")] = input.prop("checked");
-		}
-	});
-
-	$(document).on("keypress", "#attrStyle input", function(e) {
-		if (e.keyCode == 13) {
-			var parent = $(this).parent();
-
-			gb3d.edit.EditingTool3D.updateStyleByInput(parent, that);
-		}
-	});
-
-	$(document).on("focusout", "#attrStyle input", function(e) {
-		var parent = $(this).parent();
-
-		gb3d.edit.EditingTool3D.updateStyleByInput(parent, that);
-	});
-
-	// $(document).on("keypress", "#attrMaterial input", function(e){
-	// if(e.keyCode == 13){
-	// var input = $(this);
-	// var parent = input.parent();
-	//			
-	// if(input.prop("type") === "checkbox"){
-	// return;
-	// }
-	//			
-	// gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that );
-	// }
-	// });
-	//	
-	// $(document).on("focusout", "#attrMaterial input", function(e){
-	// var input = $(this);
-	// var parent = input.parent();
-	//		
-	// if(input.prop("type") === "checkbox"){
-	// return;
-	// }
-	//		
-	// gb3d.edit.EditingTool3D.updateMaterialByInput( parent, that);
-	// });
-	//	
-	// $(document).on("change", "#attrMaterial input", function(e){
-	// var input = $(this);
-	// var parent = input.parent();
-	//		
-	// if(!that.pickedObject_){
-	// return;
-	// }
-	//		
-	// if(input.prop("type") === "checkbox"){
-	// that.pickedObject_.material[parent.data("key")] = input.prop("checked");
-	// }
-	// });
-
-	$(document).on("change.spectrum", "#styleColor", function(e, color) {
-		var rgb = color.toPercentageRgb();
-		var r = parseFloat(rgb.r) / 100.0;
-		var g = parseFloat(rgb.g) / 100.0;
-		var b = parseFloat(rgb.b) / 100.0;
-
-		if (!that.pickedObject_) {
-			return;
-		}
-
-		var material = that.pickedObject_.material;
-		material.color.setRGB(r, g, b);
-	});
-
-	$(document).on("change.spectrum", "#textureEmissive", function(e, color) {
-		var rgb = color.toPercentageRgb();
-		var r = parseFloat(rgb.r) / 100.0;
-		var g = parseFloat(rgb.g) / 100.0;
-		var b = parseFloat(rgb.b) / 100.0;
-
-		if (!that.pickedObject_) {
-			return;
-		}
-
-		var material = that.pickedObject_.material;
-		material.emissive.setRGB(r, g, b);
-	});
 }
 gb3d.edit.EditingTool3D.prototype = Object.create(gb3d.edit.EditingToolBase.prototype);
 gb3d.edit.EditingTool3D.prototype.constructor = gb3d.edit.EditingTool3D;
-
-gb3d.edit.EditingTool3D.updateAttributeByInput = function(row, object) {
-	var row = row;
-	var pickedObject = object;
-	var inputs = row.find("input");
-	var x, y, z;
-
-	if (!pickedObject) {
-		return;
-	}
-
-	if (inputs.length === 0) {
-		pickedObject[row.data("key")] = $(inputs[0]).val();
-	} else if (inputs.length === 3) {
-		x = $(inputs[0]).val();
-		y = $(inputs[1]).val();
-		z = $(inputs[2]).val();
-
-		if (row.data("key") === "scale") {
-			x = (x == 0 ? 1 : x);
-			y = (y == 0 ? 1 : y);
-			z = (z == 0 ? 1 : z);
-		}
-
-		pickedObject[row.data("key")].x = parseFloat(x);
-		pickedObject[row.data("key")].y = parseFloat(y);
-		pickedObject[row.data("key")].z = parseFloat(z);
-	}
-}
-
-gb3d.edit.EditingTool3D.updateStyleByInput = function(row, obj) {
-	if (!obj) {
-		return;
-	}
-	var row = row;
-	var pickedObject = obj ? obj.pickedObject_ : undefined;
-	var input = row.find("input");
-
-	if (!pickedObject) {
-		return;
-	}
-
-	var threeObject = obj.getMap().getThreeObjectByUuid(pickedObject.uuid);
-	if (!threeObject) {
-		return;
-	}
-
-	if (!row.data("key")) {
-		return;
-	}
-
-	pickedObject.userData[row.data("key")] = $(input[0]).val();
-	this.modify3DVertices([], threeObject.getFeature().getId(), threeObject.getFeature().getGeometry().getExtent());
-}
-
-gb3d.edit.EditingTool3D.updateMaterialByInput = function(row, obj) {
-	if (!obj) {
-		return;
-	}
-
-	var row = row;
-	var pickedObject = obj ? obj.pickedObject_ : undefined;
-	var input = row.find("input");
-
-	if (!pickedObject) {
-		return;
-	}
-
-	var threeObject = this.getMap().getThreeObjectByUuid(pickedObject.uuid);
-	if (!threeObject) {
-		return;
-	}
-
-	if (!row.data("key")) {
-		return;
-	}
-
-	pickedObject.material[row.data("key")] = parseFloat($(input[0]).val());
-}
 
 /**
  * EditingTool 작업표시줄을 삭제한다.
@@ -1500,162 +1336,6 @@ gb3d.edit.EditingTool3D.prototype.editToolToggle = function() {
 }
 
 /**
- * Attribute Tab의 내용을 갱신 # 사용되지않는 함수
- * 
- * @method gb3d.edit.EditingTool3D#updateAttributeTab
- * @param {THREE.Object3D}
- *            object - ThreeJS Object3D 객체
- * @function
- */
-gb3d.edit.EditingTool3D.prototype.updateAttributeTab = function(object) {
-	var rows = $("#attrAttr").find(".gb-object-row");
-	var inputs;
-
-	if (!(object instanceof THREE.Object3D)) {
-		rows.each(function() {
-			$(this).find("input").val("");
-		});
-		return;
-	}
-
-	var attrs = {
-			position : object.position,
-			scale : object.scale,
-			rotation : object.rotation,
-			userData : object.userData,
-			name : object.name,
-			uuid : object.uuid,
-			visible : object.visible
-	}
-
-	for (var i = 0; i < rows.length; i++) {
-		inputs = $(rows[i]).find("input");
-		switch ($(rows[i]).data("key")) {
-		case "position":
-		case "scale":
-		case "rotation":
-			$(inputs[0]).val(attrs[$(rows[i]).data("key")].x);
-			$(inputs[1]).val(attrs[$(rows[i]).data("key")].y);
-			$(inputs[2]).val(attrs[$(rows[i]).data("key")].z);
-			break;
-		case "name":
-		case "uuid":
-			$(inputs[0]).val(attrs[$(rows[i]).data("key")]);
-			break;
-		case "visible":
-			$(inputs[0]).prop("checked", attrs.visible)
-			break;
-		}
-	}
-}
-
-/**
- * Style Tab의 내용을 갱신 # 사용되지않는 함수
- * 
- * @method gb3d.edit.EditingTool3D#updateStyleTab
- * @param {THREE.Object3D}
- *            object - ThreeJS Object3D 객체
- * @function
- */
-gb3d.edit.EditingTool3D.prototype.updateStyleTab = function(object) {
-	var that = this;
-	var tab = $("#attrStyle");
-	var rows = tab.find(".gb-object-row");
-	var row, span, input;
-
-	if (!(object instanceof THREE.Object3D)) {
-		tab.empty();
-		return;
-	}
-
-	var userData = object.userData;
-	var material = object.material;
-
-	tab.empty();
-	for ( var key in userData) {
-		span = $("<span class='Text'>").text(key);
-		input = $("<input class='form-control' style='flex: 1;'>").val(userData[key]);
-		row = $("<div class='gb-object-row'>").append(span).append(input);
-		row.data("key", key);
-		tab.append(row);
-
-		if (key == "type") {
-			input.attr("disabled", true);
-		}
-	}
-
-	span = $("<span class='Text'>").text("Color");
-	input = $("<input id='styleColor' class='form-control' style='flex: 1;'>");
-	row = $("<div class='gb-object-row'>").append(span).append(input);
-	row.data("key", "color");
-
-	tab.append(row);
-	input.spectrum({
-		color : "#" + material.color.getHexString()
-	});
-}
-
-/**
- * Material Tab의 내용을 갱신 # 사용되지않는 함수
- * 
- * @method gb3d.edit.EditingTool3D#updateMaterialTab
- * @param {THREE.Object3D}
- *            object - ThreeJS Object3D 객체
- * @function
- */
-gb3d.edit.EditingTool3D.prototype.updateMaterialTab = function(object) {
-	var that = this;
-	var tab = $("#attrMaterial");
-	var rows = tab.find(".gb-object-row");
-	var row, span, input, texture;
-
-	if (!(object instanceof THREE.Object3D)) {
-		tab.empty();
-		return;
-	}
-
-	var material = object.material;
-	var opts = this.materialOptions;
-	var val;
-
-	tab.empty();
-	for (var i = 0; i < opts.length; i++) {
-		val = material[opts[i]];
-		span = undefined;
-		input = undefined;
-		texture = undefined;
-
-		span = $("<span class='Text'>").text(opts[i]);
-		if (val instanceof THREE.Color) {
-			input = $("<input id='textureEmissive' class='form-control' style='flex: 1;'>");
-		} else if (typeof val === "boolean") {
-			input = $("<input class='Checkbox' type='checkbox'>").prop("checked", val);
-		} else if (typeof val === "number") {
-			input = $("<input class='form-control' style='flex: 1;'>").val(val);
-		} else if (opts[i].match(/map/gi) !== null) {
-			texture = new gb3d.UI.Texture(object, opts[i]);
-		} else {
-			continue;
-		}
-
-		if (texture !== undefined) {
-			row = $("<div class='gb-object-row'>").append(span).append(texture.span);
-		} else {
-			row = $("<div class='gb-object-row'>").append(span).append(input);
-		}
-
-		row.data("key", opts[i]);
-		tab.append(row);
-
-		if (val instanceof THREE.Color) {
-			input.spectrum({
-				color : "#" + val.getHexString()
-			});
-		}
-	}
-}
-
-/**
  * ThreeJS Object3D 객체의 Center를 지구 표면상에 위치시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#attachObjectToGround
@@ -1676,6 +1356,11 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
 
 /**
  * 선택된 three객체의 아웃라인을 표시한다
+ * 
+ * @method gb3d.edit.EditingTool3D#applySelectedOutline
+ * @param {THREE.Object3D}
+ *            object - ThreeJS Object3D 객체
+ * @function
  */
 gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object) {
 	that = this;
@@ -1688,6 +1373,9 @@ gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object) {
 
 /**
  * 선택 해제된 three객체의 아웃라인을 삭제한다
+ * 
+ * @method gb3d.edit.EditingTool3D#removeSelectedOutline
+ * @function
  */
 gb3d.edit.EditingTool3D.prototype.removeSelectedOutline = function() {
 	that = this;
@@ -1702,13 +1390,10 @@ gb3d.edit.EditingTool3D.prototype.removeSelectedOutline = function() {
  * Object 생성을 위한 사전작업 수행 함수. Feature 정보를 저장하고 Feature type에 따른 모달을 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createObjectByCoord
- * @param {String}
- *            type - Feature type
- * @param {Array.
- *            <Number> | Array.<Array.<Number>>} arr - Polygon or Point
- *            feature coordinates
- * @param {Array.
- *            <Number>} extent - Extent
+ * @param {string} type - Feature type
+ * @param {ol.Feature} feature - Openlayers feature 객체
+ * @param {string} treeid - jstree node id
+ * @param {string} layer - layer 객체 id
  */
 gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, treeid, layer) {
 	this.objectAttr.type = type;
@@ -1740,15 +1425,25 @@ gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, 
 	}
 }
 
+/**
+ * 설정한 좌표값 위치에 타입에 따른 모델링된 3차원 객체를 생성한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#createPointObject
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.type - 생성하려는 3차원 객체 모양(box, cylinder, circle, dodecahedron, icosahedron)
+ * @param {string} option.width - 가로 길이
+ * @param {string} option.height - 세로 길이
+ * @param {string} option.depth - 높이
+ * @param {string} option.radiusTop - 원통 윗부분의 지름. cylinder 에서만 사용
+ * @param {string} option.radiusBottom - 원통 아랫부분의 지름. cylinder 에서만 사용
+ * @param {string} option.radius - 생성하려는 3차원 객체 모양. circle, dodecahedron, icosahedron 에서 사용
+ * @param {string} option.width - 생성하려는 3차원 객체 모양
+ */
 gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, option) {
 	var coord = arr, points = [], geometry, cart, obj3d, x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2, type = option.type || "box",
-	// width = option.width || 40,
-	// height = option.height || 40,
-	// depth = option.depth || 40,
 	centerCart = Cesium.Cartesian3.fromDegrees(x, y), centerHigh = Cesium.Cartesian3.fromDegrees(x, y, 1);
-
-	// geometry = new THREE.BoxGeometry(parseInt(width), parseInt(height),
-	// parseInt(depth));
 
 	switch (type) {
 	case "box":
@@ -1786,9 +1481,7 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
-	// latheMesh.userData.width = width;
-	// latheMesh.userData.height = height;
-	// latheMesh.userData.depth = depth;
+	
 	for ( var i in option) {
 		if (i === "type") {
 			continue;
@@ -1806,6 +1499,7 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 		"layer" : this.objectAttr.layer
 	});
 
+	// Map에 ThreeJS 객체 추가
 	this.getMap().addThreeObject(obj3d);
 
 	var record = this.getModelRecord();
@@ -1814,6 +1508,15 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 	return obj3d;
 }
 
+/**
+ * 설정한 좌표값에 따른 직육면체의 3차원 객체를 생성한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#createPolygonObject
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.depth - 높이
+ */
 gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, option) {
 	var that = this;
 	var coord = arr, geometry, shape, cart, result, obj3d, depth = option.depth ? parseFloat(option.depth) : 50.0, x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1])
@@ -1888,6 +1591,16 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	return obj3d;
 }
 
+/**
+ * 설정한 좌표값에 따른 LinePolygon 3차원 객체를 생성한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#createLineStringObjectOnRoad
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.width - 가로 길이
+ * @param {string} option.depth - 높이
+ */
 gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, extent, option) {
 	var that = this;
 	var coord = arr, geometry, shape, cart, result, obj3d, depth = option.depth ? parseFloat(option.depth) : 50.0, x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1])
@@ -1964,8 +1677,12 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 	return obj3d;
 
 }
+
 /**
  * 3D 맵 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getMap
+ * @return {gb3d.Map} {@link gb3d.Map}
  */
 gb3d.edit.EditingTool3D.prototype.getMap = function() {
 	return this.map;
@@ -1973,11 +1690,21 @@ gb3d.edit.EditingTool3D.prototype.getMap = function() {
 
 /**
  * attribute 팝업 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getAttrPopup
+ * @return {gb.panel.PanelBase} {@link gb.panel.PanelBase}
  */
 gb3d.edit.EditingTool3D.prototype.getAttrPopup = function() {
 	return this.attrPop_;
 }
 
+/**
+ * ThreeJS Object를 선택한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#selectThree
+ * @param {string} uuid - ThreeJS Object ID
+ * @return {gb3d.object.ThreeObject} 선택된 ThreeJS Object 반환
+ */
 gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
 	var that = this;
 	var threeObject = this.getMap().getThreeObjectByUuid(uuid);
@@ -1989,12 +1716,14 @@ gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
 	this.pickedObject_ = object;
 	this.threeTransformControls.attach( object );
 	
+	// ThreeJS Object 속성창 가시화
 	that.updateAttributePopup(object.userData);
 	that.attrPop_.open();
 	
 // this.updateAttributeTab( object );
 // this.updateStyleTab( object );
 
+	// 실루엣 생성
 	this.applySelectedOutline(object);
 
 	if ( object.userData.object !== undefined ) {
@@ -2007,6 +1736,13 @@ gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
 	return threeObject;
 }
 
+/**
+ * ThreeJS Object와 연동된 Openlayers Feature를 선택한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#selectFeature
+ * @param {string} id - Openlayers Feature ID
+ * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
+ */
 gb3d.edit.EditingTool3D.prototype.selectFeature = function(id){
 	var threeObject = this.getMap().getThreeObjectById(id);
 	if(!threeObject){
@@ -2026,6 +1762,11 @@ gb3d.edit.EditingTool3D.prototype.selectFeature = function(id){
 	}
 }
 
+/**
+ * Cesium 객체 선택 초기화
+ * 
+ * @method gb3d.edit.EditingTool3D#unselectCesium
+ */
 gb3d.edit.EditingTool3D.prototype.unselectCesium = function(){
 	var that = this;
 	that.silhouetteBlue.selected = [];
@@ -2034,7 +1775,13 @@ gb3d.edit.EditingTool3D.prototype.unselectCesium = function(){
 	that.attrPop_.close();
 };
 
-
+/**
+ * ThreeJS 객체 선택 취소
+ * 
+ * @method gb3d.edit.EditingTool3D#unselectThree
+ * @param {string} uuid - ThreeJS Object ID
+ * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
+ */
 gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
 	var that = this;
 	var threeObject = this.getMap().getThreeObjectByUuid(uuid);
@@ -2054,6 +1801,13 @@ gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
 	return threeObject;
 }
 
+/**
+ * Openlayers Feature 선택 취소
+ * 
+ * @method gb3d.edit.EditingTool3D#unselectFeature
+ * @param {string} id - Openlayers Feature ID
+ * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
+ */
 gb3d.edit.EditingTool3D.prototype.unselectFeature = function(id){
 	var threeObject = this.getMap().getThreeObjectById(id);
 	if(!threeObject){
@@ -2071,6 +1825,12 @@ gb3d.edit.EditingTool3D.prototype.unselectFeature = function(id){
 	}
 }
 
+/**
+ * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 선택 상태로 설정한다. 
+ * 
+ * @method gb3d.edit.EditingTool3D#syncSelect
+ * @param {string} id - ThreeJS Object ID 또는 Openlayers Feature ID
+ */
 gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
 	var id = id;
 
@@ -2085,6 +1845,8 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
 		this.selectFeature(threeObject.getFeature().getId());
 	} else {
 		this.selectThree(threeObject.getObject().uuid);
+		
+		// Openlayers Feature 선택 시 연동된 ThreeJS Object 위치로 3D Map 이동
 // this.cesiumViewer.camera.flyTo({
 // destination: Cesium.Cartesian3.fromDegrees(threeObject.getCenter()[0],
 // threeObject.getCenter()[1],
@@ -2094,6 +1856,12 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
 	}
 }
 
+/**
+ * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 비선택 상태로 설정한다. 
+ * 
+ * @method gb3d.edit.EditingTool3D#syncUnselect
+ * @param {string} id - ThreeJS Object ID 또는 Openlayers Feature ID
+ */
 gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
 	var id = id;
 
@@ -2112,6 +1880,13 @@ gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
 	}
 }
 
+/**
+ * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 비선택 상태로 설정한다. 
+ * 
+ * @method gb3d.edit.EditingTool3D#moveObject2Dfrom3D
+ * @param {Array.<number>} center - 
+ * @param {string} uuid - ThreeJS Object ID
+ */
 gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
 	var id = uuid,
 	centerCoord = center,

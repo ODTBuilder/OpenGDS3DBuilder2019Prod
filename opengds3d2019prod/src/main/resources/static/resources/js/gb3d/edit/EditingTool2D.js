@@ -50,7 +50,7 @@ gb.edit.ACTIVEAREA = 7.75;
  * EditingTool 활성화시 다른 작업을 제한하는 모듈 }); </script> </body>
  * @class gb3d.edit.EditingTool2D
  * @requires {@link gb3d.edit.EditingToolBase}
- * @memberof gb.edit
+ * @memberof gb3d.edit
  * @param {Object}
  *            obj - 생성자 옵션
  * @param {ol.Map}
@@ -4257,6 +4257,10 @@ gb3d.edit.EditingTool2D.prototype.checkActiveTool = function(){
 
 /**
  * 연동된 3D 편집툴 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool2D#getEditingTool3D
+ * @function
+ * @return {gb3d.edit.EditingTool3D}
  */
 gb3d.edit.EditingTool2D.prototype.getEditingTool3D = function(){
 	return this.editingTool3D;
@@ -4264,6 +4268,8 @@ gb3d.edit.EditingTool2D.prototype.getEditingTool3D = function(){
 
 /**
  * WMS 피처를 선택 해제한다.
+ * @method gb3d.edit.EditingTool2D#unselectFeature
+ * @function
  */
 gb3d.edit.EditingTool2D.prototype.unselectFeature = function(){
 	var that = this;
@@ -4278,7 +4284,8 @@ gb3d.edit.EditingTool2D.prototype.unselectFeature = function(){
 /**
  * ID를 통해 WFS 피처를 선택한다.
  * 
- * @method
+ * @method gb3d.edit.EditingTool2D#selectFeatureById
+ * @function
  * @param {String}
  *            fid - feature id
  */
@@ -4361,8 +4368,9 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 /**
  * attribute 객체와 feature 객체를 통해 속성창을 표시한다.
  * 
- * @method
- * @param {String}
+ * @method gb3d.edit.EditingTool2D#showAttributePopup
+ * @param {Array.<Object>} props
+ * @param {ol.Feature} feature
  */
 gb3d.edit.EditingTool2D.prototype.showAttributePopup = function(props, feature){
 	var that = this;
