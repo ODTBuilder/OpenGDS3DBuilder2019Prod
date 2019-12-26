@@ -52,7 +52,7 @@ gb3d.object.ThreeObject = function(obj) {
  * treeid를 반환한다.
  * 
  * @method gb3d.object.ThreeObject#getTreeid
- * @return {String} Layer
+ * @return {string} jstree node id
  */
 gb3d.object.ThreeObject.prototype.getTreeid = function() {
 	return this.treeid;
@@ -154,10 +154,9 @@ gb3d.object.ThreeObject.prototype.setCenter = function(center) {
 };
 
 /**
- * Extent 반환
+ * Extent 갱신
  * 
- * @method gb3d.object.ThreeObject#getExtent
- * @return {Array.<Number>}
+ * @method gb3d.object.ThreeObject#updateExtent
  */
 gb3d.object.ThreeObject.prototype.updateExtent = function() {
 	this.extent = this.getFeature().getGeometry().getExtent();
@@ -227,9 +226,9 @@ gb3d.object.ThreeObject.prototype.setFeature = function(feature) {
 };
 
 /**
- * 사용자 정의 속성 목록을 반환한다.
+ * 버퍼값 반환
  * 
- * @method gb3d.object.ThreeObject#getFeature
+ * @method gb3d.object.ThreeObject#getBuffer
  * @return {number} Openlayers Feature
  */
 gb3d.object.ThreeObject.prototype.getBuffer = function() {
@@ -237,9 +236,9 @@ gb3d.object.ThreeObject.prototype.getBuffer = function() {
 };
 
 /**
- * 사용자 정의 속성 목록을 설정한다.
+ * 버퍼값 설정
  * 
- * @method gb3d.object.ThreeObject#setFeature
+ * @method gb3d.object.ThreeObject#setBuffer
  * @param {number}
  *            buffer - buffer value
  */

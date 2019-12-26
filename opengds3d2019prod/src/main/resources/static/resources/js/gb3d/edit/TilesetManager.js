@@ -5,7 +5,23 @@ if (!gb3d.edit)
 	gb3d.edit = {};
 
 /**
- * @classdesc Cesium 3D Tileset 관리자
+ * @classdesc
+ * Cesium 3D Tileset 관리자
+ * @class gb3d.edit.TilesetManager
+ * @memberof gb3d.edit
+ * @param {Object}
+ *            obj - 생성자 옵션
+ * @param {boolean} [isDisplay=false] - 객체 생성 후 바로 가시화 여부
+ * @param {string} [toggleClass="header-toggle-btn"] - toggle button 요소 Class 이름. 해당 button 요소에 edit tool toggle 기능 추가
+ * @param {string} targetElement - Edit tool bar를 생성할 div id 또는 class name
+ * @param {Array.<Object>} [list] - Edit tool bar에 생성할 메뉴
+ * @param {string} list[].content - 메뉴 이름
+ * @param {string} list[].icon - 메뉴 아이콘 {@link https://fontawesome.com/}
+ * @param {string} list[].color - 메뉴 색상
+ * @param {string} [obj.locale="en"] - 언어 코드
+ * @author KIM HOCHUL
+ * @date 2019. 12. 24
+ * @version 0.01
  */
 gb3d.edit.TilesetManager = function(obj) {
 	var options = obj || {};

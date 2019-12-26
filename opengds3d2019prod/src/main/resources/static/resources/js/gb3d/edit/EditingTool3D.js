@@ -1881,10 +1881,10 @@ gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
 }
 
 /**
- * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 비선택 상태로 설정한다. 
+ * ThreeJS Object와 연동된 Openlayers Feature를 특정 위치로 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#moveObject2Dfrom3D
- * @param {Array.<number>} center - 
+ * @param {Array.<number>} center - 이동하려는 위치 좌표값
  * @param {string} uuid - ThreeJS Object ID
  */
 gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
@@ -1903,6 +1903,13 @@ gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
 	threeObject.setCenter([lon, lat]);
 }
 
+/**
+ * ThreeJS Object vertices 값으로 Openlayers Feature를 변경한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#modifyObject2Dfrom3D
+ * @param {Array.<Object>} vertices - Openlayers Feature의 변경된 Coordinates 값
+ * @param {string} uuid - ThreeJS Object ID
+ */
 gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid){
 	var v = JSON.parse(JSON.stringify(vertices)),
 	id = uuid,
@@ -1930,6 +1937,14 @@ gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid
 // threeObject.getFeature().getGeometry().setCoordinates(degrees);
 }
 
+/**
+ * Openlayers Feature Coordinates 값으로 ThreeJS Object를 이동시킨다.
+ * 
+ * @method gb3d.edit.EditingTool3D#moveObject3Dfrom2D
+ * @param {string} id - Openlayers Feature ID
+ * @param {Array.<number>} center - Openlayers Feature의 변경된 Center Coordinates 값
+ * @param {Array.<number>} coord - Openlayers Feature의 변경된 Coordinates 값
+ */
 gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var that = this;
 	var featureId = id;
@@ -2003,6 +2018,15 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
 	record.update(threeObject.getLayer(), threeObject);
 }
 
+/**
+ * Openlayers Feature Coordinates 값으로 ThreeJS Object를 이동시킨다.
+ * 
+ * @method gb3d.edit.EditingTool3D#modify3DVertices
+ * @param {Array.<number>} arr - Coordinates
+ * @param {string} id - Openlayers Feature ID
+ * @param {Array.<number>} extent - MinX, MinY, MaxX, MaxY
+ * @param {Object} event
+ */
 gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, event) {
 	var that = this;
 	var objects = this.getMap().getThreeObjects(),
@@ -2219,6 +2243,9 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 
 /**
  * editing tool 2d 를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getEditingTool2D
+ * @return {gb3d.edit.EditingTool2D}
  */
 gb3d.edit.EditingTool3D.prototype.getEditingTool2D = function() {
 	return typeof this.editingTool2D === "function" ? this.editingTool2D() : this.editingTool2D;
@@ -2226,6 +2253,9 @@ gb3d.edit.EditingTool3D.prototype.getEditingTool2D = function() {
 
 /**
  * 속성 정보창을 업데이트 한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#updateAttributePopup
+ * @param {Object} userData - ThreeJS Object 속성 정보
  */
 gb3d.edit.EditingTool3D.prototype.updateAttributePopup = function(userData) {
 	var that = this;
@@ -2421,7 +2451,11 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
  * tileset feature를 선택한다
  * 
  * @method gb3d.edit.EditingTool3D#getFeatureByIdFromServer
- * @param {String}
+ * @param {string}
+ *            server - Server name
+ * @param {string}
+ *            workspace - Workspace name
+ * @param {string}
  *            fid - 피처 ID
  */
 gb3d.edit.EditingTool3D.prototype.getFeatureByIdFromServer = function(server, work, fid){
@@ -2449,7 +2483,8 @@ gb3d.edit.EditingTool3D.prototype.getFeatureByIdFromServer = function(server, wo
 
 /**
  * 3D 객체 편집시 평면도를 업데이트
- * @method
+ * 
+ * @method gb3d.edit.EditingTool3D#updateFloorPlan
  * @param {ol.Feature} selectedFeature - selected fearure
  * @param {gb3d.object.ThreeObject} threeObj - 업데이트할 객체
  */
@@ -2532,7 +2567,6 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
  * 선택한 b3dm을 glb로 변환하여 편집화면에 불러온다
  * 
  * @method gb3d.edit.EditingTool3D#getGLBfromServer
- * @param
  */
 gb3d.edit.EditingTool3D.prototype.getGLBfromServer = function(layerFeature, tileFeature){
 	var that = this;
