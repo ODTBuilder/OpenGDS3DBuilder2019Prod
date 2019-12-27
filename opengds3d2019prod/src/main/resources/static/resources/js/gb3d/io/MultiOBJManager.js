@@ -8,11 +8,9 @@ if (!gb3d.io)
 	gb3d.io = {};
 /**
  * @classdesc 압축된 다수의 OBJ 파일을 서버로 전송하고 변환된 b3dm을 불러온다.
- * 
  * @class gb3d.io.MultiOBJManager
  * @memberof gb3d.io
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
 gb3d.io.MultiOBJManager = function(obj) {
@@ -84,59 +82,57 @@ gb3d.io.MultiOBJManager.prototype.constructor = gb3d.io.MultiOBJManager;
 gb3d.io.MultiOBJManager.prototype.upload = function() {
 	var that = this;
 	this.load3DTiles(this.test);
-//	var params = {
-//		"key1" : "val1",
-//		"key2" : "val2",
-//	};
-//
-//	var finalParams = {};
-//	$.extend(finalParams, params, {});
-//
-//	var form = $("<form>");
-//	var formData = new FormData(form[0]);
-//	formData.append("file", this.inputFile);
-//	var keys = Object.keys(finalParams);
-//	for (var i = 0; i < keys.length; i++) {
-//		formData.append(keys[i], finalParams[keys[i]]);
-//	}
-//
-//	$.ajax({
-//		url : this.getUploadURL(),
-//		method : "POST",
-//		enctype : 'multipart/form-data',
-//		contentType : false,
-//		data : formData,
-//		processData : false,
-//		beforeSend : function() {
-//			// $("body").css("cursor", "wait");
-//			that.showSpinner(true, that);
-//		},
-//		complete : function() {
-//			// $("body").css("cursor", "default");
-//			that.showSpinner(false, that);
-//		},
-//		success : function(data) {
-//			console.log(data);
-//			that.printMessage(that.translation.succ[that.locale]);
-//			// modal.close();
-//			// that.open();
-//			// that.resultTable(data.layers);
-//			// that.callback();
-//		},
-//		error : function(jqXHR, textStatus, errorThrown) {
-//			that.printMessage(that.translation.err[that.locale]);
-//		}
-//	});
+	// var params = {
+	// "key1" : "val1",
+	// "key2" : "val2",
+	// };
+	//
+	// var finalParams = {};
+	// $.extend(finalParams, params, {});
+	//
+	// var form = $("<form>");
+	// var formData = new FormData(form[0]);
+	// formData.append("file", this.inputFile);
+	// var keys = Object.keys(finalParams);
+	// for (var i = 0; i < keys.length; i++) {
+	// formData.append(keys[i], finalParams[keys[i]]);
+	// }
+	//
+	// $.ajax({
+	// url : this.getUploadURL(),
+	// method : "POST",
+	// enctype : 'multipart/form-data',
+	// contentType : false,
+	// data : formData,
+	// processData : false,
+	// beforeSend : function() {
+	// // $("body").css("cursor", "wait");
+	// that.showSpinner(true, that);
+	// },
+	// complete : function() {
+	// // $("body").css("cursor", "default");
+	// that.showSpinner(false, that);
+	// },
+	// success : function(data) {
+	// console.log(data);
+	// that.printMessage(that.translation.succ[that.locale]);
+	// // modal.close();
+	// // that.open();
+	// // that.resultTable(data.layers);
+	// // that.callback();
+	// },
+	// error : function(jqXHR, textStatus, errorThrown) {
+	// that.printMessage(that.translation.err[that.locale]);
+	// }
+	// });
 };
 
 /**
  * 스피너를 보여준다.
  * 
  * @method gb.versioning.Repository#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 표시할 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 표시할 모달 객체
  */
 gb3d.io.MultiOBJManager.prototype.showSpinner = function(show, modal) {
 	if (show) {
@@ -163,8 +159,7 @@ gb3d.io.MultiOBJManager.prototype.getUploadURL = function() {
  * 업로드 메세지를 출력한다.
  * 
  * @method gb3d.io.MultiOBJManager#printMessage
- * @param {String}
- *            msg - 표시할 메세지
+ * @param {String} msg - 표시할 메세지
  */
 gb3d.io.MultiOBJManager.prototype.printMessage = function(msg) {
 	$(this.complete).empty();
@@ -175,8 +170,7 @@ gb3d.io.MultiOBJManager.prototype.printMessage = function(msg) {
  * 변환된 3d tiles를 추가한다.
  * 
  * @method gb3d.io.MultiOBJManager#load3DTiles
- * @param {String}
- *            url - 3d tiles url
+ * @param {String} url - 3d tiles url
  */
 gb3d.io.MultiOBJManager.prototype.load3DTiles = function(url) {
 	var that = this;
@@ -186,7 +180,7 @@ gb3d.io.MultiOBJManager.prototype.load3DTiles = function(url) {
 	});
 	that.getGb3dMap().getCesiumViewer().scene.primitives.add(tileset);
 	that.getGb3dMap().getCesiumViewer().zoomTo(tileset);
-	
+
 };
 
 /**

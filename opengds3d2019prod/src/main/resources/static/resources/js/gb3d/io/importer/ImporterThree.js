@@ -10,11 +10,9 @@ if (!gb3d.io.importer)
 	gb3d.io.importer = {};
 /**
  * @classdesc importerThree 객체를 정의한다.
- * 
  * @class gb3d.io.ImporterThree
  * @memberof gb3d.io
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
 gb3d.io.ImporterThree = function(obj) {
@@ -121,10 +119,8 @@ gb3d.io.ImporterThree.prototype.constructor = gb3d.io.ImporterThree;
  * 파일을 읽는다.
  * 
  * @method gb.versioning.Repository#loadFile
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 표시할 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 표시할 모달 객체
  */
 gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 	var that = this;
@@ -192,12 +188,11 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 				var children = scene.children;
 				var group = new THREE.Group();
 				/*
-				 * for(var i = 0; i < children.length; i++){ if(children[i]
-				 * instanceof THREE.Object3D && !(children[i] instanceof
-				 * THREE.Mesh)){ var arr = children[i].children; for(var j = 0;
-				 * j < arr.length; j++){ if(arr[j] instanceof THREE.Mesh){
-				 * group.add(arr[j]); } } } else if(children[i] instanceof
-				 * THREE.Mesh){ group.add(children[i]); } }
+				 * for(var i = 0; i < children.length; i++){ if(children[i] instanceof
+				 * THREE.Object3D && !(children[i] instanceof THREE.Mesh)){ var arr =
+				 * children[i].children; for(var j = 0; j < arr.length; j++){ if(arr[j] instanceof
+				 * THREE.Mesh){ group.add(arr[j]); } } } else if(children[i] instanceof THREE.Mesh){
+				 * group.add(children[i]); } }
 				 */
 				for (var i = 0; i < children.length; i++) {
 					group.add(children[i]);
@@ -478,10 +473,8 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
  * 스피너를 보여준다.
  * 
  * @method gb.versioning.Repository#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 표시할 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 표시할 모달 객체
  */
 gb3d.io.ImporterThree.prototype.showSpinner = function(show, modal) {
 	if (show) {
@@ -508,8 +501,7 @@ gb3d.io.ImporterThree.prototype.getUploadURL = function() {
  * 업로드 메세지를 출력한다.
  * 
  * @method gb3d.io.ImporterThree#printMessage
- * @param {String}
- *            msg - 표시할 메세지
+ * @param {String} msg - 표시할 메세지
  */
 gb3d.io.ImporterThree.prototype.printMessage = function(msg) {
 	$(this.complete).empty();
@@ -520,10 +512,8 @@ gb3d.io.ImporterThree.prototype.printMessage = function(msg) {
  * 객체를 회전시킬 방향벡터를 반환한다.
  * 
  * @method gb3d.io.ImporterThree.axisAngle
- * @param {Number}
- *            degree - 객체를 회전시킬 각
- * @param {String}
- *            axis - 객체를 회전시킬 축의 이름("X", "Y", "Z")
+ * @param {number} degree - 객체를 회전시킬 각
+ * @param {String} axis - 객체를 회전시킬 축의 이름("X", "Y", "Z")
  */
 gb3d.io.ImporterThree.axisAngle = function(degree, axis) {
 	var a = axis;
@@ -557,12 +547,9 @@ gb3d.io.ImporterThree.axisAngle = function(degree, axis) {
  * 
  * @method gb3d.io.ImporterThree.applyAxisAngleToAllMesh
  * @function
- * @param {THREE.Object3D|THREE.Group}
- *            obj - 객체
- * @param {String}
- *            axis - 객체를 회전시킬 축의 이름("X", "Y", "Z")
- * @param {number}
- *            radian - 객체를 회전시킬 radian값
+ * @param {THREE.Object3D|THREE.Group} obj - 객체
+ * @param {String} axis - 객체를 회전시킬 축의 이름("X", "Y", "Z")
+ * @param {number} radian - 객체를 회전시킬 radian값
  */
 gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 	var object = obj, axis = axis, radian = radian;
@@ -614,8 +601,7 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
  * GLTF 파일 유효성 검사
  * 
  * @method gb3d.io.ImporterThree.isGLTF1
- * @param {Object}
- *            contents - 파일 객체
+ * @param {Object} contents - 파일 객체
  */
 gb3d.io.ImporterThree.isGLTF1 = function(contents) {
 
@@ -655,10 +641,8 @@ gb3d.io.ImporterThree.isGLTF1 = function(contents) {
  * THREE.Group 객체의 요소들중에 Mesh 객체를 반환한다.
  * 
  * @method gb3d.io.ImporterThree#getChildrenMeshes
- * @param {THREE.Group}
- *            obj - Mesh 객체를 검색할 그룹 객체
- * @param {Array.
- *            <THREE.Mesh>} result - 결과를 담을 배열
+ * @param {THREE.Group} obj - Mesh 객체를 검색할 그룹 객체
+ * @param {Array.<THREE.Mesh>} result - 결과를 담을 배열
  * @return {Array.<THREE.Mesh>} THREE.Mesh객체 배열
  */
 gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
@@ -677,12 +661,9 @@ gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
  * 객체의 평면도를 반환한다.
  * 
  * @method gb3d.io.ImporterThree#getFloorPlan
- * @param {THREE.Object3D}
- *            obj - 평면도를 만들 객체
- * @param {Array.
- *            <Number>} center - 객체의 중점
- * @param {Array.
- *            <Object>} result - 결과를 담을 배열
+ * @param {THREE.Object3D} obj - 평면도를 만들 객체
+ * @param {Array.<number>} center - 객체의 중점
+ * @param {Array.<Object>} result - 결과를 담을 배열
  * @return {Array.<Object>} 평면도 폴리곤이 담긴 배열
  */
 gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
@@ -770,10 +751,8 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
  * 3D 객체의 평면도를 뽑아서 Dissolve 한다.
  * 
  * @method gb3d.io.ImporterThree#refreshFloorPlan
- * @param {ol.layer.Vector}
- *            layer - 평면도를 입력할 레이어
- * @param {THREE.Object3D}
- *            threeObj - 평면도를 만들 객체
+ * @param {ol.layer.Vector} layer - 평면도를 입력할 레이어
+ * @param {THREE.Object3D} threeObj - 평면도를 만들 객체
  */
 gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	var center = threeObj.getCenter();

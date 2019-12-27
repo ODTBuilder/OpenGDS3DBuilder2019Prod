@@ -8,12 +8,9 @@ if (!gb3d.tree)
  * @classdesc Cesium 3D Tileset 선언적 스타일링 관리 객체
  * @class gb3d.tree.Three
  * @memberof gb3d.tree
- * @param {Object}
- *            obj - 생성자 옵션
- * @param {string}
- *            [obj.target="body"] - UI를 생성할 Element ID 또는 Class name
- * @param {gb3d.Map}
- *            obj.map - {@link gb3d.Map}
+ * @param {Object} obj - 생성자 옵션
+ * @param {string} [obj.target="body"] - UI를 생성할 Element ID 또는 Class name
+ * @param {gb3d.Map} obj.map - {@link gb3d.Map}
  * @author KIM HOCHUL
  * @date 2019. 12. 24
  * @version 0.01

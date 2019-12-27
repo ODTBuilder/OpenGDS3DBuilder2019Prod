@@ -1,18 +1,13 @@
 if (!ol.events.Event) {
 	/**
-	 * @classdesc Stripped down implementation of the W3C DOM Level 2 Event
-	 *            interface.
-	 * @see {@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-interface}
-	 * 
-	 * This implementation only provides `type` and `target` properties, and
-	 * `stopPropagation` and `preventDefault` methods. It is meant as base class
-	 * for higher level events defined in the library, and works with
-	 * {@link ol.events.EventTarget}.
-	 * 
+	 * @classdesc Stripped down implementation of the W3C DOM Level 2 Event interface.
+	 * @see {@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-interface} This
+	 * implementation only provides `type` and `target` properties, and `stopPropagation` and
+	 * `preventDefault` methods. It is meant as base class for higher level events defined in the
+	 * library, and works with {@link ol.events.EventTarget}.
 	 * @constructor
 	 * @implements {oli.events.Event}
-	 * @param {string}
-	 *            type Type.
+	 * @param {string} type Type.
 	 */
 	ol.events.Event = function(type) {
 
@@ -60,16 +55,14 @@ if (!ol.events.Event) {
 	};
 
 	/**
-	 * @param {Event|ol.events.Event}
-	 *            evt Event
+	 * @param {Event|ol.events.Event} evt Event
 	 */
 	ol.events.Event.stopPropagation = function(evt) {
 		evt.stopPropagation();
 	};
 
 	/**
-	 * @param {Event|ol.events.Event}
-	 *            evt Event
+	 * @param {Event|ol.events.Event} evt Event
 	 */
 	ol.events.Event.preventDefault = function(evt) {
 		evt.preventDefault();
@@ -84,18 +77,14 @@ if (!ol.events.Event) {
 }
 if (!ol.MapEvent) {
 	/**
-	 * @classdesc Events emitted as map events are instances of this type. See
-	 *            {@link ol.Map} for which events trigger a map event.
-	 * 
+	 * @classdesc Events emitted as map events are instances of this type. See {@link ol.Map} for
+	 * which events trigger a map event.
 	 * @constructor
 	 * @extends {ol.events.Event}
 	 * @implements {oli.MapEvent}
-	 * @param {string}
-	 *            type Event type.
-	 * @param {ol.Map}
-	 *            map Map.
-	 * @param {?olx.FrameState=}
-	 *            opt_frameState Frame state.
+	 * @param {string} type Event type.
+	 * @param {ol.Map} map Map.
+	 * @param {?olx.FrameState=} opt_frameState Frame state.
 	 */
 	ol.MapEvent = function(type, map, opt_frameState) {
 
@@ -127,23 +116,16 @@ if (!ol.MapEvent) {
 }
 if (!ol.MapBrowserEvent) {
 	/**
-	 * @classdesc Events emitted as map browser events are instances of this
-	 *            type. See {@link ol.Map} for which events trigger a map
-	 *            browser event.
-	 * 
+	 * @classdesc Events emitted as map browser events are instances of this type. See
+	 * {@link ol.Map} for which events trigger a map browser event.
 	 * @constructor
 	 * @extends {ol.MapEvent}
 	 * @implements {oli.MapBrowserEvent}
-	 * @param {string}
-	 *            type Event type.
-	 * @param {ol.Map}
-	 *            map Map.
-	 * @param {Event}
-	 *            browserEvent Browser event.
-	 * @param {boolean=}
-	 *            opt_dragging Is the map currently being dragged?
-	 * @param {?olx.FrameState=}
-	 *            opt_frameState Frame state.
+	 * @param {string} type Event type.
+	 * @param {ol.Map} map Map.
+	 * @param {Event} browserEvent Browser event.
+	 * @param {boolean=} opt_dragging Is the map currently being dragged?
+	 * @param {?olx.FrameState=} opt_frameState Frame state.
 	 */
 	ol.MapBrowserEvent = function(type, map, browserEvent, opt_dragging, opt_frameState) {
 
@@ -159,8 +141,7 @@ if (!ol.MapBrowserEvent) {
 		this.originalEvent = browserEvent;
 
 		/**
-		 * The map pixel relative to the viewport corresponding to the original
-		 * browser event.
+		 * The map pixel relative to the viewport corresponding to the original browser event.
 		 * 
 		 * @type {ol.Pixel}
 		 * @api
@@ -168,8 +149,7 @@ if (!ol.MapBrowserEvent) {
 		this.pixel = map.getEventPixel(browserEvent);
 
 		/**
-		 * The coordinate in view projection corresponding to the original
-		 * browser event.
+		 * The coordinate in view projection corresponding to the original browser event.
 		 * 
 		 * @type {ol.Coordinate}
 		 * @api
@@ -177,8 +157,8 @@ if (!ol.MapBrowserEvent) {
 		this.coordinate = map.getCoordinateFromPixel(this.pixel);
 
 		/**
-		 * Indicates if the map is currently being dragged. Only set for
-		 * `POINTERDRAG` and `POINTERMOVE` events. Default is `false`.
+		 * Indicates if the map is currently being dragged. Only set for `POINTERDRAG` and
+		 * `POINTERMOVE` events. Default is `false`.
 		 * 
 		 * @type {boolean}
 		 * @api
@@ -224,19 +204,13 @@ if (!gb3d)
 	gb3d = {};
 /**
  * @classdesc Camera 객체를 정의한다.
- * 
  * @class gb3d.Camera
  * @memberof gb3d
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {Cesium.Camera}
- *            obj.cesiumCamera - 3차원 지도상에서 사용될 Cesium 카메라 객체
- * @param {THREE.Camera}
- *            obj.threeCamera - 3차원 지도상에서 사용될 THREE 카메라 객체
- * @param {ol.Map}
- *            obj.olMap - 2D 지도 객체
- * @param {Boolean}
- *            obj.sync2D - 2D지도와 3D 지도의 뷰 영역 동기화 여부
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {Cesium.Camera} obj.cesiumCamera - 3차원 지도상에서 사용될 Cesium 카메라 객체
+ * @param {THREE.Camera} obj.threeCamera - 3차원 지도상에서 사용될 THREE 카메라 객체
+ * @param {ol.Map} obj.olMap - 2D 지도 객체
+ * @param {boolean} obj.sync2D - 2D지도와 3D 지도의 뷰 영역 동기화 여부
  * @author SOYIJUN
  */
 gb3d.Camera = function(obj) {
@@ -263,13 +237,13 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 2D지도와 3D 지도의 뷰 영역 동기화 여부
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.sync2D = options.sync2D;
 	/**
 	 * 2D, 3D 연동시 최초 수행여부를 저장하는 변수
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.firstConst = true;
 	// this.icon = options.icon ? options.icon : undefined;
@@ -287,7 +261,7 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 초기화 위치
 	 * 
-	 * @type {Array.<Number>}
+	 * @type {Array.<number>}
 	 */
 	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
 
@@ -453,7 +427,7 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 커서 위치
 	 * 
-	 * @type {Array.<Number>}
+	 * @type {Array.<number>}
 	 */
 	this.cursorCoord = [];
 	this.olMap.on('pointermove', function(evt) {
@@ -510,32 +484,32 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 카메라 아이콘 위치가 변경되는 중인지 여부
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.isCamMoving = false;
 	/**
 	 * 카메라 아이콘을 회전 중인지 여부
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.isCamRotating = false;
 
 	/**
 	 * 커서의 이전 위치
 	 * 
-	 * @type {Array.<Number>}
+	 * @type {Array.<number>}
 	 */
 	this.prevCursorCoord = [];
 	/**
 	 * 카메라 아이콘을 드래그 중인지 여부
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.isCamDragging = false;
 	/**
 	 * 카메라 아이콘을 클릭 중인지 여부
 	 * 
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.isCamDown = false;
 	$(this.icon).mousedown(function() {
@@ -700,7 +674,7 @@ gb3d.Camera.prototype.getThreeCamera = function() {
  * cesium camera의 2차원 위치를 반환한다.
  * 
  * @method gb3d.Map#getCartographicPosition
- * @return {Array. <number>} 경위도 좌표
+ * @return {Array.<number>} 경위도 좌표
  */
 gb3d.Camera.prototype.getCartographicPosition = function() {
 	var ccam = this.getCesiumCamera();
@@ -772,8 +746,7 @@ gb3d.Camera.prototype.updateCamCartigraphicPosition = function() {
  * cesium camera의 3차원 지도상 위치를 업데이트 한다.
  * 
  * @method gb3d.Map#updateCesiumCameraPosition
- * @param {number}
- *            heading - 카메라 각도 degree
+ * @param {number} heading - 카메라 각도 degree
  */
 gb3d.Camera.prototype.updateCesiumCameraPosition = function(heading) {
 	var camPos = this.getCamIconOverlay().getPosition();

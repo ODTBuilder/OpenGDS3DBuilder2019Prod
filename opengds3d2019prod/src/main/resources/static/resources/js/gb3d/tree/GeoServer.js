@@ -12,43 +12,25 @@ if (!gb3d.tree)
 	gb3d.tree = {};
 /**
  * @classdescs 지오서버 레이어 목록을 표시하는 객체
- * 
  * @class gb3d.tree.GeoServer
- * @memberof gb.tree
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {string}
- *            [obj.locale="en"] - 사용할 언어 ko | en
- * @param {HTMLElement}
- *            obj.append - 영역 본문이 삽입될 부모 노드의 HTMLElement
- * @param {gb.tree.Openlayers}
- *            obj.cliendTree - 클라이언트 레이어 트리 객체
- * @param {ol.Map}
- *            obj.map - 편집 영역의 ol.Map
- * @param {gb.geoserver.UploadSHP}
- *            obj.uploadSHP - SHP 파일 업로드 객체
- * @param {Object}
- *            obj.url - 요청을 처리하기 위한 URL 객체
- * @param {string}
- *            obj.url.getTree - 지오서버 트리 구조를 요청하기 위한 URL
- * @param {string}
- *            obj.url.addGeoServer - 지오서버를 추가하기 위한 URL
- * @param {string}
- *            obj.url.deleteGeoServer - 지오서버를 삭제하기 위한 URL
- * @param {string}
- *            obj.url.deleteGeoServerLayer - 지오서버 레이어를 삭제하기 위한 URL
- * @param {string}
- *            obj.url.getMapWMS - WMS 레이어를 요청하기 위한 URL
- * @param {string}
- *            obj.url.getLayerInfo - WMS 레이어 세부 정보를 요청하기 위한 URL
- * @param {string}
- *            obj.url.getWFSFeature - WMS 레이어의 피처 세부 정보를 요청하기 위한 URL
- * @param {string}
- *            obj.url.switchGeoGigBranch - GeoGig 데이터저장소의 연결 브랜치 변경을 요청하기 위한 URL
- * @param {string}
- *            obj.url.geoserverInfo - GeoServer 정보를 요청하기 위한 URL
- * @param {gb.edit.ModifyLayerProperties}
- *            obj.properties - GeoServer 레이어 속성 편집 객체
+ * @memberof gb3d.tree
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {string} [obj.locale="en"] - 사용할 언어 ko | en
+ * @param {HTMLElement} obj.append - 영역 본문이 삽입될 부모 노드의 HTMLElement
+ * @param {gb.tree.Openlayers} obj.cliendTree - 클라이언트 레이어 트리 객체
+ * @param {ol.Map} obj.map - 편집 영역의 ol.Map
+ * @param {gb.geoserver.UploadSHP} obj.uploadSHP - SHP 파일 업로드 객체
+ * @param {Object} obj.url - 요청을 처리하기 위한 URL 객체
+ * @param {string} obj.url.getTree - 지오서버 트리 구조를 요청하기 위한 URL
+ * @param {string} obj.url.addGeoServer - 지오서버를 추가하기 위한 URL
+ * @param {string} obj.url.deleteGeoServer - 지오서버를 삭제하기 위한 URL
+ * @param {string} obj.url.deleteGeoServerLayer - 지오서버 레이어를 삭제하기 위한 URL
+ * @param {string} obj.url.getMapWMS - WMS 레이어를 요청하기 위한 URL
+ * @param {string} obj.url.getLayerInfo - WMS 레이어 세부 정보를 요청하기 위한 URL
+ * @param {string} obj.url.getWFSFeature - WMS 레이어의 피처 세부 정보를 요청하기 위한 URL
+ * @param {string} obj.url.switchGeoGigBranch - GeoGig 데이터저장소의 연결 브랜치 변경을 요청하기 위한 URL
+ * @param {string} obj.url.geoserverInfo - GeoServer 정보를 요청하기 위한 URL
+ * @param {gb.edit.ModifyLayerProperties} obj.properties - GeoServer 레이어 속성 편집 객체
  * @author SOYIJUN
  */
 gb3d.tree.GeoServer = function(obj) {
@@ -553,21 +535,16 @@ gb3d.tree.GeoServer = function(obj) {
 							totalObj["info"] = infoObj;
 
 							/*
-							 * var setObj = { "separator_before" : false, "icon" :
-							 * "fas fa-cog", "separator_after" : false,
-							 * "_disabled" : function() { console.log(o);
-							 * console.log(cb); var result = true; if (o.type
-							 * === "geoserver") { result = false; } return
-							 * result; }, "label" :
-							 * that.translation.setting[that.locale], "action" :
-							 * function(data) { var isEdit = gb? (gb.module ?
-							 * gb.module.isEditing : undefined) : undefined; var
-							 * inst = $.jstree.reference(data.reference), obj =
-							 * inst.get_node(data.reference); var server =
-							 * obj.text;
+							 * var setObj = { "separator_before" : false, "icon" : "fas fa-cog",
+							 * "separator_after" : false, "_disabled" : function() { console.log(o);
+							 * console.log(cb); var result = true; if (o.type === "geoserver") {
+							 * result = false; } return result; }, "label" :
+							 * that.translation.setting[that.locale], "action" : function(data) {
+							 * var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) :
+							 * undefined; var inst = $.jstree.reference(data.reference), obj =
+							 * inst.get_node(data.reference); var server = obj.text;
 							 * 
-							 * that.geoserverSettingModal(); } } totalObj["set"] =
-							 * setObj;
+							 * that.geoserverSettingModal(); } } totalObj["set"] = setObj;
 							 */
 						}
 						// 지오긱 저장소이면 브랜치 서브메뉴 객체를 만듬
@@ -1384,9 +1361,8 @@ gb3d.tree.GeoServer = function(obj) {
 									},
 									"label" : that.translation.upload[that.locale],
 									/*
-									 * ! "shortcut" : 113, "shortcut_label" :
-									 * 'F2', "icon" : "glyphicon
-									 * glyphicon-leaf",
+									 * ! "shortcut" : 113, "shortcut_label" : 'F2', "icon" :
+									 * "glyphicon glyphicon-leaf",
 									 */
 									"action" : function(data) {
 										var inst = $.jstree.reference(data.reference), obj = inst.get_node(data.reference);
@@ -1430,9 +1406,8 @@ gb3d.tree.GeoServer = function(obj) {
 									},
 									"label" : that.translation.remove[that.locale],
 									/*
-									 * ! "shortcut" : 113, "shortcut_label" :
-									 * 'F2', "icon" : "glyphicon
-									 * glyphicon-leaf",
+									 * ! "shortcut" : 113, "shortcut_label" : 'F2', "icon" :
+									 * "glyphicon glyphicon-leaf",
 									 */
 									"action" : function(data) {
 										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
@@ -1699,8 +1674,7 @@ gb3d.tree.GeoServer.prototype.getJSTree = function() {
  * jstree 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setJSTree
- * @param {$.jstree}
- *            jstree - GeoServer 목록을 표출할 jsTree 객체
+ * @param {$.jstree} jstree - GeoServer 목록을 표출할 jsTree 객체
  */
 gb3d.tree.GeoServer.prototype.setJSTree = function(jstree) {
 	this.jstree = jstree;
@@ -1720,10 +1694,8 @@ gb3d.tree.GeoServer.prototype.getLoadingNumber = function() {
  * loadingNumber 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setLoadingNumber
- * @param {number}
- *            idx - 남은 레이어 로딩 개수를 설정할 인덱스
- * @param {number}
- *            num - 남은 레이어 로딩 개수
+ * @param {number} idx - 남은 레이어 로딩 개수를 설정할 인덱스
+ * @param {number} num - 남은 레이어 로딩 개수
  */
 gb3d.tree.GeoServer.prototype.setLoadingNumber = function(idx, num) {
 	this.loadingNumber[idx] = num;
@@ -1752,8 +1724,7 @@ gb3d.tree.GeoServer.prototype.getLoadingList = function() {
  * loadingList 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setLoadingList
- * @param {Array.
- *            <Object>} list - 로딩할 레이어 목록
+ * @param {Array.<Object>} list - 로딩할 레이어 목록
  */
 gb3d.tree.GeoServer.prototype.setLoadingList = function(list) {
 	this.loadingList = list;
@@ -1763,10 +1734,8 @@ gb3d.tree.GeoServer.prototype.setLoadingList = function(list) {
  * loadingList 목록에 추가한다.
  * 
  * @method gb3d.tree.GeoServer#addLoadingList
- * @param {number}
- *            idx - 레이어 식별자가 저장될 배열의 인덱스
- * @param {string}
- *            nodeId - 레이어 식별자
+ * @param {number} idx - 레이어 식별자가 저장될 배열의 인덱스
+ * @param {string} nodeId - 레이어 식별자
  */
 gb3d.tree.GeoServer.prototype.addNodeToLoadingList = function(idx, nodeId) {
 	var list = this.getLoadingList();
@@ -1794,12 +1763,9 @@ gb3d.tree.GeoServer.prototype.initLoadingList = function() {
  * loadingList, loadingNumber 객체에 로딩 정보를 변경한다
  * 
  * @method gb3d.tree.GeoServer#changeNodeOnLoadingList
- * @param {number}
- *            idx - 로딩 정보가 저장된 인덱스
- * @param {string}
- *            nodeId - 레이어 식별자
- * @param {boolean}
- *            flag - 증감여부 (true 감소, false 증가)
+ * @param {number} idx - 로딩 정보가 저장된 인덱스
+ * @param {string} nodeId - 레이어 식별자
+ * @param {boolean} flag - 증감여부 (true 감소, false 증가)
  */
 gb3d.tree.GeoServer.prototype.changeNodeOnLoadingList = function(idx, nodeId, flag) {
 	var that = this;
@@ -1897,16 +1863,11 @@ gb3d.tree.GeoServer.prototype.openAddGeoServer = function() {
  * GeoServer를 등록한다.
  * 
  * @method gb3d.tree.GeoServer#addGeoServer
- * @param {string}
- *            name - 지오서버의 이름
- * @param {string}
- *            url - 지오서버의 URL
- * @param {string}
- *            id - 지오서버 접속을 위한 ID
- * @param {string}
- *            password - 지오서버 접속을 위한 비밀번호
- * @param {gb.modal.ModalBase}
- *            modal - 완료 후 창을 닫을 모달 객체
+ * @param {string} name - 지오서버의 이름
+ * @param {string} url - 지오서버의 URL
+ * @param {string} id - 지오서버 접속을 위한 ID
+ * @param {string} password - 지오서버 접속을 위한 비밀번호
+ * @param {gb.modal.ModalBase} modal - 완료 후 창을 닫을 모달 객체
  */
 gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, modal) {
 	var that = this;
@@ -1949,8 +1910,7 @@ gb3d.tree.GeoServer.prototype.addGeoServer = function(name, url, id, password, m
  * GeoServer 삭제 확인창을 연다.
  * 
  * @method gb3d.tree.GeoServer#openDeleteGeoServer
- * @param {string}
- *            geoserver - 목록에서 삭제할 GeoServer 이름
+ * @param {string} geoserver - 목록에서 삭제할 GeoServer 이름
  */
 gb3d.tree.GeoServer.prototype.openDeleteGeoServer = function(geoserver) {
 	var that = this;
@@ -1982,10 +1942,8 @@ gb3d.tree.GeoServer.prototype.openDeleteGeoServer = function(geoserver) {
  * GeoServer를 삭제한다.
  * 
  * @method gb3d.tree.GeoServer#deleteGeoServer
- * @param {string}
- *            geoserver - 삭제할 지오서버의 이름
- * @param {gb.modal.ModalBase}
- *            modal - 완료후 닫을 모달 객체
+ * @param {string} geoserver - 삭제할 지오서버의 이름
+ * @param {gb.modal.ModalBase} modal - 완료후 닫을 모달 객체
  */
 gb3d.tree.GeoServer.prototype.deleteGeoServer = function(geoserver, modal) {
 	var that = this;
@@ -2020,14 +1978,10 @@ gb3d.tree.GeoServer.prototype.deleteGeoServer = function(geoserver, modal) {
  * GeoServer 레이어 삭제 확인창을 연다.
  * 
  * @method gb3d.tree.GeoServer#openDeleteGeoServerLayer
- * @param {string}
- *            server - 지오서버 이름
- * @param {string}
- *            work - 작업공간 이름
- * @param {string}
- *            store - 데이터저장소 이름
- * @param {string}
- *            layer - 레이어 이름
+ * @param {string} server - 지오서버 이름
+ * @param {string} work - 작업공간 이름
+ * @param {string} store - 데이터저장소 이름
+ * @param {string} layer - 레이어 이름
  */
 gb3d.tree.GeoServer.prototype.openDeleteGeoServerLayer = function(server, work, store, layer) {
 	var that = this;
@@ -2073,16 +2027,11 @@ gb3d.tree.GeoServer.prototype.openDeleteGeoServerLayer = function(server, work, 
  * GeoServer Layer 를 삭제한다.
  * 
  * @method gb3d.tree.GeoServer#deleteGeoServerLayer
- * @param {string}
- *            geoserver - 삭제할 레이어의 지오서버 이름
- * @param {string}
- *            work - 삭제할 레이어의 지오서버 워크스페이스 이름
- * @param {string}
- *            store - 삭제할 레이어의 데이터저장소 이름
- * @param {(string|Array.
- *            <string>)} layer - 삭제할 레이어의 이름
- * @param {gb.modal.ModalBase}
- *            modal - 완료후 창을 닫을 모달 객체
+ * @param {string} geoserver - 삭제할 레이어의 지오서버 이름
+ * @param {string} work - 삭제할 레이어의 지오서버 워크스페이스 이름
+ * @param {string} store - 삭제할 레이어의 데이터저장소 이름
+ * @param {(string|Array.<string>)} layer - 삭제할 레이어의 이름
+ * @param {gb.modal.ModalBase} modal - 완료후 창을 닫을 모달 객체
  */
 gb3d.tree.GeoServer.prototype.deleteGeoServerLayer = function(geoserver, work, store, layer, modal) {
 	var that = this;
@@ -2167,8 +2116,7 @@ gb3d.tree.GeoServer.prototype.getAddGeoServerURL = function() {
  * 지오서버 추가를 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setAddGeoServerURL
- * @param {string}
- *            url - GeoServer 추가 URL
+ * @param {string} url - GeoServer 추가 URL
  */
 gb3d.tree.GeoServer.prototype.setAddGeoServerURL = function(url) {
 	this.addGeoServerURL = url;
@@ -2187,8 +2135,7 @@ gb3d.tree.GeoServer.prototype.getDeleteGeoServerURL = function() {
  * 지오서버 삭제를 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setDeleteGeoServerURL
- * @param {string}
- *            url - GeoServer 삭제 URL
+ * @param {string} url - GeoServer 삭제 URL
  */
 gb3d.tree.GeoServer.prototype.setDeleteGeoServerURL = function(url) {
 	this.deleteGeoServerURL = url;
@@ -2208,8 +2155,7 @@ gb3d.tree.GeoServer.prototype.getGeoServerInfoURL = function() {
  * 지오서버 정보 조회를 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setGeoServerInfoURL
- * @param {string}
- *            url - GeoServer 정보 조회 URL
+ * @param {string} url - GeoServer 정보 조회 URL
  */
 gb3d.tree.GeoServer.prototype.setGeoServerInfoURL = function(url) {
 	this.geoserverInfoURL = url;
@@ -2228,8 +2174,7 @@ gb3d.tree.GeoServer.prototype.getDeleteGeoServerLayerURL = function() {
  * 지오서버 레이어 삭제를 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setDeleteGeoServerLayerURL
- * @param {string}
- *            url - GeoServer 레이어 삭제 URL
+ * @param {string} url - GeoServer 레이어 삭제 URL
  */
 gb3d.tree.GeoServer.prototype.setDeleteGeoServerLayerURL = function(url) {
 	this.deleteGeoServerLayerURL = url;
@@ -2248,8 +2193,7 @@ gb3d.tree.GeoServer.prototype.getGetTreeURL = function() {
  * 지오서버 트리구조 요청을 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setGetTreeURL
- * @param {string}
- *            url - GeoServer 트리구조 요청 URL
+ * @param {string} url - GeoServer 트리구조 요청 URL
  */
 gb3d.tree.GeoServer.prototype.setGetTreeURL = function(url) {
 	this.getTreeURL = url;
@@ -2268,8 +2212,7 @@ gb3d.tree.GeoServer.prototype.getSwitchGeoGigBranchURL = function() {
  * 데이터스토어 타겟 브랜치 전환 요청을 위한 URL을 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setSwitchGeoGigBranchURL
- * @param {string}
- *            url - 브랜치 변경 URL
+ * @param {string} url - 브랜치 변경 URL
  */
 gb3d.tree.GeoServer.prototype.setSwitchGeoGigBranchURL = function(url) {
 	this.switchGeoGigBranchURL = url;
@@ -2288,8 +2231,7 @@ gb3d.tree.GeoServer.prototype.getUploadSHP = function() {
  * SHP 파일 업로드 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setUploadSHP
- * @param {gb.geoserver.UploadSHP}
- *            upload - SHP 업로드 객체
+ * @param {gb.geoserver.UploadSHP} upload - SHP 업로드 객체
  */
 gb3d.tree.GeoServer.prototype.setUploadSHP = function(upload) {
 	this.uploadSHP = upload;
@@ -2308,8 +2250,7 @@ gb3d.tree.GeoServer.prototype.getSimple3DManager = function() {
  * Simple3DManager 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setSimple3DManager
- * @param {gb3d.io.Simple3DManager}
- *            upload - SHP 업로드 객체
+ * @param {gb3d.io.Simple3DManager} upload - SHP 업로드 객체
  */
 gb3d.tree.GeoServer.prototype.setSimple3DManager = function(simple3d) {
 	this.simple3DManager = simple3d;
@@ -2328,8 +2269,7 @@ gb3d.tree.GeoServer.prototype.getMultiOBJManager = function() {
  * OBJ zip 파일 업로드 객체를 설정한다.
  * 
  * @method gb3d.tree.GeoServer#setMultiOBJManager
- * @param {gb3d.io.MultiOBJManager}
- *            upload - SHP 업로드 객체
+ * @param {gb3d.io.MultiOBJManager} upload - SHP 업로드 객체
  */
 gb3d.tree.GeoServer.prototype.setMultiOBJManager = function(multi) {
 	this.multiOBJManager = multi;
@@ -2339,10 +2279,8 @@ gb3d.tree.GeoServer.prototype.setMultiOBJManager = function(multi) {
  * 오류 메시지 창을 생성한다.
  * 
  * @method gb3d.tree.GeoServer#messageModal
- * @param {string}
- *            title - 모달의 타이틀
- * @param {string}
- *            msg - 보여줄 메세지
+ * @param {string} title - 모달의 타이틀
+ * @param {string} msg - 보여줄 메세지
  */
 gb3d.tree.GeoServer.prototype.messageModal = function(title, msg) {
 	var that = this;
@@ -2367,16 +2305,11 @@ gb3d.tree.GeoServer.prototype.messageModal = function(title, msg) {
  * GeoGig 저장소의 타겟 브랜치를 변경한다.
  * 
  * @method gb3d.tree.GeoServer#switchBranch
- * @param {string}
- *            server - 작업 중인 GeoServer 이름
- * @param {string}
- *            work - 작업 중인 작업공간 이름
- * @param {string}
- *            store - 작업 중인 데이터저장소 이름
- * @param {string}
- *            branch - 작업 중인 브랜치 이름
- * @param {gb.modal.ModalBase}
- *            modal - 완료 후 닫을 모달 객체
+ * @param {string} server - 작업 중인 GeoServer 이름
+ * @param {string} work - 작업 중인 작업공간 이름
+ * @param {string} store - 작업 중인 데이터저장소 이름
+ * @param {string} branch - 작업 중인 브랜치 이름
+ * @param {gb.modal.ModalBase} modal - 완료 후 닫을 모달 객체
  */
 gb3d.tree.GeoServer.prototype.switchBranch = function(server, work, store, branch, modal) {
 	var that = this;
@@ -2422,16 +2355,11 @@ gb3d.tree.GeoServer.prototype.switchBranch = function(server, work, store, branc
  * 노드를 마지막 자식 노드까지 로드한다.
  * 
  * @method gb3d.tree.GeoServer#openNodeRecursive
- * @param {number}
- *            idx - 레이어 목록에서 선택한 노드들의 인덱스
- * @param {Object}
- *            node - 열려는 노드
- * @param {Object}
- *            topNode - 레이어 목록에서 선택한 노드
- * @param {function}
- *            afterOpen - 로드후 실행할 콜백함수
- * @param {boolean}
- *            each - 각 노드를 불러왔을 때마다 콜백 함수를 실행할지 지정
+ * @param {number} idx - 레이어 목록에서 선택한 노드들의 인덱스
+ * @param {Object} node - 열려는 노드
+ * @param {Object} topNode - 레이어 목록에서 선택한 노드
+ * @param {function} afterOpen - 로드후 실행할 콜백함수
+ * @param {boolean} each - 각 노드를 불러왔을 때마다 콜백 함수를 실행할지 지정
  */
 gb3d.tree.GeoServer.prototype.openNodeRecursive = function(idx, node, topNode, afterOpen, each) {
 	var that = this;
@@ -2479,8 +2407,7 @@ gb3d.tree.GeoServer.prototype.openNodeRecursive = function(idx, node, topNode, a
  * GeoGig 저장소의 타겟 브랜치를 변경한다.
  * 
  * @method gb3d.tree.GeoServer#errorModal
- * @param {string}
- *            code - 오류 코드
+ * @param {string} code - 오류 코드
  */
 gb3d.tree.GeoServer.prototype.errorModal = function(code) {
 	var that = this;
@@ -2491,8 +2418,7 @@ gb3d.tree.GeoServer.prototype.errorModal = function(code) {
  * GeoServer 정보 확인창을 생성한다.
  * 
  * @method gb.versioning.Repository#geoserverInfoModal
- * @param {string}
- *            serverName - 작업 중인 서버 노드
+ * @param {string} serverName - 작업 중인 서버 노드
  */
 gb3d.tree.GeoServer.prototype.geoserverInfoModal = function(serverName) {
 	var that = this;
@@ -2583,10 +2509,8 @@ gb3d.tree.GeoServer.prototype.geoserverInfoModal = function(serverName) {
  * 스피너를 보여준다.
  * 
  * @method gb3d.tree.GeoServer#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 보이거나 숨길 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 보이거나 숨길 모달 객체
  */
 gb3d.tree.GeoServer.prototype.showSpinner = function(show, modal) {
 	if (show) {

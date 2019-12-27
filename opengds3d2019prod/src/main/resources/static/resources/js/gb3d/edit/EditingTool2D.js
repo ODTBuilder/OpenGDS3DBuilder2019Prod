@@ -7,69 +7,45 @@ if (!gb3d.edit)
 gb.edit.ACTIVEAREA = 7.75;
 /**
  * @classdesc 피처 편집 기능을 정의한다. 필수 라이브러리: jQuery, fontawesome, openlayers,
- *            {@link gb3d.edit.EditingToolBase}
+ * {@link gb3d.edit.EditingToolBase}
  * @example <head> <script
- *          src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
- *          <link rel="stylesheet"
- *          href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
- *          type="text/css"> <link rel="stylesheet" href="./gb/css/gb.css">
- *          <script src="./gb/gb.js"></script> <script src="./gb/map/map.js"></script>
- *          <%-- jsTree openlayers3--%> <script type="text/javascript"
- *          src="./jsTree-openlayers3/jstree.js"></script> <link
- *          rel="stylesheet" type="text/css"
- *          href="./jsTree-openlayers3/themes/default/style.css" /> <script
- *          type="text/javascript"
- *          src="./jsTree-openlayers3/jstree-visibility.js"></script> <script
- *          type="text/javascript"
- *          src="./jsTree-openlayers3/jstree-layerproperties.js"></script>
- *          <script type="text/javascript"
- *          src="./jsTree-openlayers3/jstree-legends.js"></script> <script
- *          type="text/javascript"
- *          src="./jsTree-openlayers3/jstree-functionmarker.js"></script> <!--
- *          gb.tree.openlayers --> <script src="./gb/tree/openlayers.js"></script>
- *          <!-- gb.edit --> <script src="./gb/edit/edithistory.js"></script>
- *          <script src="./gb/edit/undo.js"></script> <!-- gb.header -->
- *          <script src="./gb/header/base.js"></script> <script
- *          src="./gb/header/editingtool.js"></script> <title>OpenGDS/Builder
- *          example</title> </head>
- * 
- * <body> <div class="builderLayer"> <div class="builderLayerClientPanel"></div>
- * </div> <div class="bind"></div>
- * 
- * <script type="text/javascript"> var gbMap = new gb.Map({ "target" :
- * $(".bind")[0] // Openlayers Map을 생성할 HTML Element 객체 });
- * 
- * var otree = new gb.tree.OpenLayers({ "append" :
- * $(".builderLayerClientPanel")[0], // Openlayers Tree를 생성할 HTML Element 객체
- * "map" : gbMap.getUpperMap() });
- * 
- * var temp = new gb.header.EditingTool({ targetElement : gbMap.getLowerDiv(), //
- * EditingTool 메뉴바를 생성할 Div의 jQuery객체 map : gbMap.getUpperMap(), // ol.Map 객체
- * otree : otree, featureRecord : new gb.edit.FeatureRecord(), // feature의 변경사항을
- * 저장하는 객체 locale : "en", // 언어 설정 isEditing : gb.module.isEditing //
- * EditingTool 활성화시 다른 작업을 제한하는 모듈 }); </script> </body>
+ * src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+ * <link rel="stylesheet"
+ * href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css"
+ * type="text/css"> <link rel="stylesheet" href="./gb/css/gb.css"> <script src="./gb/gb.js"></script>
+ * <script src="./gb/map/map.js"></script> <%-- jsTree openlayers3--%> <script
+ * type="text/javascript" src="./jsTree-openlayers3/jstree.js"></script> <link rel="stylesheet"
+ * type="text/css" href="./jsTree-openlayers3/themes/default/style.css" /> <script
+ * type="text/javascript" src="./jsTree-openlayers3/jstree-visibility.js"></script> <script
+ * type="text/javascript" src="./jsTree-openlayers3/jstree-layerproperties.js"></script> <script
+ * type="text/javascript" src="./jsTree-openlayers3/jstree-legends.js"></script> <script
+ * type="text/javascript" src="./jsTree-openlayers3/jstree-functionmarker.js"></script> <!--
+ * gb.tree.openlayers --> <script src="./gb/tree/openlayers.js"></script> <!-- gb.edit --> <script
+ * src="./gb/edit/edithistory.js"></script> <script src="./gb/edit/undo.js"></script> <!--
+ * gb.header --> <script src="./gb/header/base.js"></script> <script
+ * src="./gb/header/editingtool.js"></script> <title>OpenGDS/Builder example</title> </head>
+ * <body> <div class="builderLayer"> <div class="builderLayerClientPanel"></div> </div> <div
+ * class="bind"></div> <script type="text/javascript"> var gbMap = new gb.Map({ "target" :
+ * $(".bind")[0] // Openlayers Map을 생성할 HTML Element 객체 }); var otree = new gb.tree.OpenLayers({
+ * "append" : $(".builderLayerClientPanel")[0], // Openlayers Tree를 생성할 HTML Element 객체 "map" :
+ * gbMap.getUpperMap() }); var temp = new gb.header.EditingTool({ targetElement :
+ * gbMap.getLowerDiv(), // EditingTool 메뉴바를 생성할 Div의 jQuery객체 map : gbMap.getUpperMap(), // ol.Map
+ * 객체 otree : otree, featureRecord : new gb.edit.FeatureRecord(), // feature의 변경사항을 저장하는 객체 locale :
+ * "en", // 언어 설정 isEditing : gb.module.isEditing // EditingTool 활성화시 다른 작업을 제한하는 모듈 }); </script>
+ * </body>
  * @class gb3d.edit.EditingTool2D
  * @requires {@link gb3d.edit.EditingToolBase}
  * @memberof gb3d.edit
- * @param {Object}
- *            obj - 생성자 옵션
- * @param {ol.Map}
- *            obj.map - 편집 기능을 적용할 Openlayers Map 객체
- * @param {gb.edit.FeatureRecord}
- *            [obj.featureRecord] - feature 편집 이력을 관리하는 객체
- * @param {gb.tree.OpenLayers}
- *            obj.otree - gb.tree.OpenLayers 객체와 EditingTool 객체를 연동. OpenLayer
- *            Tree의 레이어들을 편집
- * @param {string}
- *            obj.layerInfo - Geoserver 레이어 정보 요청 URL
- * @param {gb.versioning.Feature}
- *            [obj.versioning] - 버저닝 객체
- * @param {gb.module.isEditing}
- *            [obj.isEditing] - EditingTool 작업 실행 중 다른 작업 제한 기능을 하는 모듈
- * @param {string}
- *            obj.wfsURL - Geoserver WFS 요청 URL
- * @param {string}
- *            [obj.locale="en"] - 언어 코드
+ * @param {Object} obj - 생성자 옵션
+ * @param {ol.Map} obj.map - 편집 기능을 적용할 Openlayers Map 객체
+ * @param {gb.edit.FeatureRecord} [obj.featureRecord] - feature 편집 이력을 관리하는 객체
+ * @param {gb.tree.OpenLayers} obj.otree - gb.tree.OpenLayers 객체와 EditingTool 객체를 연동. OpenLayer
+ * Tree의 레이어들을 편집
+ * @param {string} obj.layerInfo - Geoserver 레이어 정보 요청 URL
+ * @param {gb.versioning.Feature} [obj.versioning] - 버저닝 객체
+ * @param {gb.module.isEditing} [obj.isEditing] - EditingTool 작업 실행 중 다른 작업 제한 기능을 하는 모듈
+ * @param {string} obj.wfsURL - Geoserver WFS 요청 URL
+ * @param {string} [obj.locale="en"] - 언어 코드
  * @author KIM HOCHUL
  * @date 2019. 03. 18
  * @version 0.01
@@ -808,8 +784,7 @@ gb3d.edit.EditingTool2D.prototype.constructor = gb3d.edit.EditingTool2D;
  * 
  * @method gb3d.edit.EditingTool2D#toggleFeatureHistoryModal
  * @function
- * @param {ol.Feature}
- *            feature - 변경 이력창을 생성할 Feature 객체
+ * @param {ol.Feature} feature - 변경 이력창을 생성할 Feature 객체
  */
 gb3d.edit.EditingTool2D.prototype.toggleFeatureHistoryModal = function(feature) {
 	var vfeature = this.getVersioningFeature();
@@ -881,8 +856,7 @@ gb3d.edit.EditingTool2D.prototype.toggleFeatureHistoryModal = function(feature) 
  * 
  * @method gb3d.edit.EditingTool2D#updateFeatureHistoryModal
  * @function
- * @param {ol.Feature}
- *            feature - 변경 이력창을 업데이트할 Feature 객체
+ * @param {ol.Feature} feature - 변경 이력창을 업데이트할 Feature 객체
  */
 gb3d.edit.EditingTool2D.prototype.updateFeatureHistoryModal = function(feature) {
 	var vfeature = this.getVersioningFeature();
@@ -950,8 +924,7 @@ gb3d.edit.EditingTool2D.prototype.getInteractions_ = function() {
  * 
  * @method gb3d.edit.EditingTool2D#getInteraction_
  * @function
- * @param {string}
- *            key - interaction name
+ * @param {string} key - interaction name
  * @return {ol.interaction.Interaction}
  */
 gb3d.edit.EditingTool2D.prototype.getInteraction_ = function(key) {
@@ -962,10 +935,8 @@ gb3d.edit.EditingTool2D.prototype.getInteraction_ = function(key) {
  * 
  * @method gb3d.edit.EditingTool2D#setInteraction_
  * @function
- * @param {String}
- *            key - interaction name
- * @param {ol.interaction.Interaction}
- *            val - interaction 객체
+ * @param {String} key - interaction name
+ * @param {ol.interaction.Interaction} val - interaction 객체
  */
 gb3d.edit.EditingTool2D.prototype.setInteraction_ = function(key, val) {
 	this.interaction[key] = val;
@@ -998,8 +969,7 @@ gb3d.edit.EditingTool2D.prototype.setLayer = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#activeIntrct_
  * @function
- * @param {String|Array
- *            <String>} intrct - interaction 이름 또는 interaction 이름의 배열
+ * @param {String|Array.<string>} intrct - interaction 이름 또는 interaction 이름의 배열
  */
 gb3d.edit.EditingTool2D.prototype.activeIntrct_ = function(intrct) {
 	// var that = this;
@@ -1032,8 +1002,7 @@ gb3d.edit.EditingTool2D.prototype.activeIntrct_ = function(intrct) {
  * 
  * @method gb3d.edit.EditingTool2D#deactiveIntrct_
  * @function
- * @param {String|Array
- *            <String>} intrct - interaction 이름 또는 interaction 이름의 배열
+ * @param {String|Array.<string>} intrct - interaction 이름 또는 interaction 이름의 배열
  */
 gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 	var selectInter = true;
@@ -1100,8 +1069,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
  * 
  * @method gb3d.edit.EditingTool2D#activeBtn_
  * @function
- * @param {String}
- *            btn - 활성화할 버튼의 이름
+ * @param {String} btn - 활성화할 버튼의 이름
  */
 gb3d.edit.EditingTool2D.prototype.activeBtn_ = function(btn) {
 	if(!this.btn[btn]){
@@ -1128,8 +1096,7 @@ gb3d.edit.EditingTool2D.prototype.activeBtn_ = function(btn) {
  * 
  * @method gb3d.edit.EditingTool2D#deactiveBtn_
  * @function
- * @param {String}
- *            btn - 비활성화할 버튼의 이름
+ * @param {String} btn - 비활성화할 버튼의 이름
  */
 gb3d.edit.EditingTool2D.prototype.deactiveBtn_ = function(btn) {
 	if (this.btn[btn].hasClass("active")) {
@@ -1162,8 +1129,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveAllBtn_ = function() {
  * 
  * @method gb3d.edit.EditingTool2D#select
  * @function
- * @param {ol.source.Vector}
- *            source - Feature 선택 기능을 적용할 레이어의 Vector Source 객체
+ * @param {ol.source.Vector} source - Feature 선택 기능을 적용할 레이어의 Vector Source 객체
  */
 gb3d.edit.EditingTool2D.prototype.select = function(source) {
 	var that = this;
@@ -1540,8 +1506,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
  * 
  * @method gb3d.edit.EditingTool2D#draw
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집할 레이어
+ * @param {ol.layer.Base} layer - 편집할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 
@@ -1910,8 +1875,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#move
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집할 레이어
+ * @param {ol.layer.Base} layer - 편집할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 	if (this.interaction.select === undefined) {
@@ -2026,8 +1990,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#rotate
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집할 레이어
+ * @param {ol.layer.Base} layer - 편집할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 	if (this.interaction.select === undefined) {
@@ -2134,8 +2097,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#modify
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집할 레이어
+ * @param {ol.layer.Base} layer - 편집할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
 	if (this.interaction.select === undefined) {
@@ -2274,8 +2236,7 @@ gb3d.edit.EditingTool2D.prototype.modify = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#remove
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집할 레이어
+ * @param {ol.layer.Base} layer - 편집할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 	if (this.interaction.select === undefined) {
@@ -2548,8 +2509,7 @@ gb3d.edit.EditingTool2D.prototype.getFeatures = function() {
  * 
  * @method gb3d.edit.EditingTool2D#removeFeatureFromUnmanaged
  * @function
- * @param {ol.layer.Base}
- *            layer - 임시 레이어 목록에서 삭제할 레이어 객체
+ * @param {ol.layer.Base} layer - 임시 레이어 목록에서 삭제할 레이어 객체
  */
 gb3d.edit.EditingTool2D.prototype.removeFeatureFromUnmanaged = function(layer) {
 	var that = this;
@@ -2763,8 +2723,7 @@ gb3d.edit.EditingTool2D.prototype.clearUnmanaged = function() {
  * 
  * @method gb3d.edit.EditingTool2D#setMap
  * @function
- * @param {ol.Map}
- *            map - EditingTool을 적용할 ol Map 객체
+ * @param {ol.Map} map - EditingTool을 적용할 ol Map 객체
  */
 gb3d.edit.EditingTool2D.prototype.setMap = function(map) {
 	this.map = map;
@@ -2784,8 +2743,7 @@ gb3d.edit.EditingTool2D.prototype.getMap = function() {
  * 
  * @method gb3d.edit.EditingTool2D#isString
  * @function
- * @param {string}
- *            va - 타입 검사를 수행할 값
+ * @param {string} va - 타입 검사를 수행할 값
  * @return {boolean} 타입이 적합할 시 True 반환, 적합하지않을 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.isString = function(va) {
@@ -2800,8 +2758,7 @@ gb3d.edit.EditingTool2D.prototype.isString = function(va) {
  * 
  * @method gb3d.edit.EditingTool2D#isInteger
  * @function
- * @param {string}
- *            va - 타입 검사를 수행할 값
+ * @param {string} va - 타입 검사를 수행할 값
  * @return {boolean} 타입이 적합할 시 True 반환, 적합하지않을 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.isInteger = function(va) {
@@ -2816,8 +2773,7 @@ gb3d.edit.EditingTool2D.prototype.isInteger = function(va) {
  * 
  * @method gb3d.edit.EditingTool2D#isDouble
  * @function
- * @param {string}
- *            va - 타입 검사를 수행할 값
+ * @param {string} va - 타입 검사를 수행할 값
  * @return {boolean} 타입이 적합할 시 True 반환, 적합하지않을 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.isDouble = function(va) {
@@ -2832,8 +2788,7 @@ gb3d.edit.EditingTool2D.prototype.isDouble = function(va) {
  * 
  * @method gb3d.edit.EditingTool2D#isBoolean
  * @function
- * @param {string}
- *            va - 타입 검사를 수행할 값
+ * @param {string} va - 타입 검사를 수행할 값
  * @return {boolean} 타입이 적합할 시 True 반환, 적합하지않을 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.isBoolean = function(va) {
@@ -2848,8 +2803,7 @@ gb3d.edit.EditingTool2D.prototype.isBoolean = function(va) {
  * 
  * @method gb3d.edit.EditingTool2D#isDate
  * @function
- * @param {string}
- *            va - 타입 검사를 수행할 값
+ * @param {string} va - 타입 검사를 수행할 값
  * @return {boolean} 타입이 적합할 시 True 반환, 적합하지않을 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.isDate = function(va) {
@@ -2866,8 +2820,7 @@ gb3d.edit.EditingTool2D.prototype.isDate = function(va) {
  * 
  * @method gb3d.edit.EditingTool2D#addSnappingLayer
  * @function
- * @param {ol.layer.Base}
- *            layer - 스냅핑 기능을 적용할 레이어. 그룹레이어 입력 시 하위의 모든 레이어에 스냅핑 기능 적용
+ * @param {ol.layer.Base} layer - 스냅핑 기능을 적용할 레이어. 그룹레이어 입력 시 하위의 모든 레이어에 스냅핑 기능 적용
  * @return {boolean} 성공적으로 스냅핑 기능 적용 시 True 반환, 실패 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.addSnappingLayer = function(layer) {
@@ -2929,8 +2882,7 @@ gb3d.edit.EditingTool2D.prototype.addSnappingLayer = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#removeSnappingLayer
  * @function
- * @param {ol.layer.Base}
- *            layer - 스냅핑 기능을 해제시킬 레이어. 그룹레이어 입력시 하위의 모든 레이어 스냅핑 기능 해제
+ * @param {ol.layer.Base} layer - 스냅핑 기능을 해제시킬 레이어. 그룹레이어 입력시 하위의 모든 레이어 스냅핑 기능 해제
  * @return {boolean} 성공적으로 스냅핑 기능 해제 시 True 반환, 실패 시 False반환
  */
 gb3d.edit.EditingTool2D.prototype.removeSnappingLayer = function(layer) {
@@ -3003,8 +2955,7 @@ gb3d.edit.EditingTool2D.prototype.removeSnappingLayer = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#loadSnappingLayer
  * @function
- * @param {Array.
- *            <number>} extent - 스냅핑 기능을 적용시킬 범위
+ * @param {Array.<number>} extent - 스냅핑 기능을 적용시킬 범위
  */
 gb3d.edit.EditingTool2D.prototype.loadSnappingLayer = function(extent) {
 	var that = this;
@@ -3023,8 +2974,7 @@ gb3d.edit.EditingTool2D.prototype.loadSnappingLayer = function(extent) {
  * 
  * @method gb3d.edit.EditingTool2D#zoomToFit
  * @function
- * @param {ol.layer.Base}
- *            layer - 시점 이동할 레이어
+ * @param {ol.layer.Base} layer - 시점 이동할 레이어
  */
 gb3d.edit.EditingTool2D.prototype.zoomToFit = function(layer) {
 	var that = this;
@@ -3092,33 +3042,22 @@ gb3d.edit.EditingTool2D.prototype.zoomToFit = function(layer) {
 /**
  * EditingTool에 새로운 Interaction을 추가한다.
  * 
- * @example // EditingTool 객체 선언 var edit = new gb.header.EditingTool({ ... }); //
- *          홀 폴리곤 그리기 객체 선언 var hole = new gb.interaction.HoleDraw({ selected :
- *          epan.selected }); // EditingTool에 홀 폴리곤 그리기 기능 추가
- *          edit.addInteraction({ icon : "fab fa-bitbucket", content : "Hole",
- *          interaction : hole, selectActive : true, "float" : "right",
- *          clickEvent : function() { console.log("Hole draw"); } });
+ * @example // EditingTool 객체 선언 var edit = new gb.header.EditingTool({ ... }); // 홀 폴리곤 그리기 객체 선언
+ * var hole = new gb.interaction.HoleDraw({ selected : epan.selected }); // EditingTool에 홀 폴리곤 그리기
+ * 기능 추가 edit.addInteraction({ icon : "fab fa-bitbucket", content : "Hole", interaction : hole,
+ * selectActive : true, "float" : "right", clickEvent : function() { console.log("Hole draw"); } });
  * @method gb3d.edit.EditingTool2D#addInteraction
  * @function
- * @param {Object}
- *            options - Interaction 추가 옵션
- * @param {ol.interaction.Interaction}
- *            options.interaction - 추가하려는 Interaction 객체
- * @param {string}
- *            [options.content=Unknown] - 작업 버튼에 표시될 작업명
- * @param {string}
- *            [options.icon=fas fa-asterisk] - 작업 버튼에 표시될 아이콘. fontawesome 참조({@link https://fontawesome.com/})
- * @param {function}
- *            [options.clickEvent] - 작업 활성화 버튼 클릭 시 실행될 함수
- * @param {string}
- *            [options.className] - 작업 버튼 태그 Class명 설정
- * @param {Object}
- *            [options.color] - Interaction 추가 옵션
- * @param {boolean}
- *            [options.selectActive=false] - ol.interaction.Select 객체와의 연동 여부.
- *            True 입력 시 선택된 Feature가 있을 시에만 작업이 활성화됨
- * @param {string}
- *            [options.float] - EditingTool 작업표시줄에서의 float 스타일
+ * @param {Object} options - Interaction 추가 옵션
+ * @param {ol.interaction.Interaction} options.interaction - 추가하려는 Interaction 객체
+ * @param {string} [options.content=Unknown] - 작업 버튼에 표시될 작업명
+ * @param {string} [options.icon=fas fa-asterisk] - 작업 버튼에 표시될 아이콘. fontawesome 참조({@link https://fontawesome.com/})
+ * @param {function} [options.clickEvent] - 작업 활성화 버튼 클릭 시 실행될 함수
+ * @param {string} [options.className] - 작업 버튼 태그 Class명 설정
+ * @param {Object} [options.color] - Interaction 추가 옵션
+ * @param {boolean} [options.selectActive=false] - ol.interaction.Select 객체와의 연동 여부. True 입력 시 선택된
+ * Feature가 있을 시에만 작업이 활성화됨
+ * @param {string} [options.float] - EditingTool 작업표시줄에서의 float 스타일
  */
 gb3d.edit.EditingTool2D.prototype.addInteraction = function(options){
 	function adjustStyle(element, style){
@@ -3237,10 +3176,8 @@ gb3d.edit.EditingTool2D.prototype.addInteraction = function(options){
  * 
  * @method gb3d.edit.EditingTool2D#deactiveAnotherInteraction
  * @function
- * @param {ol.interaction.Interaction}
- *            interaction - 비활성화 시키지않을 interaction 객체
- * @param {boolean}
- *            select - ture 설정 시 선택된 객체들을 해제하지않음. false 설정 시 현재 선택된 객체들을 해제.
+ * @param {ol.interaction.Interaction} interaction - 비활성화 시키지않을 interaction 객체
+ * @param {boolean} select - ture 설정 시 선택된 객체들을 해제하지않음. false 설정 시 현재 선택된 객체들을 해제.
  */
 gb3d.edit.EditingTool2D.prototype.deactiveAnotherInteraction = function(interaction, select){
 	var bool = select || false;
@@ -3276,8 +3213,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveAnotherInteraction = function(interact
  * 
  * @method gb3d.edit.EditingTool2D#getTileLayersInMap
  * @function
- * @param {ol.Map}
- *            map - 오픈레이어스 맵 객체
+ * @param {ol.Map} map - 오픈레이어스 맵 객체
  * @return {Array.<ol.layer.Tile>}
  */
 gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
@@ -3362,10 +3298,8 @@ gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
  * 
  * @method gb3d.edit.EditingTool2D#getVectorVectorLayersInMap
  * @function
- * @param {ol.Collection.
- *            <ol.layer.Base>} collection - Vector 레이어를 가지고 있는 ol.Collection 객체
- * @param {Array}
- *            dish - Vector 레이어들을 담을 배열 객체
+ * @param {ol.Collection.<ol.layer.Base>} collection - Vector 레이어를 가지고 있는 ol.Collection 객체
+ * @param {Array} dish - Vector 레이어들을 담을 배열 객체
  * @return {Array.<ol.layer.Vector>}
  */
 gb3d.edit.EditingTool2D.prototype.getVectorVectorLayersInMap = function(collection, dish){
@@ -3396,10 +3330,8 @@ gb3d.edit.EditingTool2D.prototype.getVectorVectorLayersInMap = function(collecti
  * 
  * @method gb3d.edit.EditingTool2D#getImageVectorLayersInMap
  * @function
- * @param {ol.Collection.
- *            <ol.layer.Base>} collection - Vector 레이어를 가지고 있는 ol.Collection 객체
- * @param {Array}
- *            dish - Vector 레이어들을 담을 배열 객체
+ * @param {ol.Collection.<ol.layer.Base>} collection - Vector 레이어를 가지고 있는 ol.Collection 객체
+ * @param {Array} dish - Vector 레이어들을 담을 배열 객체
  * @return {Array.<ol.layer.Vector>}
  */
 gb3d.edit.EditingTool2D.prototype.getImageVectorLayersInMap = function(collection, dish){
@@ -3422,8 +3354,8 @@ gb3d.edit.EditingTool2D.prototype.getImageVectorLayersInMap = function(collectio
 }
 
 /**
- * Geoserver로부터 Import된 모든 레이어들에 WFS를 요청하여 Openlayer Map에 Vector 레이어를 생성한다.
- * gb.tree.OpenLayers 객체가 필수적으로 설정되어 있어야만 한다.
+ * Geoserver로부터 Import된 모든 레이어들에 WFS를 요청하여 Openlayer Map에 Vector 레이어를 생성한다. gb.tree.OpenLayers 객체가
+ * 필수적으로 설정되어 있어야만 한다.
  * 
  * @method gb3d.edit.EditingTool2D#loadWFS_
  * @function
@@ -3591,8 +3523,7 @@ gb3d.edit.EditingTool2D.prototype.loadVector_ = function(){
  * 
  * @method gb3d.edit.EditingTool2D#setVisibleWFS
  * @function
- * @param {boolean}
- *            bool - 가시화 여부
+ * @param {boolean} bool - 가시화 여부
  */
 gb3d.edit.EditingTool2D.prototype.setVisibleWFS = function(bool){
 	var tree = this.otree.getJSTree();
@@ -3634,8 +3565,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWFS = function(bool){
  * 
  * @method gb3d.edit.EditingTool2D#setVisibleWMS
  * @function
- * @param {boolean}
- *            bool - 가시화 여부
+ * @param {boolean} bool - 가시화 여부
  */
 gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
 // var tileLayers = this.getTileLayersInMap(this.map);
@@ -3719,8 +3649,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
  * 
  * @method gb3d.edit.EditingTool2D#setVisibleVectorVector
  * @function
- * @param {boolean}
- *            bool - 가시화 여부
+ * @param {boolean} bool - 가시화 여부
  */
 gb3d.edit.EditingTool2D.prototype.setVisibleVectorVector = function(bool){
 	var rootLayers = this.map.getLayers();
@@ -3755,8 +3684,7 @@ gb3d.edit.EditingTool2D.prototype.setVisibleVectorVector = function(bool){
  * 
  * @method gb3d.edit.EditingTool2D#setVisibleImageVector
  * @function
- * @param {boolean}
- *            bool - 가시화 여부
+ * @param {boolean} bool - 가시화 여부
  */
 gb3d.edit.EditingTool2D.prototype.setVisibleImageVector = function(bool){
 	var rootLayers = this.map.getLayers();
@@ -3810,26 +3738,16 @@ gb3d.edit.EditingTool2D.prototype.refreshSources = function(){
  * 
  * @method gb3d.edit.EditingTool2D#setVectorSourceOfServer
  * @function
- * @param {Object}
- *            obj - Geoserver 레이어 정보 객체
- * @param {string}
- *            obj.geoserver - geoserver명
- * @param {string}
- *            obj.workspace - workspace명
- * @param {boolean}
- *            obj.labelActive - label 스타일 활성화 여부
- * @param {Object}
- *            obj.labelOptions - label 스타일 옵션({@link gb.layer.Label})
- * @param {string}
- *            layerId - 레이어 아이디
- * @param {string}
- *            layerName - 레이어명
- * @param {string}
- *            treeId - Openlayer Tree 아이디
- * @param {string}
- *            sld - 레이어 스타일 SLD
- * @return {ol.source.Vector|null} vector source 객체가 이미 저장되어있거나 잘못된 요청일 경우 null
- *         값 반환
+ * @param {Object} obj - Geoserver 레이어 정보 객체
+ * @param {string} obj.geoserver - geoserver명
+ * @param {string} obj.workspace - workspace명
+ * @param {boolean} obj.labelActive - label 스타일 활성화 여부
+ * @param {Object} obj.labelOptions - label 스타일 옵션({@link gb.layer.Label})
+ * @param {string} layerId - 레이어 아이디
+ * @param {string} layerName - 레이어명
+ * @param {string} treeId - Openlayer Tree 아이디
+ * @param {string} sld - 레이어 스타일 SLD
+ * @return {ol.source.Vector|null} vector source 객체가 이미 저장되어있거나 잘못된 요청일 경우 null 값 반환
  */
 gb3d.edit.EditingTool2D.prototype.setVectorSourceOfServer = function(obj, layerId, layerName, treeId, sld){
 	var git = obj || {};
@@ -3926,21 +3844,15 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfServer = function(obj, layerI
 }
 
 /**
- * Openlayers Map에 로드되어있는 Vector 레이어들에 대하여 render 모드가 "Vector"인 vector source
- * 객체를 생성하여 변수에 저장한다.
+ * Openlayers Map에 로드되어있는 Vector 레이어들에 대하여 render 모드가 "Vector"인 vector source 객체를 생성하여 변수에 저장한다.
  * 
  * @method gb3d.edit.EditingTool2D#setVectorSourceOfVector
  * @function
- * @param {Object}
- *            obj - 벡터 레이어 정보 객체
- * @param {string}
- *            layerId - 레이어 아이디
- * @param {string}
- *            layerName - 레이어명
- * @param {string}
- *            treeId - Openlayer Tree 노드 아이디
- * @return {ol.source.Vector|null} vector source 객체가 이미 저장되어있거나 잘못된 요청일 경우 null
- *         값 반환
+ * @param {Object} obj - 벡터 레이어 정보 객체
+ * @param {string} layerId - 레이어 아이디
+ * @param {string} layerName - 레이어명
+ * @param {string} treeId - Openlayer Tree 노드 아이디
+ * @return {ol.source.Vector|null} vector source 객체가 이미 저장되어있거나 잘못된 요청일 경우 null 값 반환
  */
 gb3d.edit.EditingTool2D.prototype.setVectorSourceOfVector = function(obj, layerId, layerName, treeId){
 	var git = obj || {};
@@ -3980,8 +3892,7 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfVector = function(obj, layerI
  * 
  * @method gb3d.edit.EditingTool2D#getVectorSourceOfServer
  * @function
- * @param {string}
- *            treeId - Openlayer Tree 노드 아이디
+ * @param {string} treeId - Openlayer Tree 노드 아이디
  * @return {ol.source.Vector|undifined} vector source 가 없을 경우 undifined 값 반환
  */
 gb3d.edit.EditingTool2D.prototype.getVectorSourceOfServer = function(treeId){
@@ -4008,8 +3919,7 @@ gb3d.edit.EditingTool2D.prototype.getVectorSourcesOfServer = function(){
  * 
  * @method gb3d.edit.EditingTool2D#getVectorSourceOfVector
  * @function
- * @param {string}
- *            treeId - Openlayer Tree 노드 아이디
+ * @param {string} treeId - Openlayer Tree 노드 아이디
  * @return {ol.source.Vector|undifined} vector source 가 없을 경우 undifined 값 반환
  */
 gb3d.edit.EditingTool2D.prototype.getVectorSourceOfVector = function(treeId){
@@ -4163,8 +4073,7 @@ gb3d.edit.EditingTool2D.prototype.editToolToggle = function(){
  * 
  * @method gb3d.edit.EditingTool2D#displayEditZoomHint
  * @function
- * @param {boolean}
- *            bool - 줌 레벨 도움말 생성 및 삭제
+ * @param {boolean} bool - 줌 레벨 도움말 생성 및 삭제
  */
 gb3d.edit.EditingTool2D.prototype.displayEditZoomHint = function(bool){
 	if(bool){
@@ -4191,16 +4100,14 @@ gb3d.edit.EditingTool2D.prototype.displayEditZoomHint = function(bool){
 			.append(span)
 			/*
 			 * .click(function(){ var view = that.map.getView(); var extent =
-			 * view.calculateExtent(); var coordinates = [[[extent[0],
-			 * extent[1]], [extent[2], extent[1]], [extent[2], extent[3]],
-			 * [extent[0], extent[3]], [extent[0], extent[1]]]]; var geom = new
-			 * ol.geom.Polygon(coordinates); var area = ol.sphere.getArea(geom,
+			 * view.calculateExtent(); var coordinates = [[[extent[0], extent[1]], [extent[2],
+			 * extent[1]], [extent[2], extent[3]], [extent[0], extent[3]], [extent[0], extent[1]]]];
+			 * var geom = new ol.geom.Polygon(coordinates); var area = ol.sphere.getArea(geom,
 			 * {projection: view.getProjection().getCode()}); area =
 			 * Math.round(area/1000000*100)/100;
 			 * 
-			 * var zoomSqrt = Math.sqrt((gb.edit.ACTIVEAREA)/area); var
-			 * zoomExtent = [extent[0]*zoomSqrt, extent[1]*zoomSqrt,
-			 * extent[2]*zoomSqrt, extent[3]*zoomSqrt];
+			 * var zoomSqrt = Math.sqrt((gb.edit.ACTIVEAREA)/area); var zoomExtent =
+			 * [extent[0]*zoomSqrt, extent[1]*zoomSqrt, extent[2]*zoomSqrt, extent[3]*zoomSqrt];
 			 * 
 			 * view.fit(zoomExtent); });
 			 */
@@ -4229,8 +4136,7 @@ gb3d.edit.EditingTool2D.prototype.getSelectSources = function(){
 }
 
 /**
- * 현재 지도의 줌 레벨이 EditingTool을 활성화할 수 있는 레벨인지 여부를 boolean값으로 반환한다. True 값이 반환될 시에
- * 작업표시줄 활성화가 가능하다.
+ * 현재 지도의 줌 레벨이 EditingTool을 활성화할 수 있는 레벨인지 여부를 boolean값으로 반환한다. True 값이 반환될 시에 작업표시줄 활성화가 가능하다.
  * 
  * @method gb3d.edit.EditingTool2D#checkActiveTool
  * @function
@@ -4268,6 +4174,7 @@ gb3d.edit.EditingTool2D.prototype.getEditingTool3D = function(){
 
 /**
  * WMS 피처를 선택 해제한다.
+ * 
  * @method gb3d.edit.EditingTool2D#unselectFeature
  * @function
  */
@@ -4286,8 +4193,7 @@ gb3d.edit.EditingTool2D.prototype.unselectFeature = function(){
  * 
  * @method gb3d.edit.EditingTool2D#selectFeatureById
  * @function
- * @param {String}
- *            fid - feature id
+ * @param {String} fid - feature id
  */
 gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 	var that = this;

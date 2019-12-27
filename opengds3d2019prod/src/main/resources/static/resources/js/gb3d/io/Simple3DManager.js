@@ -7,13 +7,10 @@ if (!gb3d)
 if (!gb3d.io)
 	gb3d.io = {};
 /**
- * @classdesc Simple3DManager 객체를 정의한다. 2D 레이어에 기반한 3D 모델 변환을 요청한다. 변환된 b3dm을
- *            불러온다
- * 
+ * @classdesc Simple3DManager 객체를 정의한다. 2D 레이어에 기반한 3D 모델 변환을 요청한다. 변환된 b3dm을 불러온다
  * @class gb3d.io.Simple3DManager
  * @memberof gb3d.io
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
 gb3d.io.Simple3DManager = function(obj) {
@@ -266,14 +263,10 @@ gb3d.io.Simple3DManager = function(obj) {
  * 포인트 대응 3d 객체 종류 선택 모달을 보여줌
  * 
  * @method gb3d.io.Simple3DManager#showPointTo3DModal
- * @param {String}
- *            geo - 등록한 GeoServer 이름
- * @param {String}
- *            work - 레이어가 포함된 워크스페이스 이름
- * @param {String}
- *            store - 레이어가 포함된 데이터스토어 이름
- * @param {String}
- *            layer - 레이어 이름
+ * @param {String} geo - 등록한 GeoServer 이름
+ * @param {String} work - 레이어가 포함된 워크스페이스 이름
+ * @param {String} store - 레이어가 포함된 데이터스토어 이름
+ * @param {String} layer - 레이어 이름
  */
 gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store, layer) {
 	var that = this;
@@ -506,14 +499,10 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
  * 라인스트링 대응 3d 객체 종류 선택 모달을 보여줌
  * 
  * @method gb3d.io.Simple3DManager#showLineStringTo3DModal
- * @param {String}
- *            geo - 등록한 GeoServer 이름
- * @param {String}
- *            work - 레이어가 포함된 워크스페이스 이름
- * @param {String}
- *            store - 레이어가 포함된 데이터스토어 이름
- * @param {String}
- *            layer - 레이어 이름
+ * @param {String} geo - 등록한 GeoServer 이름
+ * @param {String} work - 레이어가 포함된 워크스페이스 이름
+ * @param {String} store - 레이어가 포함된 데이터스토어 이름
+ * @param {String} layer - 레이어 이름
  */
 gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, store, layer) {
 	var that = this;
@@ -640,16 +629,11 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
  * 폴리곤 대응 3d 객체 종류 선택 모달을 보여줌
  * 
  * @method gb3d.io.Simple3DManager#showLineStringTo3DModal
- * @param {String}
- *            geo - 등록한 GeoServer 이름
- * @param {String}
- *            work - 레이어가 포함된 워크스페이스 이름
- * @param {String}
- *            store - 레이어가 포함된 데이터스토어 이름
- * @param {String}
- *            layer - 레이어 이름
- * @param {Function}
- *            callback - 요청이 완료된 후 수행될 콜백 함수
+ * @param {String} geo - 등록한 GeoServer 이름
+ * @param {String} work - 레이어가 포함된 워크스페이스 이름
+ * @param {String} store - 레이어가 포함된 데이터스토어 이름
+ * @param {String} layer - 레이어 이름
+ * @param {Function} callback - 요청이 완료된 후 수행될 콜백 함수
  */
 gb3d.io.Simple3DManager.prototype.showPolygonTo3DModal = function(geo, work, store, layer, callback) {
 	var that = this;
@@ -744,20 +728,13 @@ gb3d.io.Simple3DManager.prototype.get3DTilesetURL = function() {
  * 3D Tileset을 요청한다
  * 
  * @method gb3d.io.Simple3DManager#get3DTileset
- * @param {String}
- *            geo - 등록한 GeoServer 이름
- * @param {String}
- *            work - 레이어가 포함된 워크스페이스 이름
- * @param {String}
- *            store - 레이어가 포함된 데이터스토어 이름
- * @param {String}
- *            layer - 레이어 이름
- * @param {Object}
- *            geom - 2D - 3D 변환 정보
- * @param {gb.modal.Base}
- *            modal - 3D 변환 설정 모달
- * @param {Function}
- *            callback - 요청이 완료된 후 수행될 콜백 함수
+ * @param {String} geo - 등록한 GeoServer 이름
+ * @param {String} work - 레이어가 포함된 워크스페이스 이름
+ * @param {String} store - 레이어가 포함된 데이터스토어 이름
+ * @param {String} layer - 레이어 이름
+ * @param {Object} geom - 2D - 3D 변환 정보
+ * @param {gb.modal.Base} modal - 3D 변환 설정 모달
+ * @param {Function} callback - 요청이 완료된 후 수행될 콜백 함수
  */
 gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, layer, geom, modal, callback) {
 	var that = this;
@@ -862,8 +839,7 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
  * 에러 메세지를 표시한다
  * 
  * @method gb3d.io.Simple3DManager#errorModal
- * @param {String}
- *            code - 오류 코드
+ * @param {String} code - 오류 코드
  */
 gb3d.io.Simple3DManager.prototype.errorModal = function(code) {
 	var that = this;
@@ -874,10 +850,8 @@ gb3d.io.Simple3DManager.prototype.errorModal = function(code) {
  * 오류 메시지 창을 생성한다.
  * 
  * @method gb3d.io.Simple3DManager#messageModal
- * @param {String}
- *            title - 모달의 타이틀
- * @param {String}
- *            msg - 보여줄 메세지
+ * @param {String} title - 모달의 타이틀
+ * @param {String} msg - 보여줄 메세지
  */
 gb3d.io.Simple3DManager.prototype.messageModal = function(title, msg) {
 	var that = this;
@@ -922,16 +896,11 @@ gb3d.io.Simple3DManager.prototype.getLayerInfoUrl = function() {
  * 레이어 정보 조회 URL을 반환한다
  * 
  * @method gb3d.io.Simple3DManager#getLayerInfo
- * @param {String}
- *            geo - 등록한 GeoServer 이름
- * @param {String}
- *            work - 레이어가 포함된 워크스페이스 이름
- * @param {String}
- *            layer - 레이어 이름
- * @param {HTMLElement}
- *            select - 속성키 셀렉트 박스
- * @param {gb.modal.Base}
- *            modal - 속성 조회 후 스피너를 감출 모달
+ * @param {String} geo - 등록한 GeoServer 이름
+ * @param {String} work - 레이어가 포함된 워크스페이스 이름
+ * @param {String} layer - 레이어 이름
+ * @param {HTMLElement} select - 속성키 셀렉트 박스
+ * @param {gb.modal.Base} modal - 속성 조회 후 스피너를 감출 모달
  * @return {Object} - 레이어 정보
  */
 gb3d.io.Simple3DManager.prototype.getLayerInfo = function(geo, work, layer, select, modal) {

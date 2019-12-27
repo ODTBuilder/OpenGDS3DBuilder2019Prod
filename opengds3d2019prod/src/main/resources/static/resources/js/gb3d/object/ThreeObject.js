@@ -9,15 +9,11 @@ if (!gb3d.object)
 	gb3d.object = {};
 /**
  * @classdesc ThreeObject 객체를 정의한다.
- * 
  * @class gb3d.object.ThreeObject
  * @memberof gb3d.object
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {THREE.Object3D}
- *            obj.object - Three Object3D 객체
- * @param {Array.
- *            <Number>} obj.center - 모델의 위치점
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {THREE.Object3D} obj.object - Three Object3D 객체
+ * @param {Array.<number>} obj.center - 모델의 위치점
  * @author SOYIJUN
  */
 gb3d.object.ThreeObject = function(obj) {
@@ -62,8 +58,7 @@ gb3d.object.ThreeObject.prototype.getTreeid = function() {
  * treeid를 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setTreeid
- * @param {string}
- *            treeid - jstree id
+ * @param {string} treeid - jstree id
  */
 gb3d.object.ThreeObject.prototype.setTreeid = function(treeid) {
 	this.treeid = treeid;
@@ -83,8 +78,7 @@ gb3d.object.ThreeObject.prototype.getLayer = function() {
  * Layer를 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setLayer
- * @param {ol.layer.Layer}
- *            layer - Layer
+ * @param {ol.layer.Layer} layer - Layer
  */
 gb3d.object.ThreeObject.prototype.setLayer = function(layer) {
 	this.layer = layer;
@@ -104,8 +98,7 @@ gb3d.object.ThreeObject.prototype.getTileId = function() {
  * tileId 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setTileId
- * @param {String}
- *            id - Tileset ID
+ * @param {String} id - Tileset ID
  */
 gb3d.object.ThreeObject.prototype.setTileId = function(id) {
 	this.tileId = id;
@@ -125,8 +118,7 @@ gb3d.object.ThreeObject.prototype.getObject = function() {
  * three mesh 객체를 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setObject
- * @param {THREE.Object3D}
- *            obj - three object객체
+ * @param {THREE.Object3D} obj - three object객체
  */
 gb3d.object.ThreeObject.prototype.setObject = function(obj) {
 	this.object = obj;
@@ -136,7 +128,7 @@ gb3d.object.ThreeObject.prototype.setObject = function(obj) {
  * 중심 위치점을 반환한다.
  * 
  * @method gb3d.object.ThreeObject#getCenter
- * @return {Array.<Number>} 중심 위치 좌표
+ * @return {Array.<number>} 중심 위치 좌표
  */
 gb3d.object.ThreeObject.prototype.getCenter = function() {
 	return this.center;
@@ -146,8 +138,7 @@ gb3d.object.ThreeObject.prototype.getCenter = function() {
  * 중심 위치점을 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setCenter
- * @param {Array.
- *            <Number>} center - 중심 위치 좌표
+ * @param {Array.<number>} center - 중심 위치 좌표
  */
 gb3d.object.ThreeObject.prototype.setCenter = function(center) {
 	this.center = center;
@@ -166,7 +157,7 @@ gb3d.object.ThreeObject.prototype.updateExtent = function() {
  * Extent 반환
  * 
  * @method gb3d.object.ThreeObject#getExtent
- * @return {Array.<Number>}
+ * @return {Array.<number>}
  */
 gb3d.object.ThreeObject.prototype.getExtent = function() {
 	return this.extent;
@@ -176,8 +167,7 @@ gb3d.object.ThreeObject.prototype.getExtent = function() {
  * Extent 할당
  * 
  * @method gb3d.object.ThreeObject#setExtent
- * @param {Array.
- *            <Number>} extent
+ * @param {Array.<number>} extent
  */
 gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
 	this.extent = extent;
@@ -197,8 +187,7 @@ gb3d.object.ThreeObject.prototype.getType = function() {
  * Layer의 Type을 설정한다.
  * 
  * @method gb3d.object.ThreeObject#setType
- * @param {String}
- *            type - Layer type
+ * @param {String} type - Layer type
  */
 gb3d.object.ThreeObject.prototype.setType = function(type) {
 	this.type = type;
@@ -218,8 +207,7 @@ gb3d.object.ThreeObject.prototype.getFeature = function() {
  * 사용자 정의 속성 목록을 설정한다.
  * 
  * @method gb3d.object.ThreeObject#setFeature
- * @param {ol.Feature}
- *            feature - Openlayers Feature
+ * @param {ol.Feature} feature - Openlayers Feature
  */
 gb3d.object.ThreeObject.prototype.setFeature = function(feature) {
 	this.feature = feature;
@@ -239,8 +227,7 @@ gb3d.object.ThreeObject.prototype.getBuffer = function() {
  * 버퍼값 설정
  * 
  * @method gb3d.object.ThreeObject#setBuffer
- * @param {number}
- *            buffer - buffer value
+ * @param {number} buffer - buffer value
  */
 gb3d.object.ThreeObject.prototype.setBuffer = function(buffer) {
 	this.buffer = buffer;
@@ -278,8 +265,7 @@ gb3d.object.ThreeObject.prototype.getIsFromFile = function() {
  * 파일 객체 여부를 설정한다.
  * 
  * @method gb3d.object.ThreeObject#setIsFromFile
- * @param {boolean}
- *            flag - is from file?
+ * @param {boolean} flag - is from file?
  */
 gb3d.object.ThreeObject.prototype.setIsFromFile = function(flag) {
 	this.isFromFile = flag;

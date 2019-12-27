@@ -13,25 +13,16 @@ if (!gb3d.tree)
 /**
  * @classdesc 오픈레이어스 레이어 목록을 표시한다.
  * @class gb3d.tree.OpenLayers
- * @memberof gb.tree
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {HTMLElement}
- *            obj.append - 영역 본문이 삽입될 부모 노드의 ID 또는 Class 또는 Element
- * @param {ol.Map}
- *            obj.map - 편집 영역을 담당하는 ol.Map
- * @param {Object}
- *            obj.url - 요청 주소 정보
- * @param {string}
- *            obj.url.getLegend - WMS 범례 이미지를 요청할 URL
- * @param {string}
- *            [obj.token] - 요청 토큰
- * @param {gb.geoserver.UploadGeoJSON}
- *            obj.uploadJSON - Geoserver JSON 업로드 기능 객체
- * @param {gb.edit.EditingTool}
- *            obj.editingTool - 편집 기능 객체
- * @param {string|undefined}
- *            [obj.locale="en"] - 언어 코드
+ * @memberof gb3d.tree
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {HTMLElement} obj.append - 영역 본문이 삽입될 부모 노드의 ID 또는 Class 또는 Element
+ * @param {ol.Map} obj.map - 편집 영역을 담당하는 ol.Map
+ * @param {Object} obj.url - 요청 주소 정보
+ * @param {string} obj.url.getLegend - WMS 범례 이미지를 요청할 URL
+ * @param {string} [obj.token] - 요청 토큰
+ * @param {gb.geoserver.UploadGeoJSON} obj.uploadJSON - Geoserver JSON 업로드 기능 객체
+ * @param {gb.edit.EditingTool} obj.editingTool - 편집 기능 객체
+ * @param {string|undefined} [obj.locale="en"] - 언어 코드
  * @author SOYIJUN
  * @date 2018.07.02
  * @version 0.01
@@ -509,19 +500,15 @@ gb3d.tree.OpenLayers = function(obj) {
 	}
 
 	/*
-	 * $(document).ready(function() { var parentHeight =
-	 * $(that.panel).parent().innerHeight(); var headHeight =
-	 * $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
+	 * $(document).ready(function() { var parentHeight = $(that.panel).parent().innerHeight(); var
+	 * headHeight = $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
 	 * parentHeight - headHeight; $(that.panelBody).outerHeight(bodyHeight); });
-	 * $(window).resize(function() { var parentHeight =
-	 * $(that.panel).parent().innerHeight(); var headHeight =
-	 * $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
+	 * $(window).resize(function() { var parentHeight = $(that.panel).parent().innerHeight(); var
+	 * headHeight = $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
 	 * parentHeight - headHeight; $(that.panelBody).outerHeight(bodyHeight); });
-	 * setTimeout(function() { var parentHeight =
-	 * $(that.panel).parent().innerHeight(); var headHeight =
-	 * $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
-	 * parentHeight - headHeight; $(that.panelBody).outerHeight(bodyHeight); },
-	 * 1000);
+	 * setTimeout(function() { var parentHeight = $(that.panel).parent().innerHeight(); var
+	 * headHeight = $(that.panel).find(".gb-article-head").outerHeight(); var bodyHeight =
+	 * parentHeight - headHeight; $(that.panelBody).outerHeight(bodyHeight); }, 1000);
 	 */
 
 	$(this.panelBody).jstreeol3(
@@ -626,9 +613,8 @@ gb3d.tree.OpenLayers = function(obj) {
 									// "")),
 									"label" : that.translation.downloadtiles[that.locale],
 									/*
-									 * ! "shortcut" : 113, "shortcut_label" :
-									 * 'F2', "icon" : "glyphicon
-									 * glyphicon-leaf",
+									 * ! "shortcut" : 113, "shortcut_label" : 'F2', "icon" :
+									 * "glyphicon glyphicon-leaf",
 									 */
 									"action" : function(data) {
 										var inst = $.jstreeol3
@@ -656,8 +642,8 @@ gb3d.tree.OpenLayers = function(obj) {
 								// "")),
 								"label" : that.translation.import3dfile[that.locale],
 								/*
-								 * ! "shortcut" : 113, "shortcut_label" : 'F2',
-								 * "icon" : "glyphicon glyphicon-leaf",
+								 * ! "shortcut" : 113, "shortcut_label" : 'F2', "icon" : "glyphicon
+								 * glyphicon-leaf",
 								 */
 								"action" : function(data) {
 									var inst = $.jstreeol3
@@ -686,8 +672,8 @@ gb3d.tree.OpenLayers = function(obj) {
 								// "")),
 								"label" : that.translation.zoom[that.locale],
 								/*
-								 * ! "shortcut" : 113, "shortcut_label" : 'F2',
-								 * "icon" : "glyphicon glyphicon-leaf",
+								 * ! "shortcut" : 113, "shortcut_label" : 'F2', "icon" : "glyphicon
+								 * glyphicon-leaf",
 								 */
 								"action" : function(data) {
 									var inst = $.jstreeol3
@@ -751,19 +737,15 @@ gb3d.tree.OpenLayers = function(obj) {
 						};
 
 						/*
-						 * totalObj["count"] = { "separator_before" : false,
-						 * "icon" : "fa fa-eye", "separator_after" : false,
-						 * "_disabled" : false, // (this.check("delete_node", //
-						 * data.reference, // this.get_parent(data.reference), //
-						 * "")), "label" :
-						 * that.translation.countOfFeature[that.locale],
-						 * "action" : function(data) { console.log(data); var
-						 * inst = $.jstreeol3.reference(data.reference), obj =
-						 * inst.get_node(data.reference); var layers =
-						 * inst.get_selected(); for (var i = 0; i <
-						 * layers.length; i++) { var node =
-						 * inst.get_node(layers[i]); var layer =
-						 * inst.get_LayerById(layers[i]); } } };
+						 * totalObj["count"] = { "separator_before" : false, "icon" : "fa fa-eye",
+						 * "separator_after" : false, "_disabled" : false, //
+						 * (this.check("delete_node", // data.reference, //
+						 * this.get_parent(data.reference), // "")), "label" :
+						 * that.translation.countOfFeature[that.locale], "action" : function(data) {
+						 * console.log(data); var inst = $.jstreeol3.reference(data.reference), obj =
+						 * inst.get_node(data.reference); var layers = inst.get_selected(); for (var
+						 * i = 0; i < layers.length; i++) { var node = inst.get_node(layers[i]); var
+						 * layer = inst.get_LayerById(layers[i]); } } };
 						 */
 
 						if(o.type !== "Raster"){
@@ -961,23 +943,18 @@ gb3d.tree.OpenLayers = function(obj) {
 						 * @author 소이준
 						 */
 						/*
-						 * "group" : { "separator_before" : false,
-						 * "separator_after" : true, "_disabled" : false, //
-						 * (this.check("create_node", // data.reference, {}, //
-						 * "last")), "label" : "Create group", "action" :
-						 * function(data) { var inst = $.jstreeol3
-						 * .reference(data.reference), obj = inst
-						 * .get_node(data.reference); inst.create_group(obj, {},
-						 * "first", function( new_node) { setTimeout(function() {
-						 * inst.edit(new_node); }, 0); }); } }, "create" : {
-						 * "separator_before" : false, "separator_after" : true,
-						 * "_disabled" : false, // (this.check("create_node", //
-						 * data.reference, {}, // "last")), "label" : "Create",
-						 * "action" : function(data) { var inst = $.jstreeol3
-						 * .reference(data.reference), obj = inst
-						 * .get_node(data.reference); inst.create_node(obj, {},
-						 * "last", function( new_node) { setTimeout(function() {
-						 * inst.edit(new_node); }, 0); }); } },
+						 * "group" : { "separator_before" : false, "separator_after" : true,
+						 * "_disabled" : false, // (this.check("create_node", // data.reference, {}, //
+						 * "last")), "label" : "Create group", "action" : function(data) { var inst =
+						 * $.jstreeol3 .reference(data.reference), obj = inst
+						 * .get_node(data.reference); inst.create_group(obj, {}, "first", function(
+						 * new_node) { setTimeout(function() { inst.edit(new_node); }, 0); }); } },
+						 * "create" : { "separator_before" : false, "separator_after" : true,
+						 * "_disabled" : false, // (this.check("create_node", // data.reference, {}, //
+						 * "last")), "label" : "Create", "action" : function(data) { var inst =
+						 * $.jstreeol3 .reference(data.reference), obj = inst
+						 * .get_node(data.reference); inst.create_node(obj, {}, "last", function(
+						 * new_node) { setTimeout(function() { inst.edit(new_node); }, 0); }); } },
 						 */
 						// "rename" : {
 						// "separator_before" : false,
@@ -1043,17 +1020,14 @@ gb3d.tree.OpenLayers = function(obj) {
 						// }
 						// },
 						/*
-						 * "properties" : { "separator_before" : false, "icon" :
-						 * "fa fa-info-circle", "separator_after" : false,
-						 * "_disabled" : false, // (this.check("delete_node", //
-						 * data.reference, // this.get_parent(data.reference), //
-						 * "")), "label" : "Properties", "action" :
-						 * function(data) { var inst = $.jstreeol3
-						 * .reference(data.reference), obj = inst
-						 * .get_node(data.reference); if (inst.is_selected(obj)) { //
-						 * inst.delete_node_layer(inst.get_selected()); var
-						 * layer = inst.get_LayerById(obj.id);
-						 * console.log(layer); } else { //
+						 * "properties" : { "separator_before" : false, "icon" : "fa
+						 * fa-info-circle", "separator_after" : false, "_disabled" : false, //
+						 * (this.check("delete_node", // data.reference, //
+						 * this.get_parent(data.reference), // "")), "label" : "Properties",
+						 * "action" : function(data) { var inst = $.jstreeol3
+						 * .reference(data.reference), obj = inst .get_node(data.reference); if
+						 * (inst.is_selected(obj)) { // inst.delete_node_layer(inst.get_selected());
+						 * var layer = inst.get_LayerById(obj.id); console.log(layer); } else { //
 						 * inst.delete_node_layer(obj); } } },
 						 */
 					}
@@ -1069,7 +1043,6 @@ gb3d.tree.OpenLayers.prototype.constructor = gb3d.tree.OpenLayers;
  * jstree가 적용된 jquery 객체를 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getJSTreeElement
- * @function
  * @return {HTMLElement}
  */
 gb3d.tree.OpenLayers.prototype.getJSTreeElement = function() {
@@ -1080,7 +1053,6 @@ gb3d.tree.OpenLayers.prototype.getJSTreeElement = function() {
  * jstree 객체를 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getJSTree
- * @function
  * @return {$.jstreeol3.plugins.functionmarker} jstree-functionmarker.js 파일 참조
  */
 gb3d.tree.OpenLayers.prototype.getJSTree = function() {
@@ -1091,9 +1063,7 @@ gb3d.tree.OpenLayers.prototype.getJSTree = function() {
  * jstree 객체를 설정한다.
  * 
  * @method gb3d.tree.OpenLayers#setJSTree
- * @function
- * @param {$.jstreeol3}
- *            jstree - jstree 객체(jsTree-openlayers3/jstree.js 파일 참조)
+ * @param {$.jstreeol3} jstree - jstree 객체(jsTree-openlayers3/jstree.js 파일 참조)
  */
 gb3d.tree.OpenLayers.prototype.setJSTree = function(jstree) {
 	this.jstree = jstree;
@@ -1103,9 +1073,7 @@ gb3d.tree.OpenLayers.prototype.setJSTree = function(jstree) {
  * EditingTool 객체를 설정한다.
  * 
  * @method gb3d.tree.OpenLayers#setEditingTool
- * @function
- * @param {gb.edit.EditingTool}
- *            param - editingTool 객체
+ * @param {gb.edit.EditingTool} param - editingTool 객체
  */
 gb3d.tree.OpenLayers.prototype.setEditingTool = function(param) {
 	this.jstree._data.layerproperties.editingTool = param;
@@ -1115,7 +1083,6 @@ gb3d.tree.OpenLayers.prototype.setEditingTool = function(param) {
  * EditingTool 객체를 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getEditingTool
- * @function
  * @return {gb.edit.EditingTool}
  */
 gb3d.tree.OpenLayers.prototype.getEditingTool = function() {
@@ -1126,7 +1093,6 @@ gb3d.tree.OpenLayers.prototype.getEditingTool = function() {
  * Tree에 Group Node를 생성한다.
  * 
  * @method gb3d.tree.OpenLayers#createGroupNode
- * @function
  */
 gb3d.tree.OpenLayers.prototype.createGroupNode = function() {
 	var tree = this.jstree;
@@ -1142,7 +1108,6 @@ gb3d.tree.OpenLayers.prototype.createGroupNode = function() {
  * Tree 노드 목록을 새로고침한다. 모든 노드의 tree 아이디를 재설정한다.
  * 
  * @method gb3d.tree.OpenLayers#refreshList
- * @function
  */
 gb3d.tree.OpenLayers.prototype.refreshList = function() {
 	console.log("refresh");
@@ -1153,7 +1118,6 @@ gb3d.tree.OpenLayers.prototype.refreshList = function() {
  * Openlayers Tree 노드 검색창을 연다.
  * 
  * @method gb3d.tree.OpenLayers#openSearchBar
- * @function
  */
 gb3d.tree.OpenLayers.prototype.openSearchBar = function() {
 	console.log("open search on geoserver");
@@ -1169,7 +1133,6 @@ gb3d.tree.OpenLayers.prototype.openSearchBar = function() {
  * Openlayers Tree 노드 검색창을 닫는다.
  * 
  * @method gb3d.tree.OpenLayers#closeSearchBar
- * @function
  */
 gb3d.tree.OpenLayers.prototype.closeSearchBar = function() {
 	console.log("close search geoserver");
@@ -1185,7 +1148,6 @@ gb3d.tree.OpenLayers.prototype.closeSearchBar = function() {
  * uploadjson 객체를 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getUploadJSON
- * @function
  * @return {gb.geoserver.UploadGeoJSON}
  */
 gb3d.tree.OpenLayers.prototype.getUploadJSON = function() {
@@ -1196,9 +1158,7 @@ gb3d.tree.OpenLayers.prototype.getUploadJSON = function() {
  * uploadjson 객체를 설정한다.
  * 
  * @method gb3d.tree.OpenLayers#setUploadJSON
- * @function
- * @param {gb.geoserver.UploadGeoJSON}
- *            obj - uploadjson 객체
+ * @param {gb.geoserver.UploadGeoJSON} obj - uploadjson 객체
  */
 gb3d.tree.OpenLayers.prototype.setUploadJSON = function(obj) {
 	this.uploadjson = obj;
@@ -1208,7 +1168,6 @@ gb3d.tree.OpenLayers.prototype.setUploadJSON = function(obj) {
  * Layer 생성창을 연다. Layer명, 속성명은 Geoserver의 명명 규칙을 따른다.
  * 
  * @method gb3d.tree.OpenLayers#openAddLayer
- * @function
  */
 gb3d.tree.OpenLayers.prototype.openAddLayer = function() {
 	var that = this;
@@ -1378,10 +1337,7 @@ gb3d.tree.OpenLayers.prototype.openAddLayer = function() {
  * 레이어 속성 정보 설정 Layout Table을 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#getAttrForm
- * @function
- * @param {boolean}
- *            bool - Not Null, Unique 조건 설정 가시화 여부. true일 시 Not Null, Unique 조건
- *            설정 불가.
+ * @param {boolean} bool - Not Null, Unique 조건 설정 가시화 여부. true일 시 Not Null, Unique 조건 설정 불가.
  * @return {HTMLElement}
  */
 gb3d.tree.OpenLayers.getAttrForm = function(bool) {
@@ -1451,7 +1407,6 @@ gb3d.tree.OpenLayers.getAttrForm = function(bool) {
  * Shp file 업로드창을 생성한다. Zip형식의 파일만 업로드 가능하다.
  * 
  * @method gb3d.tree.OpenLayers#createUploadModal
- * @function
  */
 gb3d.tree.OpenLayers.prototype.createUploadModal = function() {
 	var that = this;
@@ -1497,12 +1452,10 @@ gb3d.tree.OpenLayers.prototype.createUploadModal = function() {
 	});
 
 	/*
-	 * var epsg = $("<div>").addClass("col-md-2").append("EPSG"); var epsgInput =
-	 * $("<input>").attr({ "type" : "text", "placeholder" : "Default: 4326"
-	 * }).addClass("form-control");
+	 * var epsg = $("<div>").addClass("col-md-2").append("EPSG"); var epsgInput = $("<input>").attr({
+	 * "type" : "text", "placeholder" : "Default: 4326" }).addClass("form-control");
 	 * 
-	 * var col1 = $("<div>").addClass("col-md-10").append(epsgInput); var row1 =
-	 * $("<div>").addClass("row").append(epsg).append(col1).css({
+	 * var col1 = $("<div>").addClass("col-md-10").append(epsgInput); var row1 = $("<div>").addClass("row").append(epsg).append(col1).css({
 	 * "margin-bottom" : "15px" });
 	 */
 
@@ -1575,15 +1528,10 @@ gb3d.tree.OpenLayers.prototype.createUploadModal = function() {
  * Shp file 업로드창을 생성한다. Zip형식의 파일만 업로드 가능하다.
  * 
  * @method gb3d.tree.OpenLayers#loadShpZip
- * @function
- * @param {string|undefined|null}
- *            encode - 인코딩 타입(Default "EUC-KR")
- * @param {window.File}
- *            file - 업로드 파일 객체
- * @param {ol.Map}
- *            map - 파일을 업로드할 맵 객체
- * @param {function}
- *            callback - 콜백함수
+ * @param {string|undefined|null} encode - 인코딩 타입(Default "EUC-KR")
+ * @param {window.File} file - 업로드 파일 객체
+ * @param {ol.Map} map - 파일을 업로드할 맵 객체
+ * @param {function} callback - 콜백함수
  */
 gb3d.tree.OpenLayers.prototype.loadShpZip = function(encode, file, map, callback) {
 	var epsg = epsg || 4326;
@@ -1633,7 +1581,6 @@ gb3d.tree.OpenLayers.prototype.loadShpZip = function(encode, file, map, callback
  * Image file 업로드창을 생성한다.
  * 
  * @method gb3d.tree.OpenLayers#createImageModal
- * @function
  */
 gb3d.tree.OpenLayers.prototype.createImageModal = function() {
 	var that = this;
@@ -1743,9 +1690,7 @@ gb3d.tree.OpenLayers.prototype.createImageModal = function() {
  * 레이어 삭제 확인창을 연다.
  * 
  * @method gb3d.tree.OpenLayers#openDeleteLayer
- * @function
- * @param {Array.
- *            <Object>} layer - 삭제하려는 레이어들의 노드 정보 배열
+ * @param {Array.<Object>} layer - 삭제하려는 레이어들의 노드 정보 배열
  */
 gb3d.tree.OpenLayers.prototype.openDeleteLayer = function(layer) {
 	var that = this;
@@ -1813,11 +1758,8 @@ gb3d.tree.OpenLayers.prototype.openDeleteLayer = function(layer) {
  * 레이어를 삭제한다.
  * 
  * @method gb3d.tree.OpenLayers#deleteLayer
- * @function
- * @param {Array.
- *            <Object>} layers - 삭제하려는 레이어들의 노드 정보 배열
- * @param {function}
- *            callback - 콜백함수
+ * @param {Array.<Object>} layers - 삭제하려는 레이어들의 노드 정보 배열
+ * @param {function} callback - 콜백함수
  */
 gb3d.tree.OpenLayers.prototype.deleteLayer = function(layers, callback){
 	var that = this;
@@ -1835,9 +1777,7 @@ gb3d.tree.OpenLayers.prototype.deleteLayer = function(layers, callback){
  * Vector 레이어의 상세정보창을 생성한다.
  * 
  * @method gb3d.tree.OpenLayers#vectorLayerInfo
- * @function
- * @param {ol.layer.Vector}
- *            layer - 레이어 객체
+ * @param {ol.layer.Vector} layer - 레이어 객체
  */
 gb3d.tree.OpenLayers.prototype.vectorLayerInfo = function(layer) {
 
@@ -1912,17 +1852,11 @@ gb3d.tree.OpenLayers.prototype.vectorLayerInfo = function(layer) {
  * Geoserver로부터 Import된 레이어의 상세정보를 요청한다.
  * 
  * @method gb3d.tree.OpenLayers#requestLayerInfo
- * @function
- * @param {Object}
- *            obj - 요청 파라미터
- * @param {string}
- *            obj.geoserver - Geoserver명
- * @param {string}
- *            obj.workspace - workspace명
- * @param {string}
- *            obj.datastore - datastore명
- * @param {string}
- *            obj.layername - layer명
+ * @param {Object} obj - 요청 파라미터
+ * @param {string} obj.geoserver - Geoserver명
+ * @param {string} obj.workspace - workspace명
+ * @param {string} obj.datastore - datastore명
+ * @param {string} obj.layername - layer명
  */
 gb3d.tree.OpenLayers.prototype.requestLayerInfo = function(obj) {
 	var that = this;
@@ -2042,11 +1976,8 @@ gb3d.tree.OpenLayers.prototype.requestLayerInfo = function(obj) {
  * 레이어 상세정보창에 표시할 Table Element를 생성하고 반환한다.
  * 
  * @method gb3d.tree.OpenLayers#createPropTable
- * @function
- * @param {Object.
- *            <string, string|Object>} obj - 테이블 내용
- * @param {boolean}
- *            isVector - 레이어 타입이 Vector인지 여부
+ * @param {Object.<string, string|Object>} obj - 테이블 내용
+ * @param {boolean} isVector - 레이어 타입이 Vector인지 여부
  * @return {HTMLElement}
  */
 gb3d.tree.OpenLayers.prototype.createPropTable = function(obj, isVector) {
@@ -2228,9 +2159,7 @@ gb3d.tree.OpenLayers.prototype.createPropTable = function(obj, isVector) {
  * 레이어 속성값 추가 모달창을 생성한다.
  * 
  * @method gb3d.tree.OpenLayers#addPropModal
- * @function
- * @param {boolean}
- *            obj - Not Null, Unique 옵션 설정 가능 여부. True일 시 설정 불가
+ * @param {boolean} obj - Not Null, Unique 옵션 설정 가능 여부. True일 시 설정 불가
  */
 gb3d.tree.OpenLayers.prototype.addPropModal = function(obj) {
 	var that = this;

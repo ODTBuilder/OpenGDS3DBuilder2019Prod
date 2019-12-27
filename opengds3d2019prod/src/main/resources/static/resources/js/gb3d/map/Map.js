@@ -9,12 +9,9 @@ if (!gb3d)
  * @classdesc Map 객체를 정의한다. Cesium 과 ThreeJS 라이브러리를 통합하여 가시화한다.
  * @class gb3d.Map
  * @memberof gb3d
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {gb.Map}
- *            gbMap - 2D Map 객체
- * @param {gb3d.edit.ModelRecord}
- *            modelRecord - 3D 객체 변경이력 관리 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {gb.Map} gbMap - 2D Map 객체
+ * @param {gb3d.edit.ModelRecord} modelRecord - 3D 객체 변경이력 관리 객체
  * @author SOYIJUN
  */
 gb3d.Map = function(obj) {
@@ -178,13 +175,13 @@ gb3d.Map = function(obj) {
 	/**
 	 * 좌표계 바운딩 박스 - 최소값
 	 * 
-	 * @type {Array.<Number>}
+	 * @type {Array.<number>}
 	 */
 	this.minCRS = [ -180.0, -90.0 ];
 	/**
 	 * 좌표계 바운딩 박스 - 최대값
 	 * 
-	 * @type {Array.<Number>}
+	 * @type {Array.<number>}
 	 */
 	this.maxCRS = [ 180.0, 90.0 ];
 
@@ -462,8 +459,7 @@ gb3d.Map.prototype.getThreeObjects = function() {
  * three transform controls 객체를 설정한다.
  * 
  * @method gb3d.Map#setThreeObjects
- * @param {Array.
- *            <gb3d.object.ThreeObject>} ThreeObject 배열
+ * @param {Array.<gb3d.object.ThreeObject>} ThreeObject 배열
  */
 gb3d.Map.prototype.setThreeObjects = function(objects) {
 	this.threeObjects = objects;
@@ -493,8 +489,7 @@ gb3d.Map.prototype.getCamera = function() {
  * 렌더링할 ThreeJS 객체를 추가한다.
  * 
  * @method gb3d.Map#addThreeObject
- * @param {gb3d.object.ThreeObject}
- *            object - ThreeObject
+ * @param {gb3d.object.ThreeObject} object - ThreeObject
  */
 gb3d.Map.prototype.addThreeObject = function(object){
 	if(object instanceof gb3d.object.ThreeObject){
@@ -512,8 +507,7 @@ gb3d.Map.prototype.addThreeObject = function(object){
  * Feature id로 Three Object 객체를 검색 및 반환
  * 
  * @method gb3d.Map#getThreeObjectById
- * @param {string}
- *            id - Feature ID
+ * @param {string} id - Feature ID
  * @return {gb3d.object.ThreeObject}
  */
 gb3d.Map.prototype.getThreeObjectById = function(id){
@@ -533,9 +527,8 @@ gb3d.Map.prototype.getThreeObjectById = function(id){
  * Three Object id로 Three Object 객체를 검색 및 반환
  * 
  * @method gb3d.Map#getThreeObjectByUuid
- * @param {string}
- *            id - Three Object ID
- * @return {gb3d.object.ThreeObject}
+ * @param {string} id - Three Object ID
+ * @return {gb3d.object.ThreeObject} 검색된 ThreeObject 객체
  */
 gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 	var threeObject = undefined,
@@ -581,10 +574,8 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
  * Object를 삭제한다.
  * 
  * @method gb3d.Map#removeThreeObject
- * @param {THREE.Object3D |
- *            String} object - ThreeObject 객체 또는 uuid
- * @param {Boolean}
- *            [cancel=false] - true 설정 시 remove 취소. 기본 false
+ * @param {THREE.Object3D | String} object - ThreeObject 객체 또는 uuid
+ * @param {boolean} [cancel=false] - true 설정 시 remove 취소. 기본 false
  */
 gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
 	var threeObject = undefined;
@@ -618,8 +609,7 @@ gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
  * Add Tileset
  * 
  * @method gb3d.Map#addTileset
- * @param {gb3d.object.Tileset}
- *            tileset - 타일셋 객체
+ * @param {gb3d.object.Tileset} tileset - 타일셋 객체
  */
 gb3d.Map.prototype.addTileset = function(tileset){
 	var that = this;
@@ -673,8 +663,7 @@ gb3d.Map.prototype.getTileset = function(){
  * 타일셋 객체 묶음을 반환한다.
  * 
  * @method gb3d.Map#getTilesetByLayer
- * @param {String}
- *            lid - 레이어 id
+ * @param {String} lid - 레이어 id
  * @return {Array.<gb3d.object.Tileset>} 타일셋 객체 묶음
  */
 gb3d.Map.prototype.getTilesetByLayer = function(lid){
@@ -685,8 +674,7 @@ gb3d.Map.prototype.getTilesetByLayer = function(lid){
  * 타일셋 객체 묶음을 설정한다.
  * 
  * @method gb3d.Map#setTileset
- * @param {Object}
- *            tiles - 타일 객체 묶음
+ * @param {Object} tiles - 타일 객체 묶음
  */
 gb3d.Map.prototype.setTileset = function(tiles){
 	this.tiles = tiles;

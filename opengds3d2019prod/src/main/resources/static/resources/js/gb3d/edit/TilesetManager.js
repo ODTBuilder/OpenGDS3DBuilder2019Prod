@@ -5,8 +5,7 @@ if (!gb3d.edit)
 	gb3d.edit = {};
 
 /**
- * @classdesc
- * Cesium 3D Tileset 관리자
+ * @classdesc Cesium 3D Tileset 관리자
  * @class gb3d.edit.TilesetManager
  * @memberof gb3d.edit
  * @param {Object} obj - 생성자 옵션
@@ -31,6 +30,7 @@ gb3d.edit.TilesetManager = function(obj) {
 
 	/**
 	 * Tileset Manager UI
+	 * 
 	 * @type {gb3d.style.Declarative}
 	 * @private
 	 */
@@ -40,6 +40,7 @@ gb3d.edit.TilesetManager = function(obj) {
 
 	/**
 	 * Tileset List
+	 * 
 	 * @type {Array.<gb3d.object.Tileset>}
 	 * @private
 	 */
@@ -136,15 +137,15 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tile
 		default:
 			res = sign;
 		}
-		
+
 		if (value === "") {
-//			return;
-//			value
+			// return;
+			// value
 			continue;
 		} else {
-			conditions.push([ "${" + key + "} " + res + " " + value, "color('" + color.toUpperCase() + "')" ]);			
+			conditions.push([ "${" + key + "} " + res + " " + value, "color('" + color.toUpperCase() + "')" ]);
 		}
-		
+
 	}
 
 	if (isDel) {
@@ -209,7 +210,7 @@ gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 			if ($(e.target).parents().eq(1).find(".gb-declare-value").val() === "") {
 				return;
 			} else {
-				that.update3DTilesetStyle(this, tileset);	
+				that.update3DTilesetStyle(this, tileset);
 			}
 		});
 

@@ -6,22 +6,16 @@ if (!gb3d.edit)
 
 /**
  * @classdesc 3차원 객체 편집 기능을 정의한다. 필수 라이브러리: jQuery, threeJS, Cesium,
- *            {@link gb3d.edit.EditingToolBase}
+ * {@link gb3d.edit.EditingToolBase}
  * @class gb3d.edit.EditingTool3D
  * @requires {@link gb3d.edit.EditingToolBase}
  * @memberof gb3d.edit
- * @param {Object}
- *            obj - 생성자 옵션
- * @param {gb3d.edit.EditingTool2D}
- *            obj.editingTool2D - 2D 편집 관리 객체
- * @param {gb3d.edit.ModelRecord}
- *            [obj.modelRecord] - Model 객체 편집 이력을 관리하는 객체
- * @param {gb3d.tree.OpenLayers}
- *            obj.otree - 레이어 관리 jstree 객체
- * @param {string}
- *            obj.getFeatureURL - Feature 객체 요청 url
- * @param {string}
- *            [obj.locale="en"] - 언어 코드
+ * @param {Object} obj - 생성자 옵션
+ * @param {gb3d.edit.EditingTool2D} obj.editingTool2D - 2D 편집 관리 객체
+ * @param {gb3d.edit.ModelRecord} [obj.modelRecord] - Model 객체 편집 이력을 관리하는 객체
+ * @param {gb3d.tree.OpenLayers} obj.otree - 레이어 관리 jstree 객체
+ * @param {string} obj.getFeatureURL - Feature 객체 요청 url
+ * @param {string} [obj.locale="en"] - 언어 코드
  * @author KIM HOCHUL
  * @date 2019. 12. 24
  * @version 0.01
@@ -1339,8 +1333,7 @@ gb3d.edit.EditingTool3D.prototype.editToolToggle = function() {
  * ThreeJS Object3D 객체의 Center를 지구 표면상에 위치시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#attachObjectToGround
- * @param {THREE.Object3D}
- *            object - ThreeJS Object3D 객체
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
  * @function
  */
 gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
@@ -1358,8 +1351,7 @@ gb3d.edit.EditingTool3D.prototype.attachObjectToGround = function(object) {
  * 선택된 three객체의 아웃라인을 표시한다
  * 
  * @method gb3d.edit.EditingTool3D#applySelectedOutline
- * @param {THREE.Object3D}
- *            object - ThreeJS Object3D 객체
+ * @param {THREE.Object3D} object - ThreeJS Object3D 객체
  * @function
  */
 gb3d.edit.EditingTool3D.prototype.applySelectedOutline = function(object) {
@@ -1390,14 +1382,10 @@ gb3d.edit.EditingTool3D.prototype.removeSelectedOutline = function() {
  * Object 생성을 위한 사전작업 수행 함수. Feature 정보를 저장하고 Feature type에 따른 모달을 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createObjectByCoord
- * @param {string}
- *            type - Feature type
- * @param {ol.Feature}
- *            feature - Openlayers feature 객체
- * @param {string}
- *            treeid - jstree node id
- * @param {string}
- *            layer - layer 객체 id
+ * @param {string} type - Feature type
+ * @param {ol.Feature} feature - Openlayers feature 객체
+ * @param {string} treeid - jstree node id
+ * @param {string} layer - layer 객체 id
  */
 gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, treeid, layer) {
 	this.objectAttr.type = type;
@@ -1433,30 +1421,17 @@ gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, 
  * 설정한 좌표값 위치에 타입에 따른 모델링된 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createPointObject
- * @param {Array.
- *            <number>} arr - 좌표값
- * @param {Array.
- *            <number>} extent - minX, minY, maxX, maxY
- * @param {Object}
- *            option - 3차원 객체 생성 옵션
- * @param {string}
- *            option.type - 생성하려는 3차원 객체 모양(box, cylinder, circle, dodecahedron,
- *            icosahedron)
- * @param {string}
- *            option.width - 가로 길이
- * @param {string}
- *            option.height - 세로 길이
- * @param {string}
- *            option.depth - 높이
- * @param {string}
- *            option.radiusTop - 원통 윗부분의 지름. cylinder 에서만 사용
- * @param {string}
- *            option.radiusBottom - 원통 아랫부분의 지름. cylinder 에서만 사용
- * @param {string}
- *            option.radius - 생성하려는 3차원 객체 모양. circle, dodecahedron, icosahedron
- *            에서 사용
- * @param {string}
- *            option.width - 생성하려는 3차원 객체 모양
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.type - 생성하려는 3차원 객체 모양(box, cylinder, circle, dodecahedron, icosahedron)
+ * @param {string} option.width - 가로 길이
+ * @param {string} option.height - 세로 길이
+ * @param {string} option.depth - 높이
+ * @param {string} option.radiusTop - 원통 윗부분의 지름. cylinder 에서만 사용
+ * @param {string} option.radiusBottom - 원통 아랫부분의 지름. cylinder 에서만 사용
+ * @param {string} option.radius - 생성하려는 3차원 객체 모양. circle, dodecahedron, icosahedron 에서 사용
+ * @param {string} option.width - 생성하려는 3차원 객체 모양
  */
 gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, option) {
 	var coord = arr, points = [], geometry, cart, obj3d, x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2, type = option.type || "box",
@@ -1529,14 +1504,10 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
  * 설정한 좌표값에 따른 직육면체의 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createPolygonObject
- * @param {Array.
- *            <number>} arr - 좌표값
- * @param {Array.
- *            <number>} extent - minX, minY, maxX, maxY
- * @param {Object}
- *            option - 3차원 객체 생성 옵션
- * @param {string}
- *            option.depth - 높이
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.depth - 높이
  */
 gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, option) {
 	var that = this;
@@ -1616,16 +1587,11 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
  * 설정한 좌표값에 따른 LinePolygon 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createLineStringObjectOnRoad
- * @param {Array.
- *            <number>} arr - 좌표값
- * @param {Array.
- *            <number>} extent - minX, minY, maxX, maxY
- * @param {Object}
- *            option - 3차원 객체 생성 옵션
- * @param {string}
- *            option.width - 가로 길이
- * @param {string}
- *            option.depth - 높이
+ * @param {Array.<number>} arr - 좌표값
+ * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {Object} option - 3차원 객체 생성 옵션
+ * @param {string} option.width - 가로 길이
+ * @param {string} option.depth - 높이
  */
 gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, extent, option) {
 	var that = this;
@@ -1728,8 +1694,7 @@ gb3d.edit.EditingTool3D.prototype.getAttrPopup = function() {
  * ThreeJS Object를 선택한다.
  * 
  * @method gb3d.edit.EditingTool3D#selectThree
- * @param {string}
- *            uuid - ThreeJS Object ID
+ * @param {string} uuid - ThreeJS Object ID
  * @return {gb3d.object.ThreeObject} 선택된 ThreeJS Object 반환
  */
 gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
@@ -1767,8 +1732,7 @@ gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
  * ThreeJS Object와 연동된 Openlayers Feature를 선택한다.
  * 
  * @method gb3d.edit.EditingTool3D#selectFeature
- * @param {string}
- *            id - Openlayers Feature ID
+ * @param {string} id - Openlayers Feature ID
  * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
  */
 gb3d.edit.EditingTool3D.prototype.selectFeature = function(id){
@@ -1807,8 +1771,7 @@ gb3d.edit.EditingTool3D.prototype.unselectCesium = function(){
  * ThreeJS 객체 선택 취소
  * 
  * @method gb3d.edit.EditingTool3D#unselectThree
- * @param {string}
- *            uuid - ThreeJS Object ID
+ * @param {string} uuid - ThreeJS Object ID
  * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
  */
 gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
@@ -1834,8 +1797,7 @@ gb3d.edit.EditingTool3D.prototype.unselectThree = function(uuid){
  * Openlayers Feature 선택 취소
  * 
  * @method gb3d.edit.EditingTool3D#unselectFeature
- * @param {string}
- *            id - Openlayers Feature ID
+ * @param {string} id - Openlayers Feature ID
  * @return {gb3d.object.ThreeObject} ThreeJS Object 반환
  */
 gb3d.edit.EditingTool3D.prototype.unselectFeature = function(id){
@@ -1859,8 +1821,7 @@ gb3d.edit.EditingTool3D.prototype.unselectFeature = function(id){
  * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 선택 상태로 설정한다.
  * 
  * @method gb3d.edit.EditingTool3D#syncSelect
- * @param {string}
- *            id - ThreeJS Object ID 또는 Openlayers Feature ID
+ * @param {string} id - ThreeJS Object ID 또는 Openlayers Feature ID
  */
 gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
 	var id = id;
@@ -1891,8 +1852,7 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id){
  * ThreeJS Object ID 또는 Openlayers Feature ID 를 입력하여 연동된 객체를 비선택 상태로 설정한다.
  * 
  * @method gb3d.edit.EditingTool3D#syncUnselect
- * @param {string}
- *            id - ThreeJS Object ID 또는 Openlayers Feature ID
+ * @param {string} id - ThreeJS Object ID 또는 Openlayers Feature ID
  */
 gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
 	var id = id;
@@ -1916,10 +1876,8 @@ gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
  * ThreeJS Object와 연동된 Openlayers Feature를 특정 위치로 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#moveObject2Dfrom3D
- * @param {Array.
- *            <number>} center - 이동하려는 위치 좌표값
- * @param {string}
- *            uuid - ThreeJS Object ID
+ * @param {Array.<number>} center - 이동하려는 위치 좌표값
+ * @param {string} uuid - ThreeJS Object ID
  */
 gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
 	var id = uuid,
@@ -1941,10 +1899,8 @@ gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
  * ThreeJS Object vertices 값으로 Openlayers Feature를 변경한다.
  * 
  * @method gb3d.edit.EditingTool3D#modifyObject2Dfrom3D
- * @param {Array.
- *            <Object>} vertices - Openlayers Feature의 변경된 Coordinates 값
- * @param {string}
- *            uuid - ThreeJS Object ID
+ * @param {Array.<Object>} vertices - Openlayers Feature의 변경된 Coordinates 값
+ * @param {string} uuid - ThreeJS Object ID
  */
 gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid){
 	var v = JSON.parse(JSON.stringify(vertices)),
@@ -1977,12 +1933,9 @@ gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid
  * Openlayers Feature Coordinates 값으로 ThreeJS Object를 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#moveObject3Dfrom2D
- * @param {string}
- *            id - Openlayers Feature ID
- * @param {Array.
- *            <number>} center - Openlayers Feature의 변경된 Center Coordinates 값
- * @param {Array.
- *            <number>} coord - Openlayers Feature의 변경된 Coordinates 값
+ * @param {string} id - Openlayers Feature ID
+ * @param {Array.<number>} center - Openlayers Feature의 변경된 Center Coordinates 값
+ * @param {Array.<number>} coord - Openlayers Feature의 변경된 Coordinates 값
  */
 gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var that = this;
@@ -2061,14 +2014,10 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
  * Openlayers Feature Coordinates 값으로 ThreeJS Object를 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#modify3DVertices
- * @param {Array.
- *            <number>} arr - Coordinates
- * @param {string}
- *            id - Openlayers Feature ID
- * @param {Array.
- *            <number>} extent - MinX, MinY, MaxX, MaxY
- * @param {Object}
- *            event
+ * @param {Array.<number>} arr - Coordinates
+ * @param {string} id - Openlayers Feature ID
+ * @param {Array.<number>} extent - MinX, MinY, MaxX, MaxY
+ * @param {Object} event
  */
 gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, event) {
 	var that = this;
@@ -2298,8 +2247,7 @@ gb3d.edit.EditingTool3D.prototype.getEditingTool2D = function() {
  * 속성 정보창을 업데이트 한다.
  * 
  * @method gb3d.edit.EditingTool3D#updateAttributePopup
- * @param {Object}
- *            userData - ThreeJS Object 속성 정보
+ * @param {Object} userData - ThreeJS Object 속성 정보
  */
 gb3d.edit.EditingTool3D.prototype.updateAttributePopup = function(userData) {
 	var that = this;
@@ -2340,8 +2288,7 @@ gb3d.edit.EditingTool3D.prototype.getModelRecord = function(){
  * 3D 모델 레코드 객체를 설정한다.
  * 
  * @method gb3d.edit.EditingTool3D#setModelRecord
- * @param {gb3d.edit.ModelRecord}
- *            record - 3D 모델 레코드 객체
+ * @param {gb3d.edit.ModelRecord} record - 3D 모델 레코드 객체
  */
 gb3d.edit.EditingTool3D.prototype.setModelRecord = function(record){
 	this.modelRecord = record;
@@ -2351,8 +2298,7 @@ gb3d.edit.EditingTool3D.prototype.setModelRecord = function(record){
  * 편집을 위한 객체의 obj를 요청한다
  * 
  * @method gb3d.edit.EditingTool3D#getOBJObjectFromB3DM
- * @param {string}
- *            fid - 파일 이름
+ * @param {string} fid - 파일 이름
  */
 gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
 	var url = this.getOBJURL();
@@ -2394,8 +2340,7 @@ gb3d.edit.EditingTool3D.prototype.getOBJObjectFromB3DM = function(feature){
  * tileset feature를 선택한다
  * 
  * @method gb3d.edit.EditingTool3D#selectTilesetFeature
- * @param {Cesium.Cesium3DTileFeature}
- *            feature - 피처
+ * @param {Cesium.Cesium3DTileFeature} feature - 피처
  */
 gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
 	var that = this;
@@ -2495,12 +2440,9 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(feature){
  * tileset feature를 선택한다
  * 
  * @method gb3d.edit.EditingTool3D#getFeatureByIdFromServer
- * @param {string}
- *            server - Server name
- * @param {string}
- *            workspace - Workspace name
- * @param {string}
- *            fid - 피처 ID
+ * @param {string} server - Server name
+ * @param {string} workspace - Workspace name
+ * @param {string} fid - 피처 ID
  */
 gb3d.edit.EditingTool3D.prototype.getFeatureByIdFromServer = function(server, work, fid){
 	var that = this;
@@ -2529,10 +2471,8 @@ gb3d.edit.EditingTool3D.prototype.getFeatureByIdFromServer = function(server, wo
  * 3D 객체 편집시 평면도를 업데이트
  * 
  * @method gb3d.edit.EditingTool3D#updateFloorPlan
- * @param {ol.Feature}
- *            selectedFeature - selected fearure
- * @param {gb3d.object.ThreeObject}
- *            threeObj - 업데이트할 객체
+ * @param {ol.Feature} selectedFeature - selected fearure
+ * @param {gb3d.object.ThreeObject} threeObj - 업데이트할 객체
  */
 gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
 	var center = threeObj.getCenter();
@@ -2613,7 +2553,6 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
  * 선택한 b3dm을 glb로 변환하여 편집화면에 불러온다
  * 
  * @method gb3d.edit.EditingTool3D#getGLBfromServer
- * 
  */
 gb3d.edit.EditingTool3D.prototype.getGLBfromServer = function(layerFeature, tileFeature){
 	var that = this;

@@ -5,14 +5,13 @@ if (!gb3d.edit)
 	gb3d.edit = {};
 
 /**
- * @classdesc
- * 2차원,3차원 편집 기능을 정의한다.
+ * @classdesc 2차원,3차원 편집 기능을 정의한다.
  * @class gb3d.edit.EditingToolBase
  * @memberof gb3d.edit
- * @param {Object}
- *            obj - 생성자 옵션
+ * @param {Object} obj - 생성자 옵션
  * @param {boolean} [obj.isDisplay=false] - 객체 생성 후 바로 가시화 여부
- * @param {string} [obj.toggleClass="header-toggle-btn"] - toggle button 요소 Class 이름. 해당 button 요소에 edit tool toggle 기능 추가
+ * @param {string} [obj.toggleClass="header-toggle-btn"] - toggle button 요소 Class 이름. 해당 button 요소에
+ * edit tool toggle 기능 추가
  * @param {string} obj.targetElement - Edit tool bar를 생성할 div id 또는 class name
  * @param {Array.<Object>} [obj.list] - Edit tool bar에 생성할 메뉴
  * @param {string} obj.list[].content - 메뉴 이름
@@ -67,6 +66,7 @@ gb3d.edit.EditingToolBase = function(obj){
 	
 	/**
 	 * 최상위 element
+	 * 
 	 * @type {n.fn.init.<HTMLDivElement>}
 	 * @private
 	 */
@@ -74,6 +74,7 @@ gb3d.edit.EditingToolBase = function(obj){
 	
 	/**
 	 * 좌측 ul element
+	 * 
 	 * @type {n.fn.init.<HTMLDivElement>}
 	 * @private
 	 */
@@ -81,6 +82,7 @@ gb3d.edit.EditingToolBase = function(obj){
 	
 	/**
 	 * 우측 ul element
+	 * 
 	 * @type {n.fn.init.<HTMLDivElement>}
 	 * @private
 	 */
@@ -88,6 +90,7 @@ gb3d.edit.EditingToolBase = function(obj){
 	
 	/**
 	 * content list
+	 * 
 	 * @type {Array.<n.fn.init.<HTMLDivElement>>}
 	 * @private
 	 */
@@ -95,6 +98,7 @@ gb3d.edit.EditingToolBase = function(obj){
 	
 	/**
 	 * active header
+	 * 
 	 * @type {boolean}
 	 * @private
 	 */
@@ -207,6 +211,7 @@ gb3d.edit.EditingToolBase.prototype.createContent = function(list){
 	
 	/**
 	 * element style 적용 함수
+	 * 
 	 * @method adjustStyle
 	 * @param {n.fn.init} element - jQuery 선택자
 	 * @param {Object} style - style정의 객체
@@ -220,32 +225,27 @@ gb3d.edit.EditingToolBase.prototype.createContent = function(list){
 	
 	// header element 생성
 	this.headerTag = $("<header>").addClass("gb-headerbase-header");
-//	adjustStyle(this.headerTag, this.headerStyle);t
+// adjustStyle(this.headerTag, this.headerStyle);t
 	
 	this.ulTagLeft = $("<ul class='left-content'>").addClass("gb-headerbase-ul-left");
-//	adjustStyle(this.ulTagLeft, this.ulStyleLeft);
+// adjustStyle(this.ulTagLeft, this.ulStyleLeft);
 	
 	this.ulTagRight = $("<ul class='right-conent'>").addClass("gb-headerbase-ul-right");
-//	adjustStyle(this.ulTagRight, this.ulStyleRight);
+// adjustStyle(this.ulTagRight, this.ulStyleRight);
 	
 	
 	// close button 생성
-	/*var closeBtn = $("<button>");
-	adjustStyle(closeBtn, this.closeBtnStyle);
-	closeBtn.hover(function(){
-		$(this).css("color", "#4c6ef5");
-	},function(){
-		$(this).css("color", "rgb(85, 85, 85)");
-	});
-	
-	closeBtn.click(function(){
-		that.closeTool();
-	});
-	
-	var closeSpan = $("<span>×</span>");
-	adjustStyle(closeSpan, this.closeSpanStyle);
-	
-	closeBtn.append(closeSpan);*/
+	/*
+	 * var closeBtn = $("<button>"); adjustStyle(closeBtn, this.closeBtnStyle);
+	 * closeBtn.hover(function(){ $(this).css("color", "#4c6ef5"); },function(){
+	 * $(this).css("color", "rgb(85, 85, 85)"); });
+	 * 
+	 * closeBtn.click(function(){ that.closeTool(); });
+	 * 
+	 * var closeSpan = $("<span>×</span>"); adjustStyle(closeSpan, this.closeSpanStyle);
+	 * 
+	 * closeBtn.append(closeSpan);
+	 */
 	
 	// header content 생성
 	var iTag, aTag, liTag;
@@ -282,9 +282,9 @@ gb3d.edit.EditingToolBase.prototype.createContent = function(list){
 			iTag.css("color", list[i].color);
 		}
 		
-//		adjustStyle(iTag, this.iStyle);
-//		adjustStyle(aTag, this.aStyle);
-//		adjustStyle(liTag, this.liStyle);
+// adjustStyle(iTag, this.iStyle);
+// adjustStyle(aTag, this.aStyle);
+// adjustStyle(liTag, this.liStyle);
 		
 		if(this.translator[list[i].content]){
 			aTag.html(this.translator[list[i].content][this.locale]);
@@ -309,15 +309,16 @@ gb3d.edit.EditingToolBase.prototype.createContent = function(list){
 		}
 	}
 	
-	//this.headerTag.append(closeBtn);
+	// this.headerTag.append(closeBtn);
 	this.headerTag.append(this.ulTagLeft);
-//	this.headerTag.append(this.ulTagRight);
+// this.headerTag.append(this.ulTagRight);
 	
 	this.targetElement.prepend(this.headerTag);
 }
 
 /**
  * header를 나타낸다.
+ * 
  * @method gb3d.edit.EditingToolBase#openTool
  */
 gb3d.edit.EditingToolBase.prototype.openTool = function(){
@@ -329,6 +330,7 @@ gb3d.edit.EditingToolBase.prototype.openTool = function(){
 
 /**
  * header를 숨긴다
+ * 
  * @method gb3d.edit.EditingToolBase#closeTool
  */
 gb3d.edit.EditingToolBase.prototype.closeTool = function(){
@@ -338,6 +340,7 @@ gb3d.edit.EditingToolBase.prototype.closeTool = function(){
 
 /**
  * header open/close toggle
+ * 
  * @method gb3d.edit.EditingToolBase#toggleTool
  */
 gb3d.edit.EditingToolBase.prototype.toggleTool = function(){
@@ -352,6 +355,7 @@ gb3d.edit.EditingToolBase.prototype.toggleTool = function(){
 
 /**
  * header를 open, close 하는 이벤트 함수를 생성한다.
+ * 
  * @method gb3d.edit.EditingToolBase#createToggleEvent
  * @param {string} className - header 토글 이벤트를 바인딩할 element의 클래스 이름
  */
@@ -365,6 +369,7 @@ gb3d.edit.EditingToolBase.prototype.createToggleEvent = function(className){
 
 /**
  * header 활성화 설정
+ * 
  * @method gb3d.edit.EditingToolBase#setActiveTool
  * @param {boolean} bool - header 활성화 여부
  */
@@ -380,8 +385,9 @@ gb3d.edit.EditingToolBase.prototype.setActiveTool = function(bool){
 
 /**
  * header 활성화 설정값 반환
+ * 
  * @method gb3d.edit.EditingToolBase#getActiveTool
- * @return {boolean} 
+ * @return {boolean}
  */
 gb3d.edit.EditingToolBase.prototype.getActiveTool = function(){
 	return this.active_;

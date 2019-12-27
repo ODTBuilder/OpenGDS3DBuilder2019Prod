@@ -1,12 +1,9 @@
 /**
  * @classdesc 3D model 편집 이력을 관리하는 객체이다.
- * 
  * @class gb3d.edit.ModelRecord
  * @memberof gb3d.edit
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {string}
- *            [obj.locale="en"] - 언어 코드
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {string} [obj.locale="en"] - 언어 코드
  * @version 0.01
  * @author SOYIJUN
  * @date 2019. 08. 14
@@ -168,9 +165,8 @@ gb3d.edit.ModelRecord.prototype.clearRemoved = function() {
  * 
  * @method gb3d.edit.ModelRecord#isEditing
  * @function
- * @param {String}
- *            layer - 편집이력을 확인할 layer id
- * @return {Boolean} 해당 레이어의 편집이력 존재 여부
+ * @param {String} layer - 편집이력을 확인할 layer id
+ * @return {boolean} 해당 레이어의 편집이력 존재 여부
  */
 gb3d.edit.ModelRecord.prototype.isEditing = function(layer) {
 	var result = false;
@@ -220,11 +216,9 @@ gb3d.edit.ModelRecord.prototype.isEditing = function(layer) {
  * 
  * @method gb3d.edit.ModelRecord#isRemoved
  * @function
- * @param {String}
- *            layer - 편집이력(삭제)에서 확인할 layer id
- * @param {gb3d.object.ThreeObject}
- *            model - 편집이력(삭제)에서 확인할 Model 객체
- * @return {Boolean} 해당 Model의 편집이력(삭제) 존재 여부
+ * @param {String} layer - 편집이력(삭제)에서 확인할 layer id
+ * @param {gb3d.object.ThreeObject} model - 편집이력(삭제)에서 확인할 Model 객체
+ * @return {boolean} 해당 Model의 편집이력(삭제) 존재 여부
  */
 gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, model) {
 	var isRemoved = false;
@@ -247,10 +241,8 @@ gb3d.edit.ModelRecord.prototype.isRemoved = function(layer, model) {
  * 
  * @method gb3d.edit.ModelRecord#create
  * @function
- * @param {String}
- *            layer - 편집이력에 임시저장할 layer id
- * @param {gb3d.object.ThreeObject}
- *            model - 편집이력에 임시저장할 model 객체
+ * @param {String} layer - 편집이력에 임시저장할 layer id
+ * @param {gb3d.object.ThreeObject} model - 편집이력에 임시저장할 model 객체
  */
 gb3d.edit.ModelRecord.prototype.create = function(layer, model) {
 	var id = layer;
@@ -282,10 +274,8 @@ gb3d.edit.ModelRecord.prototype.create = function(layer, model) {
  * 
  * @method gb3d.edit.ModelRecord#remove
  * @function
- * @param {String}
- *            layer - 편집이력에 임시저장할 layer id
- * @param {gb3d.object.ThreeObject}
- *            model - 편집이력에 임시저장할 model 객체
+ * @param {String} layer - 편집이력에 임시저장할 layer id
+ * @param {gb3d.object.ThreeObject} model - 편집이력에 임시저장할 model 객체
  */
 gb3d.edit.ModelRecord.prototype.remove = function(layer, model) {
 	var id = layer;
@@ -333,8 +323,7 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, model) {
  * 
  * @method gb3d.edit.ModelRecord#removeByLayer
  * @function
- * @param {String}
- *            layerId - 삭제할 Layer의 ID
+ * @param {String} layerId - 삭제할 Layer의 ID
  */
 gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
 	if (this.removed.hasOwnProperty(layerId)) {
@@ -352,10 +341,8 @@ gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
  * 
  * @method gb3d.edit.ModelRecord#update
  * @function
- * @param {String}
- *            layer - 편집이력에 임시저장할 layer id
- * @param {gb3d.object.ThreeObject}
- *            model - 편집이력에 임시저장할 model 객체
+ * @param {String} layer - 편집이력에 임시저장할 layer id
+ * @param {gb3d.object.ThreeObject} model - 편집이력에 임시저장할 model 객체
  */
 gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 	var id = layer;
@@ -402,10 +389,8 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
  * 
  * @method gb3d.edit.ModelRecord#deleteModelCreated
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @return {gb3d.object.ThreeObject} 생성 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
- *         객체
+ * @param {String} layerId - Layer ID
+ * @return {gb3d.object.ThreeObject} 생성 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject 객체
  */
 gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, modelId) {
 	var model = undefined;
@@ -425,12 +410,9 @@ gb3d.edit.ModelRecord.prototype.deleteModelCreated = function(layerId, modelId) 
  * 
  * @method gb3d.edit.ModelRecord#deleteModelModified
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @param {String}
- *            modelId - Model ID
- * @return {gb3d.object.ThreeObject} 편집 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
- *         객체
+ * @param {String} layerId - Layer ID
+ * @param {String} modelId - Model ID
+ * @return {gb3d.object.ThreeObject} 편집 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject 객체
  */
 gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, modelId) {
 	var model = undefined;
@@ -448,12 +430,9 @@ gb3d.edit.ModelRecord.prototype.deleteModelModified = function(layerId, modelId)
  * 
  * @method gb3d.edit.ModelRecord#deleteModelRemoved
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @param {String}
- *            modelId - Model ID
- * @return {gb3d.object.ThreeObject} 삭제 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject
- *         객체
+ * @param {String} layerId - Layer ID
+ * @param {String} modelId - Model ID
+ * @return {gb3d.object.ThreeObject} 삭제 임시 저장 목록에서 삭제된 gb3d.object.ThreeObject 객체
  */
 gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) {
 	var model = undefined;
@@ -471,8 +450,7 @@ gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) 
  * 
  * @method gb3d.edit.ModelRecord#save
  * @function
- * @param {gb.edit.EditingTool}
- *            editTool - gb.edit.EditingTool 객체
+ * @param {gb.edit.EditingTool} editTool - gb.edit.EditingTool 객체
  */
 gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var that = this;
@@ -500,8 +478,7 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
  * 
  * @method gb3d.edit.ModelRecord#closeEditTool
  * @function
- * @param {gb.edit.EditingTool}
- *            editTool - gb.edit.EditingTool 객체
+ * @param {gb.edit.EditingTool} editTool - gb.edit.EditingTool 객체
  */
 gb3d.edit.ModelRecord.prototype.closeEditTool = function(editTool) {
 	var count = 0;
@@ -769,8 +746,7 @@ gb3d.edit.ModelRecord.prototype.getSaveURL = function() {
  * 에러 메세지를 표시한다
  * 
  * @method gb3d.edit.ModelRecord#errorModal
- * @param {string}
- *            code - 오류 코드
+ * @param {string} code - 오류 코드
  */
 gb3d.edit.ModelRecord.prototype.errorModal = function(code) {
 	var that = this;
@@ -781,10 +757,8 @@ gb3d.edit.ModelRecord.prototype.errorModal = function(code) {
  * 메시지 창을 생성한다.
  * 
  * @method gb3d.edit.ModelRecord#messageModal
- * @param {string}
- *            title - 모달의 타이틀
- * @param {string}
- *            msg - 보여줄 메세지
+ * @param {string} title - 모달의 타이틀
+ * @param {string} msg - 보여줄 메세지
  */
 gb3d.edit.ModelRecord.prototype.messageModal = function(title, msg) {
 	var that = this;
@@ -809,8 +783,7 @@ gb3d.edit.ModelRecord.prototype.messageModal = function(title, msg) {
  * 재시도 창을 생성한다.
  * 
  * @method gb3d.edit.ModelRecord#retryModal
- * @param {string}
- *            func - 수행함수
+ * @param {string} func - 수행함수
  */
 gb3d.edit.ModelRecord.prototype.retryModal = function(self) {
 	var that = this;
@@ -841,8 +814,7 @@ gb3d.edit.ModelRecord.prototype.retryModal = function(self) {
  * 3D 객체의 위치와 회전을 원점으로 되돌린다.
  * 
  * @method gb3d.edit.ModelRecord#resetRotationAndPosition
- * @param {THREE.Object3D}
- *            object - 원점으로 되돌릴 3D 객체
+ * @param {THREE.Object3D} object - 원점으로 되돌릴 3D 객체
  */
 gb3d.edit.ModelRecord.prototype.resetRotationAndPosition = function(object) {
 	if (object instanceof THREE.Object3D) {
