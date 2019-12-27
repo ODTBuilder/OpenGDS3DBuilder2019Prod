@@ -7,6 +7,15 @@ if (!gb3d)
 if (!gb3d.Math)
 	gb3d.Math = {};
 
+/**
+ * 같은 시작점을 가진 두 벡터가 평행한지 검사한다.
+ * 
+ * @method gb3d.Math.isParallel
+ * @param {Array.<number>} pointA - 점A
+ * @param {Array.<number>} pointB - 점B
+ * @param {Array.<number>} standard - 시작점
+ * @return {boolean} 평행하면 True
+ */
 gb3d.Math.isParallel = function(pointA, pointB, standard){
 	var a, b, cart, va, vb, dot, result = false;
 
@@ -29,6 +38,15 @@ gb3d.Math.isParallel = function(pointA, pointB, standard){
 	return result;
 }
 
+/**
+ * 같은 시작점을 가진 두 벡터를 외적한다.
+ * 
+ * @method gb3d.Math.crossProductFromDegrees
+ * @param {Array.<number>} pointA - 점A
+ * @param {Array.<number>} pointB - 점B
+ * @param {Array.<number>} standard - 시작점
+ * @return {Object} 외적 결과
+ */
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	var a, b, u, v, w, s, cart;
 	var ca = {}, cb = {}, cw;
@@ -70,6 +88,15 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	}
 }
 
+/**
+ * Degree 좌표값으로부터 설정한 높이만큼의 3차원 객체 Vertex와 Face 값을 계산하여 반환한다.
+ * 
+ * @method gb3d.Math.getPolygonVertexAndFaceFromDegrees
+ * @param {Array.<Array.<number>>} arr - Polygon Feature의 좌표값
+ * @param {Array.<number>} center - 중점
+ * @param {number} depth - 3차원 객체의 높이
+ * @return {Object} 외적 결과
+ */
 gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	var coord = arr,
 	points = [],
@@ -220,9 +247,7 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		}
 	}
 }
-/**
- * 두 점의 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형 폴리곤 좌표를 반환한다
- */
+
 gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	// 반환할 폴리곤 좌표
 	var polygon = [];
@@ -2945,6 +2970,17 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 	geometry.uvsNeedUpdate = true;
 }
 
+/**
+ * 객체의 Matrix World 값을 초기화 한다.
+ * 
+ * @method gb3d.Math.resetMatrixWorld
+ * @param {THREE.Object3D|THREE.Group} obj - 3d 객체
+ * @param {number} quaternion - quaternion
+ * @param {Object} centerHigh - center 3차원 좌표값
+ * @param {Object} centerHigh.x - x
+ * @param {Object} centerHigh.y - y
+ * @param {Object} centerHigh.z - z
+ */
 gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 	var object = obj;
 	var quat = object.rotation.clone();
@@ -2980,9 +3016,9 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 };
  
 /**
- * 3D 객체의 위치와 회전을 원점으로 되돌린다.
+ * 3D 객체의 위치값과 회전값을 초기화한다.
  * 
- * @method gb3d.Math.#resetRotationAndPosition
+ * @method gb3d.Math.resetRotationAndPosition
  * @param {THREE.Object3D}
  *            object - 원점으로 되돌릴 3D 객체
  */

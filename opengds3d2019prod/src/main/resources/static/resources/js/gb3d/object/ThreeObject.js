@@ -11,13 +11,13 @@ if (!gb3d.object)
  * @classdesc ThreeObject 객체를 정의한다.
  * 
  * @class gb3d.object.ThreeObject
- * @memberof gb3d
+ * @memberof gb3d.object
  * @param {Object}
  *            obj - 생성자 옵션을 담은 객체
  * @param {THREE.Object3D}
- *            object - Three Object3D 객체
+ *            obj.object - Three Object3D 객체
  * @param {Array.
- *            <Number>} center - 모델의 위치점
+ *            <Number>} obj.center - 모델의 위치점
  * @author SOYIJUN
  */
 gb3d.object.ThreeObject = function(obj) {

@@ -552,6 +552,18 @@ gb3d.io.ImporterThree.axisAngle = function(degree, axis) {
 	}
 }
 
+/**
+ * 객체의 모든 Vertex에 Axis Angle 값을 적용한다.
+ * 
+ * @method gb3d.io.ImporterThree.applyAxisAngleToAllMesh
+ * @function
+ * @param {THREE.Object3D|THREE.Group}
+ *            obj - 객체
+ * @param {String}
+ *            axis - 객체를 회전시킬 축의 이름("X", "Y", "Z")
+ * @param {number}
+ *            radian - 객체를 회전시킬 radian값
+ */
 gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 	var object = obj, axis = axis, radian = radian;
 

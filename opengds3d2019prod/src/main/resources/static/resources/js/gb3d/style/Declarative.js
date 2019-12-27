@@ -5,7 +5,15 @@ if ( !gb3d.style )
 	gb3d.style = {};
 
 /**
- * 
+ * @classdesc
+ * Cesium 3D Tileset 선언적 스타일링 관리 객체
+ * @class gb3d.style.Declarative
+ * @memberof gb3d.style
+ * @param {Object} obj - 생성자 옵션
+ * @param {string} [obj.target="body"] - 선언적 스타일링 관리 UI를 생성할 Element ID 또는 Class name
+ * @author KIM HOCHUL
+ * @date 2019. 12. 24
+ * @version 0.01
  */
 gb3d.style.Declarative = function ( obj ) {
 	var that = this;
@@ -70,26 +78,62 @@ gb3d.style.Declarative = function ( obj ) {
 	});
 }
 
+/**
+ * 조건문 삭제 이벤트 발생 시 이벤트 함수 설정
+ * 
+ * @method gb3d.style.Declarative#deleteEvent
+ * @param {requestCallback} callback - callback 함수
+ */
 gb3d.style.Declarative.prototype.deleteEvent = function ( callback ) {
 	$( document ).on( "click", "#" + this.mainId + " a", callback );
 }
 
+/**
+ * 조건문 조건식 변경 이벤트 발생 시 이벤트 함수 설정
+ * 
+ * @method gb3d.style.Declarative#conditionEvent
+ * @param {requestCallback} callback - callback 함수
+ */
 gb3d.style.Declarative.prototype.conditionEvent = function ( callback ) {
 	$( document ).on( "change", "#" + this.mainId + " .gb-declare-item .gb-declare-condition", callback );
 }
 
+/**
+ * 조건문 설정값 입력 이벤트 발생 시 이벤트 함수 설정
+ * 
+ * @method gb3d.style.Declarative#inputValueEvent
+ * @param {requestCallback} callback - callback 함수
+ */
 gb3d.style.Declarative.prototype.inputValueEvent = function ( callback ) {
 	$( document ).on( "keyup", "#" + this.mainId + " .gb-declare-item .gb-declare-value", callback );
 }
 
+/**
+ * 조건문 색상 변경 이벤트 발생 시 이벤트 함수 설정
+ * 
+ * @method gb3d.style.Declarative#inputColorEvent
+ * @param {requestCallback} callback - callback 함수
+ */
 gb3d.style.Declarative.prototype.inputColorEvent = function ( callback ) {
 	$( document ).on( "change", "#" + this.mainId + " .gb-declare-item .gb-declare-color", callback );
 }
 
+/**
+ * 조건문 체크박스 선택 이벤트 발생 시 이벤트 함수 설정
+ * 
+ * @method gb3d.style.Declarative#checkEvent
+ * @param {requestCallback} callback - callback 함수
+ */
 gb3d.style.Declarative.prototype.checkEvent = function ( callback ) {
 	$( document ).on( "change", "#" + this.mainId + " .gb-declare-item input:checkbox", callback );
 }
 
+/**
+ * 새로운 Tileset 패널을 생성한다.
+ * 
+ * @method gb3d.style.Declarative#addTilesPanel
+ * @param {gb3d.object.Tileset} tileset - Tileset 객체
+ */
 gb3d.style.Declarative.prototype.addTilesPanel = function ( tileset ) {
 	var t = tileset;
 	if( t instanceof gb3d.object.Tileset ) {

@@ -9,16 +9,10 @@ if (!gb3d.edit)
  * Cesium 3D Tileset 관리자
  * @class gb3d.edit.TilesetManager
  * @memberof gb3d.edit
- * @param {Object}
- *            obj - 생성자 옵션
- * @param {boolean} [isDisplay=false] - 객체 생성 후 바로 가시화 여부
- * @param {string} [toggleClass="header-toggle-btn"] - toggle button 요소 Class 이름. 해당 button 요소에 edit tool toggle 기능 추가
- * @param {string} targetElement - Edit tool bar를 생성할 div id 또는 class name
- * @param {Array.<Object>} [list] - Edit tool bar에 생성할 메뉴
- * @param {string} list[].content - 메뉴 이름
- * @param {string} list[].icon - 메뉴 아이콘 {@link https://fontawesome.com/}
- * @param {string} list[].color - 메뉴 색상
- * @param {string} [obj.locale="en"] - 언어 코드
+ * @param {Object} obj - 생성자 옵션
+ * @param {gb3d.Map} obj.map - {@link gb3d.Map}
+ * @param {gb3d.tree.OpenLayers} obj.clientTree - {@link gb3d.tree.OpenLayers}
+ * @param {string} [obj.element="#attrDeclare"] - TilesetManager Panel을 생성할 HTML Element ID
  * @author KIM HOCHUL
  * @date 2019. 12. 24
  * @version 0.01
@@ -35,17 +29,43 @@ gb3d.edit.TilesetManager = function(obj) {
 
 	this.viewer = this.map.getCesiumViewer();
 
+	/**
+	 * Tileset Manager UI
+	 * @type {gb3d.style.Declarative}
+	 * @private
+	 */
 	this.tilesetUI = new gb3d.style.Declarative({
 		element : this.element
 	});
 
+	/**
+	 * Tileset List
+	 * @type {Array.<gb3d.object.Tileset>}
+	 * @private
+	 */
 	this.tilesetList = [];
 }
 
+/**
+ * Tileset List에 Tileset 객체 추가
+ * 
+ * @method gb3d.edit.TilesetManager#pushTilesetList
+ * @function
+ * @param {gb3d.object.Tileset} tilesetVO - {@link gb3d.object.Tileset}
+ */
 gb3d.edit.TilesetManager.prototype.pushTilesetList = function(tilesetVO) {
 	this.tilesetList.push(tilesetVO);
 }
 
+/**
+ * Tileset manager UI 변경사항대로 Tileset 객체 style을 갱신한다.
+ * 
+ * @method gb3d.edit.TilesetManager#update3DTilesetStyle
+ * @function
+ * @param {string} element - Tileset manager UI Element ID or Class name
+ * @param {Cesuim.Cesium3DTileset} tileset - Cesium 3D Tileset 객체
+ * @param {string} del - 조건식 삭제 여부
+ */
 gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tileset, del) {
 	if ($(element).hasClass("gb3d-declare-row-add")) {
 		return;
@@ -146,6 +166,14 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tile
 	tileset.style = new Cesium.Cesium3DTileStyle(styleObj);
 }
 
+/**
+ * Tileset 객체를 맵에 추가한다.
+ * 
+ * @method gb3d.edit.TilesetManager#addTileset
+ * @function
+ * @param {string} url - Tileset 파일 경로
+ * @param {string} layerid - Openlayers layer ID
+ */
 gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	var that = this;
 	var url = url;
@@ -199,6 +227,13 @@ gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	});
 }
 
+/**
+ * jstree 객체를 반환한다.
+ * 
+ * @method gb3d.edit.TilesetManager#getClientTree
+ * @function
+ * @return {gb3d.tree.OpenLayers}
+ */
 gb3d.edit.TilesetManager.prototype.getClientTree = function() {
 	return this.clientTree;
 }
