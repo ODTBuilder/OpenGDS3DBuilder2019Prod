@@ -791,41 +791,41 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 	var callback2 = function() {
 		modal.close();
 
-		// $.ajax({
-		// url : url,
-		// method : "POST",
-		// data : JSON.stringify(params),
-		// contentType : "application/json; charset=UTF-8",
-		// beforeSend : function() {
-		// $("body").css("cursor", "wait");
-		// modal.showSpinner(true);
-		// },
-		// complete : function() {
-		// $("body").css("cursor", "auto");
-		// modal.showSpinner(false);
-		// },
-		// success : function(data, textStatus, jqXHR) {
-		// console.log(data);
-		// modal.close();
-		// var success = data.succ;
-		// var path = data.path;
-		// if (success) {
-		var path = "http://localhost:8888/guest/upload/20191223_150915/3dtiles/tileset.json";
-		that.getTilesetManager().addTileset(path, layerid);
-		// }
-		// }
-		// }).fail(function(xhr, status, errorThrown) {
-		// modal.showSpinner(false);
-		// $("body").css("cursor", "auto");
-		// if (xhr.responseJSON) {
-		// if (xhr.responseJSON.status) {
-		// that.errorModal(xhr.responseJSON.status);
-		// }
-		// } else {
-		// that.messageModal(that.translation["err"][that.locale], xhr.status +
-		// " " + xhr.statusText);
-		// }
-		// });
+		$.ajax({
+			url : url,
+			method : "POST",
+			data : JSON.stringify(params),
+			contentType : "application/json; charset=UTF-8",
+			beforeSend : function() {
+				$("body").css("cursor", "wait");
+				modal.showSpinner(true);
+			},
+			complete : function() {
+				$("body").css("cursor", "auto");
+				modal.showSpinner(false);
+			},
+			success : function(data, textStatus, jqXHR) {
+				console.log(data);
+				modal.close();
+				var success = data.succ;
+				var path = data.path;
+				if (success) {
+					// var path =
+					// "http://localhost:8888/guest/upload/20191223_150915/3dtiles/tileset.json";
+					that.getTilesetManager().addTileset(path, layerid);
+				}
+			}
+		}).fail(function(xhr, status, errorThrown) {
+			modal.showSpinner(false);
+			$("body").css("cursor", "auto");
+			if (xhr.responseJSON) {
+				if (xhr.responseJSON.status) {
+					that.errorModal(xhr.responseJSON.status);
+				}
+			} else {
+				that.messageModal(that.translation["err"][that.locale], xhr.status + " " + xhr.statusText);
+			}
+		});
 	};
 
 	// 2d============
