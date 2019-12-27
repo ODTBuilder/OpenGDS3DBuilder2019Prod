@@ -5,13 +5,15 @@ if (!gb3d.tree)
 	gb3d.tree = {};
 
 /**
- * @classdesc
- * Cesium 3D Tileset 선언적 스타일링 관리 객체
+ * @classdesc Cesium 3D Tileset 선언적 스타일링 관리 객체
  * @class gb3d.tree.Three
  * @memberof gb3d.tree
- * @param {Object} obj - 생성자 옵션
- * @param {string} [obj.target="body"] - UI를 생성할 Element ID 또는 Class name
- * @param {gb3d.Map} obj.map - {@link gb3d.Map}
+ * @param {Object}
+ *            obj - 생성자 옵션
+ * @param {string}
+ *            [obj.target="body"] - UI를 생성할 Element ID 또는 Class name
+ * @param {gb3d.Map}
+ *            obj.map - {@link gb3d.Map}
  * @author KIM HOCHUL
  * @date 2019. 12. 24
  * @version 0.01
@@ -445,110 +447,110 @@ gb3d.tree.Three = function(obj) {
 					}
 				}
 				
-//				var lookAtObj = {
-//					"separator_before" : false,
-//					"icon" : "fas fa-ruler-combined",
-//					"separator_after" : false,
-//					"label" : "수평맞추기",
-//					"action" : function(data){
-//						var inst = $.jstree.reference(data.reference),
-//							obj = inst.get_node(data.reference),
-//							type = obj.type,
-//							id = obj.id;
+// var lookAtObj = {
+// "separator_before" : false,
+// "icon" : "fas fa-ruler-combined",
+// "separator_after" : false,
+// "label" : "수평맞추기",
+// "action" : function(data){
+// var inst = $.jstree.reference(data.reference),
+// obj = inst.get_node(data.reference),
+// type = obj.type,
+// id = obj.id;
 //						
-//						var child, threeObject, object, center, centerHigh;
-//						if(type === "Three"){
-//							threeObject = that.map.getThreeObjectByUuid( id );
-//							if(!threeObject){
-//								return;
-//							}
-//							object = threeObject.getObject();
-//							center = threeObject.getCenter();
-//							centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+// var child, threeObject, object, center, centerHigh;
+// if(type === "Three"){
+// threeObject = that.map.getThreeObjectByUuid( id );
+// if(!threeObject){
+// return;
+// }
+// object = threeObject.getObject();
+// center = threeObject.getCenter();
+// centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 //							
-//							// Three Object 지구 평면에 맞게 회전
-//							object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+// // Three Object 지구 평면에 맞게 회전
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 //							
-//							if (threeObject.getIsFromFile()) {
-//								var axisy1 = turf.point([ 90, 0 ]);
-//								var pickPoint = turf.point(center);
-//								var bearing = bearing = turf.bearing(pickPoint, axisy1);
-//								console.log("y축 1과 객체 중점의 각도는: " + bearing);
-//								object.rotateZ(Cesium.Math.toRadians(bearing));
-//							}
-//						} else {
-//							for(var i in obj.children){
-//								child = inst.get_node(obj.children[i]);
-//								threeObject = that.map.getThreeObjectByUuid( child.id );
-//								if(!threeObject){
-//									continue;
-//								}
+// if (threeObject.getIsFromFile()) {
+// var axisy1 = turf.point([ 90, 0 ]);
+// var pickPoint = turf.point(center);
+// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+// console.log("y축 1과 객체 중점의 각도는: " + bearing);
+// object.rotateZ(Cesium.Math.toRadians(bearing));
+// }
+// } else {
+// for(var i in obj.children){
+// child = inst.get_node(obj.children[i]);
+// threeObject = that.map.getThreeObjectByUuid( child.id );
+// if(!threeObject){
+// continue;
+// }
 //								
-//								object = threeObject.getObject();
-//								center = threeObject.getCenter();
-//								centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+// object = threeObject.getObject();
+// center = threeObject.getCenter();
+// centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 //								
-//								// Three Object 지구 평면에 맞게 회전
-//								object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+// // Three Object 지구 평면에 맞게 회전
+// object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 //								
-//								if (threeObject.getIsFromFile()) {
-//									var axisy1 = turf.point([ 90, 0 ]);
-//									var pickPoint = turf.point(center);
-//									var bearing = bearing = turf.bearing(pickPoint, axisy1);
-//									console.log("y축 1과 객체 중점의 각도는: " + bearing);
-//									object.rotateZ(Cesium.Math.toRadians(bearing));
-//								}
-//							}
-//						}
-//					}
-//				}
+// if (threeObject.getIsFromFile()) {
+// var axisy1 = turf.point([ 90, 0 ]);
+// var pickPoint = turf.point(center);
+// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+// console.log("y축 1과 객체 중점의 각도는: " + bearing);
+// object.rotateZ(Cesium.Math.toRadians(bearing));
+// }
+// }
+// }
+// }
+// }
 				
-//				var quaternionObj = {
-//					"separator_before" : false,
-//					"icon" : "fas fa-grip-lines-vertical",
-//					"separator_after" : false,
-//					"label" : "축맞추기",
-//					"action": function(data){
-//						var inst = $.jstree.reference(data.reference),
-//							obj = inst.get_node(data.reference),
-//							type = obj.type,
-//							id = obj.id;
+// var quaternionObj = {
+// "separator_before" : false,
+// "icon" : "fas fa-grip-lines-vertical",
+// "separator_after" : false,
+// "label" : "축맞추기",
+// "action": function(data){
+// var inst = $.jstree.reference(data.reference),
+// obj = inst.get_node(data.reference),
+// type = obj.type,
+// id = obj.id;
 //						
-//						var child, threeObject, object, center, centerHigh, quaternion, vertices;
-//						if(type === "Three"){
-//							threeObject = that.map.getThreeObjectByUuid( id );
-//							if(!threeObject){
-//								return;
-//							}
+// var child, threeObject, object, center, centerHigh, quaternion, vertices;
+// if(type === "Three"){
+// threeObject = that.map.getThreeObjectByUuid( id );
+// if(!threeObject){
+// return;
+// }
 //							
-//							object = threeObject.getObject();
-//							center = threeObject.getCenter();
-//							centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+// object = threeObject.getObject();
+// center = threeObject.getCenter();
+// centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 //							
-//							applyQuaternion( object, centerHigh, object.quaternion.clone() );
-//						} else {
-//							for(var i in obj.children){
-//								child = inst.get_node(obj.children[i]);
-//								threeObject = that.map.getThreeObjectByUuid( child.id );
-//								if(!threeObject){
-//									continue;
-//								}
+// applyQuaternion( object, centerHigh, object.quaternion.clone() );
+// } else {
+// for(var i in obj.children){
+// child = inst.get_node(obj.children[i]);
+// threeObject = that.map.getThreeObjectByUuid( child.id );
+// if(!threeObject){
+// continue;
+// }
 //								
-//								object = threeObject.getObject();
-//								center = threeObject.getCenter();
-//								centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+// object = threeObject.getObject();
+// center = threeObject.getCenter();
+// centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
 //								
-//								applyQuaternion( object, centerHigh, object.quaternion.clone() );
-//							}
-//						}
-//					}
-//				}
+// applyQuaternion( object, centerHigh, object.quaternion.clone() );
+// }
+// }
+// }
+// }
 				
 				if(o.type === "Point" || o.type === "MultiPoint" || o.type === "LineString" ||
 						o.type === "MultiLineString" || o.type === "Polygon" || o.type === "MultiPolygon" || o.type === "Three"){
 					totalObj["export"] = exportObj;
-//					totalObj["lookat"] = lookAtObj;
-//					totalObj["quaternion"] = quaternionObj;
+// totalObj["lookat"] = lookAtObj;
+// totalObj["quaternion"] = quaternionObj;
 				}
 				
 				return totalObj;

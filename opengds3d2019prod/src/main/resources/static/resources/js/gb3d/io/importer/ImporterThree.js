@@ -442,8 +442,8 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var zaxis = new THREE.Vector3(0, 0, 1);
 		that.object.rotateZ(Cesium.Math.toRadians(bearing));
 
-//		that.gb3dMap.getThreeScene().add(that.object);
-//		that.gb3dMap.addThreeObject(obj3d);
+		// that.gb3dMap.getThreeScene().add(that.object);
+		// that.gb3dMap.addThreeObject(obj3d);
 		// === 이준 끝 ===
 
 		var treeid = layer.get("treeid");
@@ -651,6 +651,16 @@ gb3d.io.ImporterThree.isGLTF1 = function(contents) {
 	return (json.asset != undefined && json.asset.version[0] < 2);
 }
 
+/**
+ * THREE.Group 객체의 요소들중에 Mesh 객체를 반환한다.
+ * 
+ * @method gb3d.io.ImporterThree#getChildrenMeshes
+ * @param {THREE.Group}
+ *            obj - Mesh 객체를 검색할 그룹 객체
+ * @param {Array.
+ *            <THREE.Mesh>} result - 결과를 담을 배열
+ * @return {Array.<THREE.Mesh>} THREE.Mesh객체 배열
+ */
 gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
 	if (obj instanceof THREE.Group) {
 		var chr = obj.children;
@@ -663,6 +673,18 @@ gb3d.io.ImporterThree.getChildrenMeshes = function(obj, result) {
 	return result;
 },
 
+/**
+ * 객체의 평면도를 반환한다.
+ * 
+ * @method gb3d.io.ImporterThree#getFloorPlan
+ * @param {THREE.Object3D}
+ *            obj - 평면도를 만들 객체
+ * @param {Array.
+ *            <Number>} center - 객체의 중점
+ * @param {Array.
+ *            <Object>} result - 결과를 담을 배열
+ * @return {Array.<Object>} 평면도 폴리곤이 담긴 배열
+ */
 gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 	var that = this;
 	var object = obj;
@@ -744,7 +766,15 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 	}
 	return result;
 }
-
+/**
+ * 3D 객체의 평면도를 뽑아서 Dissolve 한다.
+ * 
+ * @method gb3d.io.ImporterThree#refreshFloorPlan
+ * @param {ol.layer.Vector}
+ *            layer - 평면도를 입력할 레이어
+ * @param {THREE.Object3D}
+ *            threeObj - 평면도를 만들 객체
+ */
 gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	var center = threeObj.getCenter();
 	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
