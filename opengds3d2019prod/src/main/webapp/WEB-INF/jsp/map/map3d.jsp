@@ -223,7 +223,6 @@ html, body {
 
 		var gb3dMap = new gb3d.Map({
 			"gbMap" : gbMap,
-			// 			"modelRecord" : mrecord,
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});

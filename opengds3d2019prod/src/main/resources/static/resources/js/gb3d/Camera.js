@@ -229,26 +229,66 @@ if (!gb3d)
  * @memberof gb3d
  * @param {Object}
  *            obj - 생성자 옵션을 담은 객체
- * @param {HTMLElement}
- *            obj.target2d - 지도 영역이 될 Div의 HTMLElement
+ * @param {Cesium.Camera}
+ *            obj.cesiumCamera - 3차원 지도상에서 사용될 Cesium 카메라 객체
+ * @param {THREE.Camera}
+ *            obj.threeCamera - 3차원 지도상에서 사용될 THREE 카메라 객체
+ * @param {ol.Map}
+ *            obj.olMap - 2D 지도 객체
+ * @param {Boolean}
+ *            obj.sync2D - 2D지도와 3D 지도의 뷰 영역 동기화 여부
  * @author SOYIJUN
  */
 gb3d.Camera = function(obj) {
 	var that = this;
 	var options = obj ? obj : {};
-
+	/**
+	 * Cesium 카메라 객체
+	 * 
+	 * @type {Cesium.Camera}
+	 */
 	this.cesiumCamera = options.cesiumCamera instanceof Cesium.Camera ? options.cesiumCamera : undefined;
+	/**
+	 * THREE 카메라 객체
+	 * 
+	 * @type {THREE.Camera}
+	 */
 	this.threeCamera = options.threeCamera instanceof THREE.Camera ? options.threeCamera : undefined;
+	/**
+	 * 2D 지도 객체
+	 * 
+	 * @type {ol.Map}
+	 */
 	this.olMap = options.olMap instanceof ol.Map ? options.olMap : undefined;
+	/**
+	 * 2D지도와 3D 지도의 뷰 영역 동기화 여부
+	 * 
+	 * @type {Boolean}
+	 */
 	this.sync2D = options.sync2D;
+	/**
+	 * 2D, 3D 연동시 최초 수행여부를 저장하는 변수
+	 * 
+	 * @type {Boolean}
+	 */
 	this.firstConst = true;
-	// this.icon = optzions.icon ? options.icon : undefined;
+	// this.icon = options.icon ? options.icon : undefined;
 	// this.sector = options.sector ? options.sector : undefined;
 	if (!this.cesiumCamera || !this.threeCamera || !this.olMap) {
 		console.error("constructor parameter not provided");
 		return;
 	}
+	/**
+	 * 2D 지도의 ol.View 객체
+	 * 
+	 * @type {ol.View}
+	 */
 	this.olView = this.olMap ? this.olMap.getView() : undefined;
+	/**
+	 * 초기화 위치
+	 * 
+	 * @type {Array.<Number>}
+	 */
 	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
 
 	if (this.cesiumCamera !== undefined) {
@@ -276,7 +316,11 @@ gb3d.Camera = function(obj) {
 			}
 		});
 	}
-
+	/**
+	 * 오버레이 위에서도 줌인아웃을 할 수 있도록 휠 줌 인터랙션 객체를 저장하는 변수
+	 * 
+	 * @type {ol.interaction.MouseWheelZoom}
+	 */
 	this.wheelZoomIntr = undefined;
 	var intrs = this.olMap.getInteractions();
 	for (var i = 0; i < intrs.getLength(); i++) {
@@ -286,6 +330,11 @@ gb3d.Camera = function(obj) {
 			break;
 		}
 	}
+	/**
+	 * 카메라 아이콘
+	 * 
+	 * @type {HTMLElement}
+	 */
 	this.icon = $("<img>")
 			.attr(
 					{
@@ -297,7 +346,11 @@ gb3d.Camera = function(obj) {
 				"cursor" : "move",
 				"opacity" : 0.6
 			})[0];
-
+	/**
+	 * 시야각 아이콘
+	 * 
+	 * @type {HTMLElement}
+	 */
 	this.sector = $("<img>")
 			.attr(
 					{
@@ -311,12 +364,20 @@ gb3d.Camera = function(obj) {
 			})[0];
 
 	// this.sector = $("<div>")[0];
-
+	/**
+	 * 카메라 오버레이의 위치
+	 * 
+	 * @type {ol.geom.Point}
+	 */
 	this.camGeom = new ol.geom.Point({
 		"coordinates" : [],
 		"layout" : "XY"
 	});
-
+	/**
+	 * 카메라 아이콘 오버레이
+	 * 
+	 * @type {ol.Overlay}
+	 */
 	this.iconOverlay = new ol.Overlay({
 		position : this.camGeom.getCoordinates(),
 		positioning : 'center-center',
@@ -325,6 +386,11 @@ gb3d.Camera = function(obj) {
 	});
 	this.olMap.addOverlay(this.iconOverlay);
 
+	/**
+	 * 시야각 아이콘 오버레이
+	 * 
+	 * @type {ol.Overlay}
+	 */
 	this.sectOverlay = new ol.Overlay({
 		position : this.camGeom.getCoordinates(),
 		positioning : 'center-center',
@@ -355,6 +421,11 @@ gb3d.Camera = function(obj) {
 	$(this.icon).on('mousewheel DOMMouseScroll', wheelEvt);
 	$(this.sector).on('mousewheel DOMMouseScroll', wheelEvt);
 
+	/**
+	 * 카메라 아이콘 스타일
+	 * 
+	 * @type {ol.style.Style}
+	 */
 	this.camStyle = new ol.style.Style({
 		"image" : new ol.style.Icon({
 			"anchor" : [ 0.5, 0.5 ],
@@ -364,7 +435,11 @@ gb3d.Camera = function(obj) {
 			"size" : [ 64, 64 ]
 		})
 	});
-
+	/**
+	 * 시야각 아이콘 스타일
+	 * 
+	 * @type {ol.style.Style}
+	 */
 	this.sectorStyle = new ol.style.Style({
 		"image" : new ol.style.Icon({
 			"anchor" : [ 0.5, 0.5 ],
@@ -375,23 +450,11 @@ gb3d.Camera = function(obj) {
 			"scale" : 0.2
 		})
 	});
-
-	this.camFeature = new ol.Feature({
-		"geometry" : this.camGeom
-	});
-
-	// this.camFeature.setStyle([this.sectorStyle, this.camStyle]);
-	// this.camFeature.setStyle([this.sectorStyle]);
-
-	this.camSource = new ol.source.Vector({
-		"features" : [ this.camFeature ]
-	});
-	this.camLayer = new ol.layer.Vector({
-		"source" : this.camSource
-	});
-	// this.camLayer.setMap(this.olMap);
-	this.camInteraction;
-
+	/**
+	 * 커서 위치
+	 * 
+	 * @type {Array.<Number>}
+	 */
 	this.cursorCoord = [];
 	this.olMap.on('pointermove', function(evt) {
 		that.cursorCoord = evt.coordinate;
@@ -444,12 +507,36 @@ gb3d.Camera = function(obj) {
 			});
 		}
 	});
-
+	/**
+	 * 카메라 아이콘 위치가 변경되는 중인지 여부
+	 * 
+	 * @type {Boolean}
+	 */
 	this.isCamMoving = false;
+	/**
+	 * 카메라 아이콘을 회전 중인지 여부
+	 * 
+	 * @type {Boolean}
+	 */
 	this.isCamRotating = false;
 
+	/**
+	 * 커서의 이전 위치
+	 * 
+	 * @type {Array.<Number>}
+	 */
 	this.prevCursorCoord = [];
+	/**
+	 * 카메라 아이콘을 드래그 중인지 여부
+	 * 
+	 * @type {Boolean}
+	 */
 	this.isCamDragging = false;
+	/**
+	 * 카메라 아이콘을 클릭 중인지 여부
+	 * 
+	 * @type {Boolean}
+	 */
 	this.isCamDown = false;
 	$(this.icon).mousedown(function() {
 		that.isCamMoving = true;
@@ -590,17 +677,6 @@ gb3d.Camera = function(obj) {
 }
 
 /**
- * three transform controls 객체를 설정한다.
- * 
- * @method gb3d.Map#setThreeObjects
- * @param {Array.
- *            <gb3d.object.ThreeObject>} ThreeObject 배열
- */
-gb3d.Camera.prototype.flyTo = function() {
-
-};
-
-/**
  * cesium 카메라 객체를 반환한다.
  * 
  * @method gb3d.Map#getCesiumCamera
@@ -624,8 +700,7 @@ gb3d.Camera.prototype.getThreeCamera = function() {
  * cesium camera의 2차원 위치를 반환한다.
  * 
  * @method gb3d.Map#getCartographicPosition
- * @param {Array.
- *            <number>} 경위도 좌표
+ * @return {Array. <number>} 경위도 좌표
  */
 gb3d.Camera.prototype.getCartographicPosition = function() {
 	var ccam = this.getCesiumCamera();

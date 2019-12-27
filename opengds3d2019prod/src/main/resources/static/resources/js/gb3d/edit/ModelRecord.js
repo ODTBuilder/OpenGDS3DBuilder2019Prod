@@ -12,6 +12,11 @@
  * @date 2019. 08. 14
  */
 gb3d.edit.ModelRecord = function(obj) {
+	/**
+	 * 다중언어 객체
+	 * 
+	 * @type {Object}
+	 */
 	this.translation = {
 		"cancel" : {
 			"ko" : "취소",
@@ -63,11 +68,30 @@ gb3d.edit.ModelRecord = function(obj) {
 	 */
 	this.removed = {};
 
+	/**
+	 * 표시될 언어 값을 저장한 변수
+	 * 
+	 * @type {String}
+	 */
 	this.locale = obj.locale || "en";
+	/**
+	 * 피처 ID로 사용할 속성명
+	 * 
+	 * @type {String}
+	 */
 	this.id = obj.id ? obj.id : false;
+	/**
+	 * 저장을 요청할 URL
+	 * 
+	 * @type {String}
+	 */
 	this.saveUrl = obj.url ? obj.url : undefined;
 
-	// 편집이력 임시 저장 변수 - 2D만 성공하고 3D 저장에 실패했을때 이 변수에 저장해서 재시도
+	/**
+	 * 편집이력 임시 저장 변수 - 2D만 성공하고 3D 저장에 실패했을때 이 변수에 저장해서 재시도
+	 * 
+	 * @type {Object}
+	 */
 	this.history = undefined;
 };
 
@@ -192,7 +216,7 @@ gb3d.edit.ModelRecord.prototype.isEditing = function(layer) {
 	return result;
 };
 /**
- * 해당 Model가 삭제되었는지 임시보관 목록에서 조회한다.
+ * 해당 Model이 삭제되었는지 임시보관 목록에서 조회한다.
  * 
  * @method gb3d.edit.ModelRecord#isRemoved
  * @function
@@ -455,21 +479,21 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var url = self.getSaveURL();
 	self.history = self.getStructureToOBJ();
 	console.log(self.history);
-	// $.ajax({
-	// type: "POST",
-	// url: url,
-	// data: JSON.stringify(self.history),
-	// contentType: 'application/json; charset=utf-8',
-	// success: function(data) {
-	// console.log(data);
-	// self.history = undefined;
-	// },
-	// error: function(e) {
-	// var errorMsg = e? (e.status + ' ' + e.statusText) : "";
-	// console.log(errorMsg);
-	// self.retryModal(self);
-	// }
-	// });
+	$.ajax({
+		type : "POST",
+		url : url,
+		data : JSON.stringify(self.history),
+		contentType : 'application/json; charset=utf-8',
+		success : function(data) {
+			console.log(data);
+			self.history = undefined;
+		},
+		error : function(e) {
+			var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
+			console.log(errorMsg);
+			self.retryModal(self);
+		}
+	});
 }
 /**
  * 모든 변경사항 목록이 비어있다면 로딩창과 gb.edit.EditingTool 창을 닫는다.
@@ -754,7 +778,7 @@ gb3d.edit.ModelRecord.prototype.errorModal = function(code) {
 };
 
 /**
- * 오류 메시지 창을 생성한다.
+ * 메시지 창을 생성한다.
  * 
  * @method gb3d.edit.ModelRecord#messageModal
  * @param {string}
