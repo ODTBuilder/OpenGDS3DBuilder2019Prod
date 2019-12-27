@@ -4,15 +4,14 @@
 var gb3d;
 if (!gb3d)
 	gb3d = {};
+
 /**
- * @classdesc Map 객체를 정의한다.
- * 
+ * @classdesc Map 객체를 정의한다. Cesium 과 ThreeJS 라이브러리를 통합하여 가시화한다.
  * @class gb3d.Map
  * @memberof gb3d
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
- * @param {HTMLElement}
- *            obj.target2d - 지도 영역이 될 Div의 HTMLElement
+ * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {gb.Map} gbMap - 2D Map 객체
+ * @param {gb3d.edit.ModelRecord} modelRecord - 3D 객체 변경이력 관리 객체
  * @author SOYIJUN
  */
 gb3d.Map = function(obj) {
@@ -66,7 +65,8 @@ gb3d.Map = function(obj) {
 		console.error("target must be div element");
 		return;
 	}
-	// cesium 선언
+	
+	// cesium viewer 선언
 	this.cesiumViewer = new Cesium.Viewer(this.cesiumElem, {
 //		useDefaultRenderLoop : false,
 		scene3DOnly: true,
@@ -963,6 +963,13 @@ gb3d.Map.prototype.addThreeObject = function(object){
 //return obj3d;
 //}
 
+/**
+ * Feature id로 Three Object 객체를 검색 및 반환
+ * 
+ * @method gb3d.Map#getThreeObjectById
+ * @param {string} id - Feature ID
+ * @return {gb3d.object.ThreeObject}
+ */
 gb3d.Map.prototype.getThreeObjectById = function(id){
 	var threeObject = undefined,
 	featureId = id;
@@ -976,6 +983,13 @@ gb3d.Map.prototype.getThreeObjectById = function(id){
 	return threeObject;
 }
 
+/**
+ * Three Object id로 Three Object 객체를 검색 및 반환
+ * 
+ * @method gb3d.Map#getThreeObjectByUuid
+ * @param {string} id - Three Object ID
+ * @return {gb3d.object.ThreeObject}
+ */
 gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 	var threeObject = undefined,
 	uuid = id;
@@ -1019,12 +1033,11 @@ gb3d.Map.prototype.getThreeObjectByUuid = function(id){
 /**
  * Object를 삭제한다.
  * 
- * @method gb3d.Map#removeObject
+ * @method gb3d.Map#removeThreeObject
  * @param {THREE.Object3D |
  *            String} object - ThreeObject 객체 또는 uuid
  * @param {Boolean}
- *            bool - true 설정 시 remove 취소. 기본 false
- * @function
+ *            [cancel=false] - true 설정 시 remove 취소. 기본 false
  */
 gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
 	var threeObject = undefined;
@@ -1590,7 +1603,7 @@ gb3d.Map.prototype.removeThreeObject = function( object, cancel ) {
 //};
 
 /**
- * Object 생성을 위한 사전작업 수행 함수. Feature 정보를 저장하고 Feature type에 따른 모달을 생성한다.
+ * Add Tileset
  * 
  * @method gb3d.Map#addTileset
  * @param {gb3d.object.Tileset}
@@ -1647,7 +1660,7 @@ gb3d.Map.prototype.getTileset = function(){
 /**
  * 타일셋 객체 묶음을 반환한다.
  * 
- * @method gb3d.Map#getTileset
+ * @method gb3d.Map#getTilesetByLayer
  * @param {String}
  *            lid - 레이어 id
  * @return {Array.<gb3d.object.Tileset>} 타일셋 객체 묶음
