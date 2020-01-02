@@ -260,7 +260,7 @@ html, body {
 			"map" : gb3dMap,
 			"editingTool3D" : function() {
 				return epan3d;
-			},
+			}
 		});
 
 		var mrecord = new gb3d.edit.ModelRecord({
@@ -305,7 +305,7 @@ html, body {
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
-// 				tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayer");
+		// 				tilesetManager.addTileset("${pageContext.request.contextPath}/resources/testtileset/TilesetWithTreeBillboards/tileset.json", "testLayer");
 		/* var tiles = new gb3d.object.Tileset({
 			"layer" : "testLayer",
 			"tileId" : "testLayerTile1",
@@ -379,7 +379,15 @@ html, body {
 			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			editingTool2D : function() {
 				return epan;
+			},
+			texture : {
+				"building" : "${pageContext.request.contextPath}/resources/img/texture/building.jpg",
+				"road" : "${pageContext.request.contextPath}/resources/img/texture/road.jpg"
 			}
+		// 			texture : {
+		// 				"building" : "${pageContext.request.contextPath}/geoserver/textureImages.ajax?${_csrf.parameterName}=${_csrf.token}&type=building",
+		// 				"road" : "${pageContext.request.contextPath}/geoserver/textureImages.ajax?${_csrf.parameterName}=${_csrf.token}&type=road"
+		// 			}
 		});
 
 		// EditTool 활성화

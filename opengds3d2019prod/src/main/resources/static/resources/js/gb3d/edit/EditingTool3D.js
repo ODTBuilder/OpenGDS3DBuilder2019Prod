@@ -16,6 +16,9 @@ if (!gb3d.edit)
  * @param {gb3d.tree.OpenLayers} obj.otree - 레이어 관리 jstree 객체
  * @param {string} obj.getFeatureURL - Feature 객체 요청 url
  * @param {string} [obj.locale="en"] - 언어 코드
+ * @param {string} texture - 텍스터 이미지 요청 주소
+ * @param {string} texture.building - 빌딩의 텍스처 이미지 주소
+ * @param {string} texture.road - 도로의 텍스처 이미지 주소
  * @author KIM HOCHUL
  * @date 2019. 12. 24
  * @version 0.01
@@ -93,6 +96,22 @@ gb3d.edit.EditingTool3D = function(obj) {
 			"requiredOption" : {
 				"ko" : "은 필수 입력항목입니다.",
 				"en" : "is a required field."
+			},
+			"threedobjattr" : {
+				"ko" : "3D 객체 속성",
+				"en" : "3D Object Attribute"
+			},
+			"notset" : {
+				"ko" : "없음",
+				"en" : "Not set"
+			},
+			"building" : {
+				"ko" : "빌딩",
+				"en" : "Building"
+			},
+			"road" : {
+				"ko" : "도로",
+				"en" : "Road"
 			}
 		};
 	
@@ -145,6 +164,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.treeElement = this.otree ? this.otree.getJSTreeElement() : undefined;
 	
 	this.getFeatureURL = obj.getFeatureURL ? obj.getFeatureURL : undefined;
+	
+	this.texture = obj.texture ? obj.texture : undefined;
 	
 	// 드래그 시작, 끝 위치
 	this.dragStart = undefined;
@@ -211,7 +232,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var modalFooter = $("<div>").append(buttonArea);
 	
 	this.point3DModal = new gb.modal.ModalBase({
-		"title" : "3D Object Attribute",
+		"title" : this.translation.threedobjattr[this.locale],
 		"width" : 540,
 		"autoOpen" : false,
 		"body" : body,
@@ -266,7 +287,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var row4 = $("<div>").addClass("gb-object-row").attr("data-val", "depth").append(depthSpan).append(depthInput);
 	
 	var textureSpan = $("<span>").addClass("Text").text("Texture");
-	var textureInput = $("<input>").addClass("form-control");
+	var textureInput = $("<select>").addClass("form-control");
+	var texture1 = $("<option>").attr({
+		"value" : "notset"
+	}).text(this.translation.notset[this.locale]);
+	var texture2 = $("<option>").attr({
+		"value" : "road"
+	}).text(this.translation.road[this.locale]);
+	$(textureInput).append(texture1).append(texture2);
 	var row5 = $("<div>").addClass("gb-object-row").attr("data-val", "texture").append(textureSpan).append(textureInput);
 	
 	var content = $("<div>").addClass("type-content").append(row2).append(row4).append(row5);
@@ -287,7 +315,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var modalFooter = $("<div>").append(buttonArea);
 	
 	this.line3DModal = new gb.modal.ModalBase({
-		"title" : "3D Object Attribute",
+		"title" : this.translation.threedobjattr[this.locale],
 		"width" : 540,
 		"autoOpen" : false,
 		"body" : body,
@@ -327,9 +355,16 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var row4 = $("<div>").addClass("gb-object-row").attr("data-val", "depth").append(depthSpan).append(depthInput);
 	
 	var textureSpan = $("<span>").addClass("Text").text("Texture");
-	var textureInput = $("<input>").addClass("form-control");
+	var textureInput = $("<select>").addClass("form-control");
+	var texture1 = $("<option>").attr({
+		"value" : "notset"
+	}).text(this.translation.notset[this.locale]);
+	var texture2 = $("<option>").attr({
+		"value" : "building"
+	}).text(this.translation.building[this.locale]);
+	$(textureInput).append(texture1).append(texture2);
 	var row5 = $("<div>").addClass("gb-object-row").attr("data-val", "texture").append(textureSpan).append(textureInput);
-	
+
 	var content = $("<div>").addClass("type-content").append(row4).append(row5);
 	
 	var body = $("<div>").append(content);
@@ -348,7 +383,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	var modalFooter = $("<div>").append(buttonArea);
 	
 	this.polygon3DModal = new gb.modal.ModalBase({
-		"title" : "3D Object Attribute",
+		"title" : this.translation.threedobjattr[this.locale],
 		"width" : 540,
 		"autoOpen" : false,
 		"body" : body,
@@ -1508,6 +1543,7 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
  * @param {Array.<number>} extent - minX, minY, maxX, maxY
  * @param {Object} option - 3차원 객체 생성 옵션
  * @param {string} option.depth - 높이
+ * @param {string} option.texture - 텍스처 타입
  */
 gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, option) {
 	var that = this;
@@ -1521,19 +1557,29 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	} else {
 		return;
 	}
-
+	
 	geometry = new THREE.Geometry();
 	// 이준 시작
 	gb3d.Math.createUVVerticeOnPolygon(geometry, result);
+	
+	console.log(option.texture);
+	var texture;
+	if (option.texture !== "notset") {
+		if(that.texture.hasOwnProperty(option.texture)){
+			var txturl = that.texture[option.texture];
+			texture = new THREE.TextureLoader().load(txturl);
+		}
+	}
 	// 이준 끝
 	// var bgeometry = new THREE.BufferGeometry();
 	// bgeometry.fromGeometry(geometry);
 	// console.log(bgeometry);
-	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.FrontSide
+	var frontSideMaterial = new THREE.MeshStandardMaterial({
+		side : THREE.FrontSide,
+		map : texture
 	});
 
-	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
+	var latheMesh = new THREE.Mesh(geometry, frontSideMaterial);
 	latheMesh.position.copy(centerCart);
 	console.log(latheMesh.quaternion);
 	// 원점을 바라보도록 설정한다
@@ -1615,13 +1661,24 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 
 	// 이준 시작
 	gb3d.Math.createUVVerticeOnLineString(geometry, result);
+	
+	console.log(option.texture);
+	var texture;
+	if (option.texture !== "notset") {
+		if(that.texture.hasOwnProperty(option.texture)){
+			var txturl = that.texture[option.texture];
+			texture = new THREE.TextureLoader().load(txturl);
+		}
+	}
+	
 	// 이준 끝
 
-	var doubleSideMaterial = new THREE.MeshStandardMaterial({
-		side : THREE.FrontSide
+	var frontSideMaterial = new THREE.MeshStandardMaterial({
+		side : THREE.FrontSide,
+		map : texture
 	});
 
-	var latheMesh = new THREE.Mesh(geometry, doubleSideMaterial);
+	var latheMesh = new THREE.Mesh(geometry, frontSideMaterial);
 	// latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	// 원점을 바라보도록 설정한다
