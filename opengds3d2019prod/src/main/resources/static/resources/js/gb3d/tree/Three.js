@@ -639,8 +639,8 @@ gb3d.tree.Three = function(obj) {
 		}
 		
 		if(selected.length !== 0){
-			that.getEditingTool3D().selectThree(selected[0]);
-			that.getEditingTool3D().syncSelect(selected[0]);
+			that.getEditingTool3D().selectThree(selected[0], true);
+			that.getEditingTool3D().syncSelect(selected[0], true);
 		}
 	});
 	

@@ -302,6 +302,7 @@ html, body {
 			map : gb3dMap,
 			clientTree : otree
 		});
+		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instancedmodel/tileset.json", "testLayer" );
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batchedbuildings_1/tileset.json", "testLayerTile2", "testLayer" );
@@ -381,8 +382,8 @@ html, body {
 				return epan;
 			},
 			texture : {
-				"building" : "${pageContext.request.contextPath}/resources/img/texture/building.jpg",
-				"road" : "${pageContext.request.contextPath}/resources/img/texture/road.jpg"
+				"building" : "${pageContext.request.contextPath}/resources/img/texture/buildings/building1.jpg",
+				"road" : "${pageContext.request.contextPath}/resources/img/texture/roads/road.jpg"
 			}
 		// 			texture : {
 		// 				"building" : "${pageContext.request.contextPath}/geoserver/textureImages.ajax?${_csrf.parameterName}=${_csrf.token}&type=building",

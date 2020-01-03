@@ -374,60 +374,61 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 
-		var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
-		var features = turf.featureCollection(floor);
-		var dissolved = undefined;
-
-		try {
-			dissolved = turf.dissolve(features);
-		} catch (e) {
-			// TODO: handle exception
-			console.error(e);
-			return;
-		}
-		var fea;
-		if (dissolved) {
-			if (dissolved.type === "FeatureCollection") {
-				fea = [];
-				for (var i = 0; i < dissolved.features.length; i++) {
-					if (dissolved.features[i].geometry.type === 'Polygon') {
-						if (that.layer.get("git").geometry === "Polygon") {
-							var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						}
-					} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-						if (that.layer.get("git").geometry === "Polygon") {
-							var outer = dissolved.features[i].geometry.coordinates;
-							// for (var j = 0; j < 1; j++) {
-							var polygon = outer[0];
-							var geomPoly = new ol.geom.Polygon(polygon, "XY");
-							var feature = new ol.Feature(geomPoly);
-							feature.setId(that.object.uuid);
-							fea.push(feature);
-							obj3d["feature"] = feature;
-							// }
-						} else if (that.layer.get("git").geometry === "MultiPolygon") {
-							var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
-							var feature = new ol.Feature(geom);
-							feature.setId(that.object.uuid);
-							obj3d["feature"] = feature;
-							fea.push(feature);
-						}
-					}
-
-				}
-				source.addFeatures(fea);
-			}
-		}
+		// var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
+		// var features = turf.featureCollection(floor);
+		// var dissolved = undefined;
+		//
+		// try {
+		// dissolved = turf.dissolve(features);
+		// } catch (e) {
+		// // TODO: handle exception
+		// console.error(e);
+		// return;
+		// }
+		// var fea;
+		// if (dissolved) {
+		// if (dissolved.type === "FeatureCollection") {
+		// fea = [];
+		// for (var i = 0; i < dissolved.features.length; i++) {
+		// if (dissolved.features[i].geometry.type === 'Polygon') {
+		// if (that.layer.get("git").geometry === "Polygon") {
+		// var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+		// var feature = new ol.Feature(geom);
+		// feature.setId(that.object.uuid);
+		// obj3d["feature"] = feature;
+		// fea.push(feature);
+		// } else if (that.layer.get("git").geometry === "MultiPolygon") {
+		// var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ],
+		// "XY");
+		// var feature = new ol.Feature(geom);
+		// feature.setId(that.object.uuid);
+		// obj3d["feature"] = feature;
+		// fea.push(feature);
+		// }
+		// } else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+		// if (that.layer.get("git").geometry === "Polygon") {
+		// var outer = dissolved.features[i].geometry.coordinates;
+		// // for (var j = 0; j < 1; j++) {
+		// var polygon = outer[0];
+		// var geomPoly = new ol.geom.Polygon(polygon, "XY");
+		// var feature = new ol.Feature(geomPoly);
+		// feature.setId(that.object.uuid);
+		// fea.push(feature);
+		// obj3d["feature"] = feature;
+		// // }
+		// } else if (that.layer.get("git").geometry === "MultiPolygon") {
+		// var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+		// var feature = new ol.Feature(geom);
+		// feature.setId(that.object.uuid);
+		// obj3d["feature"] = feature;
+		// fea.push(feature);
+		// }
+		// }
+		//
+		// }
+		// source.addFeatures(fea);
+		// }
+		// }
 
 		// === 이준 시작 ===
 		var axisy1 = turf.point([ 90, 0 ]);
@@ -771,8 +772,9 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 		var bboxPolygon = turf.bboxPolygon(bbox);
 		var geom = new ol.geom.Polygon(bboxPolygon.geometry.coordinates, "XY");
 		var feature = new ol.Feature(geom);
-		layer.getSource().addFeature(feature);
+		feature.setId(threeObj.getObject().uuid);
 		threeObj["feature"] = feature;
+		layer.getSource().addFeature(feature);
 		return;
 	}
 	var fea;
