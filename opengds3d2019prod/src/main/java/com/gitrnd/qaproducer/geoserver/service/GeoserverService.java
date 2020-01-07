@@ -18,6 +18,7 @@
 package com.gitrnd.qaproducer.geoserver.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -393,7 +394,8 @@ public interface GeoserverService {
 	 * @param defVal           기본값
 	 * @return
 	 * @throws ParseException
+	 * @throws FileNotFoundException 
 	 */
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
-			String layerName, String user, double defalut) throws ParseException;
+			String layerName, String user, double defalut) throws ParseException, FileNotFoundException;
 }

@@ -31,7 +31,7 @@ public class DownloadService {
 
 	@Value("${gitrnd.apache.port}")
 	private String apachePort;
-	
+
 	public void downloadObj(HttpServletResponse response, String time, String file, String user)
 			throws UnsupportedEncodingException {
 		String encodeName = URLEncoder.encode(file, "UTF-8");

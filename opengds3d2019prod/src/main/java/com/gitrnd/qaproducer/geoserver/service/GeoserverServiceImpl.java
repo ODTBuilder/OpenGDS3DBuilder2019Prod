@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -1176,7 +1178,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, double defalut) throws ParseException {
+			String layerName, String user, double defalut) throws ParseException, FileNotFoundException {
 
 		int puFlag = 500;
 		JSONObject returnJSON = new JSONObject();
@@ -1216,7 +1218,20 @@ public class GeoserverServiceImpl implements GeoserverService {
 						String objPath = basePath + File.separator + "obj";
 						createFileDirectory(objPath);
 
-						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, defalut, objPath);
+						// copy mtl, texture image to obj path
+						// polygon
+						String mtl = "building.mtl";
+						String image = "building.jpg";
+
+						InputStream mtlIs = this.getClass().getResourceAsStream("/textures/" + mtl);
+						OutputStream mtlOs = new FileOutputStream(objPath + File.separator + mtl);
+						fileCopy(mtlIs, mtlOs);
+						InputStream imageIs = this.getClass().getResourceAsStream("/textures/" + image);
+						OutputStream imageOs = new FileOutputStream(objPath + File.separator + image);
+						fileCopy(imageIs, imageOs);
+
+						// shp to obj
+						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, defalut, objPath, mtl);
 						try {
 							shpToObj.exec();
 						} catch (Exception e) {
@@ -1566,7 +1581,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 * @param dest
 	 * @throws IOException void
 	 */
-	private static void FileNio2Copy(String source, String dest) throws IOException {
+	private void FileNio2Copy(String source, String dest) throws IOException {
 		Files.copy(new File(source).toPath(), new File(dest).toPath());
 	}
 
@@ -1601,6 +1616,19 @@ public class GeoserverServiceImpl implements GeoserverService {
 		dir.delete();
 	}
 
+	public void fileCopy(InputStream is, OutputStream os) {
+		try {
+			int data = 0;
+			while ((data = is.read()) != -1) {
+				os.write(data);
+			}
+			is.close();
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
 
 /**

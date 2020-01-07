@@ -1,85 +1,49 @@
 package com.gitrnd.gdsbuilder.parse.impl;
 
-import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.grid.Grids;
-import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.util.NullProgressListener;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
-import org.poly2tri.Poly2Tri;
-import org.poly2tri.geometry.polygon.PolygonPoint;
-import org.poly2tri.triangulation.TriangulationPoint;
-import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
-import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
-import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector2d;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class ShpToObjImpl {
 
 	private double defaultHeight = 5;
-	private static BufferedWriter writer;
-
-	private static double centerX;
-	private static double centerY;
-
-	private static List<Vector3d> vertices;
-	private static List<Vector2d> vCoordinates;
-
 	private String attribute;
 
 	private String outputPath;
 	private File file;
 	private Filter filter;
 
-	private int vIdx;
-	private int vtIdx;
-	private int vnIdx;
-
 	private int objfilenum = 0;
 
 	EnShpToObjHeightType hType = null;
+
+	private String mtl;
+	private String usemtl;
 
 	public int getObjfilenum() {
 		return objfilenum;
@@ -127,6 +91,22 @@ public class ShpToObjImpl {
 
 	public void sethType(EnShpToObjHeightType hType) {
 		this.hType = hType;
+	}
+
+	public String getMtl() {
+		return mtl;
+	}
+
+	public void setMtl(String mtl) {
+		this.mtl = mtl;
+	}
+
+	public String getUsemtl() {
+		return usemtl;
+	}
+
+	public void setUsemtl(String usemtl) {
+		this.usemtl = usemtl;
 	}
 
 	/**
@@ -187,6 +167,38 @@ public class ShpToObjImpl {
 		this.defaultHeight = defVal;
 	}
 
+	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath, String mtl) {
+		hType = EnShpToObjHeightType.DEFAULT;
+		this.file = file;
+		this.filter = filter;
+		this.outputPath = outputPath;
+		this.defaultHeight = defVal;
+		this.mtl = mtl;
+		String usemtl = null;
+		try {
+			// 파일 객체 생성
+			File mtlfile = new File(outputPath + File.separator + mtl);
+			// 입력 스트림 생성
+			FileReader filereader = new FileReader(mtlfile);
+			// 입력 버퍼 생성
+			BufferedReader bufReader = new BufferedReader(filereader);
+			String line = "";
+
+			while ((line = bufReader.readLine()) != null) {
+				if (line.startsWith("newmtl ")) {
+					usemtl = line.replace("newmtl ", "");
+				}
+			}
+			// .readLine()은 끝에 개행문자를 읽지 않는다.
+			bufReader.close();
+		} catch (FileNotFoundException e) {
+			// TODO: handle exception
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		this.usemtl = usemtl;
+	}
+
 	/**
 	 * 높이 컬럼값 지정
 	 * 
@@ -204,6 +216,38 @@ public class ShpToObjImpl {
 		this.attribute = attribute;
 	}
 
+	public ShpToObjImpl(File file, Filter filter, String attribute, String outputPath, String mtl) {
+		hType = EnShpToObjHeightType.FIX;
+		this.file = file;
+		this.filter = filter;
+		this.outputPath = outputPath;
+		this.attribute = attribute;
+		this.mtl = mtl;
+		String usemtl = null;
+		try {
+			// 파일 객체 생성
+			File mtlfile = new File(outputPath + File.separator + mtl);
+			// 입력 스트림 생성
+			FileReader filereader = new FileReader(mtlfile);
+			// 입력 버퍼 생성
+			BufferedReader bufReader = new BufferedReader(filereader);
+			String line = "";
+
+			while ((line = bufReader.readLine()) != null) {
+				if (line.startsWith("newmtl ")) {
+					usemtl = line.replace("newmtl ", "");
+				}
+			}
+			// .readLine()은 끝에 개행문자를 읽지 않는다.
+			bufReader.close();
+		} catch (FileNotFoundException e) {
+			// TODO: handle exception
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		this.usemtl = usemtl;
+	}
+
 	public void exec() throws Exception {
 		FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection = getFeatureCollectionFromFileWithFilter(
 				file, filter);
@@ -211,453 +255,21 @@ public class ShpToObjImpl {
 		SimpleFeatureType featureType = buildingCollection.getSchema();
 		String geomType = featureType.getGeometryDescriptor().getType().getBinding().getName();
 
-		if (!geomType.equals("Polygon") || !geomType.equals("MultiPolygon")) {
-
-			createFileDirectory(this.outputPath);
-			Map<String, Object> sfcMap = new HashMap<>();
-
-			// 높이값 설정
-			double height = 0.0;
-			double maxHeight = 0.0;
+		if (geomType.contains("Polygon") || geomType.contains("MultiPolygon")) {
 			if (this.hType == EnShpToObjHeightType.DEFAULT) {
-				height = defaultHeight;
-				maxHeight = defaultHeight;
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl,
+						defaultHeight, outputPath);
+				polyToObj.parseToObjFile();
+				this.outputPath = polyToObj.getOutputPath();
+				this.objfilenum = polyToObj.getObjfilenum();
+			} else if (this.hType == EnShpToObjHeightType.FIX) {
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, attribute,
+						outputPath);
+				polyToObj.parseToObjFile();
+				this.outputPath = polyToObj.getOutputPath();
+				this.objfilenum = polyToObj.getObjfilenum();
 			}
-
-			// 대용량 처리
-			int totalSize = buildingCollection.size();
-			if (totalSize > 5000) { // tmp
-				// quadtree
-				Quadtree quad = getQuadTree(buildingCollection);
-
-				// get envelops
-				List<Envelope> gridEnvs = new ArrayList<>();
-				ReferencedEnvelope bounds = buildingCollection.getBounds();
-				double h = bounds.getHeight() / 50;
-				if (h == 0) {
-					gridEnvs.add(bounds);
-				} else {
-					SimpleFeatureSource grid = Grids.createSquareGrid(bounds, h);
-					SimpleFeatureIterator gridIter = null;
-					try {
-						gridIter = grid.getFeatures().features();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					while (gridIter.hasNext()) {
-						SimpleFeature sf = gridIter.next();
-						Geometry gridGeom = (Geometry) sf.getDefaultGeometry();
-						gridEnvs.add(gridGeom.getEnvelopeInternal());
-					}
-				}
-
-				// filter
-				FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
-				int defaultS = 150;
-				int tmp = 1;
-				for (Envelope envelope : gridEnvs) {
-					List items = quad.query(envelope);
-					int tmpSize = items.size();
-					SimpleFeatureCollection dfc = new DefaultFeatureCollection();
-					for (int i = 0; i < tmpSize; i++) {
-						SimpleFeature sf = (SimpleFeature) items.get(i);
-						if (sf != null) {
-							((DefaultFeatureCollection) dfc).add(sf);
-						}
-					}
-					Filter intFilter = ff.intersects(ff.property("the_geom"), ff.literal(envelope));
-					dfc = (SimpleFeatureCollection) dfc.subCollection(intFilter);
-
-					int dfcSize = dfc.size();
-					if (dfcSize > 0) {
-						// D:\node\objTo3d-tiles-master\bin\shptoobj\obj\tmp
-						String enPath = this.outputPath + File.separator + tmp;
-						createFileDirectory(enPath);
-						tmp++;
-
-						Quadtree innerQuad = getQuadTree(dfc);
-						List<Object> innerEnvs = new ArrayList<>();// 4등분된 envelop map
-
-						List<Object> envList = new ArrayList<>();
-						envList.add(envelope);
-						envList.add(enPath);
-						innerEnvs.add(envList);
-
-						// folder
-						int halftmp = 1;
-						for (int en = 0; en < innerEnvs.size(); en++) {
-							List<Object> envs = (List<Object>) innerEnvs.get(en);
-							Envelope innerEnv = (Envelope) envs.get(0);
-							if (en == 0) {
-								if (dfcSize < defaultS) {
-									objfilenum++;
-
-									// obj file
-									ReferencedEnvelope reEnv = dfc.getBounds();
-									Coordinate center = reEnv.centre();
-									centerX = center.x;
-									centerY = center.y;
-
-									// batch table file
-									JSONObject batchTable = new JSONObject();
-									// tile propertiles
-									JSONObject tilesPropeties = new JSONObject();
-									try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-											new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
-											"utf-8"))) {
-										ShpToObjImpl.writer = writer;
-
-										vertices = new ArrayList<>();
-										vCoordinates = new ArrayList<>();
-										vIdx = 0;
-										vtIdx = 1;
-										vnIdx = 1;
-
-										// featureId
-										JSONArray batchIdArr = new JSONArray();
-										// properties
-										Collection<PropertyDescriptor> properties = dfc.getSchema().getDescriptors();
-										for (PropertyDescriptor property : properties) {
-											String name = property.getName().toString();
-											String type = property.getType().getBinding().getSimpleName();
-											if (type.equals("Double") || type.equals("Integer")) {
-												batchTable.put(name, new JSONArray());
-											}
-										}
-										FeatureIterator<SimpleFeature> features = dfc.features();
-										while (features.hasNext()) {
-											SimpleFeature feature = features.next();
-											if (this.hType == EnShpToObjHeightType.FIX) {
-												try {
-													height = (double) feature.getAttribute(attribute);
-												} catch (Exception e) {
-													height = defaultHeight;
-												}
-											}
-											if (height > maxHeight) {
-												maxHeight = height;
-											}
-											List<String> idlist = buildingFeatureToObjGroup(feature, height);
-											for (String id : idlist) {
-												// featureId
-												batchIdArr.add(id);
-												// properties
-												Iterator batchIter = batchTable.keySet().iterator();
-												while (batchIter.hasNext()) {
-													String batchKey = (String) batchIter.next();
-													JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-													propertiesArr.add(feature.getAttribute(batchKey));
-													batchTable.put(batchKey, propertiesArr);
-												}
-											}
-										}
-										Iterator batchIter = batchTable.keySet().iterator();
-										while (batchIter.hasNext()) {
-											String batchKey = (String) batchIter.next();
-											JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-											Double max = (Double) Collections.max(propertiesArr);
-											Double min = (Double) Collections.min(propertiesArr);
-											JSONObject minmaxObj = new JSONObject();
-											minmaxObj.put("minimum", min);
-											minmaxObj.put("maximum", max);
-											tilesPropeties.put(batchKey, minmaxObj);
-										}
-										batchTable.put("featureId", batchIdArr);
-									}
-
-									try (FileWriter file = new FileWriter(
-											enPath + File.separator + halftmp + "batch.json")) {
-										file.write(batchTable.toJSONString());
-									}
-
-									// tileset option file
-									double maxX = reEnv.getMaxX(); // east
-									double maxY = reEnv.getMaxY(); // north
-									double minX = reEnv.getMinX(); // west
-									double minY = reEnv.getMinY(); // south
-
-									JSONObject tileOption = new JSONObject();
-									tileOption.put("longitude", Math.toRadians(centerX));
-									tileOption.put("latitude", Math.toRadians(centerY));
-									tileOption.put("west", Math.toRadians(minX));
-									tileOption.put("south", Math.toRadians(minY));
-									tileOption.put("east", Math.toRadians(maxX));
-									tileOption.put("north", Math.toRadians(maxY));
-									tileOption.put("transHeight", 0);
-									tileOption.put("region", true);
-									tileOption.put("box", false);
-									tileOption.put("sphere", false);
-									tileOption.put("gltfUpAxis", "Z");
-									tileOption.put("minHeight", 0);
-									tileOption.put("maxHeight", maxHeight);
-									tileOption.put("properties", tilesPropeties);
-									
-									try (FileWriter file = new FileWriter(
-											enPath + File.separator + halftmp + "tile.json")) {
-										file.write(tileOption.toJSONString());
-									}
-									break;
-								}
-							}
-							List<Envelope> halfEnvels = getGrids(innerEnv, innerEnv.getHeight() / 2);
-							for (Envelope halfEnvel : halfEnvels) {
-								List halfItems = innerQuad.query(halfEnvel);
-								int halfSize = halfItems.size();
-								SimpleFeatureCollection halfSfc = new DefaultFeatureCollection();
-								for (int i = 0; i < halfSize; i++) {
-									SimpleFeature sf = (SimpleFeature) halfItems.get(i);
-									if (sf != null) {
-										((DefaultFeatureCollection) halfSfc).add(sf);
-									}
-								}
-								Filter halfFilter = ff.intersects(ff.property("the_geom"), ff.literal(halfEnvel));
-								halfSfc = (SimpleFeatureCollection) halfSfc.subCollection(halfFilter);
-								int tSize = halfSfc.size();
-								if (tSize > 0) {
-									if (tSize < defaultS) {
-										DefaultFeatureCollection tfc = new DefaultFeatureCollection();
-										SimpleFeatureIterator iter = halfSfc.features();
-										while (iter.hasNext()) {
-											SimpleFeature tsf = (SimpleFeature) iter.next();
-											if (tsf != null) {
-												String id = tsf.getID();
-												if (!sfcMap.containsKey(id)) {
-													tfc.add(tsf);
-													sfcMap.put(id, null);
-												}
-											}
-										}
-										if (tfc.size() > 0) {
-											objfilenum++;
-
-											// obj file
-											ReferencedEnvelope reEnv = halfSfc.getBounds();
-											Coordinate center = reEnv.centre();
-											centerX = center.x;
-											centerY = center.y;
-
-											// batch table file
-											JSONObject batchTable = new JSONObject();
-											// tile propertiles
-											JSONObject tilesPropeties = new JSONObject();
-											try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-													new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
-													"utf-8"))) {
-												ShpToObjImpl.writer = writer;
-
-												vertices = new ArrayList<>();
-												vCoordinates = new ArrayList<>();
-
-												vIdx = 0;
-												vtIdx = 1;
-												vnIdx = 1;
-
-												// featureId
-												JSONArray batchIdArr = new JSONArray();
-												// properties
-												Collection<PropertyDescriptor> properties = tfc.getSchema()
-														.getDescriptors();
-												for (PropertyDescriptor property : properties) {
-													String name = property.getName().toString();
-													String type = property.getType().getBinding().getSimpleName();
-													if (type.equals("Double") || type.equals("Integer")) {
-														batchTable.put(name, new JSONArray());
-													}
-												}
-												FeatureIterator<SimpleFeature> features = tfc.features();
-												while (features.hasNext()) {
-													SimpleFeature feature = features.next();
-													if (this.hType == EnShpToObjHeightType.FIX) {
-														try {
-															height = (double) feature.getAttribute(attribute);
-														} catch (Exception e) {
-															height = defaultHeight;
-														}
-													}
-													if (height > maxHeight) {
-														maxHeight = height;
-													}
-													List<String> idlist = buildingFeatureToObjGroup(feature, height);
-													for (String id : idlist) {
-														// featureId
-														batchIdArr.add(id);
-														// properties
-														Iterator batchIter = batchTable.keySet().iterator();
-														while (batchIter.hasNext()) {
-															String batchKey = (String) batchIter.next();
-															JSONArray propertiesArr = (JSONArray) batchTable
-																	.get(batchKey);
-															propertiesArr.add(feature.getAttribute(batchKey));
-															batchTable.put(batchKey, propertiesArr);
-														}
-													}
-												}
-												Iterator batchIter = batchTable.keySet().iterator();
-												while (batchIter.hasNext()) {
-													String batchKey = (String) batchIter.next();
-													JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-													Double max = (Double) Collections.max(propertiesArr);
-													Double min = (Double) Collections.min(propertiesArr);
-													JSONObject minmaxObj = new JSONObject();
-													minmaxObj.put("minimum", min);
-													minmaxObj.put("maximum", max);
-													tilesPropeties.put(batchKey, minmaxObj);
-												}
-												batchTable.put("featureId", batchIdArr);
-											}
-
-											try (FileWriter file = new FileWriter(
-													enPath + File.separator + halftmp + "batch.json")) {
-												file.write(batchTable.toJSONString());
-											}
-
-											// tileset option file
-											double maxX = reEnv.getMaxX(); // east
-											double maxY = reEnv.getMaxY(); // north
-											double minX = reEnv.getMinX(); // west
-											double minY = reEnv.getMinY(); // south
-
-											JSONObject tileOption = new JSONObject();
-											tileOption.put("longitude", Math.toRadians(centerX));
-											tileOption.put("latitude", Math.toRadians(centerY));
-											tileOption.put("west", Math.toRadians(minX));
-											tileOption.put("south", Math.toRadians(minY));
-											tileOption.put("east", Math.toRadians(maxX));
-											tileOption.put("north", Math.toRadians(maxY));
-											tileOption.put("transHeight", 0);
-											tileOption.put("region", true);
-											tileOption.put("box", false);
-											tileOption.put("sphere", false);
-											tileOption.put("gltfUpAxis", "Z");
-											tileOption.put("minHeight", 0);
-											tileOption.put("maxHeight", maxHeight);
-											tileOption.put("properties", tilesPropeties);
-											
-											try (FileWriter file = new FileWriter(
-													enPath + File.separator + halftmp + "tile.json")) {
-												file.write(tileOption.toJSONString());
-											}
-											halftmp++;
-										}
-									} else {
-										List<Object> halfEnvList = new ArrayList<>();
-										halfEnvList.add(halfEnvel);
-										innerEnvs.add(halfEnvList);
-									}
-								}
-							}
-						}
-					}
-				}
-			} else {
-				objfilenum++;
-
-				// obj file
-				ReferencedEnvelope reEnv = buildingCollection.getBounds();
-				Coordinate center = reEnv.centre();
-				centerX = center.x;
-				centerY = center.y;
-
-				// batch table file
-				JSONObject batchTable = new JSONObject();
-				// tile propertiles
-				JSONObject tilesPropeties = new JSONObject();
-				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream(outputPath + File.separator + 1 + ".obj"), "utf-8"))) {
-					ShpToObjImpl.writer = writer;
-					writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
-					ShpToObjImpl.writer = writer;
-
-					vertices = new ArrayList<>();
-					vCoordinates = new ArrayList<>();
-					vIdx = 0;
-					vtIdx = 1;
-					vnIdx = 1;
-
-					// featureId
-					JSONArray batchIdArr = new JSONArray();
-					// properties
-					Collection<PropertyDescriptor> properties = buildingCollection.getSchema().getDescriptors();
-					for (PropertyDescriptor property : properties) {
-						String name = property.getName().toString();
-						String type = property.getType().getBinding().getSimpleName();
-						if (type.equals("Double") || type.equals("Integer")) {
-							batchTable.put(name, new JSONArray());
-						}
-					}
-					FeatureIterator<SimpleFeature> features = buildingCollection.features();
-					while (features.hasNext()) {
-						SimpleFeature feature = features.next();
-						if (this.hType == EnShpToObjHeightType.FIX) {
-							try {
-								height = (double) feature.getAttribute(attribute);
-							} catch (Exception e) {
-								height = defaultHeight;
-							}
-						}
-						if (height > maxHeight) {
-							maxHeight = height;
-						}
-						List<String> idlist = buildingFeatureToObjGroup(feature, height);
-						for (String id : idlist) {
-							// featureId
-							batchIdArr.add(id);
-							// properties
-							Iterator batchIter = batchTable.keySet().iterator();
-							while (batchIter.hasNext()) {
-								String batchKey = (String) batchIter.next();
-								JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-								propertiesArr.add(feature.getAttribute(batchKey));
-								batchTable.put(batchKey, propertiesArr);
-							}
-						}
-					}
-					
-					Iterator batchIter = batchTable.keySet().iterator();
-					while (batchIter.hasNext()) {
-						String batchKey = (String) batchIter.next();
-						JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-						Double max = (Double) Collections.max(propertiesArr);
-						Double min = (Double) Collections.min(propertiesArr);
-						JSONObject minmaxObj = new JSONObject();
-						minmaxObj.put("minimum", min);
-						minmaxObj.put("maximum", max);
-						tilesPropeties.put(batchKey, minmaxObj);
-					}
-					batchTable.put("featureId", batchIdArr);
-				}
-
-				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "batch.json")) {
-					file.write(batchTable.toJSONString());
-				}
-
-				// tileset option file
-				double maxX = reEnv.getMaxX(); // east
-				double maxY = reEnv.getMaxY(); // north
-				double minX = reEnv.getMinX(); // west
-				double minY = reEnv.getMinY(); // south
-
-				JSONObject tileOption = new JSONObject();
-				tileOption.put("longitude", Math.toRadians(centerX));
-				tileOption.put("latitude", Math.toRadians(centerY));
-				tileOption.put("west", Math.toRadians(minX));
-				tileOption.put("south", Math.toRadians(minY));
-				tileOption.put("east", Math.toRadians(maxX));
-				tileOption.put("north", Math.toRadians(maxY));
-				tileOption.put("transHeight", 0);
-				tileOption.put("region", true);
-				tileOption.put("box", false);
-				tileOption.put("sphere", false);
-				tileOption.put("gltfUpAxis", "Z");
-				tileOption.put("minHeight", 0);
-				tileOption.put("maxHeight", maxHeight);
-				tileOption.put("properties", tilesPropeties);
-
-				try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "tile.json")) {
-					file.write(tileOption.toJSONString());
-				}
-			}
-		} else {
+		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
 			throw new Exception("Polygon Type만 가능합니다.");
 		}
 	}
@@ -679,286 +291,19 @@ public class ShpToObjImpl {
 		return collection;
 	}
 
-	private List<String> buildingFeatureToObjGroup(SimpleFeature feature, double height)
-			throws FactoryException, TransformException, IOException {
-
-		List<String> idList = new ArrayList<>();
-
-		Geometry multipolygon = (Geometry) feature.getDefaultGeometry();
-		int numGeom = multipolygon.getNumGeometries();
-		for (int g = 0; g < numGeom; g++) {
-			// String featureID = "g " + feature.getID();
-			String featureID = "g " + feature.getID();
-			if (numGeom > 1) {
-				featureID += "_" + (g + 1) + "\n";
-			} else {
-				featureID += "\n";
-			}
-			idList.add(feature.getID());
-			writer.write(featureID);
-			Geometry geom = multipolygon.getGeometryN(g);
-			geom.normalize();
-			Polygon pg = (Polygon) geom;
-
-			Coordinate[] coordinates = deleteInnerPoints(pg.getCoordinates());
-
-			// threeGeom
-			List<Face3> faces = new ArrayList<>();
-			StringBuilder vBuilder = new StringBuilder();
-
-			List<PolygonPoint> points = new ArrayList<>();
-
-			// 바닥
-			List<Vector3d> coorList = new ArrayList<>();
-			for (int i = 0; i < coordinates.length; i++) {
-				GeodeticCalculator gc = new GeodeticCalculator();
-				gc.setStartingGeographicPoint(centerX, coordinates[i].y);
-				gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
-				double xDistance = gc.getOrthodromicDistance();
-				if (centerX > coordinates[i].x) {
-					xDistance = -xDistance;
-				}
-				gc.setStartingGeographicPoint(coordinates[i].x, centerY);
-				gc.setDestinationGeographicPoint(coordinates[i].x, coordinates[i].y);
-				double yDistance = gc.getOrthodromicDistance();
-				if (centerY > coordinates[i].y) {
-					yDistance = -yDistance;
-				}
-				Vector3d vertice = new Vector3d(xDistance, yDistance, 0);
-				coorList.add(vertice);
-
-				// threeGeom
-				vertices.add(new Vector3d(xDistance, yDistance, 0));
-				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
-
-				vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
-
-				// tri
-				points.add(new PolygonPoint(xDistance, yDistance, 0));
-			}
-
-			int bottomStart;
-			int bottomEnd;
-			int topStart;
-			int topEnd;
-			int sideStart;
-			int sideEnd;
-
-			// 천장
-			int s = coorList.size();
-			List<Vector3d> hCoorList = new ArrayList<>();
-			for (int i = 0; i < s; i++) {
-				Vector3d vertice = createLiftedCoordinate(coorList.get(i), height);
-				hCoorList.add(vertice);
-				// threeGeom
-				vertices.add(new Vector3d(coorList.get(i).x(), coorList.get(i).y(), height));
-				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
-
-				vBuilder.append("v " + coorList.get(i).x() + " " + coorList.get(i).y() + " " + height + "\n");
-			}
-			writer.write(vBuilder.toString());
-
-			// Prepare input data
-			org.poly2tri.geometry.polygon.Polygon polygon = new org.poly2tri.geometry.polygon.Polygon(points);
-
-			// Launch tessellation
-			Poly2Tri.triangulate(polygon);
-			// Gather triangles
-			List<DelaunayTriangle> triangles = polygon.getTriangles();
-
-			// 바닥 face
-			bottomStart = faces.size();
-			for (int m = 0; m < triangles.size(); m++) {
-				DelaunayTriangle tri = triangles.get(m);
-				TriangulationPoint[] pts = tri.points;
-				int fFirIdx = vIdx + points.indexOf(pts[0]);
-				int fSecIdx = vIdx + points.indexOf(pts[1]);
-				int fThrIdx = vIdx + points.indexOf(pts[2]);
-				// threeGeom
-				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
-			}
-			bottomEnd = faces.size();
-
-			// 천장 face
-			topStart = faces.size();
-			for (int m = 0; m < triangles.size(); m++) {
-				DelaunayTriangle tri = triangles.get(m);
-				TriangulationPoint[] pts = tri.points;
-				int fFirIdx = vIdx + s + points.indexOf(pts[0]);
-				int fSecIdx = vIdx + s + points.indexOf(pts[1]);
-				int fThrIdx = vIdx + s + points.indexOf(pts[2]);
-				// threeGeom
-				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
-			}
-			topEnd = faces.size();
-
-			// 옆면 face
-			sideStart = faces.size();
-			for (int f = 0; f < s; f++) {
-				if (f == 0) {
-					faces.add(new Face3(vIdx + 0, vIdx + s - 1, vIdx + s, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + s, vIdx + s - 1, vIdx + (2 * s - 1), new Vector3d(0, 0, 0)));
-				} else {
-					faces.add(new Face3(vIdx + f, vIdx + f - 1, vIdx + f + s, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + f + s, vIdx + f - 1, vIdx + f - 1 + s, new Vector3d(0, 0, 0)));
-				}
-			}
-			sideEnd = faces.size();
-
-			vIdx += coorList.size();
-			vIdx += hCoorList.size();
-
-			com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
-			threeGeom.faces = faces;
-			threeGeom.vertices = vertices;
-			threeGeom.computeBoundingBox();
-
-			Vector3d max = threeGeom.boundingBox.getMax();
-
-			double rangeMaxX = max.x();
-			double rangeMaxY = max.y();
-
-			Envelope pgEv = pg.getEnvelopeInternal();
-			double range2dminX = pgEv.getMinX();
-			double range2dmaxX = pgEv.getMaxX();
-			double range2dminY = pgEv.getMinY();
-			double range2dmaxY = pgEv.getMaxY();
-
-			Vector2d offset2d = new Vector2d(0 - range2dminX, 0 - range2dminY);
-			Vector2d range2d = new Vector2d(((range2dminX - range2dmaxX) * -1), ((range2dminY - range2dmaxY) * -1));
-
-			// vt
-			List<List<Vector2d>> faceVertexUvs = new ArrayList<>();
-
-			// 바닥
-			for (int i = bottomStart; i < bottomEnd; i++) {
-				List<Vector2d> innerFvt = new ArrayList<>();
-				Face3 face = threeGeom.faces.get(i);
-
-				innerFvt.add(new Vector2d(0, 0));
-				innerFvt.add(new Vector2d(0, 0));
-				innerFvt.add(new Vector2d(0, 0));
-
-				faceVertexUvs.add(innerFvt);
-			}
-			// 윗면
-			for (int i = topStart; i < topEnd; i++) {
-				List<Vector2d> innerFvt = new ArrayList<>();
-				Face3 face = threeGeom.faces.get(i);
-
-				Vector2d v1 = vCoordinates.get(face.a);
-				Vector2d v2 = vCoordinates.get(face.b);
-				Vector2d v3 = vCoordinates.get(face.c);
-
-				Vector2d vt1 = new Vector2d((v1.x() + offset2d.x()) / range2d.x() * 0.4,
-						(v1.y() + offset2d.y()) / range2d.y() * 0.4 + 0.6);
-				Vector2d vt2 = new Vector2d((v2.x() + offset2d.x()) / range2d.x() * 0.4,
-						(v2.y() + offset2d.y()) / range2d.y() * 0.4 + 0.6);
-				Vector2d vt3 = new Vector2d((v3.x() + offset2d.x()) / range2d.x() * 0.4,
-						(v3.y() + offset2d.y()) / range2d.y() * 0.4 + 0.6);
-
-				innerFvt.add(vt1);
-				innerFvt.add(vt2);
-				innerFvt.add(vt3);
-
-				faceVertexUvs.add(innerFvt);
-			}
-			// 옆면
-			double vtBottom = 0;
-			double vtHeight = 0.6;
-
-			for (int i = sideStart; i < sideEnd; i = i + 2) {
-				Face3 face1 = threeGeom.faces.get(i);
-				Vector3d f1v1 = threeGeom.vertices.get(face1.a);
-				Vector3d f1v2 = threeGeom.vertices.get(face1.b);
-				Vector3d f1v3 = threeGeom.vertices.get(face1.c);
-
-				double f1from1to2 = f1v1.distanceTo(f1v2); // x축
-				double ratio12 = (f1from1to2 * 0.6) / rangeMaxY;
-				if (ratio12 > 1) {
-					ratio12 = 1;
-				}
-
-				List<Vector2d> innerFvt1 = new ArrayList<>();
-				innerFvt1.add(new Vector2d(0, vtBottom));
-				innerFvt1.add(new Vector2d(ratio12, vtBottom));
-				innerFvt1.add(new Vector2d(0, vtHeight));
-
-				List<Vector2d> innerFvt2 = new ArrayList<>();
-				innerFvt2.add(new Vector2d(0, vtHeight));
-				innerFvt2.add(new Vector2d(ratio12, vtBottom));
-				innerFvt2.add(new Vector2d(ratio12, vtHeight));
-
-				faceVertexUvs.add(innerFvt1);
-				faceVertexUvs.add(innerFvt2);
-			}
-			threeGeom.faceVertexUvs.add(faceVertexUvs);
-			// vn
-			threeGeom.computeFlatVertexNormals();
-			threeGeom.computeFaceNormals();
-			writeThreeGeometry(threeGeom);
-		}
-
-		return idList;
-	}
-
-	public void writeThreeGeometry(com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom)
-			throws IOException {
-
-		// vt
-		if (threeGeom.faceVertexUvs != null) {
-			StringBuilder vtBuilder = new StringBuilder();
-			List<List<Vector2d>> faceVertexUvs = threeGeom.faceVertexUvs.get(0);
-			for (List<Vector2d> faceVertexUv : faceVertexUvs) {
-				for (Vector2d vt : faceVertexUv) {
-					vtBuilder.append("vt " + vt.x() + " " + vt.y() + "\n");
-				}
-			}
-			writer.write(vtBuilder.toString());
-		}
-		// f
-		if (threeGeom.faces != null) {
-			StringBuilder vnBuilder = new StringBuilder();
-			StringBuilder fBuilder = new StringBuilder();
-			for (Face3 face : threeGeom.faces) {
-				// vn
-				Vector3d normal = face.normal;
-				vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
-				vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
-				vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
-
-				int a = face.a + 1;
-				int b = face.b + 1;
-				int c = face.c + 1;
-
-				fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
-				vtIdx++;
-				vnIdx++;
-				fBuilder.append(b + "/" + vnIdx + "/" + vtIdx + " ");
-				vtIdx++;
-				vnIdx++;
-				fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
-				vtIdx++;
-				vnIdx++;
-			}
-			writer.write(vnBuilder.toString());
-			writer.write(fBuilder.toString());
-		}
-	}
-
-	public String coordinateToVertexdescription(Coordinate coordinate) {
+	public static String coordinateToVertexdescription(Coordinate coordinate) {
 		return new String("v " + coordinate.x + " " + coordinate.y + " " + coordinate.z + "\n");
 	}
 
-	private Vector3d createLiftedCoordinate(Vector3d vector3d, double height) {
+	public static Vector3d createLiftedCoordinate(Vector3d vector3d, double height) {
 		return new Vector3d(vector3d.x(), vector3d.y(), height);
 	}
 
-	public Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {
+	public static Coordinate createLiftedCoordinate(Coordinate coordinate, double height) {
 		return new Coordinate(coordinate.x, coordinate.y, height);
 	}
 
-	public Coordinate[] deleteInnerPoints(Coordinate[] coordinates) {
+	public static Coordinate[] deleteInnerPoints(Coordinate[] coordinates) {
 		Coordinate startCoordinate = coordinates[0];
 		double z = startCoordinate.z;
 		if (String.valueOf(z).equals("NaN")) {
@@ -978,7 +323,7 @@ public class ShpToObjImpl {
 		return (c1.x == c2.x && c1.y == c2.y && c1.z == c2.z);
 	}
 
-	private List<Envelope> getGrids(Envelope envelope, double quadIndexWidth) {
+	public static List<Envelope> getGrids(Envelope envelope, double quadIndexWidth) {
 
 		List<Envelope> resultRefEnl = new ArrayList<Envelope>();
 		for (double y = envelope.getMinY(); y < envelope.getMaxY(); y += quadIndexWidth) {
@@ -990,7 +335,7 @@ public class ShpToObjImpl {
 		return resultRefEnl;
 	}
 
-	private Quadtree getQuadTree(FeatureCollection<SimpleFeatureType, SimpleFeature> sfc) {
+	public static Quadtree getQuadTree(FeatureCollection<SimpleFeatureType, SimpleFeature> sfc) {
 
 		Quadtree quad = new Quadtree();
 		try {
@@ -1015,7 +360,7 @@ public class ShpToObjImpl {
 		return quad;
 	}
 
-	private void createFileDirectory(String directory) {
+	public static void createFileDirectory(String directory) {
 		File file = new File(directory);
 		if (!file.exists()) {
 			file.mkdirs();

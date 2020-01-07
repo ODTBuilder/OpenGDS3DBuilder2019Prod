@@ -136,17 +136,55 @@ public class UploadService {
 		return files;
 	}
 
+	public JSONObject saveObjFiles(MultipartHttpServletRequest request, String user) {
+
+		JSONObject objMap = new JSONObject();
+
+		String basePath = baseDrive + ":/" + baseDir;
+		String uploadPath = basePath + File.separator + user + File.separator + "edit";
+
+		File path = new File(uploadPath);
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+
+		// 1. build an iterator
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile mpf = null;
+
+		// 2. get each file
+		while (itr.hasNext()) {
+			// 2.1 get next MultipartFile
+			mpf = request.getFile(itr.next());
+
+			String name = mpf.getOriginalFilename();
+			LOGGER.info("{} uploaded!", name);
+			try {
+				String gltfFile = path + File.separator + name;
+				LOGGER.info("저장 파일 경로:{}", gltfFile);
+				objMap.put(name, gltfFile);
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(gltfFile));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return objMap;
+	}
+
 	public JSONObject saveGltfFile(MultipartHttpServletRequest request) {
 
 		JSONObject obj = new JSONObject();
 		boolean succ = true;
 
 		String user = request.getParameter("user");
-		String time = request.getParameter("time");
+//		String time = request.getParameter("time");
 
 		String basePath = baseDrive + ":/" + baseDir;
-		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
-				+ File.separator + "gltf";
+//		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator + time
+//				+ File.separator + "gltf";
+
+		String uploadPath = basePath + File.separator + user + File.separator + "edit";
 
 		File path = new File(uploadPath);
 		if (!path.exists()) {
@@ -175,8 +213,9 @@ public class UploadService {
 			}
 		}
 
-		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
-				+ "gltf" + "/" + filename;
+//		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
+//				+ "gltf" + "/" + filename;
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/edit/" + filename;
 		obj.put("succ", succ);
 		obj.put("path", apachePath);
 		return obj;
@@ -239,6 +278,61 @@ public class UploadService {
 
 		return obj;
 
+	}
+
+	public JSONObject saveEdit3dtilesFile(MultipartHttpServletRequest request) throws Exception {
+
+		boolean succ = true;
+		JSONObject obj = new JSONObject();
+		String user = request.getParameter("user");
+		String time = request.getParameter("time");
+		String originObjFolder = request.getParameter("originObjFolder"); // "objPath":"20200103_111444/3dtiles"
+
+//		String basePath = baseDrive + ":/" + baseDir;
+//		String uploadPath = basePath + File.separator + user + File.separator + "upload" + File.separator
+//				+ originObjFolder;
+
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
+				+ "3dtiles" + "/" + "tileset.json";
+
+		File path = new File(originObjFolder);
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+
+		// 1. build an iterator
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile mpf = null;
+
+		// 2. get each file
+		while (itr.hasNext()) {
+			// 2.1 get next MultipartFile
+			mpf = request.getFile(itr.next());
+			LOGGER.info("{} uploaded!", mpf.getOriginalFilename());
+			try {
+				String zipFile = path + File.separator + mpf.getOriginalFilename();
+				LOGGER.info("저장 파일 경로:{}", zipFile);
+				// copy file to local disk (make sure the path "e.g.
+				// D:/temp/files" exists)
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
+				try {
+					decompress(zipFile, originObjFolder);
+					File file = new File(zipFile);
+					file.delete();
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					succ = false;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				succ = false;
+			}
+		}
+		obj.put("succ", succ);
+		obj.put("path", apachePath);
+		return obj;
 	}
 
 	public void SaveErrorFile(MultipartHttpServletRequest request) throws Exception {
