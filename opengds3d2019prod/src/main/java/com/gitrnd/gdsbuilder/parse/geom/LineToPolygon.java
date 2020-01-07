@@ -1,9 +1,8 @@
 package com.gitrnd.gdsbuilder.parse.geom;
 
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Polygon;
 
 public interface LineToPolygon {
-	public Polygon convertPoly(LineString line, double offset);
+	public Polygon convertPoly(MultiLineString line, double offset);
 }
-

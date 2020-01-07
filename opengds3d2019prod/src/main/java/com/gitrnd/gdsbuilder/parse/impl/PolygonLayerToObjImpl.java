@@ -77,19 +77,21 @@ public class PolygonLayerToObjImpl {
 	private String usemtl;
 
 	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, double defaultHeight, String outputPath) {
+			String usemtl, EnShpToObjHeightType hType, double defaultHeight, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.mtl = mtl;
 		this.usemtl = usemtl;
+		this.hType = hType;
 		this.defaultHeight = defaultHeight;
 		this.outputPath = outputPath;
 	}
 
 	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, String attribute, String outputPath) {
+			String usemtl, EnShpToObjHeightType hType, String attribute, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.mtl = mtl;
 		this.usemtl = usemtl;
+		this.hType = hType;
 		this.attribute = attribute;
 		this.outputPath = outputPath;
 	}

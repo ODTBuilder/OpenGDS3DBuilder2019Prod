@@ -32,6 +32,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShpToObjImpl {
 
 	private double defaultHeight = 5;
+	private double defaultWidth = 5;
+
 	private String attribute;
 
 	private String outputPath;
@@ -59,6 +61,14 @@ public class ShpToObjImpl {
 
 	public void setDefaultHeight(double defaultHeight) {
 		this.defaultHeight = defaultHeight;
+	}
+	
+	public double getDefaultWidth() {
+		return defaultWidth;
+	}
+
+	public void setDefaultWidth(double defaultWidth) {
+		this.defaultWidth = defaultWidth;
 	}
 
 	public String getAttribute() {
@@ -270,7 +280,19 @@ public class ShpToObjImpl {
 				this.objfilenum = polyToObj.getObjfilenum();
 			}
 		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
-			throw new Exception("Polygon Type만 가능합니다.");
+			if (this.hType == EnShpToObjHeightType.DEFAULT) {
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						defaultHeight, outputPath);
+				polyToObj.parseToObjFile();
+				this.outputPath = polyToObj.getOutputPath();
+				this.objfilenum = polyToObj.getObjfilenum();
+			} else if (this.hType == EnShpToObjHeightType.FIX) {
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						attribute, outputPath);
+				polyToObj.parseToObjFile();
+				this.outputPath = polyToObj.getOutputPath();
+				this.objfilenum = polyToObj.getObjfilenum();
+			}
 		}
 	}
 
