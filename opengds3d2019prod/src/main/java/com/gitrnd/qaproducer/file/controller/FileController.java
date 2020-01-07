@@ -90,11 +90,10 @@ public class FileController extends AbstractController {
 		}
 		return flag;
 	}
-	
+
 	@RequestMapping(value = "/downloadObj.do", method = RequestMethod.GET)
-	public void downloadObj(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("time") String time, @RequestParam("file") String file, @RequestParam("user") String user)
-			throws IOException {
+	public void downloadObj(HttpServletRequest request, HttpServletResponse response, @RequestParam("time") String time,
+			@RequestParam("file") String file, @RequestParam("user") String user) throws IOException {
 		downloadService.downloadObj(response, time, file, user);
 	}
 
@@ -121,11 +120,10 @@ public class FileController extends AbstractController {
 			LOGGER.info("ERROR!: fid: {} file delete fail!", request.getParameter("fid"));
 		}
 	}
-	
+
 	@RequestMapping(value = "/uploadGltf.do", method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject uploadGltf(MultipartHttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public JSONObject uploadGltf(MultipartHttpServletRequest request, HttpServletResponse response) throws Exception {
 		return uploadService.saveGltfFile(request);
 	}
 
@@ -134,6 +132,13 @@ public class FileController extends AbstractController {
 	public JSONObject upload3dtiles(MultipartHttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		return uploadService.save3dtilesFile(request);
+	}
+
+	@RequestMapping(value = "/uploadEdit3dtiles.do", method = RequestMethod.POST)
+	@ResponseBody
+	public JSONObject uploadEdit3dtiles(MultipartHttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		return uploadService.saveEdit3dtilesFile(request);
 	}
 
 	@RequestMapping(value = "/uploadGsError.do", method = RequestMethod.POST)
