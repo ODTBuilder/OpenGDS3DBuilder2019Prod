@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
@@ -34,7 +35,8 @@ public class Edit3dController extends AbstractController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Edit3dController.class);
 
-	@RequestMapping(value = "/objToGltf.do", method = RequestMethod.GET)
+	@RequestMapping(value = "/objToGltf.ajax", method = RequestMethod.GET)
+	@ResponseBody
 	public JSONObject convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("featureId") String featureId, @RequestParam("objPath") String objPath,
 			@AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {

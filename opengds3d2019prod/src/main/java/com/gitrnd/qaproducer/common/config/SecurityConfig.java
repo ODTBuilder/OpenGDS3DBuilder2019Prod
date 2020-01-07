@@ -38,7 +38,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/option/**").authenticated().antMatchers("/downloaderror.do").authenticated()
 				.antMatchers("/geoserver/**").authenticated().antMatchers("/file/**").authenticated()
 				.antMatchers("/upload.do").authenticated().antMatchers("/user/userinfo.do").authenticated()
-				.antMatchers("/user/deactivateuser.ajax").authenticated();
+				.antMatchers("/user/deactivateuser.ajax").authenticated().antMatchers("/objToGltf.do").authenticated()
+				.antMatchers("/edit3dLayers.do").authenticated();
 		http.formLogin().loginPage("/user/signin.do").permitAll().loginProcessingUrl("/user/signinProcess.do")
 				.defaultSuccessUrl("/map.do").failureUrl("/user/signin.do");
 		http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/user/signout.do"))
