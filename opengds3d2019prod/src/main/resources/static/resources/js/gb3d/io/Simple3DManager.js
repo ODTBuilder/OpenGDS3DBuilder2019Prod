@@ -810,8 +810,7 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 				var success = data.succ;
 				var path = data.path;
 				if (success) {
-					// var path =
-					// "http://localhost:8888/guest/upload/20191223_150915/3dtiles/tileset.json";
+//					 var path ="http://175.116.181.34:8888/guest/upload/20200106_171731/3dtiles/tileset.json";
 					that.getTilesetManager().addTileset(path, layerid);
 				}
 			}

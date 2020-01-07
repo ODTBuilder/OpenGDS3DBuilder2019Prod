@@ -381,6 +381,7 @@ html, body {
 			editingTool2D : function() {
 				return epan;
 			},
+			getGLTFURL : "objToGltf.do?${_csrf.parameterName}=${_csrf.token}",
 			texture : {
 				"building" : "${pageContext.request.contextPath}/resources/img/texture/buildings/building1.jpg",
 				"road" : "${pageContext.request.contextPath}/resources/img/texture/roads/road.jpg"
