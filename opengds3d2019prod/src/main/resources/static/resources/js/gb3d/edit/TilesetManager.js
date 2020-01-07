@@ -6,6 +6,15 @@ if (!gb3d.edit)
 
 /**
  * @classdesc Cesium 3D Tileset 관리자
+ * @class gb3d.edit.TilesetManager
+ * @memberof gb3d.edit
+ * @param {Object} obj - 생성자 옵션
+ * @param {gb3d.Map} obj.map - {@link gb3d.Map}
+ * @param {gb3d.tree.OpenLayers} obj.clientTree - {@link gb3d.tree.OpenLayers}
+ * @param {string} [obj.element="#attrDeclare"] - TilesetManager Panel을 생성할 HTML Element ID
+ * @author KIM HOCHUL
+ * @date 2019. 12. 24
+ * @version 0.01
  */
 gb3d.edit.TilesetManager = function(obj) {
 	var options = obj || {};
@@ -19,17 +28,45 @@ gb3d.edit.TilesetManager = function(obj) {
 
 	this.viewer = this.map.getCesiumViewer();
 
+	/**
+	 * Tileset Manager UI
+	 * 
+	 * @type {gb3d.style.Declarative}
+	 * @private
+	 */
 	this.tilesetUI = new gb3d.style.Declarative({
 		element : this.element
 	});
 
+	/**
+	 * Tileset List
+	 * 
+	 * @type {Array.<gb3d.object.Tileset>}
+	 * @private
+	 */
 	this.tilesetList = [];
 }
 
+/**
+ * Tileset List에 Tileset 객체 추가
+ * 
+ * @method gb3d.edit.TilesetManager#pushTilesetList
+ * @function
+ * @param {gb3d.object.Tileset} tilesetVO - {@link gb3d.object.Tileset}
+ */
 gb3d.edit.TilesetManager.prototype.pushTilesetList = function(tilesetVO) {
 	this.tilesetList.push(tilesetVO);
 }
 
+/**
+ * Tileset manager UI 변경사항대로 Tileset 객체 style을 갱신한다.
+ * 
+ * @method gb3d.edit.TilesetManager#update3DTilesetStyle
+ * @function
+ * @param {string} element - Tileset manager UI Element ID or Class name
+ * @param {Cesuim.Cesium3DTileset} tileset - Cesium 3D Tileset 객체
+ * @param {string} del - 조건식 삭제 여부
+ */
 gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tileset, del) {
 	if ($(element).hasClass("gb3d-declare-row-add")) {
 		return;
@@ -100,15 +137,15 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tile
 		default:
 			res = sign;
 		}
-		
+
 		if (value === "") {
-//			return;
-//			value
+			// return;
+			// value
 			continue;
 		} else {
-			conditions.push([ "${" + key + "} " + res + " " + value, "color('" + color.toUpperCase() + "')" ]);			
+			conditions.push([ "${" + key + "} " + res + " " + value, "color('" + color.toUpperCase() + "')" ]);
 		}
-		
+
 	}
 
 	if (isDel) {
@@ -130,6 +167,14 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tile
 	tileset.style = new Cesium.Cesium3DTileStyle(styleObj);
 }
 
+/**
+ * Tileset 객체를 맵에 추가한다.
+ * 
+ * @method gb3d.edit.TilesetManager#addTileset
+ * @function
+ * @param {string} url - Tileset 파일 경로
+ * @param {string} layerid - Openlayers layer ID
+ */
 gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	var that = this;
 	var url = url;
@@ -165,7 +210,7 @@ gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 			if ($(e.target).parents().eq(1).find(".gb-declare-value").val() === "") {
 				return;
 			} else {
-				that.update3DTilesetStyle(this, tileset);	
+				that.update3DTilesetStyle(this, tileset);
 			}
 		});
 
@@ -183,6 +228,13 @@ gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	});
 }
 
+/**
+ * jstree 객체를 반환한다.
+ * 
+ * @method gb3d.edit.TilesetManager#getClientTree
+ * @function
+ * @return {gb3d.tree.OpenLayers}
+ */
 gb3d.edit.TilesetManager.prototype.getClientTree = function() {
 	return this.clientTree;
 }

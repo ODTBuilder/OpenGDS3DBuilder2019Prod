@@ -7,13 +7,10 @@ if (!gb3d)
 if (!gb3d.io)
 	gb3d.io = {};
 /**
- * @classdesc B3DMManager 객체를 정의한다. 압축된 B3DM 파일을 서버로 전송한다. 전송한 B3DM을 렌더링한다. 편집을
- *            위해변환된 GLB파일을 불러온다.
- * 
+ * @classdesc B3DMManager 객체를 정의한다. 압축된 B3DM 파일을 서버로 전송한다. 전송한 B3DM을 렌더링한다. 편집을 위해변환된 GLB파일을 불러온다.
  * @class gb3d.io.B3DMManager
  * @memberof gb3d.io
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
 gb3d.io.B3DMManager = function(obj) {
@@ -135,10 +132,8 @@ gb3d.io.B3DMManager.prototype.upload = function() {
  * 스피너를 보여준다.
  * 
  * @method gb3d.io.B3DMManager#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 표시할 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 표시할 모달 객체
  */
 gb3d.io.B3DMManager.prototype.showSpinner = function(show, modal) {
 	if (show) {
@@ -165,8 +160,7 @@ gb3d.io.B3DMManager.prototype.getUploadURL = function() {
  * 업로드 메세지를 출력한다.
  * 
  * @method gb3d.io.B3DMManager#printMessage
- * @param {String}
- *            msg - 표시할 메세지
+ * @param {String} msg - 표시할 메세지
  */
 gb3d.io.B3DMManager.prototype.printMessage = function(msg) {
 	$(this.complete).empty();

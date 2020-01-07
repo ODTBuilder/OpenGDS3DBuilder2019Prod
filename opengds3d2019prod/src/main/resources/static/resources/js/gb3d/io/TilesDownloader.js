@@ -7,13 +7,11 @@ if (!gb3d)
 if (!gb3d.io)
 	gb3d.io = {};
 /**
- * @classdesc TilesDownloader 객체를 정의한다. 압축된 B3DM 파일을 서버로 전송한다. 전송한 B3DM을 렌더링한다. 편집을
- *            위해변환된 GLB파일을 불러온다.
- * 
+ * @classdesc TilesDownloader 객체를 정의한다. 압축된 B3DM 파일을 서버로 전송한다. 전송한 B3DM을 렌더링한다. 편집을 위해변환된 GLB파일을
+ * 불러온다.
  * @class gb3d.io.TilesDownloader
  * @memberof gb3d.io
- * @param {Object}
- *            obj - 생성자 옵션을 담은 객체
+ * @param {Object} obj - 생성자 옵션을 담은 객체
  * @author SOYIJUN
  */
 gb3d.io.TilesDownloader = function(obj) {
@@ -43,7 +41,7 @@ gb3d.io.TilesDownloader = function(obj) {
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
 	this.downloadTilesUrl = options.downloadTilesUrl ? options.downloadTilesUrl : undefined;
-	
+
 };
 gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
 
@@ -63,25 +61,25 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(geo, work, store, lay
 
 	$.ajax({
 		url : this.getDownloadTilesURL(),
-//		method : "POST",
-//		enctype : 'multipart/form-data',
-//		contentType : false,
+		// method : "POST",
+		// enctype : 'multipart/form-data',
+		// contentType : false,
 		contentType : "application/json; charset=UTF-8",
-//		data : formData,
+		// data : formData,
 		data : JSON.stringify(params),
-//		processData : false,
+		// processData : false,
 		beforeSend : function() {
-			 $("body").css("cursor", "wait");
-//			that.showSpinner(true, that);
+			$("body").css("cursor", "wait");
+			// that.showSpinner(true, that);
 		},
 		complete : function() {
-			 $("body").css("cursor", "auto");
-//			that.showSpinner(false, that);
+			$("body").css("cursor", "auto");
+			// that.showSpinner(false, that);
 		},
 		success : function(data) {
 			console.log(data);
 			$("body").css("cursor", "auto");
-//			that.printMessage(that.translation.succ[that.locale]);
+			// that.printMessage(that.translation.succ[that.locale]);
 			// modal.close();
 			// that.open();
 			// that.resultTable(data.layers);
@@ -94,8 +92,8 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(geo, work, store, lay
 					that.errorModal(jqXHR.responseJSON.status);
 				}
 			} else {
-				that.messageModal(that.translation["err"][that.locale], that.translation["errdown"][that.locale]+"<br>"+jqXHR.status + " " + jqXHR.statusText);
-			}			
+				that.messageModal(that.translation["err"][that.locale], that.translation["errdown"][that.locale] + "<br>" + jqXHR.status + " " + jqXHR.statusText);
+			}
 		}
 	});
 };
@@ -140,14 +138,14 @@ gb3d.io.TilesDownloader.prototype.upload = function() {
 		},
 		success : function(data) {
 			console.log(data);
-//			that.printMessage(that.translation.succ[that.locale]);
+			// that.printMessage(that.translation.succ[that.locale]);
 			// modal.close();
 			// that.open();
 			// that.resultTable(data.layers);
 			// that.callback();
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
-//			that.printMessage(that.translation.err[that.locale]);
+			// that.printMessage(that.translation.err[that.locale]);
 		}
 	});
 };
@@ -156,10 +154,8 @@ gb3d.io.TilesDownloader.prototype.upload = function() {
  * 스피너를 보여준다.
  * 
  * @method gb3d.io.TilesDownloader#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
- * @param {gb.modal.ModalBase}
- *            modal - 스피너를 표시할 모달 객체
+ * @param {boolean} show - 스피너 표시 유무
+ * @param {gb.modal.ModalBase} modal - 스피너를 표시할 모달 객체
  */
 gb3d.io.TilesDownloader.prototype.showSpinner = function(show, modal) {
 	if (show) {
@@ -186,8 +182,7 @@ gb3d.io.TilesDownloader.prototype.getDownloadTilesURL = function() {
  * 에러 메세지를 표시한다
  * 
  * @method gb3d.io.TilesDownloader#errorModal
- * @param {string}
- *            code - 오류 코드
+ * @param {string} code - 오류 코드
  */
 gb3d.io.TilesDownloader.prototype.errorModal = function(code) {
 	var that = this;
@@ -198,10 +193,8 @@ gb3d.io.TilesDownloader.prototype.errorModal = function(code) {
  * 오류 메시지 창을 생성한다.
  * 
  * @method gb3d.io.TilesDownloader#messageModal
- * @param {string}
- *            title - 모달의 타이틀
- * @param {string}
- *            msg - 보여줄 메세지
+ * @param {string} title - 모달의 타이틀
+ * @param {string} msg - 보여줄 메세지
  */
 gb3d.io.TilesDownloader.prototype.messageModal = function(title, msg) {
 	var that = this;

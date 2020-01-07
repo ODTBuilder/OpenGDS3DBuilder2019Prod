@@ -7,6 +7,15 @@ if (!gb3d)
 if (!gb3d.Math)
 	gb3d.Math = {};
 
+/**
+ * 같은 시작점을 가진 두 벡터가 평행한지 검사한다.
+ * 
+ * @method gb3d.Math.isParallel
+ * @param {Array.<number>} pointA - 점A
+ * @param {Array.<number>} pointB - 점B
+ * @param {Array.<number>} standard - 시작점
+ * @return {boolean} 평행하면 True
+ */
 gb3d.Math.isParallel = function(pointA, pointB, standard){
 	var a, b, cart, va, vb, dot, result = false;
 
@@ -29,6 +38,15 @@ gb3d.Math.isParallel = function(pointA, pointB, standard){
 	return result;
 }
 
+/**
+ * 같은 시작점을 가진 두 벡터를 외적한다.
+ * 
+ * @method gb3d.Math.crossProductFromDegrees
+ * @param {Array.<number>} pointA - 점A
+ * @param {Array.<number>} pointB - 점B
+ * @param {Array.<number>} standard - 시작점
+ * @return {Object} 외적 결과
+ */
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	var a, b, u, v, w, s, cart;
 	var ca = {}, cb = {}, cw;
@@ -70,6 +88,15 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
 	}
 }
 
+/**
+ * Degree 좌표값으로부터 설정한 높이만큼의 3차원 객체 Vertex와 Face 값을 계산하여 반환한다.
+ * 
+ * @method gb3d.Math.getPolygonVertexAndFaceFromDegrees
+ * @param {Array.<Array.<number>>} arr - Polygon Feature의 좌표값
+ * @param {Array.<number>} center - 중점
+ * @param {number} depth - 3차원 객체의 높이
+ * @return {Object} 외적 결과
+ */
 gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 	var coord = arr,
 	points = [],
@@ -220,8 +247,15 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		}
 	}
 }
+
 /**
- * 두 점의 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형 폴리곤 좌표를 반환한다
+ * 두 점을 중심선으로 하는 사각형을 반환한다.
+ * 
+ * @method gb3d.Math#getRectangleFromLine
+ * @param {Array.<number>} start - 시작점
+ * @param {Array.<number>} end - 끝점
+ * @param {Number} radius - 반경
+ * @return {Object} 사각형 정보
  */
 gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	// 반환할 폴리곤 좌표
@@ -391,16 +425,11 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 /**
  * 두 점의 선을 입력하면 선을 중심선으로 하는 너비를 가진 직사각형 폴리곤 좌표를 반환한다
  * 
- * @param {Array.
- *            <Array.<Number>>} center - 중심좌표
- * @param {number}
- *            radius - 부채꼴의 반지름(meter)
- * @param {number}
- *            sangle - 부채꼴의 시작각
- * @param {number}
- *            eangle - 부채꼴의 끝각
- * @param {boolean}
- *            narrow - 좁은 각을 리턴할지
+ * @param {Array.<Array.<number>>} center - 중심좌표
+ * @param {number} radius - 부채꼴의 반지름(meter)
+ * @param {number} sangle - 부채꼴의 시작각
+ * @param {number} eangle - 부채꼴의 끝각
+ * @param {boolean} narrow - 좁은 각을 리턴할지
  * @return {Object} 부채꼴의 좌표
  */
 gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
@@ -463,6 +492,16 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
 	};
 }
 
+/**
+ * LineString 좌표를 통해 3D Vertex와 Face를 만들어 주는 함수
+ * 
+ * @method gb3d.Math#getLineStringVertexAndFaceFromDegrees
+ * @param {Array.<Array.<number>>} arr - LineString 좌표
+ * @param {Number} radius - 반경
+ * @param {Array.<number>} center - 객체의 중점
+ * @param {Number} depth - 깊이 값
+ * @return {Object} 3D 객체 정보
+ */
 gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, depth){
 	var coord = arr,
 	points = [],
@@ -1584,48 +1623,39 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						rectangleVertice.push(vect);
 					}
 /*
- * // 사각형 밑면 좌표 var rectOrder = [midRects[i+1]["p1"], midRects[i+1]["p3"],
- * midRects[i+1]["end"], midRects[i+1]["p4"], midRects[i+1]["p2"],
- * midRects[i+1]["start"]]; var rvlength = rectangleVertice.length; // 사각형 밑면
- * 버텍스 for (var j = 0; j < rectOrder.length; j++) { cart =
- * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); vect = new
- * THREE.Vector3(cart.x, cart.y, cart.z); vect.sub(centerVec);
- * rectangleVertice.push(vect); } // 사각형 밑면 페이스 var rface1 = [rvlength + 4,
- * rvlength + 3, rvlength + 5]; var rface2 = [rvlength + 3, rvlength + 2,
- * rvlength + 5]; var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var
- * rface4 = [rvlength + 2, rvlength + 1, rvlength + 0];
- * rectangleFacesBottom.push(rface1); rectangleFacesBottom.push(rface2);
+ * // 사각형 밑면 좌표 var rectOrder = [midRects[i+1]["p1"], midRects[i+1]["p3"], midRects[i+1]["end"],
+ * midRects[i+1]["p4"], midRects[i+1]["p2"], midRects[i+1]["start"]]; var rvlength =
+ * rectangleVertice.length; // 사각형 밑면 버텍스 for (var j = 0; j < rectOrder.length; j++) { cart =
+ * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); vect = new THREE.Vector3(cart.x,
+ * cart.y, cart.z); vect.sub(centerVec); rectangleVertice.push(vect); } // 사각형 밑면 페이스 var rface1 =
+ * [rvlength + 4, rvlength + 3, rvlength + 5]; var rface2 = [rvlength + 3, rvlength + 2, rvlength +
+ * 5]; var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var rface4 = [rvlength + 2, rvlength +
+ * 1, rvlength + 0]; rectangleFacesBottom.push(rface1); rectangleFacesBottom.push(rface2);
  * rectangleFacesBottom.push(rface3); rectangleFacesBottom.push(rface4); var
- * currentRectangleTopFaces = [];
- * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
+ * currentRectangleTopFaces = []; currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
  * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface2)));
  * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface3)));
- * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); // 사각형 윗면
- * 페이스 var rolength = rectOrder.length; for (var j = 0; j <
- * currentRectangleTopFaces.length; j++) { currentRectangleTopFaces[j][0] =
- * currentRectangleTopFaces[j][0] + rolength; currentRectangleTopFaces[j][1] =
- * currentRectangleTopFaces[j][1] + rolength; currentRectangleTopFaces[j][2] =
- * currentRectangleTopFaces[j][2] + rolength;
+ * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); // 사각형 윗면 페이스 var rolength =
+ * rectOrder.length; for (var j = 0; j < currentRectangleTopFaces.length; j++) {
+ * currentRectangleTopFaces[j][0] = currentRectangleTopFaces[j][0] + rolength;
+ * currentRectangleTopFaces[j][1] = currentRectangleTopFaces[j][1] + rolength;
+ * currentRectangleTopFaces[j][2] = currentRectangleTopFaces[j][2] + rolength;
  * currentRectangleTopFaces[j].reverse(); } var rectangleTopFaces =
  * JSON.parse(JSON.stringify(currentRectangleTopFaces)); rectangleFacesTop =
- * rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var cp; for (var j =
- * 1; j < rectOrder.length -1; j++){ if(!gb3d.Math.isParallel(rectOrder[j+1],
- * rectOrder[j-1], rectOrder[j])){ cp =
- * gb3d.Math.crossProductFromDegrees(rectOrder[j+1], rectOrder[j-1],
- * rectOrder[j]); break; } } console.log("좌표 길이는: "+rectOrder.length); // 사각형 윗면
- * 버텍스 // rvlength = rectangleVertice.length; for(var j = 0; j <
- * rectOrder.length; j++){ cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0],
- * rectOrder[j][1]); // 보여야 할 사각형 옆면 페이스 if (j === 0) { rectangleSides.push([
- * rvlength + j + 1, rvlength + 1 + rectOrder.length, rvlength + j ]);
- * rectangleSides.push([ rvlength + 1 + rectOrder.length, rvlength +
- * rectOrder.length, rvlength + j ]); } else if (j === 3) {
- * rectangleSides.push([ rvlength + j + 1, rvlength + (2 * rectOrder.length -
- * 2), rvlength + j ]); rectangleSides.push([ rvlength + (2 * rectOrder.length -
+ * rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var cp; for (var j = 1; j <
+ * rectOrder.length -1; j++){ if(!gb3d.Math.isParallel(rectOrder[j+1], rectOrder[j-1],
+ * rectOrder[j])){ cp = gb3d.Math.crossProductFromDegrees(rectOrder[j+1], rectOrder[j-1],
+ * rectOrder[j]); break; } } console.log("좌표 길이는: "+rectOrder.length); // 사각형 윗면 버텍스 // rvlength =
+ * rectangleVertice.length; for(var j = 0; j < rectOrder.length; j++){ cart =
+ * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); // 보여야 할 사각형 옆면 페이스 if (j === 0) {
+ * rectangleSides.push([ rvlength + j + 1, rvlength + 1 + rectOrder.length, rvlength + j ]);
+ * rectangleSides.push([ rvlength + 1 + rectOrder.length, rvlength + rectOrder.length, rvlength + j
+ * ]); } else if (j === 3) { rectangleSides.push([ rvlength + j + 1, rvlength + (2 *
+ * rectOrder.length - 2), rvlength + j ]); rectangleSides.push([ rvlength + (2 * rectOrder.length -
  * 2), rvlength + j + rectOrder.length, rvlength + j ]); }
  * 
- * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y +
- * (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth); vect.sub(centerVec);
- * rectangleVertice.push(vect); }
+ * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z +
+ * (cp.w/cp.s)*depth); vect.sub(centerVec); rectangleVertice.push(vect); }
  */
 				}
 			}  
@@ -1867,62 +1897,45 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				/*
 				 * if (i+1 !== midRects.length -1) { // 사각형 밑면 좌표 var rectOrder =
-				 * [midRects[i+1]["p1"], midRects[i+1]["p3"],
-				 * midRects[i+1]["end"], midRects[i+1]["p4"],
-				 * midRects[i+1]["p2"], midRects[i+1]["start"]];
+				 * [midRects[i+1]["p1"], midRects[i+1]["p3"], midRects[i+1]["end"],
+				 * midRects[i+1]["p4"], midRects[i+1]["p2"], midRects[i+1]["start"]];
 				 * 
-				 * var rvlength = rectangleVertice.length; // 사각형 밑면 버텍스 for
-				 * (var j = 0; j < rectOrder.length; j++) { cart =
-				 * Cesium.Cartesian3.fromDegrees(rectOrder[j][0],
-				 * rectOrder[j][1]); vect = new THREE.Vector3(cart.x, cart.y,
-				 * cart.z); vect.sub(centerVec); rectangleVertice.push(vect); } //
-				 * 사각형 밑면 페이스 var rface1 = [rvlength + 4, rvlength + 3, rvlength +
-				 * 5]; var rface2 = [rvlength + 3, rvlength + 2, rvlength + 5];
-				 * var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var
+				 * var rvlength = rectangleVertice.length; // 사각형 밑면 버텍스 for (var j = 0; j <
+				 * rectOrder.length; j++) { cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0],
+				 * rectOrder[j][1]); vect = new THREE.Vector3(cart.x, cart.y, cart.z);
+				 * vect.sub(centerVec); rectangleVertice.push(vect); } // 사각형 밑면 페이스 var rface1 =
+				 * [rvlength + 4, rvlength + 3, rvlength + 5]; var rface2 = [rvlength + 3, rvlength +
+				 * 2, rvlength + 5]; var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var
 				 * rface4 = [rvlength + 2, rvlength + 1, rvlength + 0];
-				 * rectangleFacesBottom.push(rface1);
-				 * rectangleFacesBottom.push(rface2);
-				 * rectangleFacesBottom.push(rface3);
-				 * rectangleFacesBottom.push(rface4); var
+				 * rectangleFacesBottom.push(rface1); rectangleFacesBottom.push(rface2);
+				 * rectangleFacesBottom.push(rface3); rectangleFacesBottom.push(rface4); var
 				 * currentRectangleTopFaces = [];
 				 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
 				 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface2)));
 				 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface3)));
-				 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); //
-				 * 사각형 윗면 페이스 var rolength = rectOrder.length; for (var j = 0; j <
-				 * currentRectangleTopFaces.length; j++) {
-				 * currentRectangleTopFaces[j][0] =
-				 * currentRectangleTopFaces[j][0] + rolength;
-				 * currentRectangleTopFaces[j][1] =
-				 * currentRectangleTopFaces[j][1] + rolength;
-				 * currentRectangleTopFaces[j][2] =
-				 * currentRectangleTopFaces[j][2] + rolength;
-				 * currentRectangleTopFaces[j].reverse(); } var
-				 * rectangleTopFaces =
-				 * JSON.parse(JSON.stringify(currentRectangleTopFaces));
-				 * rectangleFacesTop =
-				 * rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var
+				 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); // 사각형 윗면 페이스
+				 * var rolength = rectOrder.length; for (var j = 0; j <
+				 * currentRectangleTopFaces.length; j++) { currentRectangleTopFaces[j][0] =
+				 * currentRectangleTopFaces[j][0] + rolength; currentRectangleTopFaces[j][1] =
+				 * currentRectangleTopFaces[j][1] + rolength; currentRectangleTopFaces[j][2] =
+				 * currentRectangleTopFaces[j][2] + rolength; currentRectangleTopFaces[j].reverse(); }
+				 * var rectangleTopFaces = JSON.parse(JSON.stringify(currentRectangleTopFaces));
+				 * rectangleFacesTop = rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var
 				 * cp; for (var j = 1; j < rectOrder.length -1; j++){
-				 * if(!gb3d.Math.isParallel(rectOrder[j+1], rectOrder[j-1],
-				 * rectOrder[j])){ cp =
-				 * gb3d.Math.crossProductFromDegrees(rectOrder[j+1],
-				 * rectOrder[j-1], rectOrder[j]); break; } } console.log("좌표
-				 * 길이는: "+rectOrder.length); // 사각형 윗면 버텍스 // rvlength =
-				 * rectangleVertice.length; for(var j = 0; j < rectOrder.length;
-				 * j++){ cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0],
-				 * rectOrder[j][1]); // 보여야 할 사각형 옆면 페이스 if (j === 0) {
-				 * rectangleSides.push([ rvlength + j + 1, rvlength + 1 +
-				 * rectOrder.length, rvlength + j ]); rectangleSides.push([
-				 * rvlength + 1 + rectOrder.length, rvlength + rectOrder.length,
-				 * rvlength + j ]); } else if (j === 3) { rectangleSides.push([
-				 * rvlength + j + 1, rvlength + (2 * rectOrder.length - 2),
-				 * rvlength + j ]); rectangleSides.push([ rvlength + (2 *
-				 * rectOrder.length - 2), rvlength + j + rectOrder.length,
-				 * rvlength + j ]); }
+				 * if(!gb3d.Math.isParallel(rectOrder[j+1], rectOrder[j-1], rectOrder[j])){ cp =
+				 * gb3d.Math.crossProductFromDegrees(rectOrder[j+1], rectOrder[j-1], rectOrder[j]);
+				 * break; } } console.log("좌표 길이는: "+rectOrder.length); // 사각형 윗면 버텍스 // rvlength =
+				 * rectangleVertice.length; for(var j = 0; j < rectOrder.length; j++){ cart =
+				 * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); // 보여야 할 사각형 옆면
+				 * 페이스 if (j === 0) { rectangleSides.push([ rvlength + j + 1, rvlength + 1 +
+				 * rectOrder.length, rvlength + j ]); rectangleSides.push([ rvlength + 1 +
+				 * rectOrder.length, rvlength + rectOrder.length, rvlength + j ]); } else if (j ===
+				 * 3) { rectangleSides.push([ rvlength + j + 1, rvlength + (2 * rectOrder.length -
+				 * 2), rvlength + j ]); rectangleSides.push([ rvlength + (2 * rectOrder.length - 2),
+				 * rvlength + j + rectOrder.length, rvlength + j ]); }
 				 * 
-				 * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y +
-				 * (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
-				 * vect.sub(centerVec); rectangleVertice.push(vect); } }
+				 * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth,
+				 * cart.z + (cp.w/cp.s)*depth); vect.sub(centerVec); rectangleVertice.push(vect); } }
 				 */
 			}
 			// 중간 사각형 중에 마지막
@@ -2945,6 +2958,17 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 	geometry.uvsNeedUpdate = true;
 }
 
+/**
+ * 객체의 Matrix World 값을 초기화 한다.
+ * 
+ * @method gb3d.Math.resetMatrixWorld
+ * @param {THREE.Object3D|THREE.Group} obj - 3d 객체
+ * @param {number} quaternion - quaternion
+ * @param {Object} centerHigh - center 3차원 좌표값
+ * @param {Object} centerHigh.x - x
+ * @param {Object} centerHigh.y - y
+ * @param {Object} centerHigh.z - z
+ */
 gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 	var object = obj;
 	var quat = object.rotation.clone();
@@ -2980,11 +3004,11 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 };
  
 /**
- * 3D 객체의 위치와 회전을 원점으로 되돌린다.
+ * 3D 객체의 위치값과 회전값을 초기화한다.
  * 
- * @method gb3d.Math.#resetRotationAndPosition
- * @param {THREE.Object3D}
- *            object - 원점으로 되돌릴 3D 객체
+ * @method gb3d.Math.resetRotationAndPosition
+ * @param {THREE.Object3D} object - 원점으로 되돌릴 3D 객체
+ * @return {THREE.Object3D} 변환된 3D 객체
  */
 gb3d.Math.resetRotationAndPosition = function(object) {
 	if (object instanceof THREE.Object3D) {

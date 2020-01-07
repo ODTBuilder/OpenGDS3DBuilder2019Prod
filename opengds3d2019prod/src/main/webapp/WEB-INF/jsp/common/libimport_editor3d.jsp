@@ -227,9 +227,8 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/threeUI/Material.js"></script>
 <!-- gb3d -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/gb3d/css/gb3d.css" />
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/UI.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/Map.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb3d/Camera.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/map/Map.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/map/Camera.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/math/Math.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jsTree-three/jstree.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/tree/Three.js"></script>
