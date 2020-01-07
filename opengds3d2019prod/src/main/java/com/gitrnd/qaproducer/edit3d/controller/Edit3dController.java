@@ -43,7 +43,7 @@ public class Edit3dController extends AbstractController {
 //		@param objPath 원본 obj 파일 경로
 //		@return {"path":"175.116.181.32:8888/guest/upload/20191213_185342/gltf/featureId.gltf", "succ": true}
 
-		return edit3dSevice.convertObjToGltf(featureId, loginUser.getFname(), objPath);
+		return edit3dSevice.convertObjToGltf(featureId, loginUser.getUsername(), objPath);
 
 	}
 
