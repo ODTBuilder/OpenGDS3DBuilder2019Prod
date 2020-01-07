@@ -257,14 +257,14 @@ public class ShpToObjImpl {
 
 		if (geomType.contains("Polygon") || geomType.contains("MultiPolygon")) {
 			if (this.hType == EnShpToObjHeightType.DEFAULT) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl,
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
 						defaultHeight, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
 				this.objfilenum = polyToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.FIX) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, attribute,
-						outputPath);
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						attribute, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
 				this.objfilenum = polyToObj.getObjfilenum();
