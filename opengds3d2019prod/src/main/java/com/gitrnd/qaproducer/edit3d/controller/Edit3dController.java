@@ -1,6 +1,8 @@
 package com.gitrnd.qaproducer.edit3d.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,18 +39,18 @@ public class Edit3dController extends AbstractController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Edit3dController.class);
 
-	@RequestMapping(value = "/objToGltf.ajax", method = RequestMethod.GET)
+	@RequestMapping(value = "/objToGltf.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("params") JSONObject params, @AuthenticationPrincipal LoginUser loginUser)
+			@RequestBody JSONObject params, @AuthenticationPrincipal LoginUser loginUser)
 			throws IOException, ParseException {
 
 //		@return {"path":"175.116.181.32:8888/guest/upload/20191213_185342/gltf/featureId.gltf", "succ": true}
 
 		String objPath = (String) params.get("objPath");
-		JSONArray objCenterArr = (JSONArray) params.get("objCenter");
+		List objCenterArr = (ArrayList) params.get("objCenter");
 		String featureId = (String) params.get("featureId");
-		JSONArray featureCenterArr = (JSONArray) params.get("featureCenter");
+		List featureCenterArr = (ArrayList) params.get("featureCenter");
 
 		double centerXtile = (double) objCenterArr.get(0);
 		double centerYtile = (double) objCenterArr.get(1);
