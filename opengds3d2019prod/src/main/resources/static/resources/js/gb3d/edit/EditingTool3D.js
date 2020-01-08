@@ -2634,8 +2634,10 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 	console.log(extras);
 	// obj path
 	var objPath;
+	var objCenter;
 	if (extras) {
-		objPath = extras["originObjPath"];	
+		objPath = extras["originObjPath"];
+		objCenter = [extras["centerX"], extras["centerY"]];
 	}
 	// feature id
 	var propNames = pickedFeature.getPropertyNames();
@@ -2646,12 +2648,42 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 			fid = pickedFeature.getProperty(propNames[idx]);				
 		}
 	}
-	if (!objPath || !fid) {
+	
+	// 현재 선택한 레이어를 가져온다
+	var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+	var slayer;
+	var ctileset;
+	if (slayers.length === 0) {
+		return;
+	} else if (slayers.length === 1) {
+		slayer = slayers[0];
+	} else {
+		return;
+	}
+	// 2d 피처 조회
+	var source;
+	if (slayer instanceof ol.layer.Tile) {
+		var git = slayer.get("git");
+		var vlayer = slayer.get("git").tempLayer;
+		if (vlayer) {
+			source = vlayer.getSource();
+		}
+	} else if (slayer instanceof ol.layer.Vector) {
+		source = vlayer.getSource();
+	}
+	var feature = source.getFeatureById(fid);
+	// extent 및 center 계산
+	var extent = feature.getGeometry().getExtent();
+	var x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2;
+	
+	if (!objPath || !objCenter || !fid) {
 		return;
 	}
 	var params = {
 		"objPath" : objPath,
-		"featureId" : fid
+		"objCenter" : objCenter,
+		"featureId" : fid,
+		"featureCenter" : [x, y]
 	};
 	var url = that.getGetGLTFURL();
 	$.ajax({
@@ -2667,20 +2699,17 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 				pickedFeature.show = false;
 				// gltf 경로
 				var path = data.path;
+				var opt = {
+						"objPath" : objPath,
+						"objCenter" : objCenter,
+						"featureId" : fid,
+						"featureCenter" : [x, y],
+						"layer" : slayer,
+						"feature3D" : pickedFeature	
+				};
 				// thee js 씬 상에 gltf를 올리는 함수
 				var importer = that.getImporterThree();
-				// 현재 선택한 레이어를 가져온다
-				var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-				var slayer;
-				var ctileset;
-				if (slayers.length === 0) {
-					return;
-				} else if (slayers.length === 1) {
-					slayer = slayers[0];
-				} else {
-					return;
-				}
-				importer.loadGLTFToEdit(path, fid, slayer, pickedFeature);
+				importer.loadGLTFToEdit(path, opt);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown){

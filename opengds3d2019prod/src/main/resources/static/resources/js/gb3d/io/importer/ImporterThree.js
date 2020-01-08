@@ -842,7 +842,7 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
  * @param {ol.layer.Vector || ol.layer.Tile} layer - 선택한 레이어
  * @param {Cesium.}
  */
-gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, fid, layer, feature3d) {
+gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	var that = this;
 	// Instantiate a loader
 	var loader = new THREE.GLTFLoader();
@@ -858,24 +858,8 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, fid, layer, featu
 	url,
 	// called when the resource is loaded
 	function(gltf) {
-
 		// 피처 id로 threeObject를 조회
 		var three = that.getGb3dMap().getThreeObjectById(fid);
-		// 2d 피처 조회
-		var source;
-		if (layer instanceof ol.layer.Tile) {
-			var git = layer.get("git");
-			var vlayer = layer.get("git").tempLayer;
-			if (vlayer) {
-				source = vlayer.getSource();
-			}
-		} else if (layer instanceof ol.layer.Vector) {
-			source = vlayer.getSource();
-		}
-		var feature = source.getFeatureById(fid);
-		// extent 및 center 계산
-		var extent = feature.getGeometry().getExtent();
-		var x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2;
 		// 있으면 gltf를 three 모델에 추가
 		// 없으면 새로 만듬
 		var obj3d;
