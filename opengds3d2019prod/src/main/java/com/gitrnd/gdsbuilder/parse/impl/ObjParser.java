@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.geotools.referencing.GeodeticCalculator;
 
+import com.gitrnd.gdsbuilder.parse.impl.test.DefaultObjFace;
+
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjFace;
@@ -19,6 +21,10 @@ public class ObjParser {
 
 	public ObjParser(double originMaxHeight) {
 		this.maxHeight = originMaxHeight;
+	}
+
+	public ObjParser() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public Obj combineObj(Obj originObj, Obj createObj, double centerXedit, double centerYedit, double centerXtile,
@@ -223,4 +229,63 @@ public class ObjParser {
 		this.maxHeight = maxHeight;
 	}
 
+	public Obj groupToObj(Obj originObj, String featureId, double centerXedit, double centerYedit, double centerXtile,
+			double centerYtile) {
+
+		// calculate distance
+		GeodeticCalculator gc = new GeodeticCalculator();
+		gc.setStartingGeographicPoint(centerXtile, centerYedit);
+		gc.setDestinationGeographicPoint(centerXedit, centerYedit);
+		double xDistance = gc.getOrthodromicDistance();
+		if (centerXtile > centerXedit) {
+			xDistance = -xDistance;
+		}
+		gc.setStartingGeographicPoint(centerXedit, centerYtile);
+		gc.setDestinationGeographicPoint(centerXedit, centerYedit);
+		double yDistance = gc.getOrthodromicDistance();
+		if (centerYtile > centerYedit) {
+			yDistance = -yDistance;
+		}
+		// featureId에 해당하는 feature get
+		ObjGroup group = originObj.getGroup(featureId);
+		// 단일 obj 파일로 write
+		Obj groupObj = Objs.create();
+		int numFaces = group.getNumFaces();
+		// face
+		for (int n = 0; n < numFaces; n++) {
+			ObjFace face = group.getFace(n);
+			Set<String> activatedGroupNames = originObj.getActivatedGroupNames(face);
+			if (activatedGroupNames != null) {
+				groupObj.setActiveGroupNames(activatedGroupNames);
+			}
+			String activatedMaterialGroupName = originObj.getActivatedMaterialGroupName(face);
+			if (activatedMaterialGroupName != null) {
+				groupObj.setActiveMaterialGroupName(activatedMaterialGroupName);
+			}
+			List<Integer> vertexIndices = new ArrayList<>();
+			List<Integer> texCoordIndices = new ArrayList<>();
+			List<Integer> normalIndices = new ArrayList<>();
+			int numVertices = face.getNumVertices();
+			for (int v = 0; v < numVertices; v++) {
+				int vertexIdx = face.getVertexIndex(v);
+				int texCoordIdx = face.getTexCoordIndex(v);
+				int normalIdx = face.getNormalIndex(v);
+
+				FloatTuple vertex = originObj.getVertex(vertexIdx);
+				groupObj.addVertex((float) (vertex.getX() + xDistance), (float) (vertex.getY() + yDistance),
+						vertex.getZ());
+				groupObj.addTexCoord(originObj.getTexCoord(texCoordIdx));
+				groupObj.addNormal(originObj.getNormal(normalIdx));
+
+				vertexIndices.add(groupObj.getNumVertices() - 1);
+				texCoordIndices.add(groupObj.getNumTexCoords() - 1);
+				normalIndices.add(groupObj.getNumNormals() - 1);
+			}
+			DefaultObjFace newFace = new DefaultObjFace(vertexIndices.stream().mapToInt(i -> i).toArray(),
+					texCoordIndices.stream().mapToInt(i -> i).toArray(),
+					normalIndices.stream().mapToInt(i -> i).toArray());
+			groupObj.addFace(newFace);
+		}
+		return groupObj;
+	}
 }

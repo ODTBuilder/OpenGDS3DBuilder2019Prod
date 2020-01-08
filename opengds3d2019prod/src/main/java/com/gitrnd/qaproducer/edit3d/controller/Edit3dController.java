@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -38,18 +39,28 @@ public class Edit3dController extends AbstractController {
 	@RequestMapping(value = "/objToGltf.ajax", method = RequestMethod.GET)
 	@ResponseBody
 	public JSONObject convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("featureId") String featureId, @RequestParam("objPath") String objPath,
-			@AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {
+			@RequestParam("params") JSONObject params, @AuthenticationPrincipal LoginUser loginUser)
+			throws IOException, ParseException {
 
-//		@param featureId 편집 객체 id 
-//		@param objPath 원본 obj 파일 경로
 //		@return {"path":"175.116.181.32:8888/guest/upload/20191213_185342/gltf/featureId.gltf", "succ": true}
 
-		return edit3dSevice.convertObjToGltf(featureId, loginUser.getUsername(), objPath);
+		String objPath = (String) params.get("objPath");
+		JSONArray objCenterArr = (JSONArray) params.get("objCenter");
+		String featureId = (String) params.get("featureId");
+		JSONArray featureCenterArr = (JSONArray) params.get("featureCenter");
+
+		double centerXtile = (double) objCenterArr.get(0);
+		double centerYtile = (double) objCenterArr.get(1);
+		double centerXedit = (double) featureCenterArr.get(0);
+		double centerYedit = (double) featureCenterArr.get(1);
+
+		return edit3dSevice.convertObjToGltf(loginUser.getUsername(), objPath, centerXtile, centerYtile, featureId,
+				centerXedit, centerYedit);
 
 	}
 
 	@RequestMapping(value = "/edit3dLayers.do", method = RequestMethod.GET)
+	@ResponseBody
 	public JSONObject editSingleObj(MultipartHttpServletRequest request, HttpServletResponse response,
 			@RequestParam("editInfo") JSONObject editInfo, @AuthenticationPrincipal LoginUser loginUser)
 			throws Exception {
@@ -85,9 +96,8 @@ public class Edit3dController extends AbstractController {
 		// edit obj 파일 아파치 경로 저장, 저장경로 return
 		JSONObject objFiles = uploadService.saveObjFiles(request, loginUser.getFname());
 		JSONObject layerInfo = (JSONObject) editInfo.get("layer");
-		edit3dSevice.editObjFiles(request, loginUser.getFname(), dtGeoserverManager, workspace, datastore, objFiles,
-				layerInfo);
 
-		return null;
+		return edit3dSevice.editObjFiles(request, loginUser.getFname(), dtGeoserverManager, workspace, datastore,
+				objFiles, layerInfo);
 	}
 }
