@@ -170,6 +170,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 	
 	this.getGLTFURL = obj.getGLTFURL ? obj.getGLTFURL : undefined;
 
+	this.importer = obj.importer ? obj.importer : undefined;
+	
 	// 드래그 시작, 끝 위치
 	this.dragStart = undefined;
 	this.dragEnd = undefined;
@@ -2427,49 +2429,8 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeatureSilhouette = function(pick
 
 	if (that.getActiveTool()) {
 		// 선택한 객체에 해당하는 gltf를 요청
-		var extras = pickedFeature.content.tile.extras;
-		console.log(extras);
-		// obj path
-		var objPath;
-		if (extras) {
-			objPath = extras["originObjPath"];	
-		}
-		// feature id
-		var propNames = pickedFeature.getPropertyNames();
-		var fid;
-		if (propNames) {
-			var idx = propNames.indexOf("featureId");
-			if (idx !== -1) {
-				fid = pickedFeature.getProperty(propNames[idx]);				
-			}
-		}
-		if (!objPath || !fid) {
-			return;
-		}
-		var params = {
-			"objPath" : objPath,
-			"featureId" : fid
-		};
-		var url = that.getGetGLTFURL();
-		$.ajax({
-			url : url,
-			type : "GET",
-			contentType : "application/json; charset=UTF-8",
-			data : params,
-			dataType : "JSON",
-			success : function(data, textStatus, jqXHR) {
-				console.log(data);
-
-			},
-			error: function(jqXHR, textStatus, errorThrown){
-				console.log(errorThrown);
-			}
-		});
-		// 요청 성공시 선택 개체(b3dm) 숨김
+		that.getGLTFfromServer(pickedFeature);
 		
-		// 숨긴 선택 객체의 위치에 gltf객체를 보여줌
-		// 2d feature, 3d feature 가져오기
-		// that.getGLTFfromServer();
 	} else {
 		// Save the selected feature's original color
 		var highlightedFeature = that.silhouetteBlue.selected[0];
@@ -2665,24 +2626,62 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
 /**
  * 선택한 b3dm을 glb로 변환하여 편집화면에 불러온다
  * 
- * @method gb3d.edit.EditingTool3D#getGLBfromServer
+ * @method gb3d.edit.EditingTool3D#getGLTFfromServer
  */
-gb3d.edit.EditingTool3D.prototype.getGLBfromServer = function(layerFeature, tileFeature){
+gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 	var that = this;
+	var extras = pickedFeature.content.tile.extras;
+	console.log(extras);
+	// obj path
+	var objPath;
+	if (extras) {
+		objPath = extras["originObjPath"];	
+	}
+	// feature id
+	var propNames = pickedFeature.getPropertyNames();
+	var fid;
+	if (propNames) {
+		var idx = propNames.indexOf("featureId");
+		if (idx !== -1) {
+			fid = pickedFeature.getProperty(propNames[idx]);				
+		}
+	}
+	if (!objPath || !fid) {
+		return;
+	}
 	var params = {
-			"featureId" : layerFeature.getId(),
-			"objPath" : undefined
+		"objPath" : objPath,
+		"featureId" : fid
 	};
-
+	var url = that.getGetGLTFURL();
 	$.ajax({
-		url : this.getGLBURL,
+		url : url,
 		type : "GET",
 		contentType : "application/json; charset=UTF-8",
 		data : params,
 		dataType : "JSON",
 		success : function(data, textStatus, jqXHR) {
 			console.log(data);
-
+			if (data.succ) {
+				// 요청 성공시 선택 개체(b3dm) 숨김
+				pickedFeature.show = false;
+				// gltf 경로
+				var path = data.path;
+				// thee js 씬 상에 gltf를 올리는 함수
+				var importer = that.getImporterThree();
+				// 현재 선택한 레이어를 가져온다
+				var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+				var slayer;
+				var ctileset;
+				if (slayers.length === 0) {
+					return;
+				} else if (slayers.length === 1) {
+					slayer = slayers[0];
+				} else {
+					return;
+				}
+				importer.loadGLTFToEdit(path, fid, slayer, pickedFeature);
+			}
 		},
 		error: function(jqXHR, textStatus, errorThrown){
 			console.log(errorThrown);
@@ -2791,4 +2790,24 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(pickedFeature)
  */
 gb3d.edit.EditingTool3D.prototype.getGetGLTFURL = function(){
 	return this.getGLTFURL;
+}
+
+/**
+ * ImporterThree 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getImporterThree
+ * @return {gb3d.io.ImporterThree} importer 객체
+ */
+gb3d.edit.EditingTool3D.prototype.getImporterThree = function(){
+	return this.importer;
+}
+
+/**
+ * ImporterThree 객체를 설정한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setImporterThree
+ * @param {gb3d.io.ImporterThree} importer - importer 객체
+ */
+gb3d.edit.EditingTool3D.prototype.setImporterThree = function(importer){
+	this.importer = importer;
 }

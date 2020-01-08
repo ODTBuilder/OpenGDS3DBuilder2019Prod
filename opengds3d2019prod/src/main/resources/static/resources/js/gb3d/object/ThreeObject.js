@@ -21,6 +21,8 @@ gb3d.object.ThreeObject = function(obj) {
 	var options = obj ? obj : {};
 	// THREEJS 3DObject.mesh
 	this.object = options.object;
+	// Cesiuim 3d tiles feature
+	this.feature3D = options.feature3D;
 	// center point
 	this.center = options.center;
 	// extent point [a,b,c,d]
@@ -122,6 +124,26 @@ gb3d.object.ThreeObject.prototype.getObject = function() {
  */
 gb3d.object.ThreeObject.prototype.setObject = function(obj) {
 	this.object = obj;
+};
+
+/**
+ * 3d tiles feature 객체를 반환한다.
+ * 
+ * @method gb3d.object.ThreeObject#getFeature3D
+ * @return {Cesium.Cesium3DTileFeature} cesium 3d tiles feature 객체
+ */
+gb3d.object.ThreeObject.prototype.getFeature3D = function() {
+	return this.feature3D;
+};
+
+/**
+ * 3d tiles feature 객체를 할당한다.
+ * 
+ * @method gb3d.object.ThreeObject#setFeature3D
+ * @param {Cesium.Cesium3DTileFeature} obj - cesium 3d tile feature 객체
+ */
+gb3d.object.ThreeObject.prototype.setFeature3D = function(obj) {
+	this.feature3D = obj;
 };
 
 /**

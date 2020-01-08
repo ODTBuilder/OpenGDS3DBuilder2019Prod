@@ -336,11 +336,6 @@ html, body {
 			"gb3dMap" : gb3dMap
 		});
 
-		var importThree = new gb3d.io.ImporterThree({
-			"locale" : locale !== "" ? locale : "en",
-			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/"
-		});
-
 		var gtree = new gb3d.tree.GeoServer({
 			"locale" : locale !== "" ? locale : "en",
 			"height" : "300px",
@@ -368,6 +363,12 @@ html, body {
 			}
 		});
 
+		var importThree = new gb3d.io.ImporterThree({
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap,
+			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/"
+		});
+		
 		var epan;
 		// editing Tool 3D
 		epan3d = new gb3d.edit.EditingTool3D({
@@ -382,6 +383,7 @@ html, body {
 				return epan;
 			},
 			getGLTFURL : "objToGltf.ajax?${_csrf.parameterName}=${_csrf.token}",
+			importer : importThree,
 			texture : {
 				"building" : "${pageContext.request.contextPath}/resources/img/texture/buildings/building1.jpg",
 				"road" : "${pageContext.request.contextPath}/resources/img/texture/roads/road.jpg"

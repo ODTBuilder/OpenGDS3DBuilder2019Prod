@@ -178,10 +178,12 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 
 			var contents = event.target.result;
 
-			THREE.DRACOLoader.setDecoderPath(that.decoder);
+			var dracoLoader = new THREE.DRACOLoader();
+			dracoLoader.setDecoderPath(that.decoder);
 
 			var loader = new THREE.GLTFLoader();
-			loader.setDRACOLoader(new THREE.DRACOLoader());
+			loader.setDRACOLoader(dracoLoader);
+
 			loader.parse(contents, '', function(result) {
 
 				var scene = result.scene;
@@ -216,7 +218,7 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 			var contents = event.target.result;
 
 			var loader;
-			if (gb3d.io.ImporterThree.isGLTF1(contents)) {
+			if (gb3d.io.ImporterThree.isGLTF(contents)) {
 				loader = new THREE.LegacyGLTFLoader();
 			} else {
 				loader = new THREE.GLTFLoader();
@@ -601,10 +603,10 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 /**
  * GLTF 파일 유효성 검사
  * 
- * @method gb3d.io.ImporterThree.isGLTF1
+ * @method gb3d.io.ImporterThree.isGLTF
  * @param {Object} contents - 파일 객체
  */
-gb3d.io.ImporterThree.isGLTF1 = function(contents) {
+gb3d.io.ImporterThree.isGLTF = function(contents) {
 
 	var resultContent;
 
@@ -830,3 +832,107 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	// // Cesium.Math.toRadians(bearing));
 	// that.object.rotateZ(Cesium.Math.toRadians(bearing));
 };
+
+/**
+ * 편집하기 위한 gltf 객체를 불러온다
+ * 
+ * @method gb3d.io.ImporterThree#loadGLTFToEdit
+ * @param {string} url - GLTF 파일의 위치
+ * @param {string} fid - 2d feature id
+ * @param {ol.layer.Vector || ol.layer.Tile} layer - 선택한 레이어
+ * @param {Cesium.}
+ */
+gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, fid, layer, feature3d) {
+	var that = this;
+	// Instantiate a loader
+	var loader = new THREE.GLTFLoader();
+
+	// Optional: Provide a DRACOLoader instance to decode compressed mesh data
+	var dracoLoader = new THREE.DRACOLoader();
+	dracoLoader.setDecoderPath(that.decoder);
+	loader.setDRACOLoader(dracoLoader);
+
+	// Load a glTF resource
+	loader.load(
+	// resource URL
+	url,
+	// called when the resource is loaded
+	function(gltf) {
+
+		// 피처 id로 threeObject를 조회
+		var three = that.getGb3dMap().getThreeObjectById(fid);
+		// 2d 피처 조회
+		var source;
+		if (layer instanceof ol.layer.Tile) {
+			var git = layer.get("git");
+			var vlayer = layer.get("git").tempLayer;
+			if (vlayer) {
+				source = vlayer.getSource();
+			}
+		} else if (layer instanceof ol.layer.Vector) {
+			source = vlayer.getSource();
+		}
+		var feature = source.getFeatureById(fid);
+		// extent 및 center 계산
+		var extent = feature.getGeometry().getExtent();
+		var x = extent[0] + (extent[2] - extent[0]) / 2, y = extent[1] + (extent[3] - extent[1]) / 2;
+		// 있으면 gltf를 three 모델에 추가
+		// 없으면 새로 만듬
+		var obj3d;
+		if (three) {
+			console.log(three);
+		} else {
+			console.log("no three");
+			var scene = gltf.scene;
+			var children = scene.children;
+			var group = new THREE.Group();
+			for (var i = 0; i < children.length; i++) {
+				group.add(children[i]);
+			}
+			obj3d = new gb3d.object.ThreeObject({
+				"object" : group,
+				"center" : [x, y],
+				"extent" : extent,
+				"type" : layer.get("git").geometry,
+				"feature" : feature,
+				"file" : false
+			});
+		}
+		// Map에 ThreeJS 객체 추가
+		that.getGb3dMap().addThreeObject(obj3d);
+		// 맵에 추가
+		// 숨긴 선택 객체의 위치에 gltf객체를 보여줌
+		// 2d feature, 3d feature 가져오기
+		
+// scene.add(gltf.scene);
+//
+// gltf.animations; // Array<THREE.AnimationClip>
+// gltf.scene; // THREE.Scene
+// gltf.scenes; // Array<THREE.Scene>
+// gltf.cameras; // Array<THREE.Camera>
+// gltf.asset; // Object
+
+	},
+	// called while loading is progressing
+	function(xhr) {
+
+		console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
+	},
+	// called when loading has errors
+	function(error) {
+
+		console.log('An error happened');
+
+	});
+}
+
+/**
+ * 편집하기 위한 gltf 객체를 불러온다
+ * 
+ * @method gb3d.io.ImporterThree#getGb3dMap
+ * @return {gb3d.Map} gb3d map
+ */
+gb3d.io.ImporterThree.prototype.getGb3dMap = function() {
+	return this.gb3dMap;
+}
