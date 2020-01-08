@@ -2688,9 +2688,9 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 	var url = that.getGetGLTFURL();
 	$.ajax({
 		url : url,
-		type : "GET",
+		type : "POST",
 		contentType : "application/json; charset=UTF-8",
-		data : params,
+		data : JSON.stringify(params),
 		dataType : "JSON",
 		success : function(data, textStatus, jqXHR) {
 			console.log(data);
