@@ -62,11 +62,10 @@ public class Edit3dController extends AbstractController {
 
 	}
 
-	@RequestMapping(value = "/edit3dLayers.do", method = RequestMethod.GET)
+	@RequestMapping(value = "/edit3dLayers.do", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject editSingleObj(MultipartHttpServletRequest request, HttpServletResponse response,
-			@RequestParam("editInfo") JSONObject editInfo, @AuthenticationPrincipal LoginUser loginUser)
-			throws Exception {
+			@RequestBody JSONObject editInfo, @AuthenticationPrincipal LoginUser loginUser) throws Exception {
 
 //			{
 //			  "geoserver": {

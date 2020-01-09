@@ -272,7 +272,7 @@ public class ObjParser {
 				int normalIdx = face.getNormalIndex(v);
 
 				FloatTuple vertex = originObj.getVertex(vertexIdx);
-				groupObj.addVertex((float) (vertex.getX() + xDistance), (float) (vertex.getY() + yDistance),
+				groupObj.addVertex((float) (xDistance - vertex.getX()), (float) (yDistance - vertex.getY()),
 						vertex.getZ());
 				groupObj.addTexCoord(originObj.getTexCoord(texCoordIdx));
 				groupObj.addNormal(originObj.getNormal(normalIdx));
