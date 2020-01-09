@@ -435,6 +435,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.versioningFeature = options.versioning instanceof gb.versioning.Feature ? options.versioning : undefined; 
 	this.isEditing = options.isEditing instanceof Object ? options.isEditing : undefined;
 
+	this.threeTree = options.threeTree ? options.threeTree : undefined; 
+	
 	this.otree.setEditingTool(this);
 
 	var view = this.map.getView(); 
@@ -2243,7 +2245,6 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 		return;
 	}
 	var that = this;
-
 	var selectSource = this.selectedSource;
 	if(!selectSource){
 		return;
@@ -2307,6 +2308,12 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 		$(okBtn).click(function() {
 			if (selectSource.get("git").tempLayer instanceof ol.layer.Vector) {
 				for (var i = 0; i < features.getLength(); i++) {
+					
+					var fid = features.item(i).getId(); 
+					// three tree 에서 노드 삭제
+					var edit3d = that.getEditingTool3D();
+					edit3d.removeNode(fid);
+					
 					if (features.item(i).getId().search(".new") !== -1) {
 						selectSource.removeFeature(features.item(i));
 					} else {
@@ -4303,3 +4310,23 @@ gb3d.edit.EditingTool2D.prototype.showAttributePopup = function(props, feature){
 		that.attrPop.open();
 	}
 };
+
+/**
+ * ThreeTree 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool2D#getThreeTree
+ * @return {gb3d.tree.ThreeTree} 트리 객체
+ */
+gb3d.edit.EditingTool2D.prototype.getThreeTree = function(){
+	return this.threeTree;
+}
+
+/**
+ * ThreeTree 객체를 설정한다.
+ * 
+ * @method gb3d.edit.EditingTool2D#setThreeTree
+ * @param {gb3d.tree.ThreeTree} tree - 트리 객체
+ */
+gb3d.edit.EditingTool2D.prototype.setThreeTree = function(tree){
+	this.threeTree = tree;
+}

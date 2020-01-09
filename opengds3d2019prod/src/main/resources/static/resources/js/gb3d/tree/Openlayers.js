@@ -475,12 +475,19 @@ gb3d.tree.OpenLayers = function(obj) {
 	this.tilesDownloader = options.tilesDownloader ? options.tilesDownloader : undefined;
 	this.editingTool = options.editingTool || undefined;
 	this.threeTree = options.threeTree || undefined;
+	this.threeJSTree = undefined;
+	if (this.threeTree instanceof gb3d.tree.Three) {
+		this.threeTree.setOpenlayersTree(this);
+		this.threeJSTree = this.threeTree.getJSTree(); 
+	}
 	this.token = options.token || "";
 	this.locale = options.locale || "en";
 	this.uploadjson = options.uploadJSON !== undefined ? options.uploadJSON : undefined;
 	var url = options.url;
 	this.getLegend = url.getLegend ? url.getLegend : undefined;
 
+	this.frecord = options.frecord ? options.frecord : undefined;
+	
 	this.tout = false;
 	$(this.searchInput).keyup(function() {
 		if (that.tout) {
@@ -528,12 +535,12 @@ gb3d.tree.OpenLayers = function(obj) {
 						getWFSFeature : "geoserver/geoserverWFSGetFeature.ajax"
 					}),
 					"layerRecord" : undefined,
-					"featureRecord" : options.frecord,
+					"featureRecord" : this.frecord,
 					"style" : new gb.style.LayerStyle({
 						"locale" : this.locale
 					}),
 					"editingTool" : this.editingTool,
-					"threeTree" : this.threeTree
+					"threeTree" : this.threeJSTree
 				},
 				"search" : {
 					show_only_matches : true
@@ -656,7 +663,8 @@ gb3d.tree.OpenLayers = function(obj) {
 										"gb3dMap" : that.gb3dMap,
 										"layer" : layer,
 										"locale" : that.locale,
-										"threeTree" : that.threeTree
+										"threeTree" : that.threeJSTree,
+										"featureRecord" : that.getFeatureRecord()
 									});
 									modal.open();
 								}
@@ -2285,4 +2293,54 @@ gb3d.tree.OpenLayers.prototype.addPropModal = function(obj) {
  */
 gb3d.tree.OpenLayers.prototype.getTilesDownloader = function() {
 	return this.tilesDownloader;
+}
+
+/**
+ * Three tree 객체를 반환한다.
+ * 
+ * @method gb3d.tree.OpenLayers#getThreeTree
+ * @return {gb3d.tree.Three} three tree 객체
+ */
+gb3d.tree.OpenLayers.prototype.getThreeTree = function() {
+	return this.threeTree;
+}
+
+/**
+ * Three tree 객체를 설정한다.
+ * 
+ * @method gb3d.tree.OpenLayers#setThreeTree
+ * @param {gb3d.tree.Three} tree - three tree 객체
+ */
+gb3d.tree.OpenLayers.prototype.setThreeTree = function(tree) {
+	this.threeTree = tree;
+}
+
+/**
+ * Three JSTree 객체를 반환한다.
+ * 
+ * @method gb3d.tree.OpenLayers#getThreeJSTree
+ * @return {gb3d.tree.Three} three tree 객체
+ */
+gb3d.tree.OpenLayers.prototype.getThreeJSTree = function() {
+	return this.threeJSTree;
+}
+
+/**
+ * Three JSTree 객체를 설정한다.
+ * 
+ * @method gb3d.tree.OpenLayers#setThreeJSTree
+ * @param {gb3d.tree.Three} tree - three tree 객체
+ */
+gb3d.tree.OpenLayers.prototype.setThreeJSTree = function(tree) {
+	this.threeJSTree = tree;
+}
+
+/**
+ * Three JSTree 객체를 설정한다.
+ * 
+ * @method gb3d.tree.OpenLayers#getFeatureRecord
+ * @return {gb.edit.FeatureRecord} 피처 편집이력 객체
+ */
+gb3d.tree.OpenLayers.prototype.getFeatureRecord = function() {
+	return this.frecord;
 }

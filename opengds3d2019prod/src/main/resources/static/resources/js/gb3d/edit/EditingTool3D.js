@@ -172,6 +172,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 	this.importer = obj.importer ? obj.importer : undefined;
 	
+	this.threeTree = obj.threeTree ? obj.threeTree : undefined; 
+	
 	// 드래그 시작, 끝 위치
 	this.dragStart = undefined;
 	this.dragEnd = undefined;
@@ -2702,8 +2704,10 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 				var opt = {
 						"objPath" : objPath,
 						"objCenter" : objCenter,
+						"feature" : feature,
 						"featureId" : fid,
-						"featureCenter" : [x, y],
+						"featureCenter" : extent,
+						"featureExtent" : [x, y],
 						"layer" : slayer,
 						"feature3D" : pickedFeature	
 				};
@@ -2839,4 +2843,44 @@ gb3d.edit.EditingTool3D.prototype.getImporterThree = function(){
  */
 gb3d.edit.EditingTool3D.prototype.setImporterThree = function(importer){
 	this.importer = importer;
+}
+
+/**
+ * ThreeTree 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getThreeTree
+ * @return {gb3d.tree.ThreeTree} 트리 객체
+ */
+gb3d.edit.EditingTool3D.prototype.getThreeTree = function(){
+	return this.threeTree;
+}
+
+/**
+ * ThreeTree 객체를 설정한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setThreeTree
+ * @param {gb3d.tree.ThreeTree} tree - 트리 객체
+ */
+gb3d.edit.EditingTool3D.prototype.setThreeTree = function(tree){
+	this.threeTree = tree;
+}
+
+/**
+ * ThreeTree에서 노드를 삭제한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#removeNode
+ * @param {gb3d.tree.ThreeTree} tree - 트리 객체
+ */
+gb3d.edit.EditingTool3D.prototype.removeNode = function(id){
+	var that = this;
+	var tree = that.getThreeTree();
+	var jstree = tree.getJSTree();
+	var three = that.getMap().getThreeObjectById(id);
+	var result;
+	if (three) {
+		var object = three.getObject(); 
+		var node = jstree.get_node(object.uuid);
+		result = jstree.delete_node(node); 
+	}
+	return result;
 }

@@ -255,13 +255,6 @@ html, body {
 		});
 
 		var epan3d;
-		var threeTree = new gb3d.tree.Three({
-			"target" : "#attrObject",
-			"map" : gb3dMap,
-			"editingTool3D" : function() {
-				return epan3d;
-			}
-		});
 
 		var mrecord = new gb3d.edit.ModelRecord({
 			//id : "feature_id",
@@ -282,6 +275,15 @@ html, body {
 			"downloadTilesUrl" : "geoserver/tilesdownload.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
 
+		var threeTree = new gb3d.tree.Three({
+			"target" : "#attrObject",
+			"map" : gb3dMap,
+// 			"otree" : otree,
+			"editingTool3D" : function() {
+				return epan3d;
+			}
+		});
+		
 		var otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -295,9 +297,9 @@ html, body {
 			"url" : {
 				"getLegend" : urlList.getLegend + urlList.token
 			},
-			"threeTree" : threeTree.jstree,
+			"threeTree" : threeTree
 		});
-
+		
 		var tilesetManager = new gb3d.edit.TilesetManager({
 			map : gb3dMap,
 			clientTree : otree
@@ -368,7 +370,7 @@ html, body {
 			"gb3dMap" : gb3dMap,
 			"decoder" : "${pageContext.request.contextPath}/resources/js/gb3d/libs/draco/gltf/"
 		});
-		
+
 		var epan;
 		// editing Tool 3D
 		epan3d = new gb3d.edit.EditingTool3D({
@@ -377,6 +379,7 @@ html, body {
 			isDisplay : false,
 			modelRecord : mrecord,
 			otree : otree,
+			threeTree : threeTree,
 			locale : locale || "en",
 			getFeatureURL : urlList.getWFSFeature + urlList.token,
 			editingTool2D : function() {

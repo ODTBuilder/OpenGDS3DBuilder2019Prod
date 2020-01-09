@@ -56,6 +56,7 @@ gb3d.io.ImporterThree = function(obj) {
 	this.layer = options.layer ? options.layer : undefined;
 	this.threeTree = options.threeTree ? options.threeTree : undefined;
 	this.feature = new ol.Feature();
+	this.frecord = options.featureRecord ? options.featureRecord : undefined;
 	obj.width = 300;
 	obj.autoOpen = false;
 	obj.title = this.translation.titlemsg[this.locale];
@@ -335,7 +336,83 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 	that.gb2dMap.getUpperMap().addInteraction(draw);
 
 	draw.on("drawend", function(evt) {
-		var feature = evt.feature.clone();
+		// =============================
+		var feature = evt.feature;
+		var dLayer;
+		var source2;
+		if (layer instanceof ol.layer.Tile) {
+			dLayer = source.get("git").tempLayer;
+			if (dLayer instanceof ol.layer.Vector) {
+				source2 = dLayer.getSource();
+			}
+		} else if (layer instanceof ol.layer.Vector) {
+			source2 = source;
+		}
+
+		var arr = source2.getFeatures() instanceof Array ? source2.getFeatures() : [];
+		var item = arr[0];
+		var prop, notNull = {}, setProp = {};
+
+		if (!!source2) {
+			if (layer instanceof ol.layer.Tile) {
+				var l = source2.getFeatureById(source.get("git").treeID + ".new0");
+				if (!l) {
+					var fid = source2.get("git").treeID + ".new0";
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				} else {
+					var count = 1;
+					while (source2.getFeatureById(source2.get("git").treeID + ".new" + count) !== null) {
+						count++;
+					}
+					var fid = source2.get("git").treeID + ".new" + count;
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				}
+			} else if (layer instanceof ol.layer.Vector) {
+				l = source2.getFeatureById(layer.get("treeid") + ".new0");
+				if (!l) {
+					var fid = layer.get("treeid") + ".new0";
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				} else {
+					var count = 1;
+					while (source2.getFeatureById(layer.get("treeid") + ".new" + count) !== null) {
+						count++;
+					}
+					var fid = layer.get("treeid") + ".new" + count;
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				}
+			}
+
+			gb.undo.pushAction({
+				undo : function(data) {
+					data.layer.getSource().removeFeature(data.feature);
+					data.that.featureRecord.deleteFeatureCreated(data.layer.get("id"), data.feature.getId());
+
+					// ThreeObject remove
+					var threeObject = that.getGb3dMap().getThreeObjectById(data.feature.getId());
+					that.getGb3dMap().removeThreeObject(threeObject);
+				},
+				redo : function(data) {
+					data.layer.getSource().addFeature(data.feature);
+					data.that.featureRecord.create(data.layer, data.feature);
+
+					// ThreeObject remove cancel
+					var threeObject = that.getGb3dMap().getThreeObjectById(data.feature.getId());
+					that.getGb3dMap().removeThreeObject(threeObject, true);
+				},
+				data : {
+					that : that,
+					layer : layer,
+					feature : feature
+				}
+			});
+		}
+		// =============================
+
+		// var cfeature = feature.clone();
 		evt.feature = undefined;
 		// feature.setId(that.object.uuid);
 		var geometry = feature.getGeometry();
@@ -774,7 +851,7 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 		var bboxPolygon = turf.bboxPolygon(bbox);
 		var geom = new ol.geom.Polygon(bboxPolygon.geometry.coordinates, "XY");
 		var feature = new ol.Feature(geom);
-		feature.setId(threeObj.getObject().uuid);
+		feature.setId(threeObj.getFeature().getId());
 		threeObj["feature"] = feature;
 		layer.getSource().addFeature(feature);
 		return;
@@ -788,13 +865,13 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 					if (layer.get("git").geometry === "Polygon") {
 						var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
 						var feature = new ol.Feature(geom);
-						feature.setId(threeObj.getObject().uuid);
+						feature.setId(threeObj.getFeature().getId());
 						threeObj["feature"] = feature;
 						fea.push(feature);
 					} else if (layer.get("git").geometry === "MultiPolygon") {
 						var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
 						var feature = new ol.Feature(geom);
-						feature.setId(threeObj.getObject().uuid);
+						feature.setId(threeObj.getFeature().getId());
 						threeObj["feature"] = feature;
 						fea.push(feature);
 					}
@@ -805,14 +882,14 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 						var polygon = outer[0];
 						var geomPoly = new ol.geom.Polygon(polygon, "XY");
 						var feature = new ol.Feature(geomPoly);
-						feature.setId(threeObj.getObject().uuid);
+						feature.setId(threeObj.getFeature().getId());
 						fea.push(feature);
 						threeObj["feature"] = feature;
 						// }
 					} else if (layer.get("git").geometry === "MultiPolygon") {
 						var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
 						var feature = new ol.Feature(geom);
-						feature.setId(threeObj.getObject().uuid);
+						feature.setId(threeObj.getFeature().getId());
 						threeObj["feature"] = feature;
 						fea.push(feature);
 					}
@@ -859,7 +936,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	// called when the resource is loaded
 	function(gltf) {
 		// 피처 id로 threeObject를 조회
-		var three = that.getGb3dMap().getThreeObjectById(fid);
+		var three = that.getGb3dMap().getThreeObjectById(opt["featureId"]);
 		// 있으면 gltf를 three 모델에 추가
 		// 없으면 새로 만듬
 		var obj3d;
@@ -875,26 +952,28 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 			}
 			obj3d = new gb3d.object.ThreeObject({
 				"object" : group,
-				"center" : [x, y],
-				"extent" : extent,
-				"type" : layer.get("git").geometry,
-				"feature" : feature,
+				"center" : opt["featureCenter"],
+				"extent" : opt["featureExtent"],
+				"type" : opt["layer"].get("git").geometry,
+				"feature" : opt["feature"],
 				"file" : false
 			});
 		}
 		// Map에 ThreeJS 객체 추가
+		that.getGb3dMap().getThreeScene().add(group);
+		// threeobject 추가
 		that.getGb3dMap().addThreeObject(obj3d);
 		// 맵에 추가
 		// 숨긴 선택 객체의 위치에 gltf객체를 보여줌
 		// 2d feature, 3d feature 가져오기
-		
-// scene.add(gltf.scene);
-//
-// gltf.animations; // Array<THREE.AnimationClip>
-// gltf.scene; // THREE.Scene
-// gltf.scenes; // Array<THREE.Scene>
-// gltf.cameras; // Array<THREE.Camera>
-// gltf.asset; // Object
+
+		// scene.add(gltf.scene);
+		//
+		// gltf.animations; // Array<THREE.AnimationClip>
+		// gltf.scene; // THREE.Scene
+		// gltf.scenes; // Array<THREE.Scene>
+		// gltf.cameras; // Array<THREE.Camera>
+		// gltf.asset; // Object
 
 	},
 	// called while loading is progressing
@@ -919,4 +998,14 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
  */
 gb3d.io.ImporterThree.prototype.getGb3dMap = function() {
 	return this.gb3dMap;
+}
+
+/**
+ * Three JSTree 객체를 설정한다.
+ * 
+ * @method gb3d.io.ImporterThree#getFeatureRecord
+ * @return {gb.edit.FeatureRecord} 피처 편집이력 객체
+ */
+gb3d.io.ImporterThree.prototype.getFeatureRecord = function() {
+	return this.frecord;
 }

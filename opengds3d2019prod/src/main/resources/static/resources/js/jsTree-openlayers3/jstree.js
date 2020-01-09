@@ -20,10 +20,9 @@
 			 * http://www.opensource.org/licenses/mit-license.php
 			 */
 			/*
-			 * ! if using jslint please allow for the jQuery global and use
-			 * following options: jslint: loopfunc: true, browser: true, ass:
-			 * true, bitwise: true, continue: true, nomen: true, plusplus: true,
-			 * regexp: true, unparam: true, todo: true, white: true
+			 * ! if using jslint please allow for the jQuery global and use following options:
+			 * jslint: loopfunc: true, browser: true, ass: true, bitwise: true, continue: true,
+			 * nomen: true, plusplus: true, regexp: true, unparam: true, todo: true, white: true
 			 */
 			/* jshint -W083 */
 
@@ -37,8 +36,7 @@
 			 */
 
 			// internal variables
-			var instance_counter = 0, ccp_node = false, ccp_mode = false, ccp_inst = false, themes_loaded = [], src = $('script:last')
-					.attr('src'), document = window.document; // local
+			var instance_counter = 0, ccp_node = false, ccp_mode = false, ccp_inst = false, themes_loaded = [], src = $('script:last').attr('src'), document = window.document; // local
 			// variable
 			// is
 			// always
@@ -50,9 +48,8 @@
 			// global
 
 			/**
-			 * holds all jstreeol3 related functions and variables, including
-			 * the actual class and methods to create, access and manipulate
-			 * instances.
+			 * holds all jstreeol3 related functions and variables, including the actual class and
+			 * methods to create, access and manipulate instances.
 			 * 
 			 * @name $.jstreeol3
 			 */
@@ -64,16 +61,14 @@
 				 */
 				version : '3.3.3',
 				/**
-				 * holds all the default options used when creating new
-				 * instances
+				 * holds all the default options used when creating new instances
 				 * 
 				 * @name $.jstreeol3.defaults
 				 */
 				defaults : {
 					/**
-					 * configure which plugins will be active on an instance.
-					 * Should be an array of strings, where each element is a
-					 * plugin name. The default is `[]`
+					 * configure which plugins will be active on an instance. Should be an array of
+					 * strings, where each element is a plugin name. The default is `[]`
 					 * 
 					 * @name $.jstreeol3.defaults.plugins
 					 */
@@ -99,12 +94,9 @@
 			 * creates a jstreeol3 instance
 			 * 
 			 * @name $.jstreeol3.create(el [, options])
-			 * @param {DOMElement|jQuery|String}
-			 *            el the element to create the instance on, can be
-			 *            jQuery extended or a selector
-			 * @param {Object}
-			 *            options options for this instance (extends
-			 *            `$.jstreeol3.defaults`)
+			 * @param {DOMElement|jQuery|String} el the element to create the instance on, can be
+			 * jQuery extended or a selector
+			 * @param {Object} options options for this instance (extends `$.jstreeol3.defaults`)
 			 * @return {jstreeol3} the new instance
 			 */
 			$.jstreeol3.create = function(el, options) {
@@ -123,8 +115,7 @@
 				return tmp;
 			};
 			/**
-			 * remove all traces of jstreeol3 from the DOM and destroy all
-			 * instances
+			 * remove all traces of jstreeol3 from the DOM and destroy all instances
 			 * 
 			 * @name $.jstreeol3.destroy()
 			 */
@@ -137,8 +128,7 @@
 			 * 
 			 * @private
 			 * @name $.jstreeol3.core(id)
-			 * @param {Number}
-			 *            id this instance's index
+			 * @param {Number} id this instance's index
 			 */
 			$.jstreeol3.core = function(id) {
 				this._id = id;
@@ -161,22 +151,17 @@
 				};
 			};
 			/**
-			 * get a reference to an existing instance
-			 * 
-			 * __Examples__ // provided a container with an ID of "tree", and a
-			 * nested node with an ID of "branch" // all of there will return
-			 * the same instance $.jstreeol3.reference('tree');
-			 * $.jstreeol3.reference('#tree');
+			 * get a reference to an existing instance __Examples__ // provided a container with an
+			 * ID of "tree", and a nested node with an ID of "branch" // all of there will return
+			 * the same instance $.jstreeol3.reference('tree'); $.jstreeol3.reference('#tree');
 			 * $.jstreeol3.reference($('#tree'));
 			 * $.jstreeol3.reference(document.getElementByID('tree'));
-			 * $.jstreeol3.reference('branch');
-			 * $.jstreeol3.reference('#branch');
+			 * $.jstreeol3.reference('branch'); $.jstreeol3.reference('#branch');
 			 * $.jstreeol3.reference($('#branch'));
 			 * $.jstreeol3.reference(document.getElementByID('branch'));
 			 * 
 			 * @name $.jstreeol3.reference(needle)
-			 * @param {DOMElement|jQuery|String}
-			 *            needle
+			 * @param {DOMElement|jQuery|String} needle
 			 * @return {jstreeol3|null} the instance or `null` if not found
 			 */
 			$.jstreeol3.reference = function(needle) {
@@ -211,41 +196,25 @@
 				return tmp;
 			};
 			/**
-			 * Create an instance, get an instance or invoke a command on a
-			 * instance.
-			 * 
-			 * If there is no instance associated with the current node a new
-			 * one is created and `arg` is used to extend `$.jstreeol3.defaults`
-			 * for this new instance. There would be no return value (chaining
-			 * is not broken).
-			 * 
-			 * If there is an existing instance and `arg` is a string the
-			 * command specified by `arg` is executed on the instance, with any
-			 * additional arguments passed to the function. If the function
-			 * returns a value it will be returned (chaining could break
-			 * depending on function).
-			 * 
-			 * If there is an existing instance and `arg` is not a string the
-			 * instance itself is returned (similar to `$.jstreeol3.reference`).
-			 * 
-			 * In any other case - nothing is returned and chaining is not
-			 * broken.
-			 * 
-			 * __Examples__
-			 * 
-			 * $('#tree1').jstreeol3(); // creates an instance
-			 * $('#tree2').jstreeol3({ plugins : [] }); // create an instance
-			 * with some options $('#tree1').jstreeol3('open_node',
-			 * '#branch_1'); // call a method on an existing instance, passing
-			 * additional arguments $('#tree2').jstreeol3(); // get an existing
-			 * instance (or create an instance) $('#tree2').jstreeol3(true); //
-			 * get an existing instance (will not create new instance)
-			 * $('#branch_1').jstreeol3().select_node('#branch_1'); // get an
-			 * instance (using a nested element and call a method)
+			 * Create an instance, get an instance or invoke a command on a instance. If there is no
+			 * instance associated with the current node a new one is created and `arg` is used to
+			 * extend `$.jstreeol3.defaults` for this new instance. There would be no return value
+			 * (chaining is not broken). If there is an existing instance and `arg` is a string the
+			 * command specified by `arg` is executed on the instance, with any additional arguments
+			 * passed to the function. If the function returns a value it will be returned (chaining
+			 * could break depending on function). If there is an existing instance and `arg` is not
+			 * a string the instance itself is returned (similar to `$.jstreeol3.reference`). In any
+			 * other case - nothing is returned and chaining is not broken. __Examples__
+			 * $('#tree1').jstreeol3(); // creates an instance $('#tree2').jstreeol3({ plugins : []
+			 * }); // create an instance with some options $('#tree1').jstreeol3('open_node',
+			 * '#branch_1'); // call a method on an existing instance, passing additional arguments
+			 * $('#tree2').jstreeol3(); // get an existing instance (or create an instance)
+			 * $('#tree2').jstreeol3(true); // get an existing instance (will not create new
+			 * instance) $('#branch_1').jstreeol3().select_node('#branch_1'); // get an instance
+			 * (using a nested element and call a method)
 			 * 
 			 * @name $().jstreeol3([arg])
-			 * @param {String|Object}
-			 *            arg
+			 * @param {String|Object} arg
 			 * @return {Mixed}
 			 */
 			$.fn.jstreeol3 = function(arg) {
@@ -287,12 +256,8 @@
 				return result !== null && result !== undefined ? result : this;
 			};
 			/**
-			 * used to find elements containing an instance
-			 * 
-			 * __Examples__
-			 * 
-			 * $('div:jstreeol3').each(function () {
-			 * $(this).jstreeol3('destroy'); });
+			 * used to find elements containing an instance __Examples__
+			 * $('div:jstreeol3').each(function () { $(this).jstreeol3('destroy'); });
 			 * 
 			 * @name $(':jstreeol3')
 			 * @return {jQuery}
@@ -310,88 +275,63 @@
 			 */
 			$.jstreeol3.defaults.core = {
 				/**
-				 * data configuration
-				 * 
-				 * If left as `false` the HTML inside the jstreeol3 container
-				 * element is used to populate the tree (that should be an
-				 * unordered list with list items).
-				 * 
-				 * You can also pass in a HTML string or a JSON array here.
-				 * 
-				 * It is possible to pass in a standard jQuery-like AJAX config
-				 * and jstreeol3 will automatically determine if the response is
-				 * JSON or HTML and use that to populate the tree. In addition
-				 * to the standard jQuery ajax options here you can suppy
-				 * functions for `data` and `url`, the functions will be run in
-				 * the current instance's scope and a param will be passed
-				 * indicating which node is being loaded, the return value of
-				 * those functions will be used.
-				 * 
-				 * The last option is to specify a function, that function will
-				 * receive the node being loaded as argument and a second param
-				 * which is a function which should be called with the result.
-				 * 
-				 * __Examples__ // AJAX $('#tree').jstreeol3({ 'core' : { 'data' : {
-				 * 'url' : '/get/children/', 'data' : function (node) { return {
-				 * 'id' : node.id }; } } }); // direct data
-				 * $('#tree').jstreeol3({ 'core' : { 'data' : [ 'Simple root
-				 * node', { 'id' : 'node_2', 'text' : 'Root node with options',
-				 * 'state' : { 'opened' : true, 'selected' : true }, 'children' : [ {
-				 * 'text' : 'Child 1' }, 'Child 2'] } ] } }); // function
-				 * $('#tree').jstreeol3({ 'core' : { 'data' : function (obj,
-				 * callback) { callback.call(this, ['Root 1', 'Root 2']); } });
+				 * data configuration If left as `false` the HTML inside the jstreeol3 container
+				 * element is used to populate the tree (that should be an unordered list with list
+				 * items). You can also pass in a HTML string or a JSON array here. It is possible
+				 * to pass in a standard jQuery-like AJAX config and jstreeol3 will automatically
+				 * determine if the response is JSON or HTML and use that to populate the tree. In
+				 * addition to the standard jQuery ajax options here you can suppy functions for
+				 * `data` and `url`, the functions will be run in the current instance's scope and a
+				 * param will be passed indicating which node is being loaded, the return value of
+				 * those functions will be used. The last option is to specify a function, that
+				 * function will receive the node being loaded as argument and a second param which
+				 * is a function which should be called with the result. __Examples__ // AJAX
+				 * $('#tree').jstreeol3({ 'core' : { 'data' : { 'url' : '/get/children/', 'data' :
+				 * function (node) { return { 'id' : node.id }; } } }); // direct data
+				 * $('#tree').jstreeol3({ 'core' : { 'data' : [ 'Simple root node', { 'id' :
+				 * 'node_2', 'text' : 'Root node with options', 'state' : { 'opened' : true,
+				 * 'selected' : true }, 'children' : [ { 'text' : 'Child 1' }, 'Child 2'] } ] } }); //
+				 * function $('#tree').jstreeol3({ 'core' : { 'data' : function (obj, callback) {
+				 * callback.call(this, ['Root 1', 'Root 2']); } });
 				 * 
 				 * @name $.jstreeol3.defaults.core.data
 				 */
 				data : false,
 				/**
-				 * configure the various strings used throughout the tree
-				 * 
-				 * You can use an object where the key is the string you need to
-				 * replace and the value is your replacement. Another option is
-				 * to specify a function which will be called with an argument
-				 * of the needed string and should return the replacement. If
-				 * left as `false` no replacement is made.
-				 * 
-				 * __Examples__
-				 * 
-				 * $('#tree').jstreeol3({ 'core' : { 'strings' : { 'Loading ...' :
-				 * 'Please wait ...' } } });
+				 * configure the various strings used throughout the tree You can use an object
+				 * where the key is the string you need to replace and the value is your
+				 * replacement. Another option is to specify a function which will be called with an
+				 * argument of the needed string and should return the replacement. If left as
+				 * `false` no replacement is made. __Examples__ $('#tree').jstreeol3({ 'core' : {
+				 * 'strings' : { 'Loading ...' : 'Please wait ...' } } });
 				 * 
 				 * @name $.jstreeol3.defaults.core.strings
 				 */
 				strings : false,
 				/**
-				 * determines what happens when a user tries to modify the
-				 * structure of the tree If left as `false` all operations like
-				 * create, rename, delete, move or copy are prevented. You can
-				 * set this to `true` to allow all interactions or use a
-				 * function to have better control.
-				 * 
-				 * __Examples__
-				 * 
-				 * $('#tree').jstreeol3({ 'core' : { 'check_callback' : function
-				 * (operation, node, node_parent, node_position, more) { //
-				 * operation can be 'create_node', 'rename_node', 'delete_node',
-				 * 'move_node' or 'copy_node' // in case of 'rename_node'
-				 * node_position is filled with the new node name return
-				 * operation === 'rename_node' ? true : false; } } });
+				 * determines what happens when a user tries to modify the structure of the tree If
+				 * left as `false` all operations like create, rename, delete, move or copy are
+				 * prevented. You can set this to `true` to allow all interactions or use a function
+				 * to have better control. __Examples__ $('#tree').jstreeol3({ 'core' : {
+				 * 'check_callback' : function (operation, node, node_parent, node_position, more) { //
+				 * operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or
+				 * 'copy_node' // in case of 'rename_node' node_position is filled with the new node
+				 * name return operation === 'rename_node' ? true : false; } } });
 				 * 
 				 * @name $.jstreeol3.defaults.core.check_callback
 				 * @comment ZIndex 설정을 위해 기본값을 true로 바꿈.(소이준)
 				 */
 				check_callback : true,
 				/**
-				 * a callback called with a single object parameter in the
-				 * instance's scope when something goes wrong (operation
-				 * prevented, ajax failed, etc)
+				 * a callback called with a single object parameter in the instance's scope when
+				 * something goes wrong (operation prevented, ajax failed, etc)
 				 * 
 				 * @name $.jstreeol3.defaults.core.error
 				 */
 				error : $.noop,
 				/**
-				 * the open / close animation duration in milliseconds - set
-				 * this to `false` to disable the animation (default is `200`)
+				 * the open / close animation duration in milliseconds - set this to `false` to
+				 * disable the animation (default is `200`)
 				 * 
 				 * @name $.jstreeol3.defaults.core.animation
 				 */
@@ -409,24 +349,21 @@
 				 */
 				themes : {
 					/**
-					 * the name of the theme to use (if left as `false` the
-					 * default theme is used)
+					 * the name of the theme to use (if left as `false` the default theme is used)
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.name
 					 */
 					name : false,
 					/**
-					 * the URL of the theme's CSS file, leave this as `false` if
-					 * you have manually included the theme CSS (recommended).
-					 * You can set this to `true` too which will try to autoload
-					 * the theme.
+					 * the URL of the theme's CSS file, leave this as `false` if you have manually
+					 * included the theme CSS (recommended). You can set this to `true` too which
+					 * will try to autoload the theme.
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.url
 					 */
 					url : false,
 					/**
-					 * the location of all jstreeol3 themes - only used if `url`
-					 * is set to `true`
+					 * the location of all jstreeol3 themes - only used if `url` is set to `true`
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.dir
 					 */
@@ -444,8 +381,8 @@
 					 */
 					icons : true,
 					/**
-					 * a boolean indicating if node ellipsis should be shown -
-					 * this only works with a fixed with on the container
+					 * a boolean indicating if node ellipsis should be shown - this only works with
+					 * a fixed with on the container
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.ellipsis
 					 */
@@ -457,48 +394,44 @@
 					 */
 					stripes : false,
 					/**
-					 * a string (or boolean `false`) specifying the theme
-					 * variant to use (if the theme supports variants)
+					 * a string (or boolean `false`) specifying the theme variant to use (if the
+					 * theme supports variants)
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.variant
 					 */
 					variant : false,
 					/**
-					 * a boolean specifying if a reponsive version of the theme
-					 * should kick in on smaller screens (if the theme supports
-					 * it). Defaults to `false`.
+					 * a boolean specifying if a reponsive version of the theme should kick in on
+					 * smaller screens (if the theme supports it). Defaults to `false`.
 					 * 
 					 * @name $.jstreeol3.defaults.core.themes.responsive
 					 */
 					responsive : false
 				},
 				/**
-				 * if left as `true` all parents of all selected nodes will be
-				 * opened once the tree loads (so that all selected nodes are
-				 * visible to the user)
+				 * if left as `true` all parents of all selected nodes will be opened once the tree
+				 * loads (so that all selected nodes are visible to the user)
 				 * 
 				 * @name $.jstreeol3.defaults.core.expand_selected_onload
 				 */
 				expand_selected_onload : true,
 				/**
-				 * if left as `true` web workers will be used to parse incoming
-				 * JSON data where possible, so that the UI will not be blocked
-				 * by large requests. Workers are however about 30% slower.
-				 * Defaults to `true`
+				 * if left as `true` web workers will be used to parse incoming JSON data where
+				 * possible, so that the UI will not be blocked by large requests. Workers are
+				 * however about 30% slower. Defaults to `true`
 				 * 
 				 * @name $.jstreeol3.defaults.core.worker
 				 */
 				worker : true,
 				/**
-				 * Force node text to plain text (and escape HTML). Defaults to
-				 * `false`
+				 * Force node text to plain text (and escape HTML). Defaults to `false`
 				 * 
 				 * @name $.jstreeol3.defaults.core.force_text
 				 */
 				force_text : false,
 				/**
-				 * Should the node should be toggled if the text is double
-				 * clicked . Defaults to `true`
+				 * Should the node should be toggled if the text is double clicked . Defaults to
+				 * `true`
 				 * 
 				 * @name $.jstreeol3.defaults.core.dblclick_toggle
 				 */
@@ -510,10 +443,8 @@
 				 * 
 				 * @private
 				 * @name plugin(deco [, opts])
-				 * @param {String}
-				 *            deco the plugin to decorate with
-				 * @param {Object}
-				 *            opts options for the plugin
+				 * @param {String} deco the plugin to decorate with
+				 * @param {Object} opts options for the plugin
 				 * @return {jstreeol3}
 				 */
 				plugin : function(deco, opts) {
@@ -531,10 +462,8 @@
 				 * @author 소이준
 				 * @private
 				 * @name setUniqueLayerZIndexByNode(node, zidx)
-				 * @param {obj}
-				 *            node - 노드객체
-				 * @param {number}
-				 *            zidx - z-index
+				 * @param {obj} node - 노드객체
+				 * @param {number} zidx - z-index
 				 * @return {number} 빈 z-index
 				 */
 				setUniqueLayerZIndexByNode : function(node, zidx) {
@@ -566,10 +495,8 @@
 				 * @author 소이준
 				 * @private
 				 * @name setUniqueLayerZIndex(layer, zidx)
-				 * @param {ol.layer.Base}
-				 *            layer - 함수를 적용할 레이어
-				 * @param {Number}
-				 *            zidx - Z-Index
+				 * @param {ol.layer.Base} layer - 함수를 적용할 레이어
+				 * @param {Number} zidx - Z-Index
 				 * @return {Number} 빈 z-index
 				 */
 				setUniqueLayerZIndex : function(layer, zidx) {
@@ -629,10 +556,8 @@
 				 * @author 소이준
 				 * @private
 				 * @name setUniqueLayerId(layer, id)
-				 * @param {ol.layer.Base}
-				 *            layer - 함수를 적용할 레이어
-				 * @param {String}
-				 *            id -layer id
+				 * @param {ol.layer.Base} layer - 함수를 적용할 레이어
+				 * @param {String} id -layer id
 				 */
 				setUniqueLayerId : function(layer, id) {
 					var that = this;
@@ -667,10 +592,10 @@
 									layer.set("treeid", id);
 								}
 							} else {
-//								layer.set("treeid", id);
+								// layer.set("treeid", id);
 							}
 						} else {
-//							layer.set("treeid", id);
+							// layer.set("treeid", id);
 						}
 					}
 				},
@@ -693,12 +618,10 @@
 				 * 
 				 * @private
 				 * @name init(el, optons)
-				 * @param {DOMElement|jQuery|String}
-				 *            el the element we are transforming
-				 * @param {Object}
-				 *            options options for this instance
-				 * @trigger init.jstreeol3, loading.jstreeol3, loaded.jstreeol3,
-				 *          ready.jstreeol3, changed.jstreeol3
+				 * @param {DOMElement|jQuery|String} el the element we are transforming
+				 * @param {Object} options options for this instance
+				 * @trigger init.jstreeol3, loading.jstreeol3, loaded.jstreeol3, ready.jstreeol3,
+				 * changed.jstreeol3
 				 */
 				init : function(el, options) {
 					this._model = {
@@ -838,20 +761,14 @@
 					this._data.core.original_container_html.find("li").addBack().contents().filter(function() {
 						return this.nodeType === 3 && (!this.nodeValue || /^\s+$/.test(this.nodeValue));
 					}).remove();
-					this.element
-							.html("<"
-									+ "ul class='jstreeol3-container-ul jstreeol3-children' role='group'><"
-									+ "li id='j"
-									+ this._id
-									+ "_loading' class='jstreeol3-initial-node jstreeol3-loading jstreeol3-leaf jstreeol3-last' role='tree-item'><i class='jstreeol3-icon jstreeol3-ocl'></i><"
-									+ "a class='jstreeol3-anchor' href='#'><i class='jstreeol3-icon jstreeol3-themeicon-hidden'></i>"
-									+ this.get_string("Loading ...") + "</a></li></ul>");
+					this.element.html("<" + "ul class='jstreeol3-container-ul jstreeol3-children' role='group'><" + "li id='j" + this._id
+							+ "_loading' class='jstreeol3-initial-node jstreeol3-loading jstreeol3-leaf jstreeol3-last' role='tree-item'><i class='jstreeol3-icon jstreeol3-ocl'></i><"
+							+ "a class='jstreeol3-anchor' href='#'><i class='jstreeol3-icon jstreeol3-themeicon-hidden'></i>" + this.get_string("Loading ...") + "</a></li></ul>");
 					this.element.attr('aria-activedescendant', 'j' + this._id + '_loading');
 					this._data.core.li_height = this.get_container_ul().children("li").first().height() || 24;
 					this._data.core.node = this._create_prototype_node();
 					/**
-					 * triggered after the loading text is shown and before
-					 * loading starts
+					 * triggered after the loading text is shown and before loading starts
 					 * 
 					 * @event
 					 * @name loading.jstreeol3
@@ -863,10 +780,8 @@
 				 * destroy an instance
 				 * 
 				 * @name destroy()
-				 * @param {Boolean}
-				 *            keep_html if not set to `true` the container will
-				 *            be emptied, otherwise the current DOM elements
-				 *            will be kept intact
+				 * @param {Boolean} keep_html if not set to `true` the container will be emptied,
+				 * otherwise the current DOM elements will be kept intact
 				 */
 				destroy : function(keep_html) {
 					if (this._wrk) {
@@ -912,10 +827,9 @@
 				 */
 				teardown : function() {
 					this.unbind();
-					this.element.removeClass('jstreeol3').removeData('jstreeol3').find("[class^='jstreeol3']").addBack().attr("class",
-							function() {
-								return this.className.replace(/jstreeol3[^ ]*|$/ig, '');
-							});
+					this.element.removeClass('jstreeol3').removeData('jstreeol3').find("[class^='jstreeol3']").addBack().attr("class", function() {
+						return this.className.replace(/jstreeol3[^ ]*|$/ig, '');
+					});
 					this.element = null;
 				},
 				/**
@@ -1073,10 +987,9 @@
 							break;
 						/*
 						 * ! // delete case 46: e.preventDefault(); o =
-						 * this.get_node(e.currentTarget); if(o && o.id && o.id
-						 * !== $.jstreeol3.root) { o = this.is_selected(o) ?
-						 * this.get_selected() : o; this.delete_node(o); }
-						 * break;
+						 * this.get_node(e.currentTarget); if(o && o.id && o.id !==
+						 * $.jstreeol3.root) { o = this.is_selected(o) ? this.get_selected() : o;
+						 * this.delete_node(o); } break;
 						 * 
 						 */
 						}
@@ -1088,8 +1001,7 @@
 									this.element.attr('aria-activedescendant', this._firstChild(this.get_container_ul()[0]).id);
 								}
 								/**
-								 * triggered after the root node is loaded for
-								 * the first time
+								 * triggered after the root node is loaded for the first time
 								 * 
 								 * @event
 								 * @name loaded.jstreeol3
@@ -1117,8 +1029,7 @@
 											});
 										}
 										/**
-										 * triggered after all nodes are
-										 * finished loading
+										 * triggered after all nodes are finished loading
 										 * 
 										 * @event
 										 * @name ready.jstreeol3
@@ -1132,88 +1043,90 @@
 					// quick searching when the tree is focused
 					.on(
 							'keypress.jstreeol3',
-							$.proxy(function(e) {
-								if (e.target.tagName && e.target.tagName.toLowerCase() === "input") {
-									return true;
-								}
-								if (tout) {
-									clearTimeout(tout);
-								}
-								tout = setTimeout(function() {
-									word = '';
-								}, 500);
+							$
+									.proxy(
+											function(e) {
+												if (e.target.tagName && e.target.tagName.toLowerCase() === "input") {
+													return true;
+												}
+												if (tout) {
+													clearTimeout(tout);
+												}
+												tout = setTimeout(function() {
+													word = '';
+												}, 500);
 
-								var chr = String.fromCharCode(e.which).toLowerCase(), col = this.element.find('.jstreeol3-anchor').filter(
-										':visible'), ind = col.index(document.activeElement) || 0, end = false;
-								word += chr;
+												var chr = String.fromCharCode(e.which).toLowerCase(), col = this.element.find('.jstreeol3-anchor').filter(':visible'), ind = col
+														.index(document.activeElement) || 0, end = false;
+												word += chr;
 
-								// match for whole word
-								// from current
-								// node down (including
-								// the current
-								// node)
-								if (word.length > 1) {
-									col.slice(ind).each($.proxy(function(i, v) {
-										if ($(v).text().toLowerCase().indexOf(word) === 0) {
-											$(v).focus();
-											end = true;
-											return false;
-										}
-									}, this));
-									if (end) {
-										return;
-									}
+												// match for whole word
+												// from current
+												// node down (including
+												// the current
+												// node)
+												if (word.length > 1) {
+													col.slice(ind).each($.proxy(function(i, v) {
+														if ($(v).text().toLowerCase().indexOf(word) === 0) {
+															$(v).focus();
+															end = true;
+															return false;
+														}
+													}, this));
+													if (end) {
+														return;
+													}
 
-									// match for whole
-									// word from the
-									// beginning of the
-									// tree
-									col.slice(0, ind).each($.proxy(function(i, v) {
-										if ($(v).text().toLowerCase().indexOf(word) === 0) {
-											$(v).focus();
-											end = true;
-											return false;
-										}
-									}, this));
-									if (end) {
-										return;
-									}
-								}
-								// list nodes that start
-								// with that
-								// letter (only if word
-								// consists of a
-								// single char)
-								if (new RegExp('^' + chr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '+$').test(word)) {
-									// search for the
-									// next node
-									// starting
-									// with that letter
-									col.slice(ind + 1).each($.proxy(function(i, v) {
-										if ($(v).text().toLowerCase().charAt(0) === chr) {
-											$(v).focus();
-											end = true;
-											return false;
-										}
-									}, this));
-									if (end) {
-										return;
-									}
+													// match for whole
+													// word from the
+													// beginning of the
+													// tree
+													col.slice(0, ind).each($.proxy(function(i, v) {
+														if ($(v).text().toLowerCase().indexOf(word) === 0) {
+															$(v).focus();
+															end = true;
+															return false;
+														}
+													}, this));
+													if (end) {
+														return;
+													}
+												}
+												// list nodes that start
+												// with that
+												// letter (only if word
+												// consists of a
+												// single char)
+												if (new RegExp('^' + chr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '+$').test(word)) {
+													// search for the
+													// next node
+													// starting
+													// with that letter
+													col.slice(ind + 1).each($.proxy(function(i, v) {
+														if ($(v).text().toLowerCase().charAt(0) === chr) {
+															$(v).focus();
+															end = true;
+															return false;
+														}
+													}, this));
+													if (end) {
+														return;
+													}
 
-									// search from the
-									// beginning
-									col.slice(0, ind + 1).each($.proxy(function(i, v) {
-										if ($(v).text().toLowerCase().charAt(0) === chr) {
-											$(v).focus();
-											end = true;
-											return false;
-										}
-									}, this));
-									if (end) {
-										return;
-									}
-								}
-							}, this))
+													// search from the
+													// beginning
+													col.slice(0, ind + 1).each($.proxy(function(i, v) {
+														if ($(v).text().toLowerCase().charAt(0) === chr) {
+															$(v).focus();
+															end = true;
+															return false;
+														}
+													}, this));
+													if (end) {
+														return;
+													}
+												}
+											}, this))
 					// THEME RELATED
 					.on("init.jstreeol3", $.proxy(function() {
 						var s = this.settings.core.themes;
@@ -1269,10 +1182,8 @@
 				 * 
 				 * @private
 				 * @name trigger(ev [, data])
-				 * @param {String}
-				 *            ev the name of the event to trigger
-				 * @param {Object}
-				 *            data additional data to pass with the event
+				 * @param {String} ev the name of the event to trigger
+				 * @param {Object} data additional data to pass with the event
 				 */
 				trigger : function(ev, data) {
 					if (!data) {
@@ -1291,8 +1202,8 @@
 					return this.element;
 				},
 				/**
-				 * returns the jQuery extended main UL node inside the instance
-				 * container. Used internally.
+				 * returns the jQuery extended main UL node inside the instance container. Used
+				 * internally.
 				 * 
 				 * @private
 				 * @name get_container_ul()
@@ -1306,8 +1217,7 @@
 				 * 
 				 * @private
 				 * @name get_string(key)
-				 * @param {String}
-				 *            key
+				 * @param {String} key
 				 * @return {String}
 				 */
 				get_string : function(key) {
@@ -1325,8 +1235,7 @@
 				 * 
 				 * @private
 				 * @name _firstChild(dom)
-				 * @param {DOMElement}
-				 *            dom
+				 * @param {DOMElement} dom
 				 * @return {DOMElement}
 				 */
 				_firstChild : function(dom) {
@@ -1341,8 +1250,7 @@
 				 * 
 				 * @private
 				 * @name _nextSibling(dom)
-				 * @param {DOMElement}
-				 *            dom
+				 * @param {DOMElement} dom
 				 * @return {DOMElement}
 				 */
 				_nextSibling : function(dom) {
@@ -1357,8 +1265,7 @@
 				 * 
 				 * @private
 				 * @name _previousSibling(dom)
-				 * @param {DOMElement}
-				 *            dom
+				 * @param {DOMElement} dom
 				 * @return {DOMElement}
 				 */
 				_previousSibling : function(dom) {
@@ -1369,15 +1276,12 @@
 					return dom;
 				},
 				/**
-				 * get the JSON representation of a node (or the actual jQuery
-				 * extended DOM node) by using any input (child DOM element, ID
-				 * string, selector, etc)
+				 * get the JSON representation of a node (or the actual jQuery extended DOM node) by
+				 * using any input (child DOM element, ID string, selector, etc)
 				 * 
 				 * @name get_node(obj [, as_dom])
-				 * @param {mixed}
-				 *            obj
-				 * @param {Boolean}
-				 *            as_dom
+				 * @param {mixed} obj
+				 * @param {Boolean} as_dom
 				 * @return {Object|jQuery}
 				 */
 				get_node : function(obj, as_dom) {
@@ -1390,8 +1294,7 @@
 							obj = this._model.data[obj];
 						} else if (typeof obj === "string" && this._model.data[obj.replace(/^#/, '')]) {
 							obj = this._model.data[obj.replace(/^#/, '')];
-						} else if (typeof obj === "string"
-								&& (dom = $('#' + obj.replace($.jstreeol3.idregex, '\\$&'), this.element)).length
+						} else if (typeof obj === "string" && (dom = $('#' + obj.replace($.jstreeol3.idregex, '\\$&'), this.element)).length
 								&& this._model.data[dom.closest('.jstreeol3-node').attr('id')]) {
 							obj = this._model.data[dom.closest('.jstreeol3-node').attr('id')];
 						} else if ((dom = $(obj, this.element)).length && this._model.data[dom.closest('.jstreeol3-node').attr('id')]) {
@@ -1403,8 +1306,7 @@
 						}
 
 						if (as_dom) {
-							obj = obj.id === $.jstreeol3.root ? this.element : $('#' + obj.id.replace($.jstreeol3.idregex, '\\$&'),
-									this.element);
+							obj = obj.id === $.jstreeol3.root ? this.element : $('#' + obj.id.replace($.jstreeol3.idregex, '\\$&'), this.element);
 						}
 						return obj;
 					} catch (ex) {
@@ -1412,19 +1314,15 @@
 					}
 				},
 				/**
-				 * get the path to a node, either consisting of node texts, or
-				 * of node IDs, optionally glued together (otherwise an array)
+				 * get the path to a node, either consisting of node texts, or of node IDs,
+				 * optionally glued together (otherwise an array)
 				 * 
 				 * @name get_path(obj [, glue, ids])
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {String}
-				 *            glue if you want the path as a string - pass the
-				 *            glue here (for example '/'), if a falsy value is
-				 *            supplied here, an array is returned
-				 * @param {Boolean}
-				 *            ids if set to true build the path using ID,
-				 *            otherwise node text is used
+				 * @param {mixed} obj the node
+				 * @param {String} glue if you want the path as a string - pass the glue here (for
+				 * example '/'), if a falsy value is supplied here, an array is returned
+				 * @param {Boolean} ids if set to true build the path using ID, otherwise node text
+				 * is used
 				 * @return {mixed}
 				 */
 				get_path : function(obj, glue, ids) {
@@ -1441,14 +1339,12 @@
 					return glue ? p.join(glue) : p;
 				},
 				/**
-				 * get the next visible node that is below the `obj` node. If
-				 * `strict` is set to `true` only sibling nodes are returned.
+				 * get the next visible node that is below the `obj` node. If `strict` is set to
+				 * `true` only sibling nodes are returned.
 				 * 
 				 * @name get_next_dom(obj [, strict])
-				 * @param {mixed}
-				 *            obj
-				 * @param {Boolean}
-				 *            strict
+				 * @param {mixed} obj
+				 * @param {Boolean} strict
 				 * @return {jQuery}
 				 */
 				get_next_dom : function(obj, strict) {
@@ -1490,14 +1386,12 @@
 					return obj.parentsUntil(".jstreeol3", ".jstreeol3-node").nextAll(".jstreeol3-node:visible").first();
 				},
 				/**
-				 * get the previous visible node that is above the `obj` node.
-				 * If `strict` is set to `true` only sibling nodes are returned.
+				 * get the previous visible node that is above the `obj` node. If `strict` is set to
+				 * `true` only sibling nodes are returned.
 				 * 
 				 * @name get_prev_dom(obj [, strict])
-				 * @param {mixed}
-				 *            obj
-				 * @param {Boolean}
-				 *            strict
+				 * @param {mixed} obj
+				 * @param {Boolean} strict
 				 * @return {jQuery}
 				 */
 				get_prev_dom : function(obj, strict) {
@@ -1538,8 +1432,7 @@
 				 * get the parent ID of a node
 				 * 
 				 * @name get_parent(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {String}
 				 */
 				get_parent : function(obj) {
@@ -1550,12 +1443,10 @@
 					return obj.parent;
 				},
 				/**
-				 * get a jQuery collection of all the children of a node (node
-				 * must be rendered)
+				 * get a jQuery collection of all the children of a node (node must be rendered)
 				 * 
 				 * @name get_children_dom(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {jQuery}
 				 */
 				get_children_dom : function(obj) {
@@ -1572,8 +1463,7 @@
 				 * checks if a node has children
 				 * 
 				 * @name is_parent(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_parent : function(obj) {
@@ -1584,8 +1474,7 @@
 				 * checks if a node is loaded (its children are available)
 				 * 
 				 * @name is_loaded(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_loaded : function(obj) {
@@ -1596,8 +1485,7 @@
 				 * check if a node is currently loading (fetching children)
 				 * 
 				 * @name is_loading(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_loading : function(obj) {
@@ -1608,8 +1496,7 @@
 				 * check if a node is opened
 				 * 
 				 * @name is_open(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_open : function(obj) {
@@ -1620,8 +1507,7 @@
 				 * check if a node is in a closed state
 				 * 
 				 * @name is_closed(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_closed : function(obj) {
@@ -1632,25 +1518,21 @@
 				 * check if a node has no children
 				 * 
 				 * @name is_leaf(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_leaf : function(obj) {
 					return !this.is_parent(obj);
 				},
 				/**
-				 * loads a node (fetches its children using the `core.data`
-				 * setting). Multiple nodes can be passed to by using an array.
+				 * loads a node (fetches its children using the `core.data` setting). Multiple nodes
+				 * can be passed to by using an array.
 				 * 
 				 * @name load_node(obj [, callback])
-				 * @param {mixed}
-				 *            obj
-				 * @param {function}
-				 *            callback a function to be executed once loading is
-				 *            complete, the function is executed in the
-				 *            instance's scope and receives two arguments - the
-				 *            node and a boolean status
+				 * @param {mixed} obj
+				 * @param {function} callback a function to be executed once loading is complete,
+				 * the function is executed in the instance's scope and receives two arguments - the
+				 * node and a boolean status
 				 * @return {Boolean}
 				 * @trigger load_node.jstreeol3
 				 */
@@ -1673,10 +1555,9 @@
 					if (obj.state.loaded) {
 						obj.state.loaded = false;
 						for (i = 0, j = obj.parents.length; i < j; i++) {
-							this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(
-									this._model.data[obj.parents[i]].children_d, function(v) {
-										return $.inArray(v, obj.children_d) === -1;
-									});
+							this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(this._model.data[obj.parents[i]].children_d, function(v) {
+								return $.inArray(v, obj.children_d) === -1;
+							});
 						}
 						for (k = 0, l = obj.children_d.length; k < l; k++) {
 							if (this._model.data[obj.children_d[k]].state.selected) {
@@ -1730,10 +1611,8 @@
 						 * 
 						 * @event
 						 * @name load_node.jstreeol3
-						 * @param {Object}
-						 *            node the node that was loading
-						 * @param {Boolean}
-						 *            status was the node loaded successfully
+						 * @param {Object} node the node that was loading
+						 * @param {Boolean} status was the node loaded successfully
 						 */
 						this.trigger('load_node', {
 							"node" : obj,
@@ -1751,8 +1630,7 @@
 				 * @author 소이준
 				 * @private
 				 * @name _isUniqueId(id)
-				 * @param {String}
-				 *            id - 레이어 ID
+				 * @param {String} id - 레이어 ID
 				 * @return {Boolean}
 				 */
 				_isUniqueId : function(id) {
@@ -1773,10 +1651,8 @@
 				 * @author 소이준
 				 * @private
 				 * @name _tour_CheckId(layer, id)
-				 * @param {ol.layer.Base}
-				 *            layer - 아이디를 확인할 레이어
-				 * @param {String}
-				 *            id - 아이디
+				 * @param {ol.layer.Base} layer - 아이디를 확인할 레이어
+				 * @param {String} id - 아이디
 				 * @return {Boolean}
 				 */
 				_tour_CheckId : function(layer, id) {
@@ -1887,10 +1763,8 @@
 				 * @author 소이준
 				 * @private
 				 * @name _createJSONFromLayer(layer, parentid)
-				 * @param {ol.layer.Layer}
-				 *            layer - 레이어 객체
-				 * @param {String}
-				 *            parentid - 부모 아이디
+				 * @param {ol.layer.Layer} layer - 레이어 객체
+				 * @param {String} parentid - 부모 아이디
 				 * @return {Array}
 				 */
 				_createJSONFromLayer : function(layer, parentid) {
@@ -2217,57 +2091,54 @@
 					// }
 					//
 					// }
-					
+
 					result.push(obj);
 					console.log(result);
 					// Three tree에 node 복사
 					var bool = false;
-					for(var i in result){
-						if(result[i].parent === "#"){
+					for ( var i in result) {
+						if (result[i].parent === "#") {
 							bool = true;
 						}
 					}
-					
+
 					var last = [], group = [];
-					if(bool){
-						for(var i in result){
-							if(this._data.layerproperties.threeTree.get_node(result[i].id)){
+					if (bool) {
+						for ( var i in result) {
+							if (this._data.layerproperties.threeTree.get_node(result[i].id)) {
 								continue;
 							}
-							if(result[i].type === "Group" && result[i].parent === "#"){
+							if (result[i].type === "Group" && result[i].parent === "#") {
 								this._data.layerproperties.threeTree.create_node(result[i].parent, result[i], "last", false, false);
-							} else if(result[i].type === "Group" || result[i].type === "FakeGroup"){
+							} else if (result[i].type === "Group" || result[i].type === "FakeGroup") {
 								group.push(result[i]);
 							} else {
 								last.push(result[i]);
 							}
 						}
-						
-						for(var i in group){
+
+						for ( var i in group) {
 							this._data.layerproperties.threeTree.create_node(group[i].parent, group[i], "last", false, false);
 						}
-						
-						for(var i in last){
+
+						for ( var i in last) {
 							this._data.layerproperties.threeTree.create_node(last[i].parent, last[i], "last", false, false);
 						}
-						
-//						this._data.layerproperties.threeTree.refresh();
+
+						// this._data.layerproperties.threeTree.refresh();
 					}
 					return result;
 				},
 				/**
-				 * load an array of nodes (will also load unavailable nodes as
-				 * soon as the appear in the structure). Used internally.
+				 * load an array of nodes (will also load unavailable nodes as soon as the appear in
+				 * the structure). Used internally.
 				 * 
 				 * @private
 				 * @name _load_nodes(nodes [, callback])
-				 * @param {array}
-				 *            nodes
-				 * @param {function}
-				 *            callback a function to be executed once loading is
-				 *            complete, the function is executed in the
-				 *            instance's scope and receives one argument - the
-				 *            array passed to _load_nodes
+				 * @param {array} nodes
+				 * @param {function} callback a function to be executed once loading is complete,
+				 * the function is executed in the instance's scope and receives one argument - the
+				 * array passed to _load_nodes
 				 */
 				_load_nodes : function(nodes, callback, is_callback, force_reload) {
 					var r = true, c = function() {
@@ -2297,12 +2168,10 @@
 				 * loads all unloaded nodes
 				 * 
 				 * @name load_all([obj, callback])
-				 * @param {mixed}
-				 *            obj the node to load recursively, omit to load all
-				 *            nodes in the tree
-				 * @param {function}
-				 *            callback a function to be executed once loading
-				 *            all the nodes is complete,
+				 * @param {mixed} obj the node to load recursively, omit to load all nodes in the
+				 * tree
+				 * @param {function} callback a function to be executed once loading all the nodes
+				 * is complete,
 				 * @trigger load_all.jstreeol3
 				 */
 				load_all : function(obj, callback) {
@@ -2332,8 +2201,7 @@
 						 * 
 						 * @event
 						 * @name load_all.jstreeol3
-						 * @param {Object}
-						 *            node the recursively loaded node
+						 * @param {Object} node the recursively loaded node
 						 */
 						if (callback) {
 							callback.call(this, obj);
@@ -2348,13 +2216,10 @@
 				 * 
 				 * @private
 				 * @name _load_node(obj [, callback])
-				 * @param {mixed}
-				 *            obj
-				 * @param {function}
-				 *            callback a function to be executed once loading is
-				 *            complete, the function is executed in the
-				 *            instance's scope and receives one argument - a
-				 *            boolean status
+				 * @param {mixed} obj
+				 * @param {function} callback a function to be executed once loading is complete,
+				 * the function is executed in the instance's scope and receives one argument - a
+				 * boolean status
 				 * @return {Boolean}
 				 */
 				_load_node : function(obj, callback) {
@@ -2381,8 +2246,8 @@
 							if (d === false) {
 								callback.call(this, false);
 							} else {
-								this[typeof d === 'string' ? '_append_html_data' : '_append_json_data'](obj, typeof d === 'string' ? $(
-										$.parseHTML(d)).filter(notTextOrCommentNode) : d, function(status) {
+								this[typeof d === 'string' ? '_append_html_data' : '_append_json_data'](obj, typeof d === 'string' ? $($.parseHTML(d)).filter(notTextOrCommentNode) : d, function(
+										status) {
 									callback.call(this, status);
 								});
 							}
@@ -2504,13 +2369,11 @@
 					return callback.call(this, false);
 				},
 				/**
-				 * adds a node to the list of nodes to redraw. Used only
-				 * internally.
+				 * adds a node to the list of nodes to redraw. Used only internally.
 				 * 
 				 * @private
 				 * @name _node_changed(obj [, callback])
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 */
 				_node_changed : function(obj) {
 					obj = this.get_node(obj);
@@ -2523,10 +2386,8 @@
 				 * 
 				 * @private
 				 * @name _append_html_data(obj, data)
-				 * @param {mixed}
-				 *            obj the node to append to
-				 * @param {String}
-				 *            data the HTML string to parse and append
+				 * @param {mixed} obj the node to append to
+				 * @param {String} data the HTML string to parse and append
 				 * @trigger model.jstreeol3, changed.jstreeol3
 				 */
 				_append_html_data : function(dom, data, cb) {
@@ -2554,10 +2415,8 @@
 					 * 
 					 * @event
 					 * @name model.jstreeol3
-					 * @param {Array}
-					 *            nodes an array of node IDs
-					 * @param {String}
-					 *            parent the parent ID of the nodes
+					 * @param {Array} nodes an array of node IDs
+					 * @param {String} parent the parent ID of the nodes
 					 */
 					this.trigger('model', {
 						"nodes" : dpc,
@@ -2583,12 +2442,9 @@
 				 * 
 				 * @private
 				 * @name _append_json_data(obj, data)
-				 * @param {mixed}
-				 *            obj the node to append to
-				 * @param {String}
-				 *            data the JSON object to parse and append
-				 * @param {Boolean}
-				 *            force_processing internal param - do not set
+				 * @param {mixed} obj the node to append to
+				 * @param {String} data the JSON object to parse and append
+				 * @param {Boolean} force_processing internal param - do not set
 				 * @trigger model.jstreeol3, changed.jstreeol3
 				 */
 				_append_json_data : function(dom, data, cb, force_processing) {
@@ -3007,17 +2863,14 @@
 					}
 				},
 				/**
-				 * parses a node from a jQuery object and appends them to the in
-				 * memory tree model. Used internally.
+				 * parses a node from a jQuery object and appends them to the in memory tree model.
+				 * Used internally.
 				 * 
 				 * @private
 				 * @name _parse_model_from_html(d [, p, ps])
-				 * @param {jQuery}
-				 *            d the jQuery object to parse
-				 * @param {String}
-				 *            p the parent ID
-				 * @param {Array}
-				 *            ps list of all parents
+				 * @param {jQuery} d the jQuery object to parse
+				 * @param {String} p the parent ID
+				 * @param {Array} ps list of all parents
 				 * @return {String} the ID of the object added to the model
 				 */
 				_parse_model_from_html : function(d, p, ps) {
@@ -3133,19 +2986,15 @@
 					return data.id;
 				},
 				/**
-				 * parses a node from a JSON object (used when dealing with flat
-				 * data, which has no nesting of children, but has id and parent
-				 * properties) and appends it to the in memory tree model. Used
-				 * internally.
+				 * parses a node from a JSON object (used when dealing with flat data, which has no
+				 * nesting of children, but has id and parent properties) and appends it to the in
+				 * memory tree model. Used internally.
 				 * 
 				 * @private
 				 * @name _parse_model_from_flat_json(d [, p, ps])
-				 * @param {Object}
-				 *            d the JSON object to parse
-				 * @param {String}
-				 *            p the parent ID
-				 * @param {Array}
-				 *            ps list of all parents
+				 * @param {Object} d the JSON object to parse
+				 * @param {String} p the parent ID
+				 * @param {Array} ps list of all parents
 				 * @return {String} the ID of the object added to the model
 				 */
 				_parse_model_from_flat_json : function(d, p, ps) {
@@ -3243,17 +3092,14 @@
 					return tmp.id;
 				},
 				/**
-				 * parses a node from a JSON object and appends it to the in
-				 * memory tree model. Used internally.
+				 * parses a node from a JSON object and appends it to the in memory tree model. Used
+				 * internally.
 				 * 
 				 * @private
 				 * @name _parse_model_from_json(d [, p, ps])
-				 * @param {Object}
-				 *            d the JSON object to parse
-				 * @param {String}
-				 *            p the parent ID
-				 * @param {Array}
-				 *            ps list of all parents
+				 * @param {Object} d the JSON object to parse
+				 * @param {String} p the parent ID
+				 * @param {Array} ps list of all parents
 				 * @return {String} the ID of the object added to the model
 				 */
 				_parse_model_from_json : function(d, p, ps) {
@@ -3378,8 +3224,7 @@
 				 * @trigger redraw.jstreeol3
 				 */
 				_redraw : function() {
-					var nodes = this._model.force_full_redraw ? this._model.data[$.jstreeol3.root].children.concat([])
-							: this._model.changed.concat([]), f = document.createElement('UL'), tmp, i, j, fe = this._data.core.focused;
+					var nodes = this._model.force_full_redraw ? this._model.data[$.jstreeol3.root].children.concat([]) : this._model.changed.concat([]), f = document.createElement('UL'), tmp, i, j, fe = this._data.core.focused;
 					for (i = 0, j = nodes.length; i < j; i++) {
 						tmp = this.redraw_node(nodes[i], true, this._model.force_full_redraw);
 						if (tmp && this._model.force_full_redraw) {
@@ -3407,20 +3252,17 @@
 					 * 
 					 * @event
 					 * @name redraw.jstreeol3
-					 * @param {array}
-					 *            nodes the redrawn nodes
+					 * @param {array} nodes the redrawn nodes
 					 */
 					this.trigger('redraw', {
 						"nodes" : nodes
 					});
 				},
 				/**
-				 * redraws all nodes that need to be redrawn or optionally - the
-				 * whole tree
+				 * redraws all nodes that need to be redrawn or optionally - the whole tree
 				 * 
 				 * @name redraw([full])
-				 * @param {Boolean}
-				 *            full if set to `true` all nodes are redrawn.
+				 * @param {Boolean} full if set to `true` all nodes are redrawn.
 				 */
 				redraw : function(full) {
 					if (full) {
@@ -3438,8 +3280,7 @@
 				 * 
 				 * @private
 				 * @name draw_children(node)
-				 * @param {mixed}
-				 *            node the node whose children will be redrawn
+				 * @param {mixed} node the node whose children will be redrawn
 				 */
 				draw_children : function(node) {
 					var obj = this.get_node(node), i = false, j = false, k = false, d = document;
@@ -3471,15 +3312,10 @@
 				 * 
 				 * @private
 				 * @name redraw_node(node, deep, is_callback, force_render)
-				 * @param {mixed}
-				 *            node the node to redraw
-				 * @param {Boolean}
-				 *            deep should child nodes be redrawn too
-				 * @param {Boolean}
-				 *            is_callback is this a recursion call
-				 * @param {Boolean}
-				 *            force_render should children of closed parents be
-				 *            drawn anyway
+				 * @param {mixed} node the node to redraw
+				 * @param {Boolean} deep should child nodes be redrawn too
+				 * @param {Boolean} is_callback is this a recursion call
+				 * @param {Boolean} force_render should children of closed parents be drawn anyway
 				 */
 				redraw_node : function(node, deep, is_callback, force_render) {
 					var obj = this.get_node(node), par = false, ind = false, old = false, i = false, j = false, k = false, c = '', d = document, m = this._model.data, f = false, s = false, tmp = null, t = 0, l = 0, has_children = false, last_sibling = false;
@@ -3491,15 +3327,13 @@
 					}
 					deep = deep || obj.children.length === 0;
 					node = !document.querySelector ? document.getElementById(obj.id) : this.element[0].querySelector('#'
-							+ ("0123456789".indexOf(obj.id[0]) !== -1 ? '\\3' + obj.id[0] + ' '
-									+ obj.id.substr(1).replace($.jstreeol3.idregex, '\\$&') : obj.id.replace($.jstreeol3.idregex, '\\$&'))); // ,
+							+ ("0123456789".indexOf(obj.id[0]) !== -1 ? '\\3' + obj.id[0] + ' ' + obj.id.substr(1).replace($.jstreeol3.idregex, '\\$&') : obj.id.replace($.jstreeol3.idregex, '\\$&'))); // ,
 					// this.element);
 					if (!node) {
 						deep = true;
 						// node = d.createElement('LI');
 						if (!is_callback) {
-							par = obj.parent !== $.jstreeol3.root ? $('#' + obj.parent.replace($.jstreeol3.idregex, '\\$&'), this.element)[0]
-									: null;
+							par = obj.parent !== $.jstreeol3.root ? $('#' + obj.parent.replace($.jstreeol3.idregex, '\\$&'), this.element)[0] : null;
 							if (par !== null && (!par || !m[obj.parent].state.opened)) {
 								return false;
 							}
@@ -3654,8 +3488,7 @@
 							par = this.element[0];
 						}
 						for (i = 0, j = par.childNodes.length; i < j; i++) {
-							if (par.childNodes[i] && par.childNodes[i].className
-									&& par.childNodes[i].className.indexOf('jstreeol3-children') !== -1) {
+							if (par.childNodes[i] && par.childNodes[i].className && par.childNodes[i].className.indexOf('jstreeol3-children') !== -1) {
 								tmp = par.childNodes[i];
 								break;
 							}
@@ -3690,22 +3523,15 @@
 					return node;
 				},
 				/**
-				 * opens a node, revaling its children. If the node is not
-				 * loaded it will be loaded and opened once ready.
+				 * opens a node, revaling its children. If the node is not loaded it will be loaded
+				 * and opened once ready.
 				 * 
 				 * @name open_node(obj [, callback, animation])
-				 * @param {mixed}
-				 *            obj the node to open
-				 * @param {Function}
-				 *            callback a function to execute once the node is
-				 *            opened
-				 * @param {Number}
-				 *            animation the animation duration in milliseconds
-				 *            when opening the node (overrides the
-				 *            `core.animation` setting). Use `false` for no
-				 *            animation.
-				 * @trigger open_node.jstreeol3, after_open.jstreeol3,
-				 *          before_open.jstreeol3
+				 * @param {mixed} obj the node to open
+				 * @param {Function} callback a function to execute once the node is opened
+				 * @param {Number} animation the animation duration in milliseconds when opening the
+				 * node (overrides the `core.animation` setting). Use `false` for no animation.
+				 * @trigger open_node.jstreeol3, after_open.jstreeol3, before_open.jstreeol3
 				 */
 				open_node : function(obj, callback, animation) {
 					var t1, t2, d, t;
@@ -3757,16 +3583,15 @@
 								this.trigger('before_open', {
 									"node" : obj
 								});
-								d.children(".jstreeol3-children").css("display", "none").end().removeClass("jstreeol3-closed").addClass(
-										"jstreeol3-open").attr("aria-expanded", true).children(".jstreeol3-children").stop(true, true)
-										.slideDown(animation, function() {
-											this.style.display = "";
-											if (t.element) {
-												t.trigger("after_open", {
-													"node" : obj
-												});
-											}
+								d.children(".jstreeol3-children").css("display", "none").end().removeClass("jstreeol3-closed").addClass("jstreeol3-open").attr("aria-expanded", true).children(
+										".jstreeol3-children").stop(true, true).slideDown(animation, function() {
+									this.style.display = "";
+									if (t.element) {
+										t.trigger("after_open", {
+											"node" : obj
 										});
+									}
+								});
 							}
 						}
 						obj.state.opened = true;
@@ -3775,40 +3600,35 @@
 						}
 						if (!d.length) {
 							/**
-							 * triggered when a node is about to be opened (if
-							 * the node is supposed to be in the DOM, it will
-							 * be, but it won't be visible yet)
+							 * triggered when a node is about to be opened (if the node is supposed
+							 * to be in the DOM, it will be, but it won't be visible yet)
 							 * 
 							 * @event
 							 * @name before_open.jstreeol3
-							 * @param {Object}
-							 *            node the opened node
+							 * @param {Object} node the opened node
 							 */
 							this.trigger('before_open', {
 								"node" : obj
 							});
 						}
 						/**
-						 * triggered when a node is opened (if there is an
-						 * animation it will not be completed yet)
+						 * triggered when a node is opened (if there is an animation it will not be
+						 * completed yet)
 						 * 
 						 * @event
 						 * @name open_node.jstreeol3
-						 * @param {Object}
-						 *            node the opened node
+						 * @param {Object} node the opened node
 						 */
 						this.trigger('open_node', {
 							"node" : obj
 						});
 						if (!animation || !d.length) {
 							/**
-							 * triggered when a node is opened and the animation
-							 * is complete
+							 * triggered when a node is opened and the animation is complete
 							 * 
 							 * @event
 							 * @name after_open.jstreeol3
-							 * @param {Object}
-							 *            node the opened node
+							 * @param {Object} node the opened node
 							 */
 							this.trigger("after_open", {
 								"node" : obj
@@ -3821,8 +3641,7 @@
 				 * opens every parent of a node (node should be loaded)
 				 * 
 				 * @name _open_to(obj)
-				 * @param {mixed}
-				 *            obj the node to reveal
+				 * @param {mixed} obj the node to reveal
 				 * @private
 				 */
 				_open_to : function(obj) {
@@ -3842,13 +3661,9 @@
 				 * closes a node, hiding its children
 				 * 
 				 * @name close_node(obj [, animation])
-				 * @param {mixed}
-				 *            obj the node to close
-				 * @param {Number}
-				 *            animation the animation duration in milliseconds
-				 *            when closing the node (overrides the
-				 *            `core.animation` setting). Use `false` for no
-				 *            animation.
+				 * @param {mixed} obj the node to close
+				 * @param {Number} animation the animation duration in milliseconds when closing the
+				 * node (overrides the `core.animation` setting). Use `false` for no animation.
 				 * @trigger close_node.jstreeol3, after_close.jstreeol3
 				 */
 				close_node : function(obj, animation) {
@@ -3873,26 +3688,23 @@
 
 					obj.state.opened = false;
 					/**
-					 * triggered when a node is closed (if there is an animation
-					 * it will not be complete yet)
+					 * triggered when a node is closed (if there is an animation it will not be
+					 * complete yet)
 					 * 
 					 * @event
 					 * @name close_node.jstreeol3
-					 * @param {Object}
-					 *            node the closed node
+					 * @param {Object} node the closed node
 					 */
 					this.trigger('close_node', {
 						"node" : obj
 					});
 					if (!d.length) {
 						/**
-						 * triggered when a node is closed and the animation is
-						 * complete
+						 * triggered when a node is closed and the animation is complete
 						 * 
 						 * @event
 						 * @name after_close.jstreeol3
-						 * @param {Object}
-						 *            node the closed node
+						 * @param {Object} node the closed node
 						 */
 						this.trigger("after_close", {
 							"node" : obj
@@ -3905,9 +3717,8 @@
 								"node" : obj
 							});
 						} else {
-							d.children(".jstreeol3-children").attr("style", "display:block !important").end().removeClass("jstreeol3-open")
-									.addClass("jstreeol3-closed").attr("aria-expanded", false).children(".jstreeol3-children").stop(true,
-											true).slideUp(animation, function() {
+							d.children(".jstreeol3-children").attr("style", "display:block !important").end().removeClass("jstreeol3-open").addClass("jstreeol3-closed").attr("aria-expanded", false)
+									.children(".jstreeol3-children").stop(true, true).slideUp(animation, function() {
 										this.style.display = "";
 										d.children('.jstreeol3-children').remove();
 										if (t.element) {
@@ -3920,12 +3731,10 @@
 					}
 				},
 				/**
-				 * toggles a node - closing it if it is open, opening it if it
-				 * is closed
+				 * toggles a node - closing it if it is open, opening it if it is closed
 				 * 
 				 * @name toggle_node(obj)
-				 * @param {mixed}
-				 *            obj the node to toggle
+				 * @param {mixed} obj the node to toggle
 				 */
 				toggle_node : function(obj) {
 					var t1, t2;
@@ -3944,21 +3753,15 @@
 					}
 				},
 				/**
-				 * opens all nodes within a node (or the tree), revaling their
-				 * children. If the node is not loaded it will be loaded and
-				 * opened once ready.
+				 * opens all nodes within a node (or the tree), revaling their children. If the node
+				 * is not loaded it will be loaded and opened once ready.
 				 * 
 				 * @name open_all([obj, animation, original_obj])
-				 * @param {mixed}
-				 *            obj the node to open recursively, omit to open all
-				 *            nodes in the tree
-				 * @param {Number}
-				 *            animation the animation duration in milliseconds
-				 *            when opening the nodes, the default is no
-				 *            animation
-				 * @param {jQuery}
-				 *            reference to the node that started the process
-				 *            (internal use)
+				 * @param {mixed} obj the node to open recursively, omit to open all nodes in the
+				 * tree
+				 * @param {Number} animation the animation duration in milliseconds when opening the
+				 * nodes, the default is no animation
+				 * @param {jQuery} reference to the node that started the process (internal use)
 				 * @trigger open_all.jstreeol3
 				 */
 				open_all : function(obj, animation, original_obj) {
@@ -3996,8 +3799,7 @@
 						 * 
 						 * @event
 						 * @name open_all.jstreeol3
-						 * @param {Object}
-						 *            node the opened node
+						 * @param {Object} node the opened node
 						 */
 						this.trigger('open_all', {
 							"node" : this.get_node(original_obj)
@@ -4005,17 +3807,13 @@
 					}
 				},
 				/**
-				 * closes all nodes within a node (or the tree), revaling their
-				 * children
+				 * closes all nodes within a node (or the tree), revaling their children
 				 * 
 				 * @name close_all([obj, animation])
-				 * @param {mixed}
-				 *            obj the node to close recursively, omit to close
-				 *            all nodes in the tree
-				 * @param {Number}
-				 *            animation the animation duration in milliseconds
-				 *            when closing the nodes, the default is no
-				 *            animation
+				 * @param {mixed} obj the node to close recursively, omit to close all nodes in the
+				 * tree
+				 * @param {Number} animation the animation duration in milliseconds when closing the
+				 * nodes, the default is no animation
 				 * @trigger close_all.jstreeol3
 				 */
 				close_all : function(obj, animation) {
@@ -4041,8 +3839,7 @@
 					 * 
 					 * @event
 					 * @name close_all.jstreeol3
-					 * @param {Object}
-					 *            node the closed node
+					 * @param {Object} node the closed node
 					 */
 					this.trigger('close_all', {
 						"node" : obj
@@ -4052,8 +3849,7 @@
 				 * checks if a node is disabled (not selectable)
 				 * 
 				 * @name is_disabled(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_disabled : function(obj) {
@@ -4064,8 +3860,7 @@
 				 * enables a node - so that it can be selected
 				 * 
 				 * @name enable_node(obj)
-				 * @param {mixed}
-				 *            obj the node to enable
+				 * @param {mixed} obj the node to enable
 				 * @trigger enable_node.jstreeol3
 				 */
 				enable_node : function(obj) {
@@ -4088,8 +3883,7 @@
 					 * 
 					 * @event
 					 * @name enable_node.jstreeol3
-					 * @param {Object}
-					 *            node the enabled node
+					 * @param {Object} node the enabled node
 					 */
 					this.trigger('enable_node', {
 						'node' : obj
@@ -4099,8 +3893,7 @@
 				 * disables a node - so that it can not be selected
 				 * 
 				 * @name disable_node(obj)
-				 * @param {mixed}
-				 *            obj the node to disable
+				 * @param {mixed} obj the node to disable
 				 * @trigger disable_node.jstreeol3
 				 */
 				disable_node : function(obj) {
@@ -4123,8 +3916,7 @@
 					 * 
 					 * @event
 					 * @name disable_node.jstreeol3
-					 * @param {Object}
-					 *            node the disabled node
+					 * @param {Object} node the disabled node
 					 */
 					this.trigger('disable_node', {
 						'node' : obj
@@ -4134,23 +3926,18 @@
 				 * determines if a node is hidden
 				 * 
 				 * @name is_hidden(obj)
-				 * @param {mixed}
-				 *            obj the node
+				 * @param {mixed} obj the node
 				 */
 				is_hidden : function(obj) {
 					obj = this.get_node(obj);
 					return obj.state.hidden === true;
 				},
 				/**
-				 * hides a node - it is still in the structure but will not be
-				 * visible
+				 * hides a node - it is still in the structure but will not be visible
 				 * 
 				 * @name hide_node(obj)
-				 * @param {mixed}
-				 *            obj the node to hide
-				 * @param {Boolean}
-				 *            skip_redraw internal parameter controlling if
-				 *            redraw is called
+				 * @param {mixed} obj the node to hide
+				 * @param {Boolean} skip_redraw internal parameter controlling if redraw is called
 				 * @trigger hide_node.jstreeol3
 				 */
 				hide_node : function(obj, skip_redraw) {
@@ -4180,8 +3967,7 @@
 						 * 
 						 * @event
 						 * @name hide_node.jstreeol3
-						 * @param {Object}
-						 *            node the hidden node
+						 * @param {Object} node the hidden node
 						 */
 						this.trigger('hide_node', {
 							'node' : obj
@@ -4192,11 +3978,8 @@
 				 * shows a node
 				 * 
 				 * @name show_node(obj)
-				 * @param {mixed}
-				 *            obj the node to show
-				 * @param {Boolean}
-				 *            skip_redraw internal parameter controlling if
-				 *            redraw is called
+				 * @param {mixed} obj the node to show
+				 * @param {Boolean} skip_redraw internal parameter controlling if redraw is called
 				 * @trigger show_node.jstreeol3
 				 */
 				show_node : function(obj, skip_redraw) {
@@ -4226,8 +4009,7 @@
 						 * 
 						 * @event
 						 * @name show_node.jstreeol3
-						 * @param {Object}
-						 *            node the shown node
+						 * @param {Object} node the shown node
 						 */
 						this.trigger('show_node', {
 							'node' : obj
@@ -4257,8 +4039,7 @@
 					 * 
 					 * @event
 					 * @name hide_all.jstreeol3
-					 * @param {Array}
-					 *            nodes the IDs of all hidden nodes
+					 * @param {Array} nodes the IDs of all hidden nodes
 					 */
 					this.trigger('hide_all', {
 						'nodes' : ids
@@ -4288,8 +4069,7 @@
 					 * 
 					 * @event
 					 * @name show_all.jstreeol3
-					 * @param {Array}
-					 *            nodes the IDs of all shown nodes
+					 * @param {Array} nodes the IDs of all shown nodes
 					 */
 					this.trigger('show_all', {
 						'nodes' : ids
@@ -4301,10 +4081,8 @@
 				 * 
 				 * @private
 				 * @name activate_node(obj, e)
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {Object}
-				 *            e the related event
+				 * @param {mixed} obj the node
+				 * @param {Object} e the related event
 				 * @trigger activate_node.jstreeol3, changed.jstreeol3
 				 */
 				activate_node : function(obj, e) {
@@ -4318,8 +4096,7 @@
 					// ensure last_clicked is still in the DOM, make it fresh
 					// (maybe it was moved?) and make sure it is still selected,
 					// if not - make last_clicked the last selected node
-					this._data.core.last_clicked = this._data.core.last_clicked && this._data.core.last_clicked.id !== undefined ? this
-							.get_node(this._data.core.last_clicked.id) : null;
+					this._data.core.last_clicked = this._data.core.last_clicked && this._data.core.last_clicked.id !== undefined ? this.get_node(this._data.core.last_clicked.id) : null;
 					if (this._data.core.last_clicked && !this._data.core.last_clicked.state.selected) {
 						this._data.core.last_clicked = null;
 					}
@@ -4327,8 +4104,7 @@
 						this._data.core.last_clicked = this.get_node(this._data.core.selected[this._data.core.selected.length - 1]);
 					}
 
-					if (!this.settings.core.multiple
-							|| (!e.metaKey && !e.ctrlKey && !e.shiftKey)
+					if (!this.settings.core.multiple || (!e.metaKey && !e.ctrlKey && !e.shiftKey)
 							|| (e.shiftKey && (!this._data.core.last_clicked || !this.get_parent(obj) || this.get_parent(obj) !== this._data.core.last_clicked.parent))) {
 						if (!this.settings.core.multiple && (e.metaKey || e.ctrlKey || e.shiftKey) && this.is_selected(obj)) {
 							this.deselect_node(obj, false, e);
@@ -4339,8 +4115,7 @@
 						}
 					} else {
 						if (e.shiftKey) {
-							var o = this.get_node(obj).id, l = this._data.core.last_clicked.id, p = this
-									.get_node(this._data.core.last_clicked.parent).children, c = false, i, j;
+							var o = this.get_node(obj).id, l = this._data.core.last_clicked.id, p = this.get_node(this._data.core.last_clicked.parent).children, c = false, i, j;
 							for (i = 0, j = p.length; i < j; i += 1) {
 								// separate IFs work whem o and l are the same
 								if (p[i] === o) {
@@ -4372,16 +4147,13 @@
 						}
 					}
 					/**
-					 * triggered when an node is clicked or intercated with by
-					 * the user
+					 * triggered when an node is clicked or intercated with by the user
 					 * 
 					 * @event
 					 * @name activate_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {Object}
-					 *            event the ooriginal event (if any) which
-					 *            triggered the call (may be an empty object)
+					 * @param {Object} node
+					 * @param {Object} event the ooriginal event (if any) which triggered the call
+					 * (may be an empty object)
 					 */
 					this.trigger('activate_node', {
 						'node' : this.get_node(obj),
@@ -4389,13 +4161,12 @@
 					});
 				},
 				/**
-				 * applies the hover state on a node, called when a node is
-				 * hovered by the user. Used internally.
+				 * applies the hover state on a node, called when a node is hovered by the user.
+				 * Used internally.
 				 * 
 				 * @private
 				 * @name hover_node(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @trigger hover_node.jstreeol3
 				 */
 				hover_node : function(obj) {
@@ -4414,8 +4185,7 @@
 					 * 
 					 * @event
 					 * @name hover_node.jstreeol3
-					 * @param {Object}
-					 *            node
+					 * @param {Object} node
 					 */
 					this.trigger('hover_node', {
 						'node' : this.get_node(obj)
@@ -4425,13 +4195,12 @@
 					}, 0);
 				},
 				/**
-				 * removes the hover state from a nodecalled when a node is no
-				 * longer hovered by the user. Used internally.
+				 * removes the hover state from a nodecalled when a node is no longer hovered by the
+				 * user. Used internally.
 				 * 
 				 * @private
 				 * @name dehover_node(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @trigger dehover_node.jstreeol3
 				 */
 				dehover_node : function(obj) {
@@ -4445,8 +4214,7 @@
 					 * 
 					 * @event
 					 * @name dehover_node.jstreeol3
-					 * @param {Object}
-					 *            node
+					 * @param {Object} node
 					 */
 					this.trigger('dehover_node', {
 						'node' : this.get_node(obj)
@@ -4456,14 +4224,11 @@
 				 * select a node
 				 * 
 				 * @name select_node(obj [, supress_event, prevent_open])
-				 * @param {mixed}
-				 *            obj an array can be used to select multiple nodes
-				 * @param {Boolean}
-				 *            supress_event if set to `true` the
-				 *            `changed.jstreeol3` event won't be triggered
-				 * @param {Boolean}
-				 *            prevent_open if set to `true` parents of the
-				 *            selected node won't be opened
+				 * @param {mixed} obj an array can be used to select multiple nodes
+				 * @param {Boolean} supress_event if set to `true` the `changed.jstreeol3` event
+				 * won't be triggered
+				 * @param {Boolean} prevent_open if set to `true` parents of the selected node won't
+				 * be opened
 				 * @trigger select_node.jstreeol3, changed.jstreeol3
 				 */
 				select_node : function(obj, supress_event, prevent_open, e) {
@@ -4494,13 +4259,9 @@
 						 * 
 						 * @event
 						 * @name select_node.jstreeol3
-						 * @param {Object}
-						 *            node
-						 * @param {Array}
-						 *            selected the current selection
-						 * @param {Object}
-						 *            event the event (if any) that triggered
-						 *            this select_node
+						 * @param {Object} node
+						 * @param {Array} selected the current selection
+						 * @param {Object} event the event (if any) that triggered this select_node
 						 */
 						this.trigger('select_node', {
 							'node' : obj,
@@ -4513,16 +4274,11 @@
 							 * 
 							 * @event
 							 * @name changed.jstreeol3
-							 * @param {Object}
-							 *            node
-							 * @param {Object}
-							 *            action the action that caused the
-							 *            selection to change
-							 * @param {Array}
-							 *            selected the current selection
-							 * @param {Object}
-							 *            event the event (if any) that
-							 *            triggered this changed event
+							 * @param {Object} node
+							 * @param {Object} action the action that caused the selection to change
+							 * @param {Array} selected the current selection
+							 * @param {Object} event the event (if any) that triggered this changed
+							 * event
 							 */
 							this.trigger('changed', {
 								'action' : 'select_node',
@@ -4537,12 +4293,9 @@
 				 * deselect a node
 				 * 
 				 * @name deselect_node(obj [, supress_event])
-				 * @param {mixed}
-				 *            obj an array can be used to deselect multiple
-				 *            nodes
-				 * @param {Boolean}
-				 *            supress_event if set to `true` the
-				 *            `changed.jstreeol3` event won't be triggered
+				 * @param {mixed} obj an array can be used to deselect multiple nodes
+				 * @param {Boolean} supress_event if set to `true` the `changed.jstreeol3` event
+				 * won't be triggered
 				 * @trigger deselect_node.jstreeol3, changed.jstreeol3
 				 */
 				deselect_node : function(obj, supress_event, e) {
@@ -4570,13 +4323,10 @@
 						 * 
 						 * @event
 						 * @name deselect_node.jstreeol3
-						 * @param {Object}
-						 *            node
-						 * @param {Array}
-						 *            selected the current selection
-						 * @param {Object}
-						 *            event the event (if any) that triggered
-						 *            this deselect_node
+						 * @param {Object} node
+						 * @param {Array} selected the current selection
+						 * @param {Object} event the event (if any) that triggered this
+						 * deselect_node
 						 */
 						this.trigger('deselect_node', {
 							'node' : obj,
@@ -4597,9 +4347,8 @@
 				 * select all nodes in the tree
 				 * 
 				 * @name select_all([supress_event])
-				 * @param {Boolean}
-				 *            supress_event if set to `true` the
-				 *            `changed.jstreeol3` event won't be triggered
+				 * @param {Boolean} supress_event if set to `true` the `changed.jstreeol3` event
+				 * won't be triggered
 				 * @trigger select_all.jstreeol3, changed.jstreeol3
 				 */
 				select_all : function(supress_event) {
@@ -4616,8 +4365,7 @@
 					 * 
 					 * @event
 					 * @name select_all.jstreeol3
-					 * @param {Array}
-					 *            selected the current selection
+					 * @param {Array} selected the current selection
 					 */
 					this.trigger('select_all', {
 						'selected' : this._data.core.selected
@@ -4634,9 +4382,8 @@
 				 * deselect all selected nodes
 				 * 
 				 * @name deselect_all([supress_event])
-				 * @param {Boolean}
-				 *            supress_event if set to `true` the
-				 *            `changed.jstreeol3` event won't be triggered
+				 * @param {Boolean} supress_event if set to `true` the `changed.jstreeol3` event
+				 * won't be triggered
 				 * @trigger deselect_all.jstreeol3, changed.jstreeol3
 				 */
 				deselect_all : function(supress_event) {
@@ -4653,10 +4400,8 @@
 					 * 
 					 * @event
 					 * @name deselect_all.jstreeol3
-					 * @param {Object}
-					 *            node the previous selection
-					 * @param {Array}
-					 *            selected the current selection
+					 * @param {Object} node the previous selection
+					 * @param {Array} selected the current selection
 					 */
 					this.trigger('deselect_all', {
 						'selected' : this._data.core.selected,
@@ -4674,8 +4419,7 @@
 				 * checks if a node is selected
 				 * 
 				 * @name is_selected(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				is_selected : function(obj) {
@@ -4689,10 +4433,8 @@
 				 * get an array of all selected nodes
 				 * 
 				 * @name get_selected([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 */
 				get_selected : function(full) {
@@ -4704,10 +4446,8 @@
 				 * 선택한 레이어를 반환한다.
 				 * 
 				 * @name get_selected_layer()
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 */
 				get_selected_layer : function() {
@@ -4719,14 +4459,12 @@
 					return result;
 				},
 				/**
-				 * get an array of all top level selected nodes (ignoring
-				 * children of selected nodes)
+				 * get an array of all top level selected nodes (ignoring children of selected
+				 * nodes)
 				 * 
 				 * @name get_top_selected([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 */
 				get_top_selected : function(full) {
@@ -4752,14 +4490,11 @@
 					}, this)) : tmp;
 				},
 				/**
-				 * get an array of all bottom level selected nodes (ignoring
-				 * selected parents)
+				 * get an array of all bottom level selected nodes (ignoring selected parents)
 				 * 
 				 * @name get_bottom_selected([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 */
 				get_bottom_selected : function(full) {
@@ -4774,8 +4509,8 @@
 					}, this)) : obj;
 				},
 				/**
-				 * gets the current state of the tree so that it can be restored
-				 * later with `set_state(state)`. Used internally.
+				 * gets the current state of the tree so that it can be restored later with
+				 * `set_state(state)`. Used internally.
 				 * 
 				 * @name get_state()
 				 * @private
@@ -4791,8 +4526,7 @@
 							},
 							/*
 							 * ! 'themes' : { 'name' : this.get_theme(), 'icons' :
-							 * this._data.core.themes.icons, 'dots' :
-							 * this._data.core.themes.dots },
+							 * this._data.core.themes.icons, 'dots' : this._data.core.themes.dots },
 							 */
 							'selected' : []
 						}
@@ -4816,13 +4550,10 @@
 				 * 
 				 * @name set_state(state [, callback])
 				 * @private
-				 * @param {Object}
-				 *            state the state to restore. Keep in mind this
-				 *            object is passed by reference and jstreeol3 will
-				 *            modify it.
-				 * @param {Function}
-				 *            callback an optional function to execute once the
-				 *            state is restored.
+				 * @param {Object} state the state to restore. Keep in mind this object is passed by
+				 * reference and jstreeol3 will modify it.
+				 * @param {Function} callback an optional function to execute once the state is
+				 * restored.
 				 * @trigger set_state.jstreeol3
 				 */
 				set_state : function(state, callback) {
@@ -4903,18 +4634,13 @@
 					}
 				},
 				/**
-				 * refreshes the tree - all nodes are reloaded with calls to
-				 * `load_node`.
+				 * refreshes the tree - all nodes are reloaded with calls to `load_node`.
 				 * 
 				 * @name refresh()
-				 * @param {Boolean}
-				 *            skip_loading an option to skip showing the loading
-				 *            indicator
-				 * @param {Mixed}
-				 *            forget_state if set to `true` state will not be
-				 *            reapplied, if set to a function (receiving the
-				 *            current state as argument) the result of that
-				 *            function will be used as state
+				 * @param {Boolean} skip_loading an option to skip showing the loading indicator
+				 * @param {Mixed} forget_state if set to `true` state will not be reapplied, if set
+				 * to a function (receiving the current state as argument) the result of that
+				 * function will be used as state
 				 * @trigger refresh.jstreeol3
 				 */
 				refresh : function(skip_loading, forget_state) {
@@ -4958,11 +4684,9 @@
 
 					var c = this.get_container_ul()[0].className;
 					if (!skip_loading) {
-						this.element.html("<" + "ul class='" + c + "' role='group'><"
-								+ "li class='jstreeol3-initial-node jstreeol3-loading jstreeol3-leaf jstreeol3-last' role='treeitem' id='j"
+						this.element.html("<" + "ul class='" + c + "' role='group'><" + "li class='jstreeol3-initial-node jstreeol3-loading jstreeol3-leaf jstreeol3-last' role='treeitem' id='j"
 								+ this._id + "_loading'><i class='jstreeol3-icon jstreeol3-ocl'></i><"
-								+ "a class='jstreeol3-anchor' href='#'><i class='jstreeol3-icon jstreeol3-themeicon-hidden'></i>"
-								+ this.get_string("Loading ...") + "</a></li></ul>");
+								+ "a class='jstreeol3-anchor' href='#'><i class='jstreeol3-icon jstreeol3-themeicon-hidden'></i>" + this.get_string("Loading ...") + "</a></li></ul>");
 						this.element.attr('aria-activedescendant', 'j' + this._id + '_loading');
 					}
 					this.load_node($.jstreeol3.root, function(o, s) {
@@ -4985,13 +4709,11 @@
 					});
 				},
 				/**
-				 * refreshes a node in the tree (reload its children) all opened
-				 * nodes inside that node are reloaded with calls to
-				 * `load_node`.
+				 * refreshes a node in the tree (reload its children) all opened nodes inside that
+				 * node are reloaded with calls to `load_node`.
 				 * 
 				 * @name refresh_node(obj)
-				 * @param {mixed}
-				 *            obj the node
+				 * @param {mixed} obj the node
 				 * @trigger refresh_node.jstreeol3
 				 */
 				refresh_node : function(obj) {
@@ -5016,11 +4738,9 @@
 						 * 
 						 * @event
 						 * @name refresh_node.jstreeol3
-						 * @param {Object}
-						 *            node - the refreshed node
-						 * @param {Array}
-						 *            nodes - an array of the IDs of the nodes
-						 *            that were reloaded
+						 * @param {Object} node - the refreshed node
+						 * @param {Array} nodes - an array of the IDs of the nodes that were
+						 * reloaded
 						 */
 						this.trigger('refresh_node', {
 							'node' : obj,
@@ -5032,10 +4752,8 @@
 				 * set (change) the ID of a node
 				 * 
 				 * @name set_id(obj, id)
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {String}
-				 *            id the new ID
+				 * @param {mixed} obj the node
+				 * @param {String} id the new ID
 				 * @return {Boolean}
 				 * @trigger set_id.jstreeol3
 				 */
@@ -5085,10 +4803,8 @@
 					 * 
 					 * @event
 					 * @name set_id.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            old the old id
+					 * @param {Object} node
+					 * @param {String} old the old id
 					 */
 					this.trigger('set_id', {
 						"node" : obj,
@@ -5101,8 +4817,7 @@
 				 * get the text value of a node
 				 * 
 				 * @name get_text(obj)
-				 * @param {mixed}
-				 *            obj the node
+				 * @param {mixed} obj the node
 				 * @return {String}
 				 */
 				get_text : function(obj) {
@@ -5114,10 +4829,8 @@
 				 * 
 				 * @author 소이준
 				 * @name tour_Layer(layer, id)
-				 * @param {ol.layer.Base}
-				 *            layer - 조회할 레이어
-				 * @param {string}
-				 *            id - 비교할 아이디
+				 * @param {ol.layer.Base} layer - 조회할 레이어
+				 * @param {string} id - 비교할 아이디
 				 * @return {ol.layer.Base}
 				 */
 				tour_Layer : function(layer, id) {
@@ -5178,10 +4891,8 @@
 				 * 
 				 * @author 소이준
 				 * @name tour_Layer_Id(layer, id)
-				 * @param {ol.layer.Base}
-				 *            layer - 조회할 레이어
-				 * @param {string}
-				 *            id - 비교할 아이디
+				 * @param {ol.layer.Base} layer - 조회할 레이어
+				 * @param {string} id - 비교할 아이디
 				 * @return {ol.layer.Base}
 				 */
 				tour_Layer_Id : function(layer, id) {
@@ -5244,10 +4955,8 @@
 				 * 
 				 * @author 소이준
 				 * @name sum_Layers(layer, num)
-				 * @param {ol.layer.Base}
-				 *            layer - 조회할 레이어
-				 * @param {number}
-				 *            num -
+				 * @param {ol.layer.Base} layer - 조회할 레이어
+				 * @param {number} num -
 				 * @return {number} 레이어 갯수
 				 */
 				sum_Layers : function(layer, num) {
@@ -5291,10 +5000,8 @@
 				 * get the layer by tree id
 				 * 
 				 * @name get_LayerById(id, [collection])
-				 * @param {String}
-				 *            id - layer id
-				 * @param {ol.Collection}
-				 *            collection - 레이어를 검색할 콜렉션
+				 * @param {String} id - layer id
+				 * @param {ol.Collection} collection - 레이어를 검색할 콜렉션
 				 * @return {ol.layer.Layer} layer
 				 * @author 소이준
 				 */
@@ -5328,10 +5035,8 @@
 				 * get the layer by id
 				 * 
 				 * @name get_LayerById(id, [collection])
-				 * @param {String}
-				 *            id - layer id
-				 * @param {ol.Collection}
-				 *            collection - 레이어를 검색할 콜렉션
+				 * @param {String} id - layer id
+				 * @param {ol.Collection} collection - 레이어를 검색할 콜렉션
 				 * @return {ol.layer.Layer} layer
 				 * @author 소이준
 				 */
@@ -5365,8 +5070,7 @@
 				 * get the ID value of a node
 				 * 
 				 * @name get_id(obj)
-				 * @param {mixed}
-				 *            obj the node
+				 * @param {mixed} obj the node
 				 * @return {String}
 				 * @author 소이준
 				 */
@@ -5375,16 +5079,14 @@
 					return (!obj || obj.id === $.jstreeol3.root) ? false : obj.id;
 				},
 				/**
-				 * set the text value of a node. Used internally, please use
-				 * `rename_node(obj, val)`.
+				 * set the text value of a node. Used internally, please use `rename_node(obj,
+				 * val)`.
 				 * 
 				 * @private
 				 * @name set_text(obj, val)
-				 * @param {mixed}
-				 *            obj the node, you can pass an array to set the
-				 *            text on multiple nodes
-				 * @param {String}
-				 *            val the new text value
+				 * @param {mixed} obj the node, you can pass an array to set the text on multiple
+				 * nodes
+				 * @param {String} val the new text value
 				 * @return {Boolean}
 				 * @trigger set_text.jstreeol3
 				 */
@@ -5418,10 +5120,8 @@
 					 * 
 					 * @event
 					 * @name set_text.jstreeol3
-					 * @param {Object}
-					 *            obj
-					 * @param {String}
-					 *            text the new value
+					 * @param {Object} obj
+					 * @param {String} text the new value
 					 */
 					this.trigger('set_text', {
 						"obj" : obj,
@@ -5433,24 +5133,15 @@
 				 * gets a JSON representation of a node (or the whole tree)
 				 * 
 				 * @name get_json([obj, options])
-				 * @param {mixed}
-				 *            obj
-				 * @param {Object}
-				 *            options
-				 * @param {Boolean}
-				 *            options.no_state do not return state information
-				 * @param {Boolean}
-				 *            options.no_id do not return ID
-				 * @param {Boolean}
-				 *            options.no_children do not include children
-				 * @param {Boolean}
-				 *            options.no_data do not include node data
-				 * @param {Boolean}
-				 *            options.no_li_attr do not include LI attributes
-				 * @param {Boolean}
-				 *            options.no_a_attr do not include A attributes
-				 * @param {Boolean}
-				 *            options.flat return flat JSON instead of nested
+				 * @param {mixed} obj
+				 * @param {Object} options
+				 * @param {Boolean} options.no_state do not return state information
+				 * @param {Boolean} options.no_id do not return ID
+				 * @param {Boolean} options.no_children do not include children
+				 * @param {Boolean} options.no_data do not include node data
+				 * @param {Boolean} options.no_li_attr do not include LI attributes
+				 * @param {Boolean} options.no_a_attr do not include A attributes
+				 * @param {Boolean} options.flat return flat JSON instead of nested
 				 * @return {Object}
 				 */
 				get_json : function(obj, options, flat) {
@@ -5519,21 +5210,15 @@
 				 * create a new group (do not confuse with load_node)
 				 * 
 				 * @name create_group([par, node, pos, callback, is_loaded])
-				 * @param {mixed}
-				 *            par the parent node (to create a root node use
-				 *            either "#" (string) or `null`)
-				 * @param {mixed}
-				 *            node the data for the new node (a valid JSON
-				 *            object, or a simple string with the name)
-				 * @param {mixed}
-				 *            pos the index at which to insert the node, "first"
-				 *            and "last" are also supported, default is "last"
-				 * @param {Function}
-				 *            callback a function to be called once the node is
-				 *            created
-				 * @param {Boolean}
-				 *            is_loaded internal argument indicating if the
-				 *            parent node was succesfully loaded
+				 * @param {mixed} par the parent node (to create a root node use either "#" (string)
+				 * or `null`)
+				 * @param {mixed} node the data for the new node (a valid JSON object, or a simple
+				 * string with the name)
+				 * @param {mixed} pos the index at which to insert the node, "first" and "last" are
+				 * also supported, default is "last"
+				 * @param {Function} callback a function to be called once the node is created
+				 * @param {Boolean} is_loaded internal argument indicating if the parent node was
+				 * succesfully loaded
 				 * @return {String} the ID of the newly create node
 				 * @trigger model.jstreeol3, create_node.jstreeol3
 				 * @comment 그룹 레이어 생성 (create_node함수 복사 및 수정함)
@@ -5668,13 +5353,10 @@
 					 * 
 					 * @event
 					 * @name create_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            parent the parent's ID
-					 * @param {Number}
-					 *            position the position of the new node among
-					 *            the parent's children
+					 * @param {Object} node
+					 * @param {String} parent the parent's ID
+					 * @param {Number} position the position of the new node among the parent's
+					 * children
 					 */
 					this.trigger('create_group', {
 						"node" : this.get_node(node),
@@ -5687,21 +5369,15 @@
 				 * create a new node (do not confuse with load_node)
 				 * 
 				 * @name create_node([par, node, pos, callback, is_loaded])
-				 * @param {mixed}
-				 *            par the parent node (to create a root node use
-				 *            either "#" (string) or `null`)
-				 * @param {mixed}
-				 *            node the data for the new node (a valid JSON
-				 *            object, or a simple string with the name)
-				 * @param {mixed}
-				 *            pos the index at which to insert the node, "first"
-				 *            and "last" are also supported, default is "last"
-				 * @param {Function}
-				 *            callback a function to be called once the node is
-				 *            created
-				 * @param {Boolean}
-				 *            is_loaded internal argument indicating if the
-				 *            parent node was succesfully loaded
+				 * @param {mixed} par the parent node (to create a root node use either "#" (string)
+				 * or `null`)
+				 * @param {mixed} node the data for the new node (a valid JSON object, or a simple
+				 * string with the name)
+				 * @param {mixed} pos the index at which to insert the node, "first" and "last" are
+				 * also supported, default is "last"
+				 * @param {Function} callback a function to be called once the node is created
+				 * @param {Boolean} is_loaded internal argument indicating if the parent node was
+				 * succesfully loaded
 				 * @return {String} the ID of the newly create node
 				 * @trigger model.jstreeol3, create_node.jstreeol3
 				 */
@@ -5813,13 +5489,10 @@
 					 * 
 					 * @event
 					 * @name create_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            parent the parent's ID
-					 * @param {Number}
-					 *            position the position of the new node among
-					 *            the parent's children
+					 * @param {Object} node
+					 * @param {String} parent the parent's ID
+					 * @param {Number} position the position of the new node among the parent's
+					 * children
 					 */
 					this.trigger('create_node', {
 						"node" : this.get_node(node),
@@ -5832,11 +5505,9 @@
 				 * set the text value of a node
 				 * 
 				 * @name rename_node(obj, val)
-				 * @param {mixed}
-				 *            obj the node, you can pass an array to rename
-				 *            multiple nodes to the same name
-				 * @param {String}
-				 *            val the new text value
+				 * @param {mixed} obj the node, you can pass an array to rename multiple nodes to
+				 * the same name
+				 * @param {String} val the new text value
 				 * @return {Boolean}
 				 * @trigger rename_node.jstreeol3
 				 */
@@ -5860,17 +5531,24 @@
 					}
 					this.set_text(obj, val); // .apply(this,
 					// Array.prototype.slice.call(arguments))
+					// three tree 노드 이름 변경
+					var nid;
+					if (typeof obj === "string") {
+						nid = obj;
+					} else if (typeof obj === "object") {
+						nid = obj.id;
+					}
+					var threeNode = this._data.layerproperties.threeTree.get_node(nid);
+					this._data.layerproperties.threeTree.rename_node(threeNode, val);
+					
 					/**
 					 * triggered when a node is renamed
 					 * 
 					 * @event
 					 * @name rename_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            text the new value
-					 * @param {String}
-					 *            old the old value
+					 * @param {Object} node
+					 * @param {String} text the new value
+					 * @param {String} old the old value
 					 */
 					this.trigger('rename_node', {
 						"node" : obj,
@@ -5883,9 +5561,7 @@
 				 * remove a layer and node
 				 * 
 				 * @name delete_node_layer(obj)
-				 * @param {mixed}
-				 *            obj the node, you can pass an array to delete
-				 *            multiple nodes
+				 * @param {mixed} obj the node, you can pass an array to delete multiple nodes
 				 * @return {Boolean}
 				 * @trigger delete_node.jstreeol3, changed.jstreeol3
 				 * @comment delete_node 복사 및 수정함
@@ -5894,6 +5570,7 @@
 				delete_node_layer : function(obj) {
 					var t1, t2, par, pos, tmp, i, j, k, l, c, top, lft;
 					var that = this;
+					var nid = typeof obj === "string" ? obj : obj.id;
 					if ($.isArray(obj)) {
 						obj = obj.slice();
 						for (t1 = 0, t2 = obj.length; t1 < t2; t1++) {
@@ -5992,6 +5669,8 @@
 						underRoot = obj.id;
 					}
 					var oidx = root.children.indexOf(underRoot);
+
+					this._data.layerproperties.threeTree.delete_node(nid);
 					// 여기까지
 
 					pos = $.inArray(obj.id, par.children);
@@ -6006,10 +5685,9 @@
 					tmp = obj.children_d.concat([]);
 					tmp.push(obj.id);
 					for (i = 0, j = obj.parents.length; i < j; i++) {
-						this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(this._model.data[obj.parents[i]].children_d,
-								function(v) {
-									return $.inArray(v, tmp) === -1;
-								});
+						this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(this._model.data[obj.parents[i]].children_d, function(v) {
+							return $.inArray(v, tmp) === -1;
+						});
 					}
 					for (k = 0, l = tmp.length; k < l; k++) {
 						if (this._model.data[tmp[k]].state.selected) {
@@ -6028,10 +5706,8 @@
 					 * 
 					 * @event
 					 * @name delete_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            parent the parent's ID
+					 * @param {Object} node
+					 * @param {String} parent the parent's ID
 					 */
 					this.trigger('delete_node_layer', {
 						"node" : obj,
@@ -6092,9 +5768,7 @@
 				 * remove a node
 				 * 
 				 * @name delete_node(obj)
-				 * @param {mixed}
-				 *            obj the node, you can pass an array to delete
-				 *            multiple nodes
+				 * @param {mixed} obj the node, you can pass an array to delete multiple nodes
 				 * @return {Boolean}
 				 * @trigger delete_node.jstreeol3, changed.jstreeol3
 				 */
@@ -6124,10 +5798,9 @@
 					tmp = obj.children_d.concat([]);
 					tmp.push(obj.id);
 					for (i = 0, j = obj.parents.length; i < j; i++) {
-						this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(this._model.data[obj.parents[i]].children_d,
-								function(v) {
-									return $.inArray(v, tmp) === -1;
-								});
+						this._model.data[obj.parents[i]].children_d = $.vakata.array_filter(this._model.data[obj.parents[i]].children_d, function(v) {
+							return $.inArray(v, tmp) === -1;
+						});
 					}
 					for (k = 0, l = tmp.length; k < l; k++) {
 						if (this._model.data[tmp[k]].state.selected) {
@@ -6145,10 +5818,8 @@
 					 * 
 					 * @event
 					 * @name delete_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            parent the parent's ID
+					 * @param {Object} node
+					 * @param {String} parent the parent's ID
 					 */
 					this.trigger('delete_node', {
 						"node" : obj,
@@ -6183,26 +5854,17 @@
 					return true;
 				},
 				/**
-				 * check if an operation is premitted on the tree. Used
-				 * internally.
+				 * check if an operation is premitted on the tree. Used internally.
 				 * 
 				 * @private
 				 * @name check(chk, obj, par, pos)
-				 * @param {String}
-				 *            chk the operation to check, can be "create_node",
-				 *            "rename_node", "delete_node", "copy_node" or
-				 *            "move_node"
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {mixed}
-				 *            par the parent
-				 * @param {mixed}
-				 *            pos the position to insert at, or if "rename_node" -
-				 *            the new name
-				 * @param {mixed}
-				 *            more some various additional information, for
-				 *            example if a "move_node" operations is triggered
-				 *            by DND this will be the hovered node
+				 * @param {String} chk the operation to check, can be "create_node", "rename_node",
+				 * "delete_node", "copy_node" or "move_node"
+				 * @param {mixed} obj the node
+				 * @param {mixed} par the parent
+				 * @param {mixed} pos the position to insert at, or if "rename_node" - the new name
+				 * @param {mixed} more some various additional information, for example if a
+				 * "move_node" operations is triggered by DND this will be the hovered node
 				 * @return {Boolean}
 				 */
 				check : function(chk, obj, par, pos, more) {
@@ -6210,9 +5872,7 @@
 					par = par && par.id ? par : this.get_node(par);
 					var tmp = chk.match(/^move_node|copy_node|create_node$/i) ? par : obj, chc = this.settings.core.check_callback;
 					if (chk === "move_node" || chk === "copy_node") {
-						if ((!more || !more.is_multi)
-								&& (obj.id === par.id || (chk === "move_node" && $.inArray(obj.id, par.children) === pos) || $.inArray(
-										par.id, obj.children_d) !== -1)) {
+						if ((!more || !more.is_multi) && (obj.id === par.id || (chk === "move_node" && $.inArray(obj.id, par.children) === pos) || $.inArray(par.id, obj.children_d) !== -1)) {
 							this._data.core.last_error = {
 								'error' : 'check',
 								'plugin' : 'core',
@@ -6248,8 +5908,7 @@
 						}
 						return tmp.functions[chk];
 					}
-					if (chc === false || ($.isFunction(chc) && chc.call(this, chk, obj, par, pos, more) === false)
-							|| (chc && chc[chk] === false)) {
+					if (chc === false || ($.isFunction(chc) && chc.call(this, chk, obj, par, pos, more) === false) || (chc && chc[chk] === false)) {
 						this._data.core.last_error = {
 							'error' : 'check',
 							'plugin' : 'core',
@@ -6279,28 +5938,18 @@
 				 * move a node to a new parent
 				 * 
 				 * @name move_node(obj, par [, pos, callback, is_loaded])
-				 * @param {mixed}
-				 *            obj the node to move, pass an array to move
-				 *            multiple nodes
-				 * @param {mixed}
-				 *            par the new parent
-				 * @param {mixed}
-				 *            pos the position to insert at (besides integer
-				 *            values, "first" and "last" are supported, as well
-				 *            as "before" and "after"), defaults to integer `0`
-				 * @param {function}
-				 *            callback a function to call once the move is
-				 *            completed, receives 3 arguments - the node, the
-				 *            new parent and the position
-				 * @param {Boolean}
-				 *            is_loaded internal parameter indicating if the
-				 *            parent node has been loaded
-				 * @param {Boolean}
-				 *            skip_redraw internal parameter indicating if the
-				 *            tree should be redrawn
-				 * @param {Boolean}
-				 *            instance internal parameter indicating if the node
-				 *            comes from another instance
+				 * @param {mixed} obj the node to move, pass an array to move multiple nodes
+				 * @param {mixed} par the new parent
+				 * @param {mixed} pos the position to insert at (besides integer values, "first" and
+				 * "last" are supported, as well as "before" and "after"), defaults to integer `0`
+				 * @param {function} callback a function to call once the move is completed,
+				 * receives 3 arguments - the node, the new parent and the position
+				 * @param {Boolean} is_loaded internal parameter indicating if the parent node has
+				 * been loaded
+				 * @param {Boolean} skip_redraw internal parameter indicating if the tree should be
+				 * redrawn
+				 * @param {Boolean} instance internal parameter indicating if the node comes from
+				 * another instance
 				 * @trigger move_node.jstreeol3
 				 */
 				move_node : function(obj, par, pos, callback, is_loaded, skip_redraw, origin) {
@@ -6341,8 +5990,7 @@
 					new_par = (!pos.toString().match(/^(before|after)$/) || par.id === $.jstreeol3.root) ? par : this.get_node(par.parent);
 					old_ins = origin ? origin : (this._model.data[obj.id] ? this : $.jstreeol3.reference(obj.id));
 					is_multi = !old_ins || !old_ins._id || (this._id !== old_ins._id);
-					old_pos = old_ins && old_ins._id && old_par && old_ins._model.data[old_par] && old_ins._model.data[old_par].children ? $
-							.inArray(obj.id, old_ins._model.data[old_par].children)
+					old_pos = old_ins && old_ins._id && old_par && old_ins._model.data[old_par] && old_ins._model.data[old_par].children ? $.inArray(obj.id, old_ins._model.data[old_par].children)
 							: -1;
 					if (old_ins && old_ins._id) {
 						obj = old_ins._model.data[obj.id];
@@ -6664,24 +6312,15 @@
 					 * 
 					 * @event
 					 * @name move_node.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {String}
-					 *            parent the parent's ID
-					 * @param {Number}
-					 *            position the position of the node among the
-					 *            parent's children
-					 * @param {String}
-					 *            old_parent the old parent of the node
-					 * @param {Number}
-					 *            old_position the old position of the node
-					 * @param {Boolean}
-					 *            is_multi do the node and new parent belong to
-					 *            different instances
-					 * @param {jstreeol3}
-					 *            old_instance the instance the node came from
-					 * @param {jstreeol3}
-					 *            new_instance the instance of the new parent
+					 * @param {Object} node
+					 * @param {String} parent the parent's ID
+					 * @param {Number} position the position of the node among the parent's children
+					 * @param {String} old_parent the old parent of the node
+					 * @param {Number} old_position the old position of the node
+					 * @param {Boolean} is_multi do the node and new parent belong to different
+					 * instances
+					 * @param {jstreeol3} old_instance the instance the node came from
+					 * @param {jstreeol3} new_instance the instance of the new parent
 					 */
 					this.trigger('move_node', {
 						"node" : obj,
@@ -6700,28 +6339,18 @@
 				 * copy a node to a new parent
 				 * 
 				 * @name copy_node(obj, par [, pos, callback, is_loaded])
-				 * @param {mixed}
-				 *            obj the node to copy, pass an array to copy
-				 *            multiple nodes
-				 * @param {mixed}
-				 *            par the new parent
-				 * @param {mixed}
-				 *            pos the position to insert at (besides integer
-				 *            values, "first" and "last" are supported, as well
-				 *            as "before" and "after"), defaults to integer `0`
-				 * @param {function}
-				 *            callback a function to call once the move is
-				 *            completed, receives 3 arguments - the node, the
-				 *            new parent and the position
-				 * @param {Boolean}
-				 *            is_loaded internal parameter indicating if the
-				 *            parent node has been loaded
-				 * @param {Boolean}
-				 *            skip_redraw internal parameter indicating if the
-				 *            tree should be redrawn
-				 * @param {Boolean}
-				 *            instance internal parameter indicating if the node
-				 *            comes from another instance
+				 * @param {mixed} obj the node to copy, pass an array to copy multiple nodes
+				 * @param {mixed} par the new parent
+				 * @param {mixed} pos the position to insert at (besides integer values, "first" and
+				 * "last" are supported, as well as "before" and "after"), defaults to integer `0`
+				 * @param {function} callback a function to call once the move is completed,
+				 * receives 3 arguments - the node, the new parent and the position
+				 * @param {Boolean} is_loaded internal parameter indicating if the parent node has
+				 * been loaded
+				 * @param {Boolean} skip_redraw internal parameter indicating if the tree should be
+				 * redrawn
+				 * @param {Boolean} instance internal parameter indicating if the node comes from
+				 * another instance
 				 * @trigger model.jstreeol3 copy_node.jstreeol3
 				 */
 				copy_node : function(obj, par, pos, callback, is_loaded, skip_redraw, origin) {
@@ -6864,26 +6493,16 @@
 					 * 
 					 * @event
 					 * @name copy_node.jstreeol3
-					 * @param {Object}
-					 *            node the copied node
-					 * @param {Object}
-					 *            original the original node
-					 * @param {String}
-					 *            parent the parent's ID
-					 * @param {Number}
-					 *            position the position of the node among the
-					 *            parent's children
-					 * @param {String}
-					 *            old_parent the old parent of the node
-					 * @param {Number}
-					 *            old_position the position of the original node
-					 * @param {Boolean}
-					 *            is_multi do the node and new parent belong to
-					 *            different instances
-					 * @param {jstreeol3}
-					 *            old_instance the instance the node came from
-					 * @param {jstreeol3}
-					 *            new_instance the instance of the new parent
+					 * @param {Object} node the copied node
+					 * @param {Object} original the original node
+					 * @param {String} parent the parent's ID
+					 * @param {Number} position the position of the node among the parent's children
+					 * @param {String} old_parent the old parent of the node
+					 * @param {Number} old_position the position of the original node
+					 * @param {Boolean} is_multi do the node and new parent belong to different
+					 * instances
+					 * @param {jstreeol3} old_instance the instance the node came from
+					 * @param {jstreeol3} new_instance the instance of the new parent
 					 */
 					this.trigger('copy_node', {
 						"node" : tmp,
@@ -6891,8 +6510,8 @@
 						"parent" : new_par.id,
 						"position" : pos,
 						"old_parent" : old_par,
-						"old_position" : old_ins && old_ins._id && old_par && old_ins._model.data[old_par]
-								&& old_ins._model.data[old_par].children ? $.inArray(obj.id, old_ins._model.data[old_par].children) : -1,
+						"old_position" : old_ins && old_ins._id && old_par && old_ins._model.data[old_par] && old_ins._model.data[old_par].children ? $.inArray(obj.id,
+								old_ins._model.data[old_par].children) : -1,
 						'is_multi' : (old_ins && old_ins._id && old_ins._id !== this._id),
 						'is_foreign' : (!old_ins || !old_ins._id),
 						'old_instance' : old_ins,
@@ -6904,8 +6523,7 @@
 				 * cut a node (a later call to `paste(obj)` would move the node)
 				 * 
 				 * @name cut(obj)
-				 * @param {mixed}
-				 *            obj multiple objects can be passed using an array
+				 * @param {mixed} obj multiple objects can be passed using an array
 				 * @trigger cut.jstreeol3
 				 */
 				cut : function(obj) {
@@ -6936,20 +6554,17 @@
 					 * 
 					 * @event
 					 * @name cut.jstreeol3
-					 * @param {Array}
-					 *            node
+					 * @param {Array} node
 					 */
 					this.trigger('cut', {
 						"node" : obj
 					});
 				},
 				/**
-				 * copy a node (a later call to `paste(obj)` would copy the
-				 * node)
+				 * copy a node (a later call to `paste(obj)` would copy the node)
 				 * 
 				 * @name copy(obj)
-				 * @param {mixed}
-				 *            obj multiple objects can be passed using an array
+				 * @param {mixed} obj multiple objects can be passed using an array
 				 * @trigger copy.jstreeol3
 				 */
 				copy : function(obj) {
@@ -6980,21 +6595,18 @@
 					 * 
 					 * @event
 					 * @name copy.jstreeol3
-					 * @param {Array}
-					 *            node
+					 * @param {Array} node
 					 */
 					this.trigger('copy', {
 						"node" : obj
 					});
 				},
 				/**
-				 * get the current buffer (any nodes that are waiting for a
-				 * paste operation)
+				 * get the current buffer (any nodes that are waiting for a paste operation)
 				 * 
 				 * @name get_buffer()
-				 * @return {Object} an object consisting of `mode` ("copy_node"
-				 *         or "move_node"), `node` (an array of objects) and
-				 *         `inst` (the instance)
+				 * @return {Object} an object consisting of `mode` ("copy_node" or "move_node"),
+				 * `node` (an array of objects) and `inst` (the instance)
 				 */
 				get_buffer : function() {
 					return {
@@ -7014,16 +6626,12 @@
 					// ccp_inst._model.data[ccp_node];
 				},
 				/**
-				 * copy or move the previously cut or copied nodes to a new
-				 * parent
+				 * copy or move the previously cut or copied nodes to a new parent
 				 * 
 				 * @name paste(obj [, pos])
-				 * @param {mixed}
-				 *            obj the new parent
-				 * @param {mixed}
-				 *            pos the position to insert at (besides integer,
-				 *            "first" and "last" are supported), defaults to
-				 *            integer `0`
+				 * @param {mixed} obj the new parent
+				 * @param {mixed} pos the position to insert at (besides integer, "first" and "last"
+				 * are supported), defaults to integer `0`
 				 * @trigger paste.jstreeol3
 				 */
 				paste : function(obj, pos) {
@@ -7037,13 +6645,9 @@
 						 * 
 						 * @event
 						 * @name paste.jstreeol3
-						 * @param {String}
-						 *            parent the ID of the receiving node
-						 * @param {Array}
-						 *            node the nodes in the buffer
-						 * @param {String}
-						 *            mode the performed operation - "copy_node"
-						 *            or "move_node"
+						 * @param {String} parent the ID of the receiving node
+						 * @param {Array} node the nodes in the buffer
+						 * @param {String} mode the performed operation - "copy_node" or "move_node"
 						 */
 						this.trigger('paste', {
 							"parent" : obj.id,
@@ -7078,8 +6682,7 @@
 				 * 
 				 * @author 소이준
 				 * @name zoom_to_fit(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 */
 				zoom_to_fit : function(layer, ext) {
 					var that = this;
@@ -7132,19 +6735,13 @@
 				 * put a node in edit mode (input field to rename the node)
 				 * 
 				 * @name edit(obj [, default_text, callback])
-				 * @param {mixed}
-				 *            obj
-				 * @param {String}
-				 *            default_text the text to populate the input with
-				 *            (if omitted or set to a non-string value the
-				 *            node's text value is used)
-				 * @param {Function}
-				 *            callback a function to be called once the text box
-				 *            is blurred, it is called in the instance's scope
-				 *            and receives the node, a status parameter (true if
-				 *            the rename is successful, false otherwise) and a
-				 *            boolean indicating if the user cancelled the edit.
-				 *            You can access the node's title using .text
+				 * @param {mixed} obj
+				 * @param {String} default_text the text to populate the input with (if omitted or
+				 * set to a non-string value the node's text value is used)
+				 * @param {Function} callback a function to be called once the text box is blurred,
+				 * it is called in the instance's scope and receives the node, a status parameter
+				 * (true if the rename is successful, false otherwise) and a boolean indicating if
+				 * the user cancelled the edit. You can access the node's title using .text
 				 */
 				edit : function(obj, default_text, callback) {
 					var rtl, w, a, s, t, h1, h2, fn, tmp, cancel = false;
@@ -7175,9 +6772,8 @@
 					a = obj.children('.jstreeol3-anchor').focus();
 					s = $('<span>');
 					/*
-					 * ! oi = obj.children("i:visible"), ai =
-					 * a.children("i:visible"), w1 = oi.width() * oi.length, w2 =
-					 * ai.width() * ai.length,
+					 * ! oi = obj.children("i:visible"), ai = a.children("i:visible"), w1 =
+					 * oi.width() * oi.length, w2 = ai.width() * ai.length,
 					 */
 					t = default_text;
 					h1 = $("<" + "div />", {
@@ -7215,8 +6811,7 @@
 							s.remove();
 							t = f ? t : $('<div></div>').append($.parseHTML(t)).html();
 							this.set_text(obj, t);
-							nv = !!this.rename_node(obj, f ? $('<div></div>').text(v).text() : $('<div></div>').append($.parseHTML(v))
-									.html());
+							nv = !!this.rename_node(obj, f ? $('<div></div>').text(v).text() : $('<div></div>').append($.parseHTML(v)).html());
 							if (!nv) {
 								this.set_text(obj, t); // move
 								// this
@@ -7292,13 +6887,10 @@
 				 * changes the theme
 				 * 
 				 * @name set_theme(theme_name [, theme_url])
-				 * @param {String}
-				 *            theme_name the name of the new theme to apply
-				 * @param {mixed}
-				 *            theme_url the location of the CSS file for this
-				 *            theme. Omit or set to `false` if you manually
-				 *            included the file. Set to `true` to autoload from
-				 *            the `core.themes.dir` directory.
+				 * @param {String} theme_name the name of the new theme to apply
+				 * @param {mixed} theme_url the location of the CSS file for this theme. Omit or set
+				 * to `false` if you manually included the file. Set to `true` to autoload from the
+				 * `core.themes.dir` directory.
 				 * @trigger set_theme.jstreeol3
 				 */
 				set_theme : function(theme_name, theme_url) {
@@ -7321,15 +6913,13 @@
 					}
 					this._data.core.themes.name = theme_name;
 					this.element.addClass('jstreeol3-' + theme_name);
-					this.element[this.settings.core.themes.responsive ? 'addClass' : 'removeClass']('jstreeol3-' + theme_name
-							+ '-responsive');
+					this.element[this.settings.core.themes.responsive ? 'addClass' : 'removeClass']('jstreeol3-' + theme_name + '-responsive');
 					/**
 					 * triggered when a theme is set
 					 * 
 					 * @event
 					 * @name set_theme.jstreeol3
-					 * @param {String}
-					 *            theme the new theme
+					 * @param {String} theme the new theme
 					 */
 					this.trigger('set_theme', {
 						'theme' : theme_name
@@ -7348,9 +6938,8 @@
 				 * changes the theme variant (if the theme has variants)
 				 * 
 				 * @name set_theme_variant(variant_name)
-				 * @param {String|Boolean}
-				 *            variant_name the variant to apply (if `false` is
-				 *            used the current variant is removed)
+				 * @param {String|Boolean} variant_name the variant to apply (if `false` is used the
+				 * current variant is removed)
 				 */
 				set_theme_variant : function(variant_name) {
 					if (this._data.core.themes.variant) {
@@ -7371,8 +6960,7 @@
 					return this._data.core.themes.variant;
 				},
 				/**
-				 * shows a striped background on the container (if the theme
-				 * supports it)
+				 * shows a striped background on the container (if the theme supports it)
 				 * 
 				 * @name show_stripes()
 				 */
@@ -7551,13 +7139,10 @@
 				 * set the node icon for a node
 				 * 
 				 * @name set_icon(obj, icon)
-				 * @param {mixed}
-				 *            obj
-				 * @param {String}
-				 *            icon the new icon - can be a path to an icon or a
-				 *            className, if using an image that is in the
-				 *            current directory use a `./` prefix, otherwise it
-				 *            will be detected as a class
+				 * @param {mixed} obj
+				 * @param {String} icon the new icon - can be a path to an icon or a className, if
+				 * using an image that is in the current directory use a `./` prefix, otherwise it
+				 * will be detected as a class
 				 */
 				set_icon : function(obj, icon) {
 					var t1, t2, dom, old;
@@ -7590,8 +7175,7 @@
 						}
 					} else {
 						dom.removeClass(old).css("background", "");
-						dom.addClass('jstreeol3-themeicon-custom').css("background", "url('" + icon + "') center center no-repeat").attr(
-								"rel", icon);
+						dom.addClass('jstreeol3-themeicon-custom').css("background", "url('" + icon + "') center center no-repeat").attr("rel", icon);
 						if (old === false) {
 							this.show_icon(obj);
 						}
@@ -7602,8 +7186,7 @@
 				 * get the node icon for a node
 				 * 
 				 * @name get_icon(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {String}
 				 */
 				get_icon : function(obj) {
@@ -7614,8 +7197,7 @@
 				 * hide the icon on an individual node
 				 * 
 				 * @name hide_icon(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 */
 				hide_icon : function(obj) {
 					var t1, t2;
@@ -7631,16 +7213,14 @@
 						return false;
 					}
 					obj.icon = false;
-					this.get_node(obj, true).children(".jstreeol3-anchor").children(".jstreeol3-themeicon").addClass(
-							'jstreeol3-themeicon-hidden');
+					this.get_node(obj, true).children(".jstreeol3-anchor").children(".jstreeol3-themeicon").addClass('jstreeol3-themeicon-hidden');
 					return true;
 				},
 				/**
 				 * show the icon on an individual node
 				 * 
 				 * @name show_icon(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 */
 				show_icon : function(obj) {
 					var t1, t2, dom;
@@ -7725,12 +7305,9 @@
 			};
 
 			/**
-			 * ### Changed plugin
-			 * 
-			 * This plugin adds more information to the `changed.jstreeol3`
-			 * event. The new data is contained in the `changed` event data
-			 * property, and contains a lists of `selected` and `deselected`
-			 * nodes.
+			 * ### Changed plugin This plugin adds more information to the `changed.jstreeol3`
+			 * event. The new data is contained in the `changed` event data property, and contains a
+			 * lists of `selected` and `deselected` nodes.
 			 */
 
 			$.jstreeol3.plugins.changed = function(options, parent) {
@@ -7764,26 +7341,18 @@
 						last = data.selected.slice();
 					}
 					/**
-					 * triggered when selection changes (the "changed" plugin
-					 * enhances the original event with more data)
+					 * triggered when selection changes (the "changed" plugin enhances the original
+					 * event with more data)
 					 * 
 					 * @event
 					 * @name changed.jstreeol3
-					 * @param {Object}
-					 *            node
-					 * @param {Object}
-					 *            action the action that caused the selection to
-					 *            change
-					 * @param {Array}
-					 *            selected the current selection
-					 * @param {Object}
-					 *            changed an object containing two properties
-					 *            `selected` and `deselected` - both arrays of
-					 *            node IDs, which were selected or deselected
-					 *            since the last changed event
-					 * @param {Object}
-					 *            event the event (if any) that triggered this
-					 *            changed event
+					 * @param {Object} node
+					 * @param {Object} action the action that caused the selection to change
+					 * @param {Array} selected the current selection
+					 * @param {Object} changed an object containing two properties `selected` and
+					 * `deselected` - both arrays of node IDs, which were selected or deselected
+					 * since the last changed event
+					 * @param {Object} event the event (if any) that triggered this changed event
 					 * @plugin changed
 					 */
 					parent.trigger.call(this, ev, data);
@@ -7795,13 +7364,10 @@
 			};
 
 			/**
-			 * ### Checkbox plugin
-			 * 
-			 * This plugin renders checkbox icons in front of each node, making
-			 * multiple selection much easier. It also supports tri-state
-			 * behavior, meaning that if a node has a few of its children
-			 * checked it will be rendered as undetermined, and state will be
-			 * propagated up.
+			 * ### Checkbox plugin This plugin renders checkbox icons in front of each node, making
+			 * multiple selection much easier. It also supports tri-state behavior, meaning that if
+			 * a node has a few of its children checked it will be rendered as undetermined, and
+			 * state will be propagated up.
 			 */
 
 			var _i = document.createElement('I');
@@ -7815,56 +7381,52 @@
 			 */
 			$.jstreeol3.defaults.checkbox = {
 				/**
-				 * a boolean indicating if checkboxes should be visible (can be
-				 * changed at a later time using `show_checkboxes()` and
-				 * `hide_checkboxes`). Defaults to `true`.
+				 * a boolean indicating if checkboxes should be visible (can be changed at a later
+				 * time using `show_checkboxes()` and `hide_checkboxes`). Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.visible
 				 * @plugin checkbox
 				 */
 				visible : true,
 				/**
-				 * a boolean indicating if checkboxes should cascade down and
-				 * have an undetermined state. Defaults to `true`.
+				 * a boolean indicating if checkboxes should cascade down and have an undetermined
+				 * state. Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.three_state
 				 * @plugin checkbox
 				 */
 				three_state : true,
 				/**
-				 * a boolean indicating if clicking anywhere on the node should
-				 * act as clicking on the checkbox. Defaults to `true`.
+				 * a boolean indicating if clicking anywhere on the node should act as clicking on
+				 * the checkbox. Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.whole_node
 				 * @plugin checkbox
 				 */
 				whole_node : true,
 				/**
-				 * a boolean indicating if the selected style of a node should
-				 * be kept, or removed. Defaults to `true`.
+				 * a boolean indicating if the selected style of a node should be kept, or removed.
+				 * Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.keep_selected_style
 				 * @plugin checkbox
 				 */
 				keep_selected_style : true,
 				/**
-				 * This setting controls how cascading and undetermined nodes
-				 * are applied. If 'up' is in the string - cascading up is
-				 * enabled, if 'down' is in the string - cascading down is
-				 * enabled, if 'undetermined' is in the string - undetermined
-				 * nodes will be used. If `three_state` is set to `true` this
-				 * setting is automatically set to 'up+down+undetermined'.
-				 * Defaults to ''.
+				 * This setting controls how cascading and undetermined nodes are applied. If 'up'
+				 * is in the string - cascading up is enabled, if 'down' is in the string -
+				 * cascading down is enabled, if 'undetermined' is in the string - undetermined
+				 * nodes will be used. If `three_state` is set to `true` this setting is
+				 * automatically set to 'up+down+undetermined'. Defaults to ''.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.cascade
 				 * @plugin checkbox
 				 */
 				cascade : '',
 				/**
-				 * This setting controls if checkbox are bound to the general
-				 * tree selection or to an internal array maintained by the
-				 * checkbox plugin. Defaults to `true`, only set to `false` if
-				 * you know exactly what you are doing.
+				 * This setting controls if checkbox are bound to the general tree selection or to
+				 * an internal array maintained by the checkbox plugin. Defaults to `true`, only set
+				 * to `false` if you know exactly what you are doing.
 				 * 
 				 * @name $.jstreeol3.defaults.checkbox.tie_selection
 				 * @plugin checkbox
@@ -7909,8 +7471,7 @@
 						this.element.on('model.jstreeol3', $.proxy(function(e, data) {
 							var m = this._model.data, p = m[data.parent], dpc = data.nodes, i, j;
 							for (i = 0, j = dpc.length; i < j; i++) {
-								m[dpc[i]].state.checked = m[dpc[i]].state.checked
-										|| (m[dpc[i]].original && m[dpc[i]].original.state && m[dpc[i]].original.state.checked);
+								m[dpc[i]].state.checked = m[dpc[i]].state.checked || (m[dpc[i]].original && m[dpc[i]].original.state && m[dpc[i]].original.state.checked);
 								if (m[dpc[i]].state.checked) {
 									this._data.checkbox.selected.push(dpc[i]);
 								}
@@ -7932,16 +7493,14 @@
 																	for (i = 0, j = dpc.length; i < j; i++) {
 																		m[dpc[i]].state[t ? 'selected' : 'checked'] = true;
 																	}
-																	this._data[t ? 'core' : 'checkbox'].selected = this._data[t ? 'core'
-																			: 'checkbox'].selected.concat(dpc);
+																	this._data[t ? 'core' : 'checkbox'].selected = this._data[t ? 'core' : 'checkbox'].selected.concat(dpc);
 																} else {
 																	for (i = 0, j = dpc.length; i < j; i++) {
 																		if (m[dpc[i]].state[t ? 'selected' : 'checked']) {
 																			for (k = 0, l = m[dpc[i]].children_d.length; k < l; k++) {
 																				m[m[dpc[i]].children_d[k]].state[t ? 'selected' : 'checked'] = true;
 																			}
-																			this._data[t ? 'core' : 'checkbox'].selected = this._data[t ? 'core'
-																					: 'checkbox'].selected.concat(m[dpc[i]].children_d);
+																			this._data[t ? 'core' : 'checkbox'].selected = this._data[t ? 'core' : 'checkbox'].selected.concat(m[dpc[i]].children_d);
 																		}
 																	}
 																}
@@ -7967,9 +7526,7 @@
 																			this._data[t ? 'core' : 'checkbox'].selected.push(p.id);
 																			tmp = this.get_node(p, true);
 																			if (tmp && tmp.length) {
-																				tmp.attr('aria-selected', true).children(
-																						'.jstreeol3-anchor').addClass(
-																						t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																				tmp.attr('aria-selected', true).children('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																			}
 																		} else {
 																			break;
@@ -7979,16 +7536,14 @@
 																}
 															}
 
-															this._data[t ? 'core' : 'checkbox'].selected = $.vakata
-																	.array_unique(this._data[t ? 'core' : 'checkbox'].selected);
+															this._data[t ? 'core' : 'checkbox'].selected = $.vakata.array_unique(this._data[t ? 'core' : 'checkbox'].selected);
 														}, this))
 								.on(
 										this.settings.checkbox.tie_selection ? 'select_node.jstreeol3' : 'check_node.jstreeol3',
 										$
 												.proxy(
 														function(e, data) {
-															var obj = data.node, m = this._model.data, par = this.get_node(obj.parent), dom = this
-																	.get_node(obj, true), i, j, c, tmp, s = this.settings.checkbox.cascade, t = this.settings.checkbox.tie_selection, sel = {}, cur = this._data[t ? 'core'
+															var obj = data.node, m = this._model.data, par = this.get_node(obj.parent), dom = this.get_node(obj, true), i, j, c, tmp, s = this.settings.checkbox.cascade, t = this.settings.checkbox.tie_selection, sel = {}, cur = this._data[t ? 'core'
 																	: 'checkbox'].selected;
 
 															for (i = 0, j = cur.length; i < j; i++) {
@@ -8008,8 +7563,7 @@
 																	sel[obj.children_d[i]] = true;
 																	tmp = m[obj.children_d[i]];
 																	tmp.state[t ? 'selected' : 'checked'] = true;
-																	if (tmp && tmp.original && tmp.original.state
-																			&& tmp.original.state.undetermined) {
+																	if (tmp && tmp.original && tmp.original.state && tmp.original.state.undetermined) {
 																		tmp.original.state.undetermined = false;
 																	}
 																}
@@ -8033,10 +7587,7 @@
 																		// ].selected.push(par.id);
 																		tmp = this.get_node(par, true);
 																		if (tmp && tmp.length) {
-																			tmp
-																					.attr('aria-selected', true)
-																					.children('.jstreeol3-anchor')
-																					.addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																			tmp.attr('aria-selected', true).children('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																		}
 																	} else {
 																		break;
@@ -8058,21 +7609,18 @@
 															// .children
 															// separately?)
 															if (s.indexOf('down') !== -1 && dom.length) {
-																dom.find('.jstreeol3-anchor').addClass(
-																		t ? 'jstreeol3-clicked' : 'jstreeol3-checked').parent().attr(
-																		'aria-selected', true);
+																dom.find('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked').parent().attr('aria-selected', true);
 															}
 														}, this))
-								.on(this.settings.checkbox.tie_selection ? 'deselect_all.jstreeol3' : 'uncheck_all.jstreeol3',
-										$.proxy(function(e, data) {
-											var obj = this.get_node($.jstreeol3.root), m = this._model.data, i, j, tmp;
-											for (i = 0, j = obj.children_d.length; i < j; i++) {
-												tmp = m[obj.children_d[i]];
-												if (tmp && tmp.original && tmp.original.state && tmp.original.state.undetermined) {
-													tmp.original.state.undetermined = false;
-												}
-											}
-										}, this))
+								.on(this.settings.checkbox.tie_selection ? 'deselect_all.jstreeol3' : 'uncheck_all.jstreeol3', $.proxy(function(e, data) {
+									var obj = this.get_node($.jstreeol3.root), m = this._model.data, i, j, tmp;
+									for (i = 0, j = obj.children_d.length; i < j; i++) {
+										tmp = m[obj.children_d[i]];
+										if (tmp && tmp.original && tmp.original.state && tmp.original.state.undetermined) {
+											tmp.original.state.undetermined = false;
+										}
+									}
+								}, this))
 								.on(
 										this.settings.checkbox.tie_selection ? 'deselect_node.jstreeol3' : 'uncheck_node.jstreeol3',
 										$
@@ -8080,8 +7628,7 @@
 														function(e, data) {
 															var obj = data.node, dom = this.get_node(obj, true), i, j, tmp, s = this.settings.checkbox.cascade, t = this.settings.checkbox.tie_selection, cur = this._data[t ? 'core'
 																	: 'checkbox'].selected, sel = {};
-															if (obj && obj.original && obj.original.state
-																	&& obj.original.state.undetermined) {
+															if (obj && obj.original && obj.original.state && obj.original.state.undetermined) {
 																obj.original.state.undetermined = false;
 															}
 
@@ -8090,8 +7637,7 @@
 																for (i = 0, j = obj.children_d.length; i < j; i++) {
 																	tmp = this._model.data[obj.children_d[i]];
 																	tmp.state[t ? 'selected' : 'checked'] = false;
-																	if (tmp && tmp.original && tmp.original.state
-																			&& tmp.original.state.undetermined) {
+																	if (tmp && tmp.original && tmp.original.state && tmp.original.state.undetermined) {
 																		tmp.original.state.undetermined = false;
 																	}
 																}
@@ -8102,14 +7648,12 @@
 																for (i = 0, j = obj.parents.length; i < j; i++) {
 																	tmp = this._model.data[obj.parents[i]];
 																	tmp.state[t ? 'selected' : 'checked'] = false;
-																	if (tmp && tmp.original && tmp.original.state
-																			&& tmp.original.state.undetermined) {
+																	if (tmp && tmp.original && tmp.original.state && tmp.original.state.undetermined) {
 																		tmp.original.state.undetermined = false;
 																	}
 																	tmp = this.get_node(obj.parents[i], true);
 																	if (tmp && tmp.length) {
-																		tmp.attr('aria-selected', false).children('.jstreeol3-anchor')
-																				.removeClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																		tmp.attr('aria-selected', false).children('.jstreeol3-anchor').removeClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																	}
 																}
 															}
@@ -8135,41 +7679,34 @@
 															// .children
 															// separately?)
 															if (s.indexOf('down') !== -1 && dom.length) {
-																dom.find('.jstreeol3-anchor').removeClass(
-																		t ? 'jstreeol3-clicked' : 'jstreeol3-checked').parent().attr(
-																		'aria-selected', false);
+																dom.find('.jstreeol3-anchor').removeClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked').parent().attr('aria-selected', false);
 															}
 														}, this));
 					}
 					if (this.settings.checkbox.cascade.indexOf('up') !== -1) {
 						this.element
-								.on(
-										'delete_node.jstreeol3',
-										$
-												.proxy(
-														function(e, data) {
-															// apply up (whole
-															// handler)
-															var p = this.get_node(data.parent), m = this._model.data, i, j, c, tmp, t = this.settings.checkbox.tie_selection;
-															while (p && p.id !== $.jstreeol3.root && !p.state[t ? 'selected' : 'checked']) {
-																c = 0;
-																for (i = 0, j = p.children.length; i < j; i++) {
-																	c += m[p.children[i]].state[t ? 'selected' : 'checked'];
-																}
-																if (j > 0 && c === j) {
-																	p.state[t ? 'selected' : 'checked'] = true;
-																	this._data[t ? 'core' : 'checkbox'].selected.push(p.id);
-																	tmp = this.get_node(p, true);
-																	if (tmp && tmp.length) {
-																		tmp.attr('aria-selected', true).children('.jstreeol3-anchor')
-																				.addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
-																	}
-																} else {
-																	break;
-																}
-																p = this.get_node(p.parent);
-															}
-														}, this))
+								.on('delete_node.jstreeol3', $.proxy(function(e, data) {
+									// apply up (whole
+									// handler)
+									var p = this.get_node(data.parent), m = this._model.data, i, j, c, tmp, t = this.settings.checkbox.tie_selection;
+									while (p && p.id !== $.jstreeol3.root && !p.state[t ? 'selected' : 'checked']) {
+										c = 0;
+										for (i = 0, j = p.children.length; i < j; i++) {
+											c += m[p.children[i]].state[t ? 'selected' : 'checked'];
+										}
+										if (j > 0 && c === j) {
+											p.state[t ? 'selected' : 'checked'] = true;
+											this._data[t ? 'core' : 'checkbox'].selected.push(p.id);
+											tmp = this.get_node(p, true);
+											if (tmp && tmp.length) {
+												tmp.attr('aria-selected', true).children('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+											}
+										} else {
+											break;
+										}
+										p = this.get_node(p.parent);
+									}
+								}, this))
 								.on(
 										'move_node.jstreeol3',
 										$
@@ -8177,12 +7714,10 @@
 														function(e, data) {
 															// apply up (whole
 															// handler)
-															var is_multi = data.is_multi, old_par = data.old_parent, new_par = this
-																	.get_node(data.parent), m = this._model.data, p, c, i, j, tmp, t = this.settings.checkbox.tie_selection;
+															var is_multi = data.is_multi, old_par = data.old_parent, new_par = this.get_node(data.parent), m = this._model.data, p, c, i, j, tmp, t = this.settings.checkbox.tie_selection;
 															if (!is_multi) {
 																p = this.get_node(old_par);
-																while (p && p.id !== $.jstreeol3.root
-																		&& !p.state[t ? 'selected' : 'checked']) {
+																while (p && p.id !== $.jstreeol3.root && !p.state[t ? 'selected' : 'checked']) {
 																	c = 0;
 																	for (i = 0, j = p.children.length; i < j; i++) {
 																		c += m[p.children[i]].state[t ? 'selected' : 'checked'];
@@ -8192,10 +7727,7 @@
 																		this._data[t ? 'core' : 'checkbox'].selected.push(p.id);
 																		tmp = this.get_node(p, true);
 																		if (tmp && tmp.length) {
-																			tmp
-																					.attr('aria-selected', true)
-																					.children('.jstreeol3-anchor')
-																					.addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																			tmp.attr('aria-selected', true).children('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																		}
 																	} else {
 																		break;
@@ -8215,23 +7747,16 @@
 																		this._data[t ? 'core' : 'checkbox'].selected.push(p.id);
 																		tmp = this.get_node(p, true);
 																		if (tmp && tmp.length) {
-																			tmp
-																					.attr('aria-selected', true)
-																					.children('.jstreeol3-anchor')
-																					.addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																			tmp.attr('aria-selected', true).children('.jstreeol3-anchor').addClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																		}
 																	}
 																} else {
 																	if (p.state[t ? 'selected' : 'checked']) {
 																		p.state[t ? 'selected' : 'checked'] = false;
-																		this._data[t ? 'core' : 'checkbox'].selected = $.vakata
-																				.array_remove_item(
-																						this._data[t ? 'core' : 'checkbox'].selected, p.id);
+																		this._data[t ? 'core' : 'checkbox'].selected = $.vakata.array_remove_item(this._data[t ? 'core' : 'checkbox'].selected, p.id);
 																		tmp = this.get_node(p, true);
 																		if (tmp && tmp.length) {
-																			tmp.attr('aria-selected', false).children('.jstreeol3-anchor')
-																					.removeClass(
-																							t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
+																			tmp.attr('aria-selected', false).children('.jstreeol3-anchor').removeClass(t ? 'jstreeol3-clicked' : 'jstreeol3-checked');
 																		}
 																	} else {
 																		break;
@@ -8243,8 +7768,7 @@
 					}
 				};
 				/**
-				 * set the undetermined state where and if necessary. Used
-				 * internally.
+				 * set the undetermined state where and if necessary. Used internally.
 				 * 
 				 * @private
 				 * @name _undetermined()
@@ -8254,8 +7778,7 @@
 					if (this.element === null) {
 						return;
 					}
-					var i, j, k, l, o = {}, m = this._model.data, t = this.settings.checkbox.tie_selection, s = this._data[t ? 'core'
-							: 'checkbox'].selected, p = [], tt = this;
+					var i, j, k, l, o = {}, m = this._model.data, t = this.settings.checkbox.tie_selection, s = this._data[t ? 'core' : 'checkbox'].selected, p = [], tt = this;
 					for (i = 0, j = s.length; i < j; i++) {
 						if (m[s[i]] && m[s[i]].parents) {
 							for (k = 0, l = m[s[i]].parents.length; k < l; k++) {
@@ -8270,42 +7793,39 @@
 						}
 					}
 					// attempt for server side undetermined state
-					this.element.find('.jstreeol3-closed').not(':has(.jstreeol3-children)').each(
-							function() {
-								var tmp = tt.get_node(this), tmp2;
-								if (!tmp.state.loaded) {
-									if (tmp.original && tmp.original.state && tmp.original.state.undetermined
-											&& tmp.original.state.undetermined === true) {
-										if (o[tmp.id] === undefined && tmp.id !== $.jstreeol3.root) {
-											o[tmp.id] = true;
-											p.push(tmp.id);
-										}
-										for (k = 0, l = tmp.parents.length; k < l; k++) {
-											if (o[tmp.parents[k]] === undefined && tmp.parents[k] !== $.jstreeol3.root) {
-												o[tmp.parents[k]] = true;
-												p.push(tmp.parents[k]);
-											}
-										}
+					this.element.find('.jstreeol3-closed').not(':has(.jstreeol3-children)').each(function() {
+						var tmp = tt.get_node(this), tmp2;
+						if (!tmp.state.loaded) {
+							if (tmp.original && tmp.original.state && tmp.original.state.undetermined && tmp.original.state.undetermined === true) {
+								if (o[tmp.id] === undefined && tmp.id !== $.jstreeol3.root) {
+									o[tmp.id] = true;
+									p.push(tmp.id);
+								}
+								for (k = 0, l = tmp.parents.length; k < l; k++) {
+									if (o[tmp.parents[k]] === undefined && tmp.parents[k] !== $.jstreeol3.root) {
+										o[tmp.parents[k]] = true;
+										p.push(tmp.parents[k]);
 									}
-								} else {
-									for (i = 0, j = tmp.children_d.length; i < j; i++) {
-										tmp2 = m[tmp.children_d[i]];
-										if (!tmp2.state.loaded && tmp2.original && tmp2.original.state && tmp2.original.state.undetermined
-												&& tmp2.original.state.undetermined === true) {
-											if (o[tmp2.id] === undefined && tmp2.id !== $.jstreeol3.root) {
-												o[tmp2.id] = true;
-												p.push(tmp2.id);
-											}
-											for (k = 0, l = tmp2.parents.length; k < l; k++) {
-												if (o[tmp2.parents[k]] === undefined && tmp2.parents[k] !== $.jstreeol3.root) {
-													o[tmp2.parents[k]] = true;
-													p.push(tmp2.parents[k]);
-												}
-											}
+								}
+							}
+						} else {
+							for (i = 0, j = tmp.children_d.length; i < j; i++) {
+								tmp2 = m[tmp.children_d[i]];
+								if (!tmp2.state.loaded && tmp2.original && tmp2.original.state && tmp2.original.state.undetermined && tmp2.original.state.undetermined === true) {
+									if (o[tmp2.id] === undefined && tmp2.id !== $.jstreeol3.root) {
+										o[tmp2.id] = true;
+										p.push(tmp2.id);
+									}
+									for (k = 0, l = tmp2.parents.length; k < l; k++) {
+										if (o[tmp2.parents[k]] === undefined && tmp2.parents[k] !== $.jstreeol3.root) {
+											o[tmp2.parents[k]] = true;
+											p.push(tmp2.parents[k]);
 										}
 									}
 								}
-							});
+							}
+						}
+					});
 
 					this.element.find('.jstreeol3-undetermined').removeClass('jstreeol3-undetermined');
 					for (i = 0, j = p.length; i < j; i++) {
@@ -8322,8 +7842,7 @@
 					if (obj) {
 						var i, j, tmp = null, icon = null;
 						for (i = 0, j = obj.childNodes.length; i < j; i++) {
-							if (obj.childNodes[i] && obj.childNodes[i].className
-									&& obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
+							if (obj.childNodes[i] && obj.childNodes[i].className && obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
 								tmp = obj.childNodes[i];
 								break;
 							}
@@ -8384,24 +7903,20 @@
 				 * checks if a node is in an undetermined state
 				 * 
 				 * @name is_undetermined(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 */
 				this.is_undetermined = function(obj) {
 					obj = this.get_node(obj);
-					var s = this.settings.checkbox.cascade, i, j, t = this.settings.checkbox.tie_selection, d = this._data[t ? 'core'
-							: 'checkbox'].selected, m = this._model.data;
-					if (!obj || obj.state[t ? 'selected' : 'checked'] === true || s.indexOf('undetermined') === -1
-							|| (s.indexOf('down') === -1 && s.indexOf('up') === -1)) {
+					var s = this.settings.checkbox.cascade, i, j, t = this.settings.checkbox.tie_selection, d = this._data[t ? 'core' : 'checkbox'].selected, m = this._model.data;
+					if (!obj || obj.state[t ? 'selected' : 'checked'] === true || s.indexOf('undetermined') === -1 || (s.indexOf('down') === -1 && s.indexOf('up') === -1)) {
 						return false;
 					}
 					if (!obj.state.loaded && obj.original.state.undetermined === true) {
 						return true;
 					}
 					for (i = 0, j = obj.children_d.length; i < j; i++) {
-						if ($.inArray(obj.children_d[i], d) !== -1
-								|| (!m[obj.children_d[i]].state.loaded && m[obj.children_d[i]].original.state.undetermined)) {
+						if ($.inArray(obj.children_d[i], d) !== -1 || (!m[obj.children_d[i]].state.loaded && m[obj.children_d[i]].original.state.undetermined)) {
 							return true;
 						}
 					}
@@ -8411,8 +7926,7 @@
 				 * disable a node's checkbox
 				 * 
 				 * @name disable_checkbox(obj)
-				 * @param {mixed}
-				 *            obj an array can be used too
+				 * @param {mixed} obj an array can be used too
 				 * @trigger disable_checkbox.jstreeol3
 				 * @plugin checkbox
 				 */
@@ -8440,8 +7954,7 @@
 						 * 
 						 * @event
 						 * @name disable_checkbox.jstreeol3
-						 * @param {Object}
-						 *            node
+						 * @param {Object} node
 						 * @plugin checkbox
 						 */
 						this.trigger('disable_checkbox', {
@@ -8453,8 +7966,7 @@
 				 * enable a node's checkbox
 				 * 
 				 * @name disable_checkbox(obj)
-				 * @param {mixed}
-				 *            obj an array can be used too
+				 * @param {mixed} obj an array can be used too
 				 * @trigger enable_checkbox.jstreeol3
 				 * @plugin checkbox
 				 */
@@ -8482,8 +7994,7 @@
 						 * 
 						 * @event
 						 * @name enable_checkbox.jstreeol3
-						 * @param {Object}
-						 *            node
+						 * @param {Object} node
 						 * @plugin checkbox
 						 */
 						this.trigger('enable_checkbox', {
@@ -8496,12 +8007,10 @@
 					if ($(e.target).hasClass('jstreeol3-checkbox-disabled')) {
 						return false;
 					}
-					if (this.settings.checkbox.tie_selection
-							&& (this.settings.checkbox.whole_node || $(e.target).hasClass('jstreeol3-checkbox'))) {
+					if (this.settings.checkbox.tie_selection && (this.settings.checkbox.whole_node || $(e.target).hasClass('jstreeol3-checkbox'))) {
 						e.ctrlKey = true;
 					}
-					if (this.settings.checkbox.tie_selection
-							|| (!this.settings.checkbox.whole_node && !$(e.target).hasClass('jstreeol3-checkbox'))) {
+					if (this.settings.checkbox.tie_selection || (!this.settings.checkbox.whole_node && !$(e.target).hasClass('jstreeol3-checkbox'))) {
 						return parent.activate_node.call(this, obj, e);
 					}
 					if (this.is_disabled(obj)) {
@@ -8518,12 +8027,11 @@
 				};
 
 				/**
-				 * check a node (only if tie_selection in checkbox settings is
-				 * false, otherwise select_node will be called internally)
+				 * check a node (only if tie_selection in checkbox settings is false, otherwise
+				 * select_node will be called internally)
 				 * 
 				 * @name check_node(obj)
-				 * @param {mixed}
-				 *            obj an array can be used to check multiple nodes
+				 * @param {mixed} obj an array can be used to check multiple nodes
 				 * @trigger check_node.jstreeol3
 				 * @plugin checkbox
 				 */
@@ -8551,18 +8059,14 @@
 							dom.children('.jstreeol3-anchor').addClass('jstreeol3-checked');
 						}
 						/**
-						 * triggered when an node is checked (only if
-						 * tie_selection in checkbox settings is false)
+						 * triggered when an node is checked (only if tie_selection in checkbox
+						 * settings is false)
 						 * 
 						 * @event
 						 * @name check_node.jstreeol3
-						 * @param {Object}
-						 *            node
-						 * @param {Array}
-						 *            selected the current selection
-						 * @param {Object}
-						 *            event the event (if any) that triggered
-						 *            this check_node
+						 * @param {Object} node
+						 * @param {Array} selected the current selection
+						 * @param {Object} event the event (if any) that triggered this check_node
 						 * @plugin checkbox
 						 */
 						this.trigger('check_node', {
@@ -8573,12 +8077,11 @@
 					}
 				};
 				/**
-				 * uncheck a node (only if tie_selection in checkbox settings is
-				 * false, otherwise deselect_node will be called internally)
+				 * uncheck a node (only if tie_selection in checkbox settings is false, otherwise
+				 * deselect_node will be called internally)
 				 * 
 				 * @name uncheck_node(obj)
-				 * @param {mixed}
-				 *            obj an array can be used to uncheck multiple nodes
+				 * @param {mixed} obj an array can be used to uncheck multiple nodes
 				 * @trigger uncheck_node.jstreeol3
 				 * @plugin checkbox
 				 */
@@ -8606,18 +8109,14 @@
 							dom.children('.jstreeol3-anchor').removeClass('jstreeol3-checked');
 						}
 						/**
-						 * triggered when an node is unchecked (only if
-						 * tie_selection in checkbox settings is false)
+						 * triggered when an node is unchecked (only if tie_selection in checkbox
+						 * settings is false)
 						 * 
 						 * @event
 						 * @name uncheck_node.jstreeol3
-						 * @param {Object}
-						 *            node
-						 * @param {Array}
-						 *            selected the current selection
-						 * @param {Object}
-						 *            event the event (if any) that triggered
-						 *            this uncheck_node
+						 * @param {Object} node
+						 * @param {Array} selected the current selection
+						 * @param {Object} event the event (if any) that triggered this uncheck_node
 						 * @plugin checkbox
 						 */
 						this.trigger('uncheck_node', {
@@ -8628,9 +8127,8 @@
 					}
 				};
 				/**
-				 * checks all nodes in the tree (only if tie_selection in
-				 * checkbox settings is false, otherwise select_all will be
-				 * called internally)
+				 * checks all nodes in the tree (only if tie_selection in checkbox settings is
+				 * false, otherwise select_all will be called internally)
 				 * 
 				 * @name check_all()
 				 * @trigger check_all.jstreeol3, changed.jstreeol3
@@ -8649,13 +8147,12 @@
 					}
 					this.redraw(true);
 					/**
-					 * triggered when all nodes are checked (only if
-					 * tie_selection in checkbox settings is false)
+					 * triggered when all nodes are checked (only if tie_selection in checkbox
+					 * settings is false)
 					 * 
 					 * @event
 					 * @name check_all.jstreeol3
-					 * @param {Array}
-					 *            selected the current selection
+					 * @param {Array} selected the current selection
 					 * @plugin checkbox
 					 */
 					this.trigger('check_all', {
@@ -8663,9 +8160,8 @@
 					});
 				};
 				/**
-				 * uncheck all checked nodes (only if tie_selection in checkbox
-				 * settings is false, otherwise deselect_all will be called
-				 * internally)
+				 * uncheck all checked nodes (only if tie_selection in checkbox settings is false,
+				 * otherwise deselect_all will be called internally)
 				 * 
 				 * @name uncheck_all()
 				 * @trigger uncheck_all.jstreeol3
@@ -8684,15 +8180,13 @@
 					this._data.checkbox.selected = [];
 					this.element.find('.jstreeol3-checked').removeClass('jstreeol3-checked');
 					/**
-					 * triggered when all nodes are unchecked (only if
-					 * tie_selection in checkbox settings is false)
+					 * triggered when all nodes are unchecked (only if tie_selection in checkbox
+					 * settings is false)
 					 * 
 					 * @event
 					 * @name uncheck_all.jstreeol3
-					 * @param {Object}
-					 *            node the previous selection
-					 * @param {Array}
-					 *            selected the current selection
+					 * @param {Object} node the previous selection
+					 * @param {Array} selected the current selection
 					 * @plugin checkbox
 					 */
 					this.trigger('uncheck_all', {
@@ -8701,12 +8195,11 @@
 					});
 				};
 				/**
-				 * checks if a node is checked (if tie_selection is on in the
-				 * settings this function will return the same as is_selected)
+				 * checks if a node is checked (if tie_selection is on in the settings this function
+				 * will return the same as is_selected)
 				 * 
 				 * @name is_checked(obj)
-				 * @param {mixed}
-				 *            obj
+				 * @param {mixed} obj
 				 * @return {Boolean}
 				 * @plugin checkbox
 				 */
@@ -8721,15 +8214,12 @@
 					return obj.state.checked;
 				};
 				/**
-				 * get an array of all checked nodes (if tie_selection is on in
-				 * the settings this function will return the same as
-				 * get_selected)
+				 * get an array of all checked nodes (if tie_selection is on in the settings this
+				 * function will return the same as get_selected)
 				 * 
 				 * @name get_checked([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 * @plugin checkbox
 				 */
@@ -8742,16 +8232,13 @@
 					}, this)) : this._data.checkbox.selected;
 				};
 				/**
-				 * get an array of all top level checked nodes (ignoring
-				 * children of checked nodes) (if tie_selection is on in the
-				 * settings this function will return the same as
+				 * get an array of all top level checked nodes (ignoring children of checked nodes)
+				 * (if tie_selection is on in the settings this function will return the same as
 				 * get_top_selected)
 				 * 
 				 * @name get_top_checked([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 * @plugin checkbox
 				 */
@@ -8781,15 +8268,13 @@
 					}, this)) : tmp;
 				};
 				/**
-				 * get an array of all bottom level checked nodes (ignoring
-				 * selected parents) (if tie_selection is on in the settings
-				 * this function will return the same as get_bottom_selected)
+				 * get an array of all bottom level checked nodes (ignoring selected parents) (if
+				 * tie_selection is on in the settings this function will return the same as
+				 * get_bottom_selected)
 				 * 
 				 * @name get_bottom_checked([full])
-				 * @param {mixed}
-				 *            full if set to `true` the returned array will
-				 *            consist of the full node objects, otherwise - only
-				 *            IDs will be returned
+				 * @param {mixed} full if set to `true` the returned array will consist of the full
+				 * node objects, otherwise - only IDs will be returned
 				 * @return {Array}
 				 * @plugin checkbox
 				 */
@@ -8815,8 +8300,7 @@
 							for (k = 0, l = tmp.children_d.length; k < l; k++) {
 								if (this._model.data[tmp.children_d[k]].state.checked) {
 									c = true;
-									this._data.checkbox.selected = $.vakata.array_remove_item(this._data.checkbox.selected,
-											tmp.children_d[k]);
+									this._data.checkbox.selected = $.vakata.array_remove_item(this._data.checkbox.selected, tmp.children_d[k]);
 								}
 							}
 						}
@@ -8859,18 +8343,15 @@
 			// $.jstreeol3.defaults.plugins.push("checkbox");
 
 			/**
-			 * ### Conditionalselect plugin
-			 * 
-			 * This plugin allows defining a callback to allow or deny node
-			 * selection by user input (activate node method).
+			 * ### Conditionalselect plugin This plugin allows defining a callback to allow or deny
+			 * node selection by user input (activate node method).
 			 */
 
 			/**
-			 * a callback (function) which is invoked in the instance's scope
-			 * and receives two arguments - the node and the event that
-			 * triggered the `activate_node` call. Returning false prevents
-			 * working with the node, returning true allows invoking
-			 * activate_node. Defaults to returning `true`.
+			 * a callback (function) which is invoked in the instance's scope and receives two
+			 * arguments - the node and the event that triggered the `activate_node` call. Returning
+			 * false prevents working with the node, returning true allows invoking activate_node.
+			 * Defaults to returning `true`.
 			 * 
 			 * @name $.jstreeol3.defaults.checkbox.visible
 			 * @plugin checkbox
@@ -8888,9 +8369,7 @@
 			};
 
 			/**
-			 * ### Contextmenu plugin
-			 * 
-			 * Shows a context menu when a node is right-clicked.
+			 * ### Contextmenu plugin Shows a context menu when a node is right-clicked.
 			 */
 
 			/**
@@ -8901,55 +8380,45 @@
 			 */
 			$.jstreeol3.defaults.contextmenu = {
 				/**
-				 * a boolean indicating if the node should be selected when the
-				 * context menu is invoked on it. Defaults to `true`.
+				 * a boolean indicating if the node should be selected when the context menu is
+				 * invoked on it. Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.contextmenu.select_node
 				 * @plugin contextmenu
 				 */
 				select_node : true,
 				/**
-				 * a boolean indicating if the menu should be shown aligned with
-				 * the node. Defaults to `true`, otherwise the mouse coordinates
-				 * are used.
+				 * a boolean indicating if the menu should be shown aligned with the node. Defaults
+				 * to `true`, otherwise the mouse coordinates are used.
 				 * 
 				 * @name $.jstreeol3.defaults.contextmenu.show_at_node
 				 * @plugin contextmenu
 				 */
 				show_at_node : true,
 				/**
-				 * an object of actions, or a function that accepts a node and a
-				 * callback function and calls the callback function with an
-				 * object of actions available for that node (you can also
-				 * return the items too).
-				 * 
-				 * Each action consists of a key (a unique name) and a value
-				 * which is an object with the following properties (only label
-				 * and action are required). Once a menu item is activated the
-				 * `action` function will be invoked with an object containing
-				 * the following keys: item - the contextmenu item definition as
-				 * seen below, reference - the DOM node that was used (the tree
-				 * node), element - the contextmenu DOM element, position - an
-				 * object with x/y properties indicating the position of the
-				 * menu. * `separator_before` - a boolean indicating if there
-				 * should be a separator before this item * `separator_after` -
-				 * a boolean indicating if there should be a separator after
-				 * this item * `_disabled` - a boolean indicating if this action
-				 * should be disabled * `label` - a string - the name of the
-				 * action (could be a function returning a string) * `title` - a
-				 * string - an optional tooltip for the item * `action` - a
-				 * function to be executed if this item is chosen, the function
-				 * will receive * `icon` - a string, can be a path to an icon or
-				 * a className, if using an image that is in the current
-				 * directory use a `./` prefix, otherwise it will be detected as
-				 * a class * `shortcut` - keyCode which will trigger the action
-				 * if the menu is open (for example `113` for rename, which
-				 * equals F2) * `shortcut_label` - shortcut label (like for
-				 * example `F2` for rename) * `submenu` - an object with the
-				 * same structure as $.jstreeol3.defaults.contextmenu.items
-				 * which can be used to create a submenu - each key will be
-				 * rendered as a separate option in a submenu that will appear
-				 * once the current item is hovered
+				 * an object of actions, or a function that accepts a node and a callback function
+				 * and calls the callback function with an object of actions available for that node
+				 * (you can also return the items too). Each action consists of a key (a unique
+				 * name) and a value which is an object with the following properties (only label
+				 * and action are required). Once a menu item is activated the `action` function
+				 * will be invoked with an object containing the following keys: item - the
+				 * contextmenu item definition as seen below, reference - the DOM node that was used
+				 * (the tree node), element - the contextmenu DOM element, position - an object with
+				 * x/y properties indicating the position of the menu. * `separator_before` - a
+				 * boolean indicating if there should be a separator before this item *
+				 * `separator_after` - a boolean indicating if there should be a separator after
+				 * this item * `_disabled` - a boolean indicating if this action should be disabled *
+				 * `label` - a string - the name of the action (could be a function returning a
+				 * string) * `title` - a string - an optional tooltip for the item * `action` - a
+				 * function to be executed if this item is chosen, the function will receive *
+				 * `icon` - a string, can be a path to an icon or a className, if using an image
+				 * that is in the current directory use a `./` prefix, otherwise it will be detected
+				 * as a class * `shortcut` - keyCode which will trigger the action if the menu is
+				 * open (for example `113` for rename, which equals F2) * `shortcut_label` -
+				 * shortcut label (like for example `F2` for rename) * `submenu` - an object with
+				 * the same structure as $.jstreeol3.defaults.contextmenu.items which can be used to
+				 * create a submenu - each key will be rendered as a separate option in a submenu
+				 * that will appear once the current item is hovered
 				 * 
 				 * @name $.jstreeol3.defaults.contextmenu.items
 				 * @plugin contextmenu
@@ -9001,12 +8470,8 @@
 					}).on(
 							'touchmove.vakata.jstreeol3',
 							function(e) {
-								if (cto
-										&& e.originalEvent
-										&& e.originalEvent.changedTouches
-										&& e.originalEvent.changedTouches[0]
-										&& (Math.abs(ex - e.originalEvent.changedTouches[0].clientX) > 50 || Math.abs(ey
-												- e.originalEvent.changedTouches[0].clientY) > 50)) {
+								if (cto && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]
+										&& (Math.abs(ex - e.originalEvent.changedTouches[0].clientX) > 50 || Math.abs(ey - e.originalEvent.changedTouches[0].clientY) > 50)) {
 									clearTimeout(cto);
 								}
 							}).on('touchend.vakata.jstreeol3', function(e) {
@@ -9016,19 +8481,15 @@
 					});
 
 					/*
-					 * ! if(!('oncontextmenu' in document.body) &&
-					 * ('ontouchstart' in document.body)) { var el = null, tm =
-					 * null; this.element .on("touchstart", ".jstreeol3-anchor",
-					 * function (e) { el = e.currentTarget; tm = +new Date();
+					 * ! if(!('oncontextmenu' in document.body) && ('ontouchstart' in
+					 * document.body)) { var el = null, tm = null; this.element .on("touchstart",
+					 * ".jstreeol3-anchor", function (e) { el = e.currentTarget; tm = +new Date();
 					 * $(document).one("touchend", function (e) { e.target =
 					 * document.elementFromPoint(e.originalEvent.targetTouches[0].pageX -
-					 * window.pageXOffset,
-					 * e.originalEvent.targetTouches[0].pageY -
-					 * window.pageYOffset); e.currentTarget = e.target; tm =
-					 * ((+(new Date())) - tm); if(e.target === el && tm > 600 &&
-					 * tm < 1000) { e.preventDefault();
-					 * $(el).trigger('contextmenu', e); } el = null; tm = null;
-					 * }); }); }
+					 * window.pageXOffset, e.originalEvent.targetTouches[0].pageY -
+					 * window.pageYOffset); e.currentTarget = e.target; tm = ((+(new Date())) - tm);
+					 * if(e.target === el && tm > 600 && tm < 1000) { e.preventDefault();
+					 * $(el).trigger('contextmenu', e); } el = null; tm = null; }); }); }
 					 */
 					$(document).on("context_hide.vakata.jstreeol3", $.proxy(function(e, data) {
 						this._data.contextmenu.visible = false;
@@ -9046,17 +8507,10 @@
 				 * prepare and show the context menu for a node
 				 * 
 				 * @name show_contextmenu(obj [, x, y])
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {Number}
-				 *            x the x-coordinate relative to the document to
-				 *            show the menu at
-				 * @param {Number}
-				 *            y the y-coordinate relative to the document to
-				 *            show the menu at
-				 * @param {Object}
-				 *            e the event if available that triggered the
-				 *            contextmenu
+				 * @param {mixed} obj the node
+				 * @param {Number} x the x-coordinate relative to the document to show the menu at
+				 * @param {Number} y the y-coordinate relative to the document to show the menu at
+				 * @param {Object} e the event if available that triggered the contextmenu
 				 * @plugin contextmenu
 				 * @trigger show_contextmenu.jstreeol3
 				 */
@@ -9089,16 +8543,10 @@
 				 * show the prepared context menu for a node
 				 * 
 				 * @name _show_contextmenu(obj, x, y, i)
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {Number}
-				 *            x the x-coordinate relative to the document to
-				 *            show the menu at
-				 * @param {Number}
-				 *            y the y-coordinate relative to the document to
-				 *            show the menu at
-				 * @param {Number}
-				 *            i the object of items to show
+				 * @param {mixed} obj the node
+				 * @param {Number} x the x-coordinate relative to the document to show the menu at
+				 * @param {Number} y the y-coordinate relative to the document to show the menu at
+				 * @param {Number} i the object of items to show
 				 * @plugin contextmenu
 				 * @trigger show_contextmenu.jstreeol3
 				 * @private
@@ -9120,14 +8568,9 @@
 					 * 
 					 * @event
 					 * @name show_contextmenu.jstreeol3
-					 * @param {Object}
-					 *            node the node
-					 * @param {Number}
-					 *            x the x-coordinate of the menu relative to the
-					 *            document
-					 * @param {Number}
-					 *            y the y-coordinate of the menu relative to the
-					 *            document
+					 * @param {Object} node the node
+					 * @param {Number} x the x-coordinate of the menu relative to the document
+					 * @param {Number} y the y-coordinate of the menu relative to the document
 					 * @plugin contextmenu
 					 */
 					this.trigger('show_contextmenu', {
@@ -9200,20 +8643,16 @@
 							}
 							vakata_context.items.push(val);
 							if (!sep && val.separator_before) {
-								str += "<" + "li class='vakata-context-separator'><" + "a href='#' "
-										+ ($.vakata.context.settings.icons ? '' : 'style="margin-left:0px;"') + ">&#160;<" + "/a><"
+								str += "<" + "li class='vakata-context-separator'><" + "a href='#' " + ($.vakata.context.settings.icons ? '' : 'style="margin-left:0px;"') + ">&#160;<" + "/a><"
 										+ "/li>";
 							}
 							sep = false;
-							str += "<" + "li class='" + (val._class || "")
-									+ (val._disabled === true || ($.isFunction(val._disabled) && val._disabled({
-										"item" : val,
-										"reference" : vakata_context.reference,
-										"element" : vakata_context.element
-									})) ? " vakata-contextmenu-disabled " : "") + "' "
-									+ (val.shortcut ? " data-shortcut='" + val.shortcut + "' " : '') + ">";
-							str += "<" + "a href='#' rel='" + (vakata_context.items.length - 1) + "' "
-									+ (val.title ? "title='" + val.title + "'" : "") + ">";
+							str += "<" + "li class='" + (val._class || "") + (val._disabled === true || ($.isFunction(val._disabled) && val._disabled({
+								"item" : val,
+								"reference" : vakata_context.reference,
+								"element" : vakata_context.element
+							})) ? " vakata-contextmenu-disabled " : "") + "' " + (val.shortcut ? " data-shortcut='" + val.shortcut + "' " : '') + ">";
+							str += "<" + "a href='#' rel='" + (vakata_context.items.length - 1) + "' " + (val.title ? "title='" + val.title + "'" : "") + ">";
 							if ($.vakata.context.settings.icons) {
 								str += "<" + "i ";
 								if (val.icon) {
@@ -9230,8 +8669,8 @@
 								"reference" : vakata_context.reference,
 								"element" : vakata_context.element
 							}) : val.label)
-									+ (val.shortcut ? ' <span class="vakata-contextmenu-shortcut vakata-contextmenu-shortcut-'
-											+ val.shortcut + '">' + (val.shortcut_label || '') + '</span>' : '') + "<" + "/a>";
+									+ (val.shortcut ? ' <span class="vakata-contextmenu-shortcut vakata-contextmenu-shortcut-' + val.shortcut + '">' + (val.shortcut_label || '') + '</span>' : '')
+									+ "<" + "/a>";
 							if (val.submenu) {
 								tmp = $.vakata.context._parse(val.submenu, true);
 								if (tmp) {
@@ -9240,8 +8679,7 @@
 							}
 							str += "<" + "/li>";
 							if (val.separator_after) {
-								str += "<" + "li class='vakata-context-separator'><" + "a href='#' "
-										+ ($.vakata.context.settings.icons ? '' : 'style="margin-left:0px;"') + ">&#160;<" + "/a><"
+								str += "<" + "li class='vakata-context-separator'><" + "a href='#' " + ($.vakata.context.settings.icons ? '' : 'style="margin-left:0px;"') + ">&#160;<" + "/a><"
 										+ "/li>";
 								sep = true;
 							}
@@ -9251,19 +8689,14 @@
 							str += "</ul>";
 						}
 						/**
-						 * triggered on the document when the contextmenu is
-						 * parsed (HTML is built)
+						 * triggered on the document when the contextmenu is parsed (HTML is built)
 						 * 
 						 * @event
 						 * @plugin contextmenu
 						 * @name context_parse.vakata
-						 * @param {jQuery}
-						 *            reference the element that was right
-						 *            clicked
-						 * @param {jQuery}
-						 *            element the DOM element of the menu itself
-						 * @param {Object}
-						 *            position the x & y coordinates of the menu
+						 * @param {jQuery} reference the element that was right clicked
+						 * @param {jQuery} element the DOM element of the menu itself
+						 * @param {Object} position the x & y coordinates of the menu
 						 */
 						if (!is_callback) {
 							vakata_context.html = str;
@@ -9276,8 +8709,9 @@
 						if (!o.length || !o.children("ul").length) {
 							return;
 						}
-						var e = o.children("ul"), xl = o.offset().left, x = xl + o.outerWidth(), y = o.offset().top, w = e.width(), h = e
-								.height(), dw = $(window).width() + $(window).scrollLeft(), dh = $(window).height() + $(window).scrollTop();
+						var e = o.children("ul"), xl = o.offset().left, x = xl + o.outerWidth(), y = o.offset().top, w = e.width(), h = e.height(), dw = $(window).width() + $(window).scrollLeft(), dh = $(
+								window).height()
+								+ $(window).scrollTop();
 						// може да се спести е една проверка - дали няма някой
 						// от класовете вече нагоре
 						if (right_to_left) {
@@ -9360,21 +8794,14 @@
 							}).show().find('a').first().focus().parent().addClass("vakata-context-hover");
 							vakata_context.is_visible = true;
 							/**
-							 * triggered on the document when the contextmenu is
-							 * shown
+							 * triggered on the document when the contextmenu is shown
 							 * 
 							 * @event
 							 * @plugin contextmenu
 							 * @name context_show.vakata
-							 * @param {jQuery}
-							 *            reference the element that was right
-							 *            clicked
-							 * @param {jQuery}
-							 *            element the DOM element of the menu
-							 *            itself
-							 * @param {Object}
-							 *            position the x & y coordinates of the
-							 *            menu
+							 * @param {jQuery} reference the element that was right clicked
+							 * @param {jQuery} element the DOM element of the menu itself
+							 * @param {Object} position the x & y coordinates of the menu
 							 */
 							$.vakata.context._trigger("show");
 						}
@@ -9384,21 +8811,14 @@
 							vakata_context.element.hide().find("ul").hide().end().find(':focus').blur().end().detach();
 							vakata_context.is_visible = false;
 							/**
-							 * triggered on the document when the contextmenu is
-							 * hidden
+							 * triggered on the document when the contextmenu is hidden
 							 * 
 							 * @event
 							 * @plugin contextmenu
 							 * @name context_hide.vakata
-							 * @param {jQuery}
-							 *            reference the element that was right
-							 *            clicked
-							 * @param {jQuery}
-							 *            element the DOM element of the menu
-							 *            itself
-							 * @param {Object}
-							 *            position the x & y coordinates of the
-							 *            menu
+							 * @param {jQuery} reference the element that was right clicked
+							 * @param {jQuery} element the DOM element of the menu itself
+							 * @param {Object} position the x & y coordinates of the menu
 							 */
 							$.vakata.context._trigger("hide");
 						}
@@ -9409,29 +8829,25 @@
 					var to = false;
 
 					vakata_context.element = $("<ul class='vakata-context'></ul>");
-					vakata_context.element.on(
-							"mouseenter",
-							"li",
-							function(e) {
-								e.stopImmediatePropagation();
+					vakata_context.element.on("mouseenter", "li", function(e) {
+						e.stopImmediatePropagation();
 
-								if ($.contains(this, e.relatedTarget)) {
-									// премахнато заради delegate
-									// mouseleave
-									// по-долу
-									// $(this).find(".vakata-context-hover").removeClass("vakata-context-hover");
-									return;
-								}
+						if ($.contains(this, e.relatedTarget)) {
+							// премахнато заради delegate
+							// mouseleave
+							// по-долу
+							// $(this).find(".vakata-context-hover").removeClass("vakata-context-hover");
+							return;
+						}
 
-								if (to) {
-									clearTimeout(to);
-								}
-								vakata_context.element.find(".vakata-context-hover").removeClass("vakata-context-hover").end();
+						if (to) {
+							clearTimeout(to);
+						}
+						vakata_context.element.find(".vakata-context-hover").removeClass("vakata-context-hover").end();
 
-								$(this).siblings().find("ul").hide().end().end().parentsUntil(".vakata-context", "li").addBack().addClass(
-										"vakata-context-hover");
-								$.vakata.context._show_submenu(this);
-							})
+						$(this).siblings().find("ul").hide().end().end().parentsUntil(".vakata-context", "li").addBack().addClass("vakata-context-hover");
+						$.vakata.context._show_submenu(this);
+					})
 					// тестово - дали не натоварва?
 					.on("mouseleave", "li", function(e) {
 						if ($.contains(this, e.relatedTarget)) {
@@ -9447,18 +8863,14 @@
 								};
 							}(this)), $.vakata.context.settings.hide_onmouseleave);
 						}
+					}).on("click", "a", function(e) {
+						e.preventDefault();
+						// })
+						// .on("mouseup", "a", function (e) {
+						if (!$(this).blur().parent().hasClass("vakata-context-disabled") && $.vakata.context._execute($(this).attr("rel")) !== false) {
+							$.vakata.context.hide();
+						}
 					}).on(
-							"click",
-							"a",
-							function(e) {
-								e.preventDefault();
-								// })
-								// .on("mouseup", "a", function (e) {
-								if (!$(this).blur().parent().hasClass("vakata-context-disabled")
-										&& $.vakata.context._execute($(this).attr("rel")) !== false) {
-									$.vakata.context.hide();
-								}
-							}).on(
 							'keydown',
 							'a',
 							function(e) {
@@ -9472,20 +8884,18 @@
 									break;
 								case 37:
 									if (vakata_context.is_visible) {
-										vakata_context.element.find(".vakata-context-hover").last().closest("li").first().find("ul").hide()
-												.find(".vakata-context-hover").removeClass("vakata-context-hover").end().end()
-												.children('a').focus();
+										vakata_context.element.find(".vakata-context-hover").last().closest("li").first().find("ul").hide().find(".vakata-context-hover").removeClass(
+												"vakata-context-hover").end().end().children('a').focus();
 										e.stopImmediatePropagation();
 										e.preventDefault();
 									}
 									break;
 								case 38:
 									if (vakata_context.is_visible) {
-										o = vakata_context.element.find("ul:visible").addBack().last().children(".vakata-context-hover")
-												.removeClass("vakata-context-hover").prevAll("li:not(.vakata-context-separator)").first();
+										o = vakata_context.element.find("ul:visible").addBack().last().children(".vakata-context-hover").removeClass("vakata-context-hover").prevAll(
+												"li:not(.vakata-context-separator)").first();
 										if (!o.length) {
-											o = vakata_context.element.find("ul:visible").addBack().last().children(
-													"li:not(.vakata-context-separator)").last();
+											o = vakata_context.element.find("ul:visible").addBack().last().children("li:not(.vakata-context-separator)").last();
 										}
 										o.addClass("vakata-context-hover").children('a').focus();
 										e.stopImmediatePropagation();
@@ -9494,20 +8904,18 @@
 									break;
 								case 39:
 									if (vakata_context.is_visible) {
-										vakata_context.element.find(".vakata-context-hover").last().children("ul").show().children(
-												"li:not(.vakata-context-separator)").removeClass("vakata-context-hover").first().addClass(
-												"vakata-context-hover").children('a').focus();
+										vakata_context.element.find(".vakata-context-hover").last().children("ul").show().children("li:not(.vakata-context-separator)").removeClass(
+												"vakata-context-hover").first().addClass("vakata-context-hover").children('a').focus();
 										e.stopImmediatePropagation();
 										e.preventDefault();
 									}
 									break;
 								case 40:
 									if (vakata_context.is_visible) {
-										o = vakata_context.element.find("ul:visible").addBack().last().children(".vakata-context-hover")
-												.removeClass("vakata-context-hover").nextAll("li:not(.vakata-context-separator)").first();
+										o = vakata_context.element.find("ul:visible").addBack().last().children(".vakata-context-hover").removeClass("vakata-context-hover").nextAll(
+												"li:not(.vakata-context-separator)").first();
 										if (!o.length) {
-											o = vakata_context.element.find("ul:visible").addBack().last().children(
-													"li:not(.vakata-context-separator)").first();
+											o = vakata_context.element.find("ul:visible").addBack().last().children("li:not(.vakata-context-separator)").first();
 										}
 										o.addClass("vakata-context-hover").children('a').focus();
 										e.stopImmediatePropagation();
@@ -9547,10 +8955,8 @@
 			// $.jstreeol3.defaults.plugins.push("contextmenu");
 
 			/**
-			 * ### Drag'n'drop plugin
-			 * 
-			 * Enables dragging and dropping of nodes in the tree, resulting in
-			 * a move or copy operations.
+			 * ### Drag'n'drop plugin Enables dragging and dropping of nodes in the tree, resulting
+			 * in a move or copy operations.
 			 */
 
 			/**
@@ -9561,107 +8967,99 @@
 			 */
 			$.jstreeol3.defaults.dnd = {
 				/**
-				 * a boolean indicating if a copy should be possible while
-				 * dragging (by pressint the meta key or Ctrl). Defaults to
-				 * `true`.
+				 * a boolean indicating if a copy should be possible while dragging (by pressint the
+				 * meta key or Ctrl). Defaults to `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.copy
 				 * @plugin dnd
 				 */
 				copy : true,
 				/**
-				 * a number indicating how long a node should remain hovered
-				 * while dragging to be opened. Defaults to `500`.
+				 * a number indicating how long a node should remain hovered while dragging to be
+				 * opened. Defaults to `500`.
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.open_timeout
 				 * @plugin dnd
 				 */
 				open_timeout : 500,
 				/**
-				 * a function invoked each time a node is about to be dragged,
-				 * invoked in the tree's scope and receives the nodes about to
-				 * be dragged as an argument (array) and the event that started
-				 * the drag - return `false` to prevent dragging
+				 * a function invoked each time a node is about to be dragged, invoked in the tree's
+				 * scope and receives the nodes about to be dragged as an argument (array) and the
+				 * event that started the drag - return `false` to prevent dragging
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.is_draggable
 				 * @plugin dnd
 				 */
 				is_draggable : true,
 				/**
-				 * a boolean indicating if checks should constantly be made
-				 * while the user is dragging the node (as opposed to checking
-				 * only on drop), default is `true`
+				 * a boolean indicating if checks should constantly be made while the user is
+				 * dragging the node (as opposed to checking only on drop), default is `true`
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.check_while_dragging
 				 * @plugin dnd
 				 */
 				check_while_dragging : true,
 				/**
-				 * a boolean indicating if nodes from this tree should only be
-				 * copied with dnd (as opposed to moved), default is `false`
+				 * a boolean indicating if nodes from this tree should only be copied with dnd (as
+				 * opposed to moved), default is `false`
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.always_copy
 				 * @plugin dnd
 				 */
 				always_copy : false,
 				/**
-				 * when dropping a node "inside", this setting indicates the
-				 * position the node should go to - it can be an integer or a
-				 * string: "first" (same as 0) or "last", default is `0`
+				 * when dropping a node "inside", this setting indicates the position the node
+				 * should go to - it can be an integer or a string: "first" (same as 0) or "last",
+				 * default is `0`
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.inside_pos
 				 * @plugin dnd
 				 */
 				inside_pos : 0,
 				/**
-				 * when starting the drag on a node that is selected this
-				 * setting controls if all selected nodes are dragged or only
-				 * the single node, default is `true`, which means all selected
-				 * nodes are dragged when the drag is started on a selected node
+				 * when starting the drag on a node that is selected this setting controls if all
+				 * selected nodes are dragged or only the single node, default is `true`, which
+				 * means all selected nodes are dragged when the drag is started on a selected node
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.drag_selection
 				 * @plugin dnd
 				 */
 				drag_selection : true,
 				/**
-				 * controls whether dnd works on touch devices. If left as
-				 * boolean true dnd will work the same as in desktop browsers,
-				 * which in some cases may impair scrolling. If set to boolean
-				 * false dnd will not work on touch devices. There is a special
-				 * third option - string "selected" which means only selected
-				 * nodes can be dragged on touch devices.
+				 * controls whether dnd works on touch devices. If left as boolean true dnd will
+				 * work the same as in desktop browsers, which in some cases may impair scrolling.
+				 * If set to boolean false dnd will not work on touch devices. There is a special
+				 * third option - string "selected" which means only selected nodes can be dragged
+				 * on touch devices.
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.touch
 				 * @plugin dnd
 				 */
 				touch : true,
 				/**
-				 * controls whether items can be dropped anywhere on the node,
-				 * not just on the anchor, by default only the node anchor is a
-				 * valid drop target. Works best with the wholerow plugin. If
-				 * enabled on mobile depending on the interface it might be hard
-				 * for the user to cancel the drop, since the whole tree
-				 * container will be a valid drop target.
+				 * controls whether items can be dropped anywhere on the node, not just on the
+				 * anchor, by default only the node anchor is a valid drop target. Works best with
+				 * the wholerow plugin. If enabled on mobile depending on the interface it might be
+				 * hard for the user to cancel the drop, since the whole tree container will be a
+				 * valid drop target.
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.large_drop_target
 				 * @plugin dnd
 				 */
 				large_drop_target : false,
 				/**
-				 * controls whether a drag can be initiated from any part of the
-				 * node and not just the text/icon part, works best with the
-				 * wholerow plugin. Keep in mind it can cause problems with tree
-				 * scrolling on mobile depending on the interface - in that case
-				 * set the touch option to "selected".
+				 * controls whether a drag can be initiated from any part of the node and not just
+				 * the text/icon part, works best with the wholerow plugin. Keep in mind it can
+				 * cause problems with tree scrolling on mobile depending on the interface - in that
+				 * case set the touch option to "selected".
 				 * 
 				 * @name $.jstreeol3.defaults.dnd.large_drag_target
 				 * @plugin dnd
 				 */
 				large_drag_target : false,
 				/**
-				 * controls whether use HTML5 dnd api instead of classical. That
-				 * will allow better integration of dnd events with other HTML5
-				 * controls.
+				 * controls whether use HTML5 dnd api instead of classical. That will allow better
+				 * integration of dnd events with other HTML5 controls.
 				 * 
 				 * @reference http://caniuse.com/#feat=dragndrop
 				 * @name $.jstreeol3.defaults.dnd.use_html5
@@ -9680,71 +9078,48 @@
 				this.bind = function() {
 					parent.bind.call(this);
 
-					this.element
-							.on(
-									this.settings.dnd.use_html5 ? 'dragstart.jstreeol3' : 'mousedown.jstreeol3 touchstart.jstreeol3',
-									this.settings.dnd.large_drag_target ? '.jstreeol3-node' : '.jstreeol3-anchor',
-									$
-											.proxy(
-													function(e) {
-														if (this.settings.dnd.large_drag_target
-																&& $(e.target).closest('.jstreeol3-node')[0] !== e.currentTarget) {
-															return true;
-														}
-														if (e.type === "touchstart"
-																&& (!this.settings.dnd.touch || (this.settings.dnd.touch === 'selected' && !$(
-																		e.currentTarget).closest('.jstreeol3-node').children(
-																		'.jstreeol3-anchor').hasClass('jstreeol3-clicked')))) {
-															return true;
-														}
-														var obj = this.get_node(e.target), mlt = this.is_selected(obj)
-																&& this.settings.dnd.drag_selection ? this.get_top_selected().length : 1, txt = (mlt > 1 ? mlt
-																+ ' ' + this.get_string('nodes')
-																: this.get_text(e.currentTarget));
-														if (this.settings.core.force_text) {
-															txt = $.vakata.html.escape(txt);
-														}
-														if (obj
-																&& obj.id
-																&& obj.id !== $.jstreeol3.root
-																&& (e.which === 1 || e.type === "touchstart" || e.type === "dragstart")
-																&& (this.settings.dnd.is_draggable === true || ($
-																		.isFunction(this.settings.dnd.is_draggable) && this.settings.dnd.is_draggable
-																		.call(this, (mlt > 1 ? this.get_top_selected(true) : [ obj ]), e)))) {
-															drg = {
-																'jstreeol3' : true,
-																'origin' : this,
-																'obj' : this.get_node(obj, true),
-																'nodes' : mlt > 1 ? this.get_top_selected() : [ obj.id ]
-															};
-															elm = e.currentTarget;
-															if (this.settings.dnd.use_html5) {
-																$.vakata.dnd._trigger('start', e, {
-																	'helper' : $(),
-																	'element' : elm,
-																	'data' : drg
-																});
-															} else {
-																this.element.trigger('mousedown.jstreeol3');
-																return $.vakata.dnd
-																		.start(
-																				e,
-																				drg,
-																				'<div id="jstreeol3-dnd" class="jstreeol3-'
-																						+ this.get_theme()
-																						+ ' jstreeol3-'
-																						+ this.get_theme()
-																						+ '-'
-																						+ this.get_theme_variant()
-																						+ ' '
-																						+ (this.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive'
-																								: '')
-																						+ '"><i class="jstreeol3-icon jstreeol3-er"></i>'
-																						+ txt
-																						+ '<ins class="jstreeol3-copy" style="display:none;">+</ins></div>');
-															}
-														}
-													}, this));
+					this.element.on(this.settings.dnd.use_html5 ? 'dragstart.jstreeol3' : 'mousedown.jstreeol3 touchstart.jstreeol3', this.settings.dnd.large_drag_target ? '.jstreeol3-node'
+							: '.jstreeol3-anchor', $.proxy(function(e) {
+						if (this.settings.dnd.large_drag_target && $(e.target).closest('.jstreeol3-node')[0] !== e.currentTarget) {
+							return true;
+						}
+						if (e.type === "touchstart"
+								&& (!this.settings.dnd.touch || (this.settings.dnd.touch === 'selected' && !$(e.currentTarget).closest('.jstreeol3-node').children('.jstreeol3-anchor').hasClass(
+										'jstreeol3-clicked')))) {
+							return true;
+						}
+						var obj = this.get_node(e.target), mlt = this.is_selected(obj) && this.settings.dnd.drag_selection ? this.get_top_selected().length : 1, txt = (mlt > 1 ? mlt + ' '
+								+ this.get_string('nodes') : this.get_text(e.currentTarget));
+						if (this.settings.core.force_text) {
+							txt = $.vakata.html.escape(txt);
+						}
+						if (obj
+								&& obj.id
+								&& obj.id !== $.jstreeol3.root
+								&& (e.which === 1 || e.type === "touchstart" || e.type === "dragstart")
+								&& (this.settings.dnd.is_draggable === true || ($.isFunction(this.settings.dnd.is_draggable) && this.settings.dnd.is_draggable.call(this, (mlt > 1 ? this
+										.get_top_selected(true) : [ obj ]), e)))) {
+							drg = {
+								'jstreeol3' : true,
+								'origin' : this,
+								'obj' : this.get_node(obj, true),
+								'nodes' : mlt > 1 ? this.get_top_selected() : [ obj.id ]
+							};
+							elm = e.currentTarget;
+							if (this.settings.dnd.use_html5) {
+								$.vakata.dnd._trigger('start', e, {
+									'helper' : $(),
+									'element' : elm,
+									'data' : drg
+								});
+							} else {
+								this.element.trigger('mousedown.jstreeol3');
+								return $.vakata.dnd.start(e, drg, '<div id="jstreeol3-dnd" class="jstreeol3-' + this.get_theme() + ' jstreeol3-' + this.get_theme() + '-' + this.get_theme_variant()
+										+ ' ' + (this.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive' : '') + '"><i class="jstreeol3-icon jstreeol3-er"></i>' + txt
+										+ '<ins class="jstreeol3-copy" style="display:none;">+</ins></div>');
+							}
+						}
+					}, this));
 					if (this.settings.dnd.use_html5) {
 						this.element.on('dragover.jstreeol3', function(e) {
 							e.preventDefault();
@@ -9783,8 +9158,7 @@
 						} else {
 							var i, j, tmp = null;
 							for (i = 0, j = obj.childNodes.length; i < j; i++) {
-								if (obj.childNodes[i] && obj.childNodes[i].className
-										&& obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
+								if (obj.childNodes[i] && obj.childNodes[i].className && obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
 									tmp = obj.childNodes[i];
 									break;
 								}
@@ -9800,8 +9174,7 @@
 
 			$(function() {
 				// bind only once for all instances
-				var lastmv = false, laster = false, lastev = false, opento = false, marker = $('<div id="jstreeol3-marker">&#160;</div>')
-						.hide(); // .appendTo('body');
+				var lastmv = false, laster = false, lastev = false, opento = false, marker = $('<div id="jstreeol3-marker">&#160;</div>').hide(); // .appendTo('body');
 
 				$(document)
 						.on('dnd_start.vakata.jstreeol3', function(e, data) {
@@ -9834,22 +9207,17 @@
 									var ins = $.jstreeol3.reference(data.event.target), ref = false, off = false, rel = false, tmp, l, t, h, p, i, o, ok, t1, t2, op, ps, pr, ip, tm, is_copy, pn;
 									// if we are over an instance
 									if (ins && ins._data && ins._data.dnd) {
-										marker.attr('class', 'jstreeol3-' + ins.get_theme()
-												+ (ins.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive' : ''));
-										is_copy = data.data.origin
-												&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey)));
+										marker.attr('class', 'jstreeol3-' + ins.get_theme() + (ins.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive' : ''));
+										is_copy = data.data.origin && (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey)));
 										data.helper.children().attr(
 												'class',
-												'jstreeol3-' + ins.get_theme() + ' jstreeol3-' + ins.get_theme() + '-'
-														+ ins.get_theme_variant() + ' '
-														+ (ins.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive' : '')).find(
-												'.jstreeol3-copy').first()[is_copy ? 'show' : 'hide']();
+												'jstreeol3-' + ins.get_theme() + ' jstreeol3-' + ins.get_theme() + '-' + ins.get_theme_variant() + ' '
+														+ (ins.settings.core.themes.responsive ? ' jstreeol3-dnd-responsive' : '')).find('.jstreeol3-copy').first()[is_copy ? 'show' : 'hide']();
 
 										// if are hovering the container itself
 										// add a new root node
 										// console.log(data.event);
-										if ((data.event.target === ins.element[0] || data.event.target === ins.get_container_ul()[0])
-												&& ins.get_container_ul().children().length === 0) {
+										if ((data.event.target === ins.element[0] || data.event.target === ins.get_container_ul()[0]) && ins.get_container_ul().children().length === 0) {
 											ok = true;
 											for (t1 = 0, t2 = data.data.nodes.length; t1 < t2; t1++) {
 												ok = ok
@@ -9857,10 +9225,8 @@
 																.check(
 																		(data.data.origin
 																				&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey))) ? "copy_node"
-																				: "move_node"), (data.data.origin
-																				&& data.data.origin !== ins ? data.data.origin
-																				.get_node(data.data.nodes[t1]) : data.data.nodes[t1]),
-																		$.jstreeol3.root, 'last', {
+																				: "move_node"), (data.data.origin && data.data.origin !== ins ? data.data.origin.get_node(data.data.nodes[t1])
+																				: data.data.nodes[t1]), $.jstreeol3.root, 'last', {
 																			'dnd' : true,
 																			'ref' : ins.get_node($.jstreeol3.root),
 																			'pos' : 'i',
@@ -9879,8 +9245,7 @@
 													'pos' : 'last'
 												};
 												marker.hide();
-												data.helper.find('.jstreeol3-icon').first().removeClass('jstreeol3-er').addClass(
-														'jstreeol3-ok');
+												data.helper.find('.jstreeol3-icon').first().removeClass('jstreeol3-er').addClass('jstreeol3-ok');
 												if (data.event.originalEvent && data.event.originalEvent.dataTransfer) {
 													data.event.originalEvent.dataTransfer.dropEffect = is_copy ? 'copy' : 'move';
 												}
@@ -9888,12 +9253,11 @@
 											}
 										} else {
 											// if we are hovering a tree node
-											ref = ins.settings.dnd.large_drop_target ? $(data.event.target).closest('.jstreeol3-node')
-													.children('.jstreeol3-anchor') : $(data.event.target).closest('.jstreeol3-anchor');
+											ref = ins.settings.dnd.large_drop_target ? $(data.event.target).closest('.jstreeol3-node').children('.jstreeol3-anchor') : $(data.event.target).closest(
+													'.jstreeol3-anchor');
 											if (ref && ref.length && ref.parent().is('.jstreeol3-closed, .jstreeol3-open, .jstreeol3-leaf')) {
 												off = ref.offset();
-												rel = (data.event.pageY !== undefined ? data.event.pageY : data.event.originalEvent.pageY)
-														- off.top;
+												rel = (data.event.pageY !== undefined ? data.event.pageY : data.event.originalEvent.pageY) - off.top;
 												h = ref.outerHeight();
 												if (rel < h / 3) {
 													o = [ 'b', 'i', 'a' ];
@@ -9919,8 +9283,7 @@
 																		l = off.left - 2;
 																		t = off.top + h / 2 + 1;
 																		p = tm.id;
-																		i = ip === 'first' ? 0 : (ip === 'last' ? tm.children.length : Math
-																				.min(ip, tm.children.length));
+																		i = ip === 'first' ? 0 : (ip === 'last' ? tm.children.length : Math.min(ip, tm.children.length));
 																		break;
 																	case 'a':
 																		l = off.left - 6;
@@ -9935,8 +9298,7 @@
 																				&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey))) ? "copy_node"
 																				: "move_node";
 																		ps = i;
-																		if (op === "move_node" && v === 'a'
-																				&& (data.data.origin && data.data.origin === ins)
+																		if (op === "move_node" && v === 'a' && (data.data.origin && data.data.origin === ins)
 																				&& p === ins.get_parent(data.data.nodes[t1])) {
 																			pr = ins.get_node(p);
 																			if (ps > $.inArray(data.data.nodes[t1], pr.children)) {
@@ -9944,23 +9306,16 @@
 																			}
 																		}
 																		ok = ok
-																				&& ((ins && ins.settings && ins.settings.dnd && ins.settings.dnd.check_while_dragging === false) || ins
-																						.check(
-																								op,
-																								(data.data.origin
-																										&& data.data.origin !== ins ? data.data.origin
-																										.get_node(data.data.nodes[t1])
-																										: data.data.nodes[t1]),
-																								p,
-																								ps,
-																								{
-																									'dnd' : true,
-																									'ref' : ins.get_node(ref.parent()),
-																									'pos' : v,
-																									'origin' : data.data.origin,
-																									'is_multi' : (data.data.origin && data.data.origin !== ins),
-																									'is_foreign' : (!data.data.origin)
-																								}));
+																				&& ((ins && ins.settings && ins.settings.dnd && ins.settings.dnd.check_while_dragging === false) || ins.check(op,
+																						(data.data.origin && data.data.origin !== ins ? data.data.origin.get_node(data.data.nodes[t1])
+																								: data.data.nodes[t1]), p, ps, {
+																							'dnd' : true,
+																							'ref' : ins.get_node(ref.parent()),
+																							'pos' : v,
+																							'origin' : data.data.origin,
+																							'is_multi' : (data.data.origin && data.data.origin !== ins),
+																							'is_foreign' : (!data.data.origin)
+																						}));
 																		if (!ok) {
 																			if (ins && ins.last_error) {
 																				laster = ins.last_error();
@@ -9968,8 +9323,7 @@
 																			break;
 																		}
 																	}
-																	if (v === 'i' && ref.parent().is('.jstreeol3-closed')
-																			&& ins.settings.dnd.open_timeout) {
+																	if (v === 'i' && ref.parent().is('.jstreeol3-closed') && ins.settings.dnd.open_timeout) {
 																		opento = setTimeout((function(x, z) {
 																			return function() {
 																				x.open_node(z);
@@ -9985,19 +9339,15 @@
 																		lastmv = {
 																			'ins' : ins,
 																			'par' : p,
-																			'pos' : v === 'i' && ip === 'last' && i === 0
-																					&& !ins.is_loaded(tm) ? 'last' : i
+																			'pos' : v === 'i' && ip === 'last' && i === 0 && !ins.is_loaded(tm) ? 'last' : i
 																		};
 																		marker.css({
 																			'left' : l + 'px',
 																			'top' : t + 'px'
 																		}).show();
-																		data.helper.find('.jstreeol3-icon').first().removeClass(
-																				'jstreeol3-er').addClass('jstreeol3-ok');
-																		if (data.event.originalEvent
-																				&& data.event.originalEvent.dataTransfer) {
-																			data.event.originalEvent.dataTransfer.dropEffect = is_copy ? 'copy'
-																					: 'move';
+																		data.helper.find('.jstreeol3-icon').first().removeClass('jstreeol3-er').addClass('jstreeol3-ok');
+																		if (data.event.originalEvent && data.event.originalEvent.dataTransfer) {
+																			data.event.originalEvent.dataTransfer.dropEffect = is_copy ? 'copy' : 'move';
 																		}
 																		laster = {};
 																		o = true;
@@ -10017,8 +9367,7 @@
 										data.event.originalEvent.dataTransfer.dropEffect = 'none';
 									}
 									marker.hide();
-								})
-						.on('dnd_scroll.vakata.jstreeol3', function(e, data) {
+								}).on('dnd_scroll.vakata.jstreeol3', function(e, data) {
 							if (!data || !data.data || !data.data.jstreeol3) {
 								return;
 							}
@@ -10026,8 +9375,7 @@
 							lastmv = false;
 							lastev = false;
 							data.helper.find('.jstreeol3-icon').first().removeClass('jstreeol3-ok').addClass('jstreeol3-er');
-						})
-						.on(
+						}).on(
 								'dnd_stop.vakata.jstreeol3',
 								function(e, data) {
 									$('.jstreeol3-dnd-parent').removeClass('jstreeol3-dnd-parent');
@@ -10041,8 +9389,7 @@
 									var i, j, nodes = [];
 									if (lastmv) {
 										for (i = 0, j = data.data.nodes.length; i < j; i++) {
-											nodes[i] = data.data.origin ? data.data.origin.get_node(data.data.nodes[i])
-													: data.data.nodes[i];
+											nodes[i] = data.data.origin ? data.data.origin.get_node(data.data.nodes[i]) : data.data.nodes[i];
 										}
 										lastmv.ins[data.data.origin
 												&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (data.event.metaKey || data.event.ctrlKey))) ? 'copy_node'
@@ -10072,8 +9419,7 @@
 									// }
 									lastev = false;
 									lastmv = false;
-								})
-						.on(
+								}).on(
 								'keyup.jstreeol3 keydown.jstreeol3',
 								function(e, data) {
 									data = $.vakata.dnd._get();
@@ -10090,8 +9436,7 @@
 											$.vakata.dnd._clean();
 										} else {
 											data.helper.find('.jstreeol3-copy').first()[data.data.origin
-													&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (e.metaKey || e.ctrlKey))) ? 'show'
-													: 'hide']();
+													&& (data.data.origin.settings.dnd.always_copy || (data.data.origin.settings.dnd.copy && (e.metaKey || e.ctrlKey))) ? 'show' : 'hide']();
 											if (lastev) {
 												lastev.metaKey = e.metaKey;
 												lastev.ctrlKey = e.ctrlKey;
@@ -10201,33 +9546,25 @@
 						vakata_dnd.scroll_e.scrollLeft(j + vakata_dnd.scroll_l * $.vakata.dnd.settings.scroll_speed);
 						if (i !== vakata_dnd.scroll_e.scrollTop() || j !== vakata_dnd.scroll_e.scrollLeft()) {
 							/**
-							 * triggered on the document when a drag causes an
-							 * element to scroll
+							 * triggered on the document when a drag causes an element to scroll
 							 * 
 							 * @event
 							 * @plugin dnd
 							 * @name dnd_scroll.vakata
-							 * @param {Mixed}
-							 *            data any data supplied with the call
-							 *            to $.vakata.dnd.start
-							 * @param {DOM}
-							 *            element the DOM element being dragged
-							 * @param {jQuery}
-							 *            helper the helper shown next to the
-							 *            mouse
-							 * @param {jQuery}
-							 *            event the element that is scrolling
+							 * @param {Mixed} data any data supplied with the call to
+							 * $.vakata.dnd.start
+							 * @param {DOM} element the DOM element being dragged
+							 * @param {jQuery} helper the helper shown next to the mouse
+							 * @param {jQuery} event the element that is scrolling
 							 */
 							$.vakata.dnd._trigger("scroll", vakata_dnd.scroll_e);
 						}
 					},
 					start : function(e, data, html) {
-						if (e.type === "touchstart" && e.originalEvent && e.originalEvent.changedTouches
-								&& e.originalEvent.changedTouches[0]) {
+						if (e.type === "touchstart" && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) {
 							e.pageX = e.originalEvent.changedTouches[0].pageX;
 							e.pageY = e.originalEvent.changedTouches[0].pageY;
-							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset,
-									e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
+							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset, e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
 						}
 						if (vakata_dnd.is_drag) {
 							$.vakata.dnd.stop({});
@@ -10267,21 +9604,17 @@
 						return false;
 					},
 					drag : function(e) {
-						if (e.type === "touchmove" && e.originalEvent && e.originalEvent.changedTouches
-								&& e.originalEvent.changedTouches[0]) {
+						if (e.type === "touchmove" && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) {
 							e.pageX = e.originalEvent.changedTouches[0].pageX;
 							e.pageY = e.originalEvent.changedTouches[0].pageY;
-							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset,
-									e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
+							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset, e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
 						}
 						if (!vakata_dnd.is_down) {
 							return;
 						}
 						if (!vakata_dnd.is_drag) {
-							if (Math.abs(e.pageX - vakata_dnd.init_x) > (vakata_dnd.is_touch ? $.vakata.dnd.settings.threshold_touch
-									: $.vakata.dnd.settings.threshold)
-									|| Math.abs(e.pageY - vakata_dnd.init_y) > (vakata_dnd.is_touch ? $.vakata.dnd.settings.threshold_touch
-											: $.vakata.dnd.settings.threshold)) {
+							if (Math.abs(e.pageX - vakata_dnd.init_x) > (vakata_dnd.is_touch ? $.vakata.dnd.settings.threshold_touch : $.vakata.dnd.settings.threshold)
+									|| Math.abs(e.pageY - vakata_dnd.init_y) > (vakata_dnd.is_touch ? $.vakata.dnd.settings.threshold_touch : $.vakata.dnd.settings.threshold)) {
 								if (vakata_dnd.helper) {
 									vakata_dnd.helper.appendTo("body");
 									vakata_dnd.helper_w = vakata_dnd.helper.outerWidth();
@@ -10294,18 +9627,12 @@
 								 * @event
 								 * @plugin dnd
 								 * @name dnd_start.vakata
-								 * @param {Mixed}
-								 *            data any data supplied with the
-								 *            call to $.vakata.dnd.start
-								 * @param {DOM}
-								 *            element the DOM element being
-								 *            dragged
-								 * @param {jQuery}
-								 *            helper the helper shown next to
-								 *            the mouse
-								 * @param {Object}
-								 *            event the event that caused the
-								 *            start (probably mousemove)
+								 * @param {Mixed} data any data supplied with the call to
+								 * $.vakata.dnd.start
+								 * @param {DOM} element the DOM element being dragged
+								 * @param {jQuery} helper the helper shown next to the mouse
+								 * @param {Object} event the event that caused the start (probably
+								 * mousemove)
 								 */
 								$.vakata.dnd._trigger("start", e);
 							} else {
@@ -10318,11 +9645,9 @@
 						vakata_dnd.scroll_t = 0;
 						vakata_dnd.scroll_l = 0;
 						vakata_dnd.scroll_e = false;
-						$($(e.target).parentsUntil("body").addBack().get().reverse()).filter(
-								function() {
-									return (/^auto|scroll$/).test($(this).css("overflow"))
-											&& (this.scrollHeight > this.offsetHeight || this.scrollWidth > this.offsetWidth);
-								}).each(function() {
+						$($(e.target).parentsUntil("body").addBack().get().reverse()).filter(function() {
+							return (/^auto|scroll$/).test($(this).css("overflow")) && (this.scrollHeight > this.offsetHeight || this.scrollWidth > this.offsetWidth);
+						}).each(function() {
 							var t = $(this), o = t.offset();
 							if (this.scrollHeight > this.offsetHeight) {
 								if (o.top + t.height() - e.pageY < $.vakata.dnd.settings.scroll_proximity) {
@@ -10395,16 +9720,11 @@
 						 * @event
 						 * @plugin dnd
 						 * @name dnd_move.vakata
-						 * @param {Mixed}
-						 *            data any data supplied with the call to
-						 *            $.vakata.dnd.start
-						 * @param {DOM}
-						 *            element the DOM element being dragged
-						 * @param {jQuery}
-						 *            helper the helper shown next to the mouse
-						 * @param {Object}
-						 *            event the event that caused this to
-						 *            trigger (most likely mousemove)
+						 * @param {Mixed} data any data supplied with the call to $.vakata.dnd.start
+						 * @param {DOM} element the DOM element being dragged
+						 * @param {jQuery} helper the helper shown next to the mouse
+						 * @param {Object} event the event that caused this to trigger (most likely
+						 * mousemove)
 						 */
 						$.vakata.dnd._trigger("move", e);
 						return false;
@@ -10413,27 +9733,21 @@
 						if (e.type === "touchend" && e.originalEvent && e.originalEvent.changedTouches && e.originalEvent.changedTouches[0]) {
 							e.pageX = e.originalEvent.changedTouches[0].pageX;
 							e.pageY = e.originalEvent.changedTouches[0].pageY;
-							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset,
-									e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
+							e.target = document.elementFromPoint(e.originalEvent.changedTouches[0].pageX - window.pageXOffset, e.originalEvent.changedTouches[0].pageY - window.pageYOffset);
 						}
 						if (vakata_dnd.is_drag) {
 							/**
-							 * triggered on the document when a drag stops (the
-							 * dragged element is dropped)
+							 * triggered on the document when a drag stops (the dragged element is
+							 * dropped)
 							 * 
 							 * @event
 							 * @plugin dnd
 							 * @name dnd_stop.vakata
-							 * @param {Mixed}
-							 *            data any data supplied with the call
-							 *            to $.vakata.dnd.start
-							 * @param {DOM}
-							 *            element the DOM element being dragged
-							 * @param {jQuery}
-							 *            helper the helper shown next to the
-							 *            mouse
-							 * @param {Object}
-							 *            event the event that caused the stop
+							 * @param {Mixed} data any data supplied with the call to
+							 * $.vakata.dnd.start
+							 * @param {DOM} element the DOM element being dragged
+							 * @param {jQuery} helper the helper shown next to the mouse
+							 * @param {Object} event the event that caused the stop
 							 */
 							if (e.target !== vakata_dnd.target) {
 								$(vakata_dnd.target).off('click.vakata');
@@ -10461,32 +9775,22 @@
 			// $.jstreeol3.defaults.plugins.push("dnd");
 
 			/**
-			 * ### Massload plugin
-			 * 
-			 * Adds massload functionality to jstreeol3, so that multiple nodes
-			 * can be loaded in a single request (only useful with lazy
-			 * loading).
+			 * ### Massload plugin Adds massload functionality to jstreeol3, so that multiple nodes
+			 * can be loaded in a single request (only useful with lazy loading).
 			 */
 
 			/**
-			 * massload configuration
-			 * 
-			 * It is possible to set this to a standard jQuery-like AJAX config.
-			 * In addition to the standard jQuery ajax options here you can
-			 * supply functions for `data` and `url`, the functions will be run
-			 * in the current instance's scope and a param will be passed
-			 * indicating which node IDs need to be loaded, the return value of
-			 * those functions will be used.
-			 * 
-			 * You can also set this to a function, that function will receive
-			 * the node IDs being loaded as argument and a second param which is
-			 * a function (callback) which should be called with the result.
-			 * 
-			 * Both the AJAX and the function approach rely on the same return
-			 * value - an object where the keys are the node IDs, and the value
-			 * is the children of that node as an array. { "id1" : [{ "text" :
-			 * "Child of ID1", "id" : "c1" }, { "text" : "Another child of ID1",
-			 * "id" : "c2" }], "id2" : [{ "text" : "Child of ID2", "id" : "c3" }] }
+			 * massload configuration It is possible to set this to a standard jQuery-like AJAX
+			 * config. In addition to the standard jQuery ajax options here you can supply functions
+			 * for `data` and `url`, the functions will be run in the current instance's scope and a
+			 * param will be passed indicating which node IDs need to be loaded, the return value of
+			 * those functions will be used. You can also set this to a function, that function will
+			 * receive the node IDs being loaded as argument and a second param which is a function
+			 * (callback) which should be called with the result. Both the AJAX and the function
+			 * approach rely on the same return value - an object where the keys are the node IDs,
+			 * and the value is the children of that node as an array. { "id1" : [{ "text" : "Child
+			 * of ID1", "id" : "c1" }, { "text" : "Another child of ID1", "id" : "c2" }], "id2" : [{
+			 * "text" : "Child of ID2", "id" : "c3" }] }
 			 * 
 			 * @name $.jstreeol3.defaults.massload
 			 * @plugin massload
@@ -10565,12 +9869,11 @@
 				this._load_node = function(obj, callback) {
 					var data = this._data.massload[obj.id], rslt = null, dom;
 					if (data) {
-						rslt = this[typeof data === 'string' ? '_append_html_data' : '_append_json_data'](obj,
-								typeof data === 'string' ? $($.parseHTML(data)).filter(function() {
-									return this.nodeType !== 3;
-								}) : data, function(status) {
-									callback.call(this, status);
-								});
+						rslt = this[typeof data === 'string' ? '_append_html_data' : '_append_json_data'](obj, typeof data === 'string' ? $($.parseHTML(data)).filter(function() {
+							return this.nodeType !== 3;
+						}) : data, function(status) {
+							callback.call(this, status);
+						});
 						dom = this.get_node(obj.id, true);
 						if (dom && dom.length) {
 							dom.removeClass("jstreeol3-loading").attr('aria-busy', false);
@@ -10583,9 +9886,7 @@
 			};
 
 			/**
-			 * ### Search plugin
-			 * 
-			 * Adds search functionality to jstreeol3.
+			 * ### Search plugin Adds search functionality to jstreeol3.
 			 */
 
 			/**
@@ -10596,83 +9897,75 @@
 			 */
 			$.jstreeol3.defaults.search = {
 				/**
-				 * a jQuery-like AJAX config, which jstreeol3 uses if a server
-				 * should be queried for results.
-				 * 
-				 * A `str` (which is the search string) parameter will be added
-				 * with the request, an optional `inside` parameter will be
-				 * added if the search is limited to a node id. The expected
-				 * result is a JSON array with nodes that need to be opened so
-				 * that matching nodes will be revealed. Leave this setting as
-				 * `false` to not query the server. You can also set this to a
-				 * function, which will be invoked in the instance's scope and
-				 * receive 3 parameters - the search string, the callback to
-				 * call with the array of nodes to load, and the optional node
-				 * ID to limit the search to
+				 * a jQuery-like AJAX config, which jstreeol3 uses if a server should be queried for
+				 * results. A `str` (which is the search string) parameter will be added with the
+				 * request, an optional `inside` parameter will be added if the search is limited to
+				 * a node id. The expected result is a JSON array with nodes that need to be opened
+				 * so that matching nodes will be revealed. Leave this setting as `false` to not
+				 * query the server. You can also set this to a function, which will be invoked in
+				 * the instance's scope and receive 3 parameters - the search string, the callback
+				 * to call with the array of nodes to load, and the optional node ID to limit the
+				 * search to
 				 * 
 				 * @name $.jstreeol3.defaults.search.ajax
 				 * @plugin search
 				 */
 				ajax : false,
 				/**
-				 * Indicates if the search should be fuzzy or not (should
-				 * `chnd3` match `child node 3`). Default is `false`.
+				 * Indicates if the search should be fuzzy or not (should `chnd3` match `child node
+				 * 3`). Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.fuzzy
 				 * @plugin search
 				 */
 				fuzzy : false,
 				/**
-				 * Indicates if the search should be case sensitive. Default is
-				 * `false`.
+				 * Indicates if the search should be case sensitive. Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.case_sensitive
 				 * @plugin search
 				 */
 				case_sensitive : false,
 				/**
-				 * Indicates if the tree should be filtered (by default) to show
-				 * only matching nodes (keep in mind this can be a heavy on
-				 * large trees in old browsers). This setting can be changed at
-				 * runtime when calling the search method. Default is `false`.
+				 * Indicates if the tree should be filtered (by default) to show only matching nodes
+				 * (keep in mind this can be a heavy on large trees in old browsers). This setting
+				 * can be changed at runtime when calling the search method. Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.show_only_matches
 				 * @plugin search
 				 */
 				show_only_matches : false,
 				/**
-				 * Indicates if the children of matched element are shown (when
-				 * show_only_matches is true) This setting can be changed at
-				 * runtime when calling the search method. Default is `false`.
+				 * Indicates if the children of matched element are shown (when show_only_matches is
+				 * true) This setting can be changed at runtime when calling the search method.
+				 * Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.show_only_matches_children
 				 * @plugin search
 				 */
 				show_only_matches_children : false,
 				/**
-				 * Indicates if all nodes opened to reveal the search result,
-				 * should be closed when the search is cleared or a new search
-				 * is performed. Default is `true`.
+				 * Indicates if all nodes opened to reveal the search result, should be closed when
+				 * the search is cleared or a new search is performed. Default is `true`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.close_opened_onclear
 				 * @plugin search
 				 */
 				close_opened_onclear : true,
 				/**
-				 * Indicates if only leaf nodes should be included in search
-				 * results. Default is `false`.
+				 * Indicates if only leaf nodes should be included in search results. Default is
+				 * `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.search_leaves_only
 				 * @plugin search
 				 */
 				search_leaves_only : false,
 				/**
-				 * If set to a function it wil be called in the instance's scope
-				 * with two arguments - search string and node (where node will
-				 * be every node in the structure, so use with caution). If the
-				 * function returns a truthy value the node will be considered a
-				 * match (it might not be displayed if search_only_leaves is set
-				 * to true and the node is not a leaf). Default is `false`.
+				 * If set to a function it wil be called in the instance's scope with two arguments -
+				 * search string and node (where node will be every node in the structure, so use
+				 * with caution). If the function returns a truthy value the node will be considered
+				 * a match (it might not be displayed if search_only_leaves is set to true and the
+				 * node is not a leaf). Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.search.search_callback
 				 * @plugin search
@@ -10724,21 +10017,14 @@
 				 * used to search the tree nodes for a given string
 				 * 
 				 * @name search(str [, skip_async])
-				 * @param {String}
-				 *            str the search string
-				 * @param {Boolean}
-				 *            skip_async if set to true server will not be
-				 *            queried even if configured
-				 * @param {Boolean}
-				 *            show_only_matches if set to true only matching
-				 *            nodes will be shown (keep in mind this can be very
-				 *            slow on large trees or old browsers)
-				 * @param {mixed}
-				 *            inside an optional node to whose children to limit
-				 *            the search
-				 * @param {Boolean}
-				 *            append if set to true the results of this search
-				 *            are appended to the previous search
+				 * @param {String} str the search string
+				 * @param {Boolean} skip_async if set to true server will not be queried even if
+				 * configured
+				 * @param {Boolean} show_only_matches if set to true only matching nodes will be
+				 * shown (keep in mind this can be very slow on large trees or old browsers)
+				 * @param {mixed} inside an optional node to whose children to limit the search
+				 * @param {Boolean} append if set to true the results of this search are appended to
+				 * the previous search
 				 * @plugin search
 				 * @trigger search.jstreeol3
 				 */
@@ -10814,18 +10100,14 @@
 						caseSensitive : s.case_sensitive,
 						fuzzy : s.fuzzy
 					});
-					$.each(m[inside ? inside : $.jstreeol3.root].children_d,
-							function(ii, i) {
-								var v = m[i];
-								if (v.text
-										&& !v.state.hidden
-										&& (!s.search_leaves_only || (v.state.loaded && v.children.length === 0))
-										&& ((s.search_callback && s.search_callback.call(this, str, v)) || (!s.search_callback && f
-												.search(v.text).isMatch))) {
-									r.push(i);
-									p = p.concat(v.parents);
-								}
-							});
+					$.each(m[inside ? inside : $.jstreeol3.root].children_d, function(ii, i) {
+						var v = m[i];
+						if (v.text && !v.state.hidden && (!s.search_leaves_only || (v.state.loaded && v.children.length === 0))
+								&& ((s.search_callback && s.search_callback.call(this, str, v)) || (!s.search_callback && f.search(v.text).isMatch))) {
+							r.push(i);
+							p = p.concat(v.parents);
+						}
+					});
 					if (r.length) {
 						p = $.vakata.array_unique(p);
 						for (i = 0, j = p.length; i < j; i++) {
@@ -10834,24 +10116,14 @@
 							}
 						}
 						if (!append) {
-							this._data.search.dom = $(this.element[0].querySelectorAll('#'
-									+ $.map(
-											r,
-											function(v) {
-												return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' '
-														+ v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex,
-														'\\$&');
-											}).join(', #')));
+							this._data.search.dom = $(this.element[0].querySelectorAll('#' + $.map(r, function(v) {
+								return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' ' + v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex, '\\$&');
+							}).join(', #')));
 							this._data.search.res = r;
 						} else {
-							this._data.search.dom = this._data.search.dom.add($(this.element[0].querySelectorAll('#'
-									+ $.map(
-											r,
-											function(v) {
-												return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' '
-														+ v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex,
-														'\\$&');
-											}).join(', #'))));
+							this._data.search.dom = this._data.search.dom.add($(this.element[0].querySelectorAll('#' + $.map(r, function(v) {
+								return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' ' + v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex, '\\$&');
+							}).join(', #'))));
 							this._data.search.res = $.vakata.array_unique(this._data.search.res.concat(r));
 						}
 						this._data.search.dom.children(".jstreeol3-anchor").addClass('jstreeol3-search');
@@ -10861,13 +10133,9 @@
 					 * 
 					 * @event
 					 * @name search.jstreeol3
-					 * @param {jQuery}
-					 *            nodes a jQuery collection of matching nodes
-					 * @param {String}
-					 *            str the search string
-					 * @param {Array}
-					 *            res a collection of objects represeing the
-					 *            matching nodes
+					 * @param {jQuery} nodes a jQuery collection of matching nodes
+					 * @param {String} str the search string
+					 * @param {Array} res a collection of objects represeing the matching nodes
 					 * @plugin search
 					 */
 					this.trigger('search', {
@@ -10878,8 +10146,8 @@
 					});
 				};
 				/**
-				 * used to clear the last search (removes classes and shows all
-				 * nodes if filtering is on)
+				 * used to clear the last search (removes classes and shows all nodes if filtering
+				 * is on)
 				 * 
 				 * @name clear_search()
 				 * @plugin search
@@ -10894,15 +10162,11 @@
 					 * 
 					 * @event
 					 * @name clear_search.jstreeol3
-					 * @param {jQuery}
-					 *            nodes a jQuery collection of matching nodes
-					 *            (the result from the last search)
-					 * @param {String}
-					 *            str the search string (the last search string)
-					 * @param {Array}
-					 *            res a collection of objects represeing the
-					 *            matching nodes (the result from the last
-					 *            search)
+					 * @param {jQuery} nodes a jQuery collection of matching nodes (the result from
+					 * the last search)
+					 * @param {String} str the search string (the last search string)
+					 * @param {Array} res a collection of objects represeing the matching nodes (the
+					 * result from the last search)
 					 * @plugin search
 					 */
 					this.trigger('clear_search', {
@@ -10911,14 +10175,9 @@
 						res : this._data.search.res
 					});
 					if (this._data.search.res.length) {
-						this._data.search.dom = $(this.element[0].querySelectorAll('#'
-								+ $.map(
-										this._data.search.res,
-										function(v) {
-											return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' '
-													+ v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex,
-													'\\$&');
-										}).join(', #')));
+						this._data.search.dom = $(this.element[0].querySelectorAll('#' + $.map(this._data.search.res, function(v) {
+							return "0123456789".indexOf(v[0]) !== -1 ? '\\3' + v[0] + ' ' + v.substr(1).replace($.jstreeol3.idregex, '\\$&') : v.replace($.jstreeol3.idregex, '\\$&');
+						}).join(', #')));
 						this._data.search.dom.children(".jstreeol3-anchor").removeClass("jstreeol3-search");
 					}
 					this._data.search.str = "";
@@ -10933,8 +10192,7 @@
 						if ($.inArray(obj.id, this._data.search.res) !== -1) {
 							var i, j, tmp = null;
 							for (i = 0, j = obj.childNodes.length; i < j; i++) {
-								if (obj.childNodes[i] && obj.childNodes[i].className
-										&& obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
+								if (obj.childNodes[i] && obj.childNodes[i].className && obj.childNodes[i].className.indexOf("jstreeol3-anchor") !== -1) {
 									tmp = obj.childNodes[i];
 									break;
 								}
@@ -10996,8 +10254,7 @@
 								score : 1
 							};
 						}
-						var i, j, textLen = text.length, scoreThreshold = MATCH_THRESHOLD, bestLoc = text.indexOf(pattern, MATCH_LOCATION), binMin, binMid, binMax = patternLen
-								+ textLen, lastRd, start, finish, rd, charMatch, score = 1, locations = [];
+						var i, j, textLen = text.length, scoreThreshold = MATCH_THRESHOLD, bestLoc = text.indexOf(pattern, MATCH_LOCATION), binMin, binMid, binMax = patternLen + textLen, lastRd, start, finish, rd, charMatch, score = 1, locations = [];
 						if (bestLoc !== -1) {
 							scoreThreshold = Math.min(match_bitapScore(0, bestLoc), scoreThreshold);
 							bestLoc = text.lastIndexOf(pattern, MATCH_LOCATION + patternLen);
@@ -11070,16 +10327,13 @@
 			// $.jstreeol3.defaults.plugins.push("search");
 
 			/**
-			 * ### Sort plugin
-			 * 
-			 * Automatically sorts all siblings in the tree according to a
-			 * sorting function.
+			 * ### Sort plugin Automatically sorts all siblings in the tree according to a sorting
+			 * function.
 			 */
 
 			/**
-			 * the settings function used to sort the nodes. It is executed in
-			 * the tree's context, accepts two nodes as arguments and should
-			 * return `1` or `-1`.
+			 * the settings function used to sort the nodes. It is executed in the tree's context,
+			 * accepts two nodes as arguments and should return `1` or `-1`.
 			 * 
 			 * @name $.jstreeol3.defaults.sort
 			 * @plugin sort
@@ -11113,11 +10367,8 @@
 				 * 
 				 * @private
 				 * @name sort(obj [, deep])
-				 * @param {mixed}
-				 *            obj the node
-				 * @param {Boolean}
-				 *            deep if set to `true` nodes are sorted
-				 *            recursively.
+				 * @param {mixed} obj the node
+				 * @param {Boolean} deep if set to `true` nodes are sorted recursively.
 				 * @plugin sort
 				 * @trigger search.jstreeol3
 				 */
@@ -11139,11 +10390,8 @@
 			// $.jstreeol3.defaults.plugins.push("sort");
 
 			/**
-			 * ### State plugin
-			 * 
-			 * Saves the state of the tree (selected nodes, opened nodes) on the
-			 * user's computer using available options (localStorage, cookies,
-			 * etc)
+			 * ### State plugin Saves the state of the tree (selected nodes, opened nodes) on the
+			 * user's computer using available options (localStorage, cookies, etc)
 			 */
 
 			var to = false;
@@ -11155,35 +10403,32 @@
 			 */
 			$.jstreeol3.defaults.state = {
 				/**
-				 * A string for the key to use when saving the current tree
-				 * (change if using multiple trees in your project). Defaults to
-				 * `jstreeol3`.
+				 * A string for the key to use when saving the current tree (change if using
+				 * multiple trees in your project). Defaults to `jstreeol3`.
 				 * 
 				 * @name $.jstreeol3.defaults.state.key
 				 * @plugin state
 				 */
 				key : 'jstreeol3',
 				/**
-				 * A space separated list of events that trigger a state save.
-				 * Defaults to `changed.jstreeol3 open_node.jstreeol3
-				 * close_node.jstreeol3`.
+				 * A space separated list of events that trigger a state save. Defaults to
+				 * `changed.jstreeol3 open_node.jstreeol3 close_node.jstreeol3`.
 				 * 
 				 * @name $.jstreeol3.defaults.state.events
 				 * @plugin state
 				 */
 				events : 'changed.jstreeol3 open_node.jstreeol3 close_node.jstreeol3 check_node.jstreeol3 uncheck_node.jstreeol3',
 				/**
-				 * Time in milliseconds after which the state will expire.
-				 * Defaults to 'false' meaning - no expire.
+				 * Time in milliseconds after which the state will expire. Defaults to 'false'
+				 * meaning - no expire.
 				 * 
 				 * @name $.jstreeol3.defaults.state.ttl
 				 * @plugin state
 				 */
 				ttl : false,
 				/**
-				 * A function that will be executed prior to restoring state
-				 * with one argument - the state object. Can be used to clear
-				 * unwanted parts of the state.
+				 * A function that will be executed prior to restoring state with one argument - the
+				 * state object. Can be used to clear unwanted parts of the state.
 				 * 
 				 * @name $.jstreeol3.defaults.state.filter
 				 * @plugin state
@@ -11203,9 +10448,8 @@
 							}, this), 100);
 						}, this));
 						/**
-						 * triggered when the state plugin is finished restoring
-						 * the state (and immediately after ready if there is no
-						 * state to restore).
+						 * triggered when the state plugin is finished restoring the state (and
+						 * immediately after ready if there is no state to restore).
 						 * 
 						 * @event
 						 * @name state_ready.jstreeol3
@@ -11299,38 +10543,28 @@
 			// $.jstreeol3.defaults.plugins.push("state");
 
 			/**
-			 * ### Types plugin
-			 * 
-			 * Makes it possible to add predefined types for groups of nodes,
-			 * which make it possible to easily control nesting rules and icon
-			 * for each group.
+			 * ### Types plugin Makes it possible to add predefined types for groups of nodes, which
+			 * make it possible to easily control nesting rules and icon for each group.
 			 */
 
 			/**
-			 * An object storing all types as key value pairs, where the key is
-			 * the type name and the value is an object that could contain
-			 * following keys (all optional). * `max_children` the maximum
-			 * number of immediate children this node type can have. Do not
-			 * specify or set to `-1` for unlimited. * `max_depth` the maximum
-			 * number of nesting this node type can have. A value of `1` would
-			 * mean that the node can have children, but no grandchildren. Do
-			 * not specify or set to `-1` for unlimited. * `valid_children` an
-			 * array of node type strings, that nodes of this type can have as
-			 * children. Do not specify or set to `-1` for no limits. * `icon` a
-			 * string - can be a path to an icon or a className, if using an
-			 * image that is in the current directory use a `./` prefix,
-			 * otherwise it will be detected as a class. Omit to use the default
-			 * icon from your theme. * `li_attr` an object of values which will
-			 * be used to add HTML attributes on the resulting LI DOM node
-			 * (merged with the node's own data) * `a_attr` an object of values
-			 * which will be used to add HTML attributes on the resulting A DOM
-			 * node (merged with the node's own data)
-			 * 
-			 * There are two predefined types: * `#` represents the root of the
-			 * tree, for example `max_children` would control the maximum number
-			 * of root nodes. * `default` represents the default node - any
-			 * settings here will be applied to all nodes that do not have a
-			 * type specified.
+			 * An object storing all types as key value pairs, where the key is the type name and
+			 * the value is an object that could contain following keys (all optional). *
+			 * `max_children` the maximum number of immediate children this node type can have. Do
+			 * not specify or set to `-1` for unlimited. * `max_depth` the maximum number of nesting
+			 * this node type can have. A value of `1` would mean that the node can have children,
+			 * but no grandchildren. Do not specify or set to `-1` for unlimited. * `valid_children`
+			 * an array of node type strings, that nodes of this type can have as children. Do not
+			 * specify or set to `-1` for no limits. * `icon` a string - can be a path to an icon or
+			 * a className, if using an image that is in the current directory use a `./` prefix,
+			 * otherwise it will be detected as a class. Omit to use the default icon from your
+			 * theme. * `li_attr` an object of values which will be used to add HTML attributes on
+			 * the resulting LI DOM node (merged with the node's own data) * `a_attr` an object of
+			 * values which will be used to add HTML attributes on the resulting A DOM node (merged
+			 * with the node's own data) There are two predefined types: * `#` represents the root
+			 * of the tree, for example `max_children` would control the maximum number of root
+			 * nodes. * `default` represents the default node - any settings here will be applied to
+			 * all nodes that do not have a type specified.
 			 * 
 			 * @name $.jstreeol3.defaults.types
 			 * @plugin types
@@ -11428,8 +10662,7 @@
 							if (m[dpc[i]].original && m[dpc[i]].original.type && t[m[dpc[i]].original.type]) {
 								c = m[dpc[i]].original.type;
 							}
-							if (m[dpc[i]].data && m[dpc[i]].data.jstreeol3 && m[dpc[i]].data.jstreeol3.type
-									&& t[m[dpc[i]].data.jstreeol3.type]) {
+							if (m[dpc[i]].data && m[dpc[i]].data.jstreeol3 && m[dpc[i]].data.jstreeol3.type && t[m[dpc[i]].data.jstreeol3.type]) {
 								c = m[dpc[i]].data.jstreeol3.type;
 							}
 							m[dpc[i]].type = c;
@@ -11545,8 +10778,7 @@
 								};
 								return false;
 							}
-							if (tmp.valid_children !== undefined && tmp.valid_children !== -1
-									&& $.inArray((obj.type || 'default'), tmp.valid_children) === -1) {
+							if (tmp.valid_children !== undefined && tmp.valid_children !== -1 && $.inArray((obj.type || 'default'), tmp.valid_children) === -1) {
 								this._data.core.last_error = {
 									'error' : 'check',
 									'plugin' : 'types',
@@ -11600,8 +10832,7 @@
 				 * used to retrieve the type settings object for a node
 				 * 
 				 * @name get_rules(obj)
-				 * @param {mixed}
-				 *            obj the node to find the rules for
+				 * @param {mixed} obj the node to find the rules for
 				 * @return {Object}
 				 * @plugin types
 				 */
@@ -11623,15 +10854,12 @@
 					return tmp;
 				};
 				/**
-				 * used to retrieve the type string or settings object for a
-				 * node
+				 * used to retrieve the type string or settings object for a node
 				 * 
 				 * @name get_type(obj [, rules])
-				 * @param {mixed}
-				 *            obj the node to find the rules for
-				 * @param {Boolean}
-				 *            rules if set to `true` instead of a string the
-				 *            settings object will be returned
+				 * @param {mixed} obj the node to find the rules for
+				 * @param {Boolean} rules if set to `true` instead of a string the settings object
+				 * will be returned
 				 * @return {String|Object}
 				 * @plugin types
 				 */
@@ -11645,10 +10873,8 @@
 				 * used to change a node's type
 				 * 
 				 * @name set_type(obj, type)
-				 * @param {mixed}
-				 *            obj the node to change
-				 * @param {String}
-				 *            type the new type
+				 * @param {mixed} obj the node to change
+				 * @param {String} type the new type
 				 * @plugin types
 				 */
 				this.set_type = function(obj, type) {
@@ -11783,10 +11009,7 @@
 			// $.jstreeol3.defaults.plugins.push("types");
 
 			/**
-			 * ### Unique plugin
-			 * 
-			 * Enforces that no nodes with the same name can coexist as
-			 * siblings.
+			 * ### Unique plugin Enforces that no nodes with the same name can coexist as siblings.
 			 */
 
 			/**
@@ -11797,18 +11020,16 @@
 			 */
 			$.jstreeol3.defaults.unique = {
 				/**
-				 * Indicates if the comparison should be case sensitive. Default
-				 * is `false`.
+				 * Indicates if the comparison should be case sensitive. Default is `false`.
 				 * 
 				 * @name $.jstreeol3.defaults.unique.case_sensitive
 				 * @plugin unique
 				 */
 				case_sensitive : false,
 				/**
-				 * A callback executed in the instance's scope when a new node
-				 * is created and the name is already taken, the two arguments
-				 * are the conflicting name and the counter. The default will
-				 * produce results like `New node (2)`.
+				 * A callback executed in the instance's scope when a new node is created and the
+				 * name is already taken, the two arguments are the conflicting name and the
+				 * counter. The default will produce results like `New node (2)`.
 				 * 
 				 * @name $.jstreeol3.defaults.unique.duplicate
 				 * @plugin unique
@@ -11945,9 +11166,7 @@
 			// $.jstreeol3.defaults.plugins.push("unique");
 
 			/**
-			 * ### Wholerow plugin
-			 * 
-			 * Makes each node appear block level. Making selection easier. May
+			 * ### Wholerow plugin Makes each node appear block level. Making selection easier. May
 			 * cause slow down for large trees in old browsers.
 			 */
 
@@ -11978,20 +11197,14 @@
 								tmp.children('.jstreeol3-wholerow').addClass('jstreeol3-wholerow-clicked');
 							}
 						}
-					}, this)).on(
-							"open_node.jstreeol3",
-							$.proxy(function(e, data) {
-								this.get_node(data.node, true).find('.jstreeol3-clicked').parent().children('.jstreeol3-wholerow')
-										.addClass('jstreeol3-wholerow-clicked');
-							}, this)).on(
-							"hover_node.jstreeol3 dehover_node.jstreeol3",
-							$.proxy(function(e, data) {
-								if (e.type === "hover_node" && this.is_disabled(data.node)) {
-									return;
-								}
-								this.get_node(data.node, true).children('.jstreeol3-wholerow')[e.type === "hover_node" ? "addClass"
-										: "removeClass"]('jstreeol3-wholerow-hovered');
-							}, this)).on("contextmenu.jstreeol3", ".jstreeol3-wholerow", $.proxy(function(e) {
+					}, this)).on("open_node.jstreeol3", $.proxy(function(e, data) {
+						this.get_node(data.node, true).find('.jstreeol3-clicked').parent().children('.jstreeol3-wholerow').addClass('jstreeol3-wholerow-clicked');
+					}, this)).on("hover_node.jstreeol3 dehover_node.jstreeol3", $.proxy(function(e, data) {
+						if (e.type === "hover_node" && this.is_disabled(data.node)) {
+							return;
+						}
+						this.get_node(data.node, true).children('.jstreeol3-wholerow')[e.type === "hover_node" ? "addClass" : "removeClass"]('jstreeol3-wholerow-hovered');
+					}, this)).on("contextmenu.jstreeol3", ".jstreeol3-wholerow", $.proxy(function(e) {
 						if (this._data.contextmenu) {
 							e.preventDefault();
 							var tmp = $.Event('contextmenu', {
@@ -12006,9 +11219,8 @@
 						}
 					}, this))
 					/*
-					 * ! .on("mousedown.jstreeol3 touchstart.jstreeol3",
-					 * ".jstreeol3-wholerow", function (e) { if(e.target ===
-					 * e.currentTarget) { var a =
+					 * ! .on("mousedown.jstreeol3 touchstart.jstreeol3", ".jstreeol3-wholerow",
+					 * function (e) { if(e.target === e.currentTarget) { var a =
 					 * $(e.currentTarget).closest(".jstreeol3-node").children(".jstreeol3-anchor");
 					 * e.target = a[0]; a.trigger(e); } })
 					 */

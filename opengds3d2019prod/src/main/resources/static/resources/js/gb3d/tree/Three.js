@@ -21,6 +21,10 @@ gb3d.tree.Three = function(obj) {
 	var options = obj || {};
 	var target = options.target || "body";
 	this.map = options.map || undefined;
+	this.otree = options.otree || undefined;
+	if (this.otree instanceof gb3d.tree.OpenLayers) {
+		this.otree.setThreeTree(this);
+	}
 	if(!this.map){
 		console.error("gb3d.tree.Three: map is required parameter.");
 		return;
@@ -771,4 +775,48 @@ gb3d.tree.Three = function(obj) {
  */
 gb3d.tree.Three.prototype.getEditingTool3D = function(){
 	return typeof this.editingTool3D === "function" ? this.editingTool3D() : this.editingTool3D;
+};
+
+/**
+ * 3D 모델 편집도구 객체를 반환한다.
+ * 
+ * @method gb3d.tree.Three#getJSTree
+ * @return {jsTree} jstree 객체
+ */
+gb3d.tree.Three.prototype.getJSTree = function(){
+	return this.jstree;
+};
+
+/**
+ * openlayers tree 객체를 반환한다.
+ * 
+ * @method gb3d.tree.Three#getOpenlayersTree
+ * @return {gb3d.tree.Openlayers}
+ */
+gb3d.tree.Three.prototype.getOpenlayersTree = function(){
+	return this.otree;
+};
+
+/**
+ * openlayers tree 객체를 설정한다.
+ * 
+ * @method gb3d.tree.Three#setOpenlayersTree
+ * @param {gb3d.tree.Openlayers} tree - 트리 객체
+ */
+gb3d.tree.Three.prototype.setOpenlayersTree = function(tree){
+	this.otree = tree;
+};
+
+/**
+ * 트리를 새로고침한다.
+ * 
+ * @method gb3d.tree.Three#refresh
+ * @param {gb3d.tree.Openlayers} tree - 트리 객체
+ */
+gb3d.tree.Three.prototype.refresh = function(){
+	var otree = getOpenlayersTree();
+	var jstreeLayers = otree.getJSTree();
+	var jstreeModel = this.getJSTree();
+	var rootNodeModel = jstreeModel.get_node("#");
+	
 };
