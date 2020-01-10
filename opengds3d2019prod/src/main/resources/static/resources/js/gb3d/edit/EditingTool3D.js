@@ -276,6 +276,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 		});
 
+		// 레이어 트리 아이디 입력
+		opt["treeid"] = that.objectAttr.treeid;
 		// ***** 입력값 유효성 검사 필요 *****
 		that.createPointObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
@@ -350,6 +352,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 // opt);
 // that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent,
 // opt);
+		// 레이어 트리 아이디 입력
+		opt["treeid"] = that.objectAttr.treeid;
 		that.createLineStringObjectOnRoad(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 // $("#pointObjectCreateModal").modal("hide");
 		that.line3DModal.close();
@@ -412,8 +416,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 		});
 
+		// 레이어 트리 아이디 입력
+		opt["treeid"] = that.objectAttr.treeid;
+		
 		// ***** 입력값 유효성 검사 필요 *****
-
 		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
 // $("#polygonObjectCreateModal").modal("hide");
