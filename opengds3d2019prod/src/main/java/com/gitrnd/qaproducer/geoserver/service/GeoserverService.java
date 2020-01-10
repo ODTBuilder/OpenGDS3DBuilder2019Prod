@@ -367,35 +367,11 @@ public interface GeoserverService {
 	 */
 	public List<String> getStyleList(DTGeoserverManager geoserverManager, String workspace);
 
-	/**
-	 * 높이조건이 컬럼인 GeoserverLayer 3Dtiles 생성
-	 * 
-	 * @author SG.LEE
-	 * @param geoserverManager Geoserver 관리 클래스
-	 * @param workspace        작업공간
-	 * @param datastore        저장소
-	 * @param srs              좌표계
-	 * @param layerName        레이어명
-	 * @param attribute        컬럼명
-	 * @return
-	 */
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager geoserverManager, String workspace, String datastore,
-			String layerName, String user, String fix) throws ParseException;
+	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
+			String datastore, String layerName, String username, String heightType, String heightValue)
+			throws Exception;
 
-	/**
-	 * 높이조건이 고정인 GeoserverLayer 3Dtiles 생성
-	 * 
-	 * @author SG.LEE
-	 * @param geoserverManager Geoserver 관리 클래스
-	 * @param workspace        작업공간
-	 * @param datastore        저장소
-	 * @param srs              좌표계
-	 * @param layerName        레이어명
-	 * @param defVal           기본값
-	 * @return
-	 * @throws ParseException
-	 * @throws FileNotFoundException 
-	 */
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
-			String layerName, String user, double defalut) throws ParseException, FileNotFoundException;
+	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
+			String layerName, String username, String heightType, String heightValue, String widthType,
+			String widthValue) throws Exception;
 }

@@ -28,13 +28,15 @@ import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 public class ShpToObjImpl {
 
 	private double defaultHeight = 5;
 	private double defaultWidth = 5;
 
-	private String attribute;
+	private String heightAttribute;
+	private String widthAttribute;
 
 	private String outputPath;
 	private File file;
@@ -43,6 +45,7 @@ public class ShpToObjImpl {
 	private int objfilenum = 0;
 
 	EnShpToObjHeightType hType = null;
+	EnShpToObjWidthType wType = null;
 
 	private String mtl;
 	private String usemtl;
@@ -62,7 +65,7 @@ public class ShpToObjImpl {
 	public void setDefaultHeight(double defaultHeight) {
 		this.defaultHeight = defaultHeight;
 	}
-	
+
 	public double getDefaultWidth() {
 		return defaultWidth;
 	}
@@ -71,12 +74,20 @@ public class ShpToObjImpl {
 		this.defaultWidth = defaultWidth;
 	}
 
-	public String getAttribute() {
-		return attribute;
+	public String getHeightAttribute() {
+		return heightAttribute;
 	}
 
-	public void setAttribute(String attribute) {
-		this.attribute = attribute;
+	public void setHeightAttribute(String heightAttribute) {
+		this.heightAttribute = heightAttribute;
+	}
+
+	public String getWidthAttribute() {
+		return widthAttribute;
+	}
+
+	public void setWidthAttribute(String widthAttribute) {
+		this.widthAttribute = widthAttribute;
 	}
 
 	public String getOutputPath() {
@@ -103,19 +114,42 @@ public class ShpToObjImpl {
 		this.hType = hType;
 	}
 
+	public EnShpToObjWidthType getwType() {
+		return wType;
+	}
+
+	public void setwType(EnShpToObjWidthType wType) {
+		this.wType = wType;
+	}
+
 	public String getMtl() {
 		return mtl;
 	}
 
 	public void setMtl(String mtl) {
 		this.mtl = mtl;
-	}
+		String usemtl = null;
+		try {
+			// 파일 객체 생성
+			File mtlfile = new File(outputPath + File.separator + mtl);
+			// 입력 스트림 생성
+			FileReader filereader = new FileReader(mtlfile);
+			// 입력 버퍼 생성
+			BufferedReader bufReader = new BufferedReader(filereader);
+			String line = "";
 
-	public String getUsemtl() {
-		return usemtl;
-	}
-
-	public void setUsemtl(String usemtl) {
+			while ((line = bufReader.readLine()) != null) {
+				if (line.startsWith("newmtl ")) {
+					usemtl = line.replace("newmtl ", "");
+				}
+			}
+			// .readLine()은 끝에 개행문자를 읽지 않는다.
+			bufReader.close();
+		} catch (FileNotFoundException e) {
+			// TODO: handle exception
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 		this.usemtl = usemtl;
 	}
 
@@ -125,9 +159,12 @@ public class ShpToObjImpl {
 	 * @author SG.LEE
 	 */
 	public enum EnShpToObjHeightType {
+
 		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
 
 		String type;
+		double defaultHeight;
+		double attributeKey;
 
 		private EnShpToObjHeightType(String type) {
 			this.type = type;
@@ -159,106 +196,50 @@ public class ShpToObjImpl {
 		}
 	}
 
-	/**
-	 * 높이 고정값
-	 * 
-	 * @author SG.LEE
-	 * @param file
-	 * @param filter
-	 * @param defVal
-	 * @param outputPath
-	 * @throws Exception
-	 */
-	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath) {
-		hType = EnShpToObjHeightType.DEFAULT;
-		this.file = file;
-		this.filter = filter;
-		this.outputPath = outputPath;
-		this.defaultHeight = defVal;
-	}
+	public enum EnShpToObjWidthType {
 
-	public ShpToObjImpl(File file, Filter filter, double defVal, String outputPath, String mtl) {
-		hType = EnShpToObjHeightType.DEFAULT;
-		this.file = file;
-		this.filter = filter;
-		this.outputPath = outputPath;
-		this.defaultHeight = defVal;
-		this.mtl = mtl;
-		String usemtl = null;
-		try {
-			// 파일 객체 생성
-			File mtlfile = new File(outputPath + File.separator + mtl);
-			// 입력 스트림 생성
-			FileReader filereader = new FileReader(mtlfile);
-			// 입력 버퍼 생성
-			BufferedReader bufReader = new BufferedReader(filereader);
-			String line = "";
+		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
 
-			while ((line = bufReader.readLine()) != null) {
-				if (line.startsWith("newmtl ")) {
-					usemtl = line.replace("newmtl ", "");
-				}
-			}
-			// .readLine()은 끝에 개행문자를 읽지 않는다.
-			bufReader.close();
-		} catch (FileNotFoundException e) {
-			// TODO: handle exception
-		} catch (IOException e) {
-			System.out.println(e);
+		String type;
+
+		private EnShpToObjWidthType(String type) {
+			this.type = type;
 		}
-		this.usemtl = usemtl;
-	}
 
-	/**
-	 * 높이 컬럼값 지정
-	 * 
-	 * @author SG.LEE
-	 * @param file
-	 * @param filter
-	 * @param attribute
-	 * @param outputPath
-	 */
-	public ShpToObjImpl(File file, Filter filter, String attribute, String outputPath) {
-		hType = EnShpToObjHeightType.FIX;
-		this.file = file;
-		this.filter = filter;
-		this.outputPath = outputPath;
-		this.attribute = attribute;
-	}
-
-	public ShpToObjImpl(File file, Filter filter, String attribute, String outputPath, String mtl) {
-		hType = EnShpToObjHeightType.FIX;
-		this.file = file;
-		this.filter = filter;
-		this.outputPath = outputPath;
-		this.attribute = attribute;
-		this.mtl = mtl;
-		String usemtl = null;
-		try {
-			// 파일 객체 생성
-			File mtlfile = new File(outputPath + File.separator + mtl);
-			// 입력 스트림 생성
-			FileReader filereader = new FileReader(mtlfile);
-			// 입력 버퍼 생성
-			BufferedReader bufReader = new BufferedReader(filereader);
-			String line = "";
-
-			while ((line = bufReader.readLine()) != null) {
-				if (line.startsWith("newmtl ")) {
-					usemtl = line.replace("newmtl ", "");
-				}
+		/**
+		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
+		 * 
+		 * @author SG.LEE
+		 * @param type type명
+		 * @return {@link EnTreeType}
+		 */
+		public static EnShpToObjWidthType getFromType(String type) {
+			for (EnShpToObjWidthType tt : values()) {
+				if (tt == UNKNOWN)
+					continue;
+				if (tt.type.equals(type))
+					return tt;
 			}
-			// .readLine()은 끝에 개행문자를 읽지 않는다.
-			bufReader.close();
-		} catch (FileNotFoundException e) {
-			// TODO: handle exception
-		} catch (IOException e) {
-			System.out.println(e);
+			return UNKNOWN;
 		}
-		this.usemtl = usemtl;
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+	}
+
+	public ShpToObjImpl(File file, Filter filter, String outputPath) {
+		this.file = file;
+		this.filter = filter;
+		this.outputPath = outputPath;
 	}
 
 	public void exec() throws Exception {
+
 		FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection = getFeatureCollectionFromFileWithFilter(
 				file, filter);
 
@@ -274,24 +255,34 @@ public class ShpToObjImpl {
 				this.objfilenum = polyToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.FIX) {
 				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						attribute, outputPath);
+						heightAttribute, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
 				this.objfilenum = polyToObj.getObjfilenum();
 			}
 		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
-			if (this.hType == EnShpToObjHeightType.DEFAULT) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						defaultHeight, outputPath);
-				polyToObj.parseToObjFile();
-				this.outputPath = polyToObj.getOutputPath();
-				this.objfilenum = polyToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						attribute, outputPath);
-				polyToObj.parseToObjFile();
-				this.outputPath = polyToObj.getOutputPath();
-				this.objfilenum = polyToObj.getObjfilenum();
+
+			// tmp
+			BufferParameters bufferParam = new BufferParameters();
+			bufferParam.setEndCapStyle(bufferParam.CAP_ROUND);
+			bufferParam.setJoinStyle(bufferParam.JOIN_ROUND);
+
+			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						this.wType, defaultHeight, defaultWidth, bufferParam, outputPath);
+				lineToObj.parseToObjFile();
+			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						this.wType, defaultHeight, widthAttribute, bufferParam, outputPath);
+				lineToObj.parseToObjFile();
+			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						this.wType, heightAttribute, defaultWidth, bufferParam, outputPath);
+				lineToObj.parseToObjFile();
+			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+						this.wType, heightAttribute, widthAttribute, bufferParam, outputPath);
+				lineToObj.parseToObjFile();
 			}
 		}
 	}

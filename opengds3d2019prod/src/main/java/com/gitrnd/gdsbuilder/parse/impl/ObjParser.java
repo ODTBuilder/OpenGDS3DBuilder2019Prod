@@ -2,6 +2,8 @@ package com.gitrnd.gdsbuilder.parse.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.geotools.referencing.GeodeticCalculator;
@@ -12,6 +14,7 @@ import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjFace;
 import de.javagl.obj.ObjGroup;
+import de.javagl.obj.ObjSplitting;
 import de.javagl.obj.ObjUtils;
 import de.javagl.obj.Objs;
 
@@ -246,10 +249,27 @@ public class ObjParser {
 		if (centerYtile > centerYedit) {
 			yDistance = -yDistance;
 		}
+
 		// featureId에 해당하는 feature get
-		ObjGroup group = originObj.getGroup(featureId);
+		ObjGroup group = null;
+		String useMtl = null;
+		Map<String, Obj> materialGroups = ObjSplitting.splitByMaterialGroups(originObj);
+		for (Entry<String, Obj> entry : materialGroups.entrySet()) {
+			String materialName = entry.getKey();
+			ObjGroup tmpGroup = originObj.getGroup(featureId);
+			if (tmpGroup != null) {
+				group = tmpGroup;
+				useMtl = materialName;
+			}
+		}
+
 		// 단일 obj 파일로 write
 		Obj groupObj = Objs.create();
+		List<String> mtl = originObj.getMtlFileNames();
+		if (mtl != null) {
+			groupObj.setMtlFileNames(originObj.getMtlFileNames());
+		}
+
 		int numFaces = group.getNumFaces();
 		// face
 		for (int n = 0; n < numFaces; n++) {
@@ -258,13 +278,15 @@ public class ObjParser {
 			if (activatedGroupNames != null) {
 				groupObj.setActiveGroupNames(activatedGroupNames);
 			}
-			String activatedMaterialGroupName = originObj.getActivatedMaterialGroupName(face);
-			if (activatedMaterialGroupName != null) {
-				groupObj.setActiveMaterialGroupName(activatedMaterialGroupName);
+			// String activatedMaterialGroupName =
+			// originObj.getActivatedMaterialGroupName(face);
+			if (useMtl != null) {
+				groupObj.setActiveMaterialGroupName(useMtl);
 			}
 			List<Integer> vertexIndices = new ArrayList<>();
 			List<Integer> texCoordIndices = new ArrayList<>();
 			List<Integer> normalIndices = new ArrayList<>();
+
 			int numVertices = face.getNumVertices();
 			for (int v = 0; v < numVertices; v++) {
 				int vertexIdx = face.getVertexIndex(v);
@@ -272,7 +294,7 @@ public class ObjParser {
 				int normalIdx = face.getNormalIndex(v);
 
 				FloatTuple vertex = originObj.getVertex(vertexIdx);
-				groupObj.addVertex((float) (xDistance - vertex.getX()), (float) (yDistance - vertex.getY()),
+				groupObj.addVertex((float) (-(xDistance - vertex.getX())), (float) (-(yDistance - vertex.getY())),
 						vertex.getZ());
 				groupObj.addTexCoord(originObj.getTexCoord(texCoordIdx));
 				groupObj.addNormal(originObj.getNormal(normalIdx));
