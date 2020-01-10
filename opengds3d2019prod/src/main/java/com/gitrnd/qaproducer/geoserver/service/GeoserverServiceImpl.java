@@ -85,6 +85,8 @@ import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
 import com.gitrnd.gdsbuilder.geoserver.service.en.EnLayerBboxRecalculate;
 import com.gitrnd.gdsbuilder.parse.impl.DataConvertorImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -1175,10 +1177,10 @@ public class GeoserverServiceImpl implements GeoserverService {
 		return styles;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, double defalut) throws ParseException, FileNotFoundException {
+	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layerName, String user, String heightType, String heightValue)
+			throws FileNotFoundException, ParseException {
 
 		int puFlag = 500;
 		JSONObject returnJSON = new JSONObject();
@@ -1231,10 +1233,22 @@ public class GeoserverServiceImpl implements GeoserverService {
 						fileCopy(imageIs, imageOs);
 
 						// shp to obj
-						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, defalut, objPath, mtl);
+						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
+						shpToObj.setMtl(mtl);
+						
+						// set height
+						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
+						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.FIX);
+							shpToObj.setHeightAttribute(heightValue);
+						}
+						
 						try {
 							shpToObj.exec();
 						} catch (Exception e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
@@ -1315,8 +1329,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public JSONObject geolayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, String attribute) throws ParseException {
+	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layerName, String user, String heightType, String heightValue, String widthType, String widthValue)
+			throws Exception {
 
 		int puFlag = 500;
 		JSONObject returnJSON = new JSONObject();
@@ -1356,12 +1371,44 @@ public class GeoserverServiceImpl implements GeoserverService {
 						String objPath = basePath + File.separator + "obj";
 						createFileDirectory(objPath);
 
-						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, attribute, objPath);
+						// copy mtl, texture image to obj path
+						// polygon
+//						String mtl = "building.mtl";
+//						String image = "building.jpg";
+//
+//						InputStream mtlIs = this.getClass().getResourceAsStream("/textures/" + mtl);
+//						OutputStream mtlOs = new FileOutputStream(objPath + File.separator + mtl);
+//						fileCopy(mtlIs, mtlOs);
+//						InputStream imageIs = this.getClass().getResourceAsStream("/textures/" + image);
+//						OutputStream imageOs = new FileOutputStream(objPath + File.separator + image);
+//						fileCopy(imageIs, imageOs);
+
+						// shp to obj
+						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
+//						shpToObj.setMtl(mtl);
+
+						// set height
+						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
+						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.FIX);
+							shpToObj.setHeightAttribute(heightValue);
+						}
+						// set width
+						if (widthType.equals(EnShpToObjWidthType.DEFAULT.getType())) {
+							shpToObj.setwType(EnShpToObjWidthType.DEFAULT);
+							shpToObj.setDefaultWidth(Double.parseDouble(heightValue));
+						} else if (heightType.equals(EnShpToObjWidthType.FIX.getType())) {
+							shpToObj.setwType(EnShpToObjWidthType.FIX);
+							shpToObj.setWidthAttribute(heightValue);
+						}
+
 						try {
 							shpToObj.exec();
 						} catch (Exception e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
-
 						}
 
 						boolean combineFlag = false;
@@ -1418,7 +1465,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 						JSONParser parser = new JSONParser();
 						Object obj = parser.parse(res.getBody());
 						returnJSON = (JSONObject) obj;
+
 						logger.info(returnJSON.toString());
+
 						puFlag = 200;
 						// 다 처리하고 zip 삭제
 						File zipFile = new File(zipPath);
@@ -1436,6 +1485,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 			}
 		}
 		return returnJSON;
+
 	}
 
 	private void createFileDirectory(String directory) {
@@ -1629,6 +1679,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 			e.printStackTrace();
 		}
 	}
+
 }
 
 /**

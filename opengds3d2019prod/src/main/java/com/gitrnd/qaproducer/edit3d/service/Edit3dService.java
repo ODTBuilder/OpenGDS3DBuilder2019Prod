@@ -2,6 +2,7 @@ package com.gitrnd.qaproducer.edit3d.service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -54,15 +54,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.gdsbuilder.geoserver.converter.type.GeneralMapExport;
 import com.gitrnd.gdsbuilder.parse.impl.ObjParser;
-import com.gitrnd.gdsbuilder.parse.impl.test.DefaultObjFace;
 import com.gitrnd.gdsbuilder.parse.impl.test.ObjReader;
 
 import de.javagl.obj.Obj;
-import de.javagl.obj.ObjFace;
-import de.javagl.obj.ObjGroup;
 import de.javagl.obj.ObjUtils;
 import de.javagl.obj.ObjWriter;
-import de.javagl.obj.Objs;
 
 @Service
 @PropertySources({ @PropertySource(value = "classpath:application.yml", ignoreResourceNotFound = true),
@@ -106,10 +102,53 @@ public class Edit3dService {
 		ObjParser objParser = new ObjParser();
 		Obj groupObj = objParser.groupToObj(originObj, featureId, centerXedit, centerYedit, centerXtile, centerYtile);
 
+		String mtlPath = null;
+		String image = null;
+		List<String> mtls = groupObj.getMtlFileNames();
+		for (String mtl : mtls) {
+			mtlPath = originFile.getParent() + File.separator + mtl;
+			try {
+				// 파일 객체 생성
+				File mtlfile = new File(mtlPath);
+				// 입력 스트림 생성
+				FileReader filereader = new FileReader(mtlfile);
+				// 입력 버퍼 생성
+				BufferedReader bufReader = new BufferedReader(filereader);
+				String line = "";
+
+				while ((line = bufReader.readLine()) != null) {
+					if (line.contains("map_Kd ")) {
+						image = line.replace("\t", "");
+						image = image.replace(" ", "");
+						image = originFile.getParent() + File.separator + image.replace("map_Kd", "");
+					}
+				}
+				// .readLine()은 끝에 개행문자를 읽지 않는다.
+				bufReader.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String directory = originFile.getParent() + File.separator + "edit";
+		createFileDirectory(directory);
+		// Write an Mtl, Image file
+		if (mtlPath != null && image != null) {
+			File mtlFile = new File(mtlPath);
+			InputStream mtlIs = new FileInputStream(mtlFile);
+			OutputStream mtlOs = new FileOutputStream(directory + File.separator + mtlFile.getName());
+			fileCopy(mtlIs, mtlOs);
+			File imageFile = new File(image);
+			InputStream imageIs = new FileInputStream(imageFile);
+			OutputStream imageOs = new FileOutputStream(directory + File.separator + imageFile.getName());
+			fileCopy(imageIs, imageOs);
+		}
 		// Write an OBJ file
 		OutputStream objOutputStream = null;
 		String fileName = featureId + ".obj";
-		String newObjpath = fileDir + File.separator + fileName;
+		String newObjpath = directory + File.separator + fileName;
 		try {
 			objOutputStream = new FileOutputStream(newObjpath);
 		} catch (FileNotFoundException e) {
@@ -122,13 +161,19 @@ public class Edit3dService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		objOutputStream.close();
 
 		String[] splitArr = objPath.split("/");
 		String timeStr = splitArr[0];
 
+		// 파일 폴더 압축
+		String zipfile = timeStr + "_obj.zip";
+		String zipPath = originFile.getParent() + File.separator + zipfile; // zip 파일 이름
+		createZipFile(directory, zipPath);
+
 		// web path
 		String webPath = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?" + "user=" + user
-				+ "&time=" + timeStr + "&file=" + fileName;
+				+ "&time=" + timeStr + "&file=" + zipfile;
 
 		// obj to gltf
 		// API 요청 파라미터 생성
@@ -139,7 +184,7 @@ public class Edit3dService {
 		bodyJson.put("user", user);
 		bodyJson.put("time", timeStr);
 		bodyJson.put("path", webPath);
-		bodyJson.put("file", fileName);
+		bodyJson.put("file", zipfile);
 		String bodyString = bodyJson.toJSONString();
 
 		// restTemplate
@@ -158,7 +203,17 @@ public class Edit3dService {
 		ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity, String.class);
 
 		JSONParser jsonParser = new JSONParser();
-		return (JSONObject) jsonParser.parse(res.getBody());
+		JSONObject returnJson = (JSONObject) jsonParser.parse(res.getBody());
+
+		// 다 처리하고 zip 삭제
+		File zipFile = new File(zipPath);
+		if (zipFile.exists()) {
+			zipFile.delete();
+		}
+		// edit 폴더 삭제
+		deleteDirectory(new File(directory));
+
+		return returnJson;
 	}
 
 	public JSONObject editObjFiles(MultipartHttpServletRequest request, String user, DTGeoserverManager dtGeoManager,
@@ -581,6 +636,13 @@ public class Edit3dService {
 
 	}
 
+	private void createFileDirectory(String directory) {
+		File file = new File(directory);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+	}
+
 	private void deleteDirectory(File dir) {
 
 		if (dir.exists()) {
@@ -594,6 +656,20 @@ public class Edit3dService {
 			}
 		}
 		dir.delete();
+	}
+
+	private void fileCopy(InputStream is, OutputStream os) {
+		try {
+			int data = 0;
+			while ((data = is.read()) != -1) {
+				os.write(data);
+			}
+			is.close();
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionFromFileWithFilter(File file,

@@ -47,7 +47,6 @@ import com.gitrnd.gdsbuilder.geoserver.data.DTGeoserverManagerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
 import com.gitrnd.qaproducer.common.security.LoginUser;
 import com.gitrnd.qaproducer.controller.AbstractController;
 import com.gitrnd.qaproducer.geoserver.service.GeoserverLayerProxyService;
@@ -265,7 +264,6 @@ public class GeoserverController extends AbstractController {
 		return flag;
 	}
 
-	
 	/**
 	 * Geoserver WMS API 요청
 	 * 
@@ -286,28 +284,27 @@ public class GeoserverController extends AbstractController {
 		String serverName = (String) request.getParameter("serverName");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		String workspace = (String) request.getParameter("workspace");
-		String geoRequest =  (String) request.getParameter("request");
-		
-		if(geoRequest==null){
-			geoRequest =  (String) request.getParameter("REQUEST");
+		String geoRequest = (String) request.getParameter("request");
+
+		if (geoRequest == null) {
+			geoRequest = (String) request.getParameter("REQUEST");
 		}
-		
+
 		if (dtGeoserverManager == null) {
 			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
 		} else if (workspace.equals("") || workspace == null || geoRequest.equals("") || geoRequest == null) {
 			response.sendError(601, "workspace를 입력하지 않았습니다.");
 		} else {
-			if(geoRequest.toLowerCase().equals("getmap")){
+			if (geoRequest.toLowerCase().equals("getmap")) {
 				proService.requestGetMap(dtGeoserverManager, workspace, request, response);
-			}else if(geoRequest.toLowerCase().equals("getfeatureinfo")){
+			} else if (geoRequest.toLowerCase().equals("getfeatureinfo")) {
 				proService.requestGetFeatureInfo(dtGeoserverManager, workspace, request, response);
-			}else if(geoRequest.toLowerCase().equals("getlegendgraphic")){
+			} else if (geoRequest.toLowerCase().equals("getlegendgraphic")) {
 				proService.requestWMSGetLegendGraphic(dtGeoserverManager, workspace, request, response);
 			}
 		}
 	}
-	
-	
+
 	/**
 	 * Geoserver WMS GetMap API 요청
 	 * 
@@ -865,8 +862,7 @@ public class GeoserverController extends AbstractController {
 	@RequestMapping(value = "/requestGeoLayerTo3DTiles.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject requestGeoLayerTo3DTiles(HttpServletRequest request, HttpServletResponse response,
-			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser)
-			throws IOException, NumberFormatException, ParseException {
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws Exception {
 
 		if (loginUser == null) {
 			response.sendError(600);
@@ -882,35 +878,18 @@ public class GeoserverController extends AbstractController {
 		String geom = (String) jsonObject.get("geometry2d");
 		// String srs = (String) request.getParameter("srs");
 		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-		String paramStr = (String) jsonObject.get("depthValue");
+		String heightValue = (String) jsonObject.get("depthValue");
 
-		// 조건에 따른 파라미터
-//		String defVal = (String) request.getParameter("defVal"); // 입력값
-//		String attribute = (String) request.getParameter("attribute"); // shp 컬럼명
-
-//		if (dtGeoserverManager == null) {
-//			response.sendError(603, "Geoserver 세션이 존재하지 않습니다.");
-//		} else if (workspace.equals("") || workspace == null || datastore.equals("") || datastore == null
-//				|| layerName.equals("") || layerName == null || heightType.equals("") || heightType == null) {
-//			response.sendError(601, "미입력 텍스트가 존재합니다.");
-//		} else {
-//			if (heightType == null) {
-//				response.sendError(601, "미입력 텍스트가 존재합니다.");
-//			} else if (paramStr.equals("") || paramStr == null) {
-//				response.sendError(601, "미입력 텍스트가 존재합니다.");
-//			} else {
-//				response.sendError(601, "잘못입력한 정보가 있습니다.");
-//			}
-//		}
 		JSONObject returnJson = new JSONObject();
-		if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
-			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), Double.valueOf(paramStr));
-		} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-			returnJson = geoserverService.geolayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), paramStr);
-		} else {
-
+		if (geom.equals("Polygon")) {
+			returnJson = geoserverService.geoPolygonlayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
+					loginUser.getUsername(), heightType, heightValue);
+		}
+		if (geom.equals("LineString")) {
+			String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default)
+			String widthValue = (String) jsonObject.get("widthValue");
+			returnJson = geoserverService.geoLinelayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
+					loginUser.getUsername(), heightType, heightValue, widthType, widthValue);
 		}
 		return returnJson;
 	}

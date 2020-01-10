@@ -70,9 +70,9 @@ public class PolygonLayerToObjImpl {
 
 	private int objfilenum = 0;
 
-	EnShpToObjHeightType hType = null;
+	private EnShpToObjHeightType hType;
 
-	FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
+	private FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
 	private String mtl;
 	private String usemtl;
 
@@ -517,7 +517,6 @@ public class PolygonLayerToObjImpl {
 				if (mtl != null) {
 					writer.write("mtllib " + mtl + "\n");
 				}
-				this.writer = writer;
 				vertices = new ArrayList<>();
 				vCoordinates = new ArrayList<>();
 				vIdx = 0;
@@ -607,7 +606,6 @@ public class PolygonLayerToObjImpl {
 				file.write(tileOption.toJSONString());
 			}
 		}
-
 	}
 
 	private List<String> buildingFeatureToObjGroup(SimpleFeature feature, double height)
@@ -637,7 +635,6 @@ public class PolygonLayerToObjImpl {
 			// threeGeom
 			List<Face3> faces = new ArrayList<>();
 			StringBuilder vBuilder = new StringBuilder();
-
 			List<PolygonPoint> points = new ArrayList<>();
 
 			// 바닥
@@ -708,6 +705,7 @@ public class PolygonLayerToObjImpl {
 				int fThrIdx = vIdx + points.indexOf(pts[2]);
 				// threeGeom
 				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(fThrIdx, fSecIdx, fFirIdx, new Vector3d(0, 0, 0)));
 			}
 			bottomEnd = faces.size();
 
@@ -721,6 +719,7 @@ public class PolygonLayerToObjImpl {
 				int fThrIdx = vIdx + s + points.indexOf(pts[2]);
 				// threeGeom
 				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(fThrIdx, fSecIdx, fFirIdx, new Vector3d(0, 0, 0)));
 			}
 			topEnd = faces.size();
 
@@ -730,9 +729,15 @@ public class PolygonLayerToObjImpl {
 				if (f == 0) {
 					faces.add(new Face3(vIdx + 0, vIdx + s - 1, vIdx + s, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(vIdx + s, vIdx + s - 1, vIdx + (2 * s - 1), new Vector3d(0, 0, 0)));
+
+					faces.add(new Face3(vIdx + s, vIdx + s - 1, vIdx + 0, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(vIdx + (2 * s - 1), vIdx + s - 1, vIdx + s, new Vector3d(0, 0, 0)));
 				} else {
 					faces.add(new Face3(vIdx + f, vIdx + f - 1, vIdx + f + s, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(vIdx + f + s, vIdx + f - 1, vIdx + f - 1 + s, new Vector3d(0, 0, 0)));
+
+					faces.add(new Face3(vIdx + f + s, vIdx + f - 1, vIdx + f, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(vIdx + f - 1 + s, vIdx + f - 1, vIdx + f + s, new Vector3d(0, 0, 0)));
 				}
 			}
 			sideEnd = faces.size();
