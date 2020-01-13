@@ -444,6 +444,12 @@ inline-block;
 	padding-top: 50px;
 }
 
+.gb-spinner-position-40 {
+	/* 	position: relative; */
+	/* 	top: 50%; */
+	padding-top: 40%;
+}
+
 .gb-spinner-body {
 	z-index: 10;
 	position: absolute;

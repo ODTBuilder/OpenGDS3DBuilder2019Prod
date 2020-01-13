@@ -678,6 +678,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
+		} else {
+			if(that.getMap().getPause()){
+				return;
+			}
 		}
 
 		if (event.ctrlKey) {
@@ -1226,6 +1230,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
 			return;
+		} else {
+			if(that.getMap().getPause()){
+				return;
+			}
 		}
 
 		// event.preventDefault();
@@ -2623,7 +2631,7 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
 
 	// var axisy1 = turf.point([ 90, 0 ]);
 	// var pickPoint = turf.point(center);
-	// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+	// var bearing = turf.bearing(pickPoint, axisy1);
 	// console.log("y축 1과 객체 중점의 각도는: " + bearing);
 	// // var zaxis = new THREE.Vector3(0, 0, 1);
 	// // gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
@@ -2687,6 +2695,8 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 	if (!objPath || !objCenter || !fid) {
 		return;
 	}
+	// 스피너 표출
+	that.getMap().showSpinner(true);
 	var params = {
 		"objPath" : objPath,
 		"objCenter" : objCenter,
@@ -2703,8 +2713,6 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 		success : function(data, textStatus, jqXHR) {
 			console.log(data);
 			if (data.succ) {
-				// 요청 성공시 선택 개체(b3dm) 숨김
-				pickedFeature.show = false;
 				// gltf 경로
 				var path = data.path;
 				var opt = {
@@ -2712,10 +2720,11 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 						"objCenter" : objCenter,
 						"feature" : feature,
 						"featureId" : fid,
-						"featureCenter" : extent,
-						"featureExtent" : [x, y],
+						"featureExtent" : extent,
+						"featureCenter" : [x, y],
 						"layer" : slayer,
-						"feature3D" : pickedFeature	
+						"feature3D" : pickedFeature,
+						"threeTree" : that.getThreeTree()
 				};
 				// thee js 씬 상에 gltf를 올리는 함수
 				var importer = that.getImporterThree();

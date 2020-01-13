@@ -341,9 +341,20 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var dLayer;
 		var source2;
 		if (layer instanceof ol.layer.Tile) {
-			dLayer = source.get("git").tempLayer;
-			if (dLayer instanceof ol.layer.Vector) {
-				source2 = dLayer.getSource();
+			var git = layer.get("git");
+			if (git) {
+				dLayer = git.tempLayer;
+				if (dLayer instanceof ol.layer.Vector) {
+					source2 = dLayer.getSource();
+				}				
+			} else {
+				git = source.get("git");
+				if (git) {
+					dLayer = git.tempLayer;
+					if (dLayer instanceof ol.layer.Vector) {
+						source2 = dLayer.getSource();
+					}				
+				}				
 			}
 		} else if (layer instanceof ol.layer.Vector) {
 			source2 = source;
@@ -355,7 +366,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		if (!!source2) {
 			if (layer instanceof ol.layer.Tile) {
-				var l = source2.getFeatureById(source.get("git").treeID + ".new0");
+				var l = source2.getFeatureById(source2.get("git").treeID + ".new0");
 				if (!l) {
 					var fid = source2.get("git").treeID + ".new0";
 					feature.setId(fid);
@@ -411,7 +422,10 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			});
 		}
 		// =============================
-
+		
+		if(evt.target.source_ !== undefined && evt.target.source_ instanceof ol.source.TileWMS){
+			evt.target.source_ = source2; 
+		}
 		// var cfeature = feature.clone();
 		evt.feature = undefined;
 		// feature.setId(that.object.uuid);
@@ -512,7 +526,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		// === 이준 시작 ===
 		var axisy1 = turf.point([ 90, 0 ]);
 		var pickPoint = turf.point(center);
-		var bearing = bearing = turf.bearing(pickPoint, axisy1);
+		var bearing = turf.bearing(pickPoint, axisy1);
 		console.log("y축 1과 객체 중점의 각도는: " + bearing);
 		var zaxis = new THREE.Vector3(0, 0, 1);
 		that.object.rotateZ(Cesium.Math.toRadians(bearing));
@@ -523,21 +537,21 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		var treeid = layer.get("treeid");
 
-		var l = source.getFeatureById(treeid + ".new0");
+		var l = source2.getFeatureById(treeid + ".new0");
 
 		if (!l) {
 			var fid = treeid + ".new0";
 			feature.setId(fid);
 		} else {
 			var count = 1;
-			while (source.getFeatureById(treeid + ".new" + count) !== null) {
+			while (source2.getFeatureById(treeid + ".new" + count) !== null) {
 				count++;
 			}
 			var fid = treeid + ".new" + count;
 			feature.setId(fid);
 		}
 
-		source.addFeature(feature);
+		source2.addFeature(feature);
 		var featureId = obj3d.feature.getId();
 
 		that.threeTree.create_node(treeid, {
@@ -842,6 +856,22 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	var floor = gb3d.io.ImporterThree.getFloorPlan(threeObj.getObject(), center, []);
 	var features = turf.featureCollection(floor);
 	var dissolved = undefined;
+	
+	var finalSource;
+	if (layer instanceof ol.layer.Tile) {
+		var git = layer.get("git");
+		var tlayer = git.tempLayer;
+		if (tlayer instanceof ol.layer.Vector) {
+			finalSource = tlayer.getSource();
+		} else {
+			return;
+		}
+	} else if (layer instanceof ol.layer.Vector) {
+		finalSource = layer.getSource();
+	} else {
+		return;
+	}
+	
 	try {
 		dissolved = turf.dissolve(features);
 	} catch (e) {
@@ -853,7 +883,7 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 		var feature = new ol.Feature(geom);
 		feature.setId(threeObj.getFeature().getId());
 		threeObj["feature"] = feature;
-		layer.getSource().addFeature(feature);
+		finalSource.addFeature(feature);
 		return;
 	}
 	var fea;
@@ -896,13 +926,13 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 				}
 
 			}
-			layer.getSource().addFeatures(fea);
+			finalSource.addFeatures(fea);
 		}
 	}
 
 	// var axisy1 = turf.point([ 90, 0 ]);
 	// var pickPoint = turf.point(center);
-	// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+	// var bearing = turf.bearing(pickPoint, axisy1);
 	// console.log("y축 1과 객체 중점의 각도는: " + bearing);
 	// // var zaxis = new THREE.Vector3(0, 0, 1);
 	// // gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
@@ -950,6 +980,23 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 			for (var i = 0; i < children.length; i++) {
 				group.add(children[i]);
 			}
+			
+			var center = opt["featureCenter"];
+			var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
+			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+
+			var position = group.position;
+			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
+			group.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			
+			// === 이준 시작 ===
+			var axisy1 = turf.point([ 90, 0 ]);
+			var pickPoint = turf.point(center);
+			var bearing = turf.bearing(pickPoint, axisy1);
+			console.log("y축 1과 객체 중점의 각도는: " + bearing);
+			group.rotateZ(Cesium.Math.toRadians(bearing));
+			// === 이준 끝 ===
+			
 			obj3d = new gb3d.object.ThreeObject({
 				"object" : group,
 				"center" : opt["featureCenter"],
@@ -959,10 +1006,24 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"file" : false
 			});
 		}
+		// 요청 성공시 선택 개체(b3dm) 숨김
+		opt["feature3D"].show = false;
 		// Map에 ThreeJS 객체 추가
 		that.getGb3dMap().getThreeScene().add(group);
 		// threeobject 추가
 		that.getGb3dMap().addThreeObject(obj3d);
+		if (opt.threeTree) {
+			opt.threeTree.getJSTree().create_node(opt.layer.get("treeid"), {
+				"parent" : opt.layer.get("treeid"),
+				"id" : group.uuid,
+				"text" : opt.featureId,
+				"type" : "Three"
+			}, "last", false, false);
+			// gltf 선택 상태로 만듬
+			opt.threeTree.getJSTree().deselect_all();
+			opt.threeTree.getJSTree().select_node(group.uuid);
+		}
+		that.getGb3dMap().showSpinner(false);
 		// 맵에 추가
 		// 숨긴 선택 객체의 위치에 gltf객체를 보여줌
 		// 2d feature, 3d feature 가져오기

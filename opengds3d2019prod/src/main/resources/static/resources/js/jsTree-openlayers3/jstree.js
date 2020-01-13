@@ -675,6 +675,12 @@
 
 						this._data.core.layers.on('add', function(e) {
 							var addLayer = e.element;
+							var git = addLayer.get("git"); 
+							if (git) {
+								if (git.temp) {
+									return;
+								}
+							}
 							var last = that._data.core.layers.getLength() - 1;
 							that.git.lastPointer = that.setUniqueLayerZIndex(addLayer, that.git.lastPointer);
 							if (addLayer.get("treeid") === undefined) {
@@ -694,6 +700,12 @@
 						});
 						this._data.core.layers.on('remove', function(e) {
 							var removedLayer = e.element;
+							var git = removedLayer.get("git"); 
+							if (git) {
+								if (git.temp) {
+									return;
+								}
+							}
 							var rzidx = removedLayer.getZIndex();
 							var id = removedLayer.get("treeid");
 							if (that.git.isContextmenu) {
@@ -1809,6 +1821,8 @@
 									obj.type = "default";
 									break;
 								}
+							} else {
+								obj.type = "default";
 							}
 						}
 						// result.push(obj);
@@ -2122,7 +2136,15 @@
 						}
 
 						for ( var i in last) {
-							this._data.layerproperties.threeTree.create_node(last[i].parent, last[i], "last", false, false);
+							var git = layer.get("git"); 
+							if (git) {
+								var temp = git.temp;
+								if (!temp) {
+									this._data.layerproperties.threeTree.create_node(last[i].parent, last[i], "last", false, false);
+								}
+							} else {
+								this._data.layerproperties.threeTree.create_node(last[i].parent, last[i], "last", false, false);	
+							}
 						}
 
 						// this._data.layerproperties.threeTree.refresh();

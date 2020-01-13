@@ -475,7 +475,7 @@ gb3d.tree.Three = function(obj) {
 // if (threeObject.getIsFromFile()) {
 // var axisy1 = turf.point([ 90, 0 ]);
 // var pickPoint = turf.point(center);
-// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+// var bearing = turf.bearing(pickPoint, axisy1);
 // console.log("y축 1과 객체 중점의 각도는: " + bearing);
 // object.rotateZ(Cesium.Math.toRadians(bearing));
 // }
@@ -497,7 +497,7 @@ gb3d.tree.Three = function(obj) {
 // if (threeObject.getIsFromFile()) {
 // var axisy1 = turf.point([ 90, 0 ]);
 // var pickPoint = turf.point(center);
-// var bearing = bearing = turf.bearing(pickPoint, axisy1);
+// var bearing = turf.bearing(pickPoint, axisy1);
 // console.log("y축 1과 객체 중점의 각도는: " + bearing);
 // object.rotateZ(Cesium.Math.toRadians(bearing));
 // }

@@ -35,7 +35,7 @@ gb3d.tree.OpenLayers = function(obj) {
 				"ko" : "3D Tiles 다운로드"
 			},
 			"import3dfile" : {
-				"en" : "Import 3D file",
+				"en" : "Import a 3D file",
 				"ko" : "3D 파일 불러오기"
 			},
 			"zoom" : {
@@ -261,6 +261,10 @@ gb3d.tree.OpenLayers = function(obj) {
 			"more" : {
 				"ko" : "개",
 				"en" : "more"
+			},
+			"onlyeditmode" : {
+				"ko" : "편집모드에서 사용해야 합니다.",
+				"en" : "It must be used in edit mode."
 			}
 	};
 	/**
@@ -653,6 +657,10 @@ gb3d.tree.OpenLayers = function(obj) {
 								 * glyphicon-leaf",
 								 */
 								"action" : function(data) {
+									if(!that.getEditingTool().getActiveTool()){
+										alert(that.translation.onlyeditmode[that.locale]);
+										return;
+									}
 									var inst = $.jstreeol3
 									.reference(data.reference), obj = inst
 									.get_node(data.reference);

@@ -234,6 +234,10 @@ gb3d.edit.EditingTool2D = function(obj) {
 		renderMode: "vector",
 		source : this.tempSource
 	});
+	var git = {
+		"temp" : true
+	};
+	this.tempVector.set("git", git);
 	this.tempVector.set("name", this.translation.tempLayer[this.locale]);
 
 // this.managed = new ol.layer.Vector({
@@ -1057,6 +1061,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 
 	if(!!this.selectedSource){
 		this.map.removeLayer(this.tempVector);
+// this.getEditingTool3D().getThreeTree().getJSTree().delete_node();
 		if(this.getActiveTool()){
 			this.selectedSource.get("git").tempLayer.setMap(this.map);
 		} else {
@@ -1477,7 +1482,15 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 
 					var feature = recursiveSearch(root, fidnum);
 					if (feature) {
-						that.getEditingTool3D().selectTilesetFeature(feature);
+						if (feature.show) {
+							if (that.getActiveTool()) {
+								that.getEditingTool3D().getGLTFfromServer(feature);	
+							} else {
+								that.getEditingTool3D().selectTilesetFeature(feature);	
+							}
+						} else {
+							that.getEditingTool3D().syncSelect(that.features.item(0).getId());
+						}
 					} else {
 						that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 					}

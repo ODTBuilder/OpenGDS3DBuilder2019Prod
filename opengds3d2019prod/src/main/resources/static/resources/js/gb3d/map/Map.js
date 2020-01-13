@@ -18,7 +18,10 @@ gb3d.Map = function(obj) {
 
 	var that = this;
 	var options = obj ? obj : {};
-
+	/**
+	 * 스피너 표시 중 여부
+	 */
+	this.pause = false;
 	/**
 	 * 3d 지도 영역 엘리먼트
 	 * 
@@ -700,3 +703,31 @@ gb3d.Map.prototype.getBindingElement = function(){
 	return this.bind3dElem;
 };
 
+/**
+ * 스피너를 보여준다.
+ * 
+ * @method gb3d.Map#showSpinner
+ * @param {boolean}
+ *            show - 스피너 표시 유무
+ */
+gb3d.Map.prototype.showSpinner = function(show) {
+	if (show) {
+		var spinnerArea = $("<div>").append($("<i>").addClass("fas fa-spinner fa-spin fa-5x")).addClass("gb-spinner-wrap").addClass(
+				"gb-spinner-body").addClass("gb-spinner-position-40");
+		$(this.getBindingElement()).append(spinnerArea);
+		this.pause = true;
+	} else {
+		$(this.getBindingElement()).find(".gb-spinner-wrap").remove();
+		this.pause = false;
+	}
+};
+
+/**
+ * 스피너 표시 유무를 반환한다.
+ * 
+ * @method gb3d.Map#getPause
+ * @return {boolean} 현재 스피너 표시 중 여부
+ */
+gb3d.Map.prototype.getPause = function(){
+	return this.pause;
+};
