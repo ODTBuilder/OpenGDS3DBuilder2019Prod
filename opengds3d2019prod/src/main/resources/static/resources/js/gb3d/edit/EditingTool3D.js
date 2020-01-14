@@ -173,7 +173,10 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.importer = obj.importer ? obj.importer : undefined;
 	
 	this.threeTree = obj.threeTree ? obj.threeTree : undefined; 
-	
+	/**
+	 * ThreeJS 객체의 편집 활성화 여부
+	 */
+	this.threeEdit = false;
 	// 드래그 시작, 끝 위치
 	this.dragStart = undefined;
 	this.dragEnd = undefined;
@@ -278,6 +281,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		// 레이어 트리 아이디 입력
 		opt["treeid"] = that.objectAttr.treeid;
+		// 피처 아이디 입력
+		opt["featureId"] = that.objectAttr.feature.getId();
 		// ***** 입력값 유효성 검사 필요 *****
 		that.createPointObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 
@@ -354,6 +359,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 // opt);
 		// 레이어 트리 아이디 입력
 		opt["treeid"] = that.objectAttr.treeid;
+		// 피처 아이디 입력
+		opt["featureId"] = that.objectAttr.feature.getId();
 		that.createLineStringObjectOnRoad(that.objectAttr.coordinate, that.objectAttr.extent, opt);
 // $("#pointObjectCreateModal").modal("hide");
 		that.line3DModal.close();
@@ -418,6 +425,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 		// 레이어 트리 아이디 입력
 		opt["treeid"] = that.objectAttr.treeid;
+		// 피처 아이디 입력
+		opt["featureId"] = that.objectAttr.feature.getId();
 		
 		// ***** 입력값 유효성 검사 필요 *****
 		that.createPolygonObject(that.objectAttr.coordinate, that.objectAttr.extent, opt);
@@ -677,7 +686,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// that.updateStyleTab(undefined);
 			// that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
-			return;
+// return;
 		} else {
 			if(that.getMap().getPause()){
 				return;
@@ -688,6 +697,20 @@ gb3d.edit.EditingTool3D = function(obj) {
 			return;
 		}
 
+		var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+		var slayer;
+		var lid;
+		if (slayers.length === 0) {
+			return;
+		} else if (slayers.length === 1) {
+			slayer = slayers[0];
+			lid = slayer.get("id");
+			var arrlid = lid.split(":");
+			if (arrlid.length === 4) {
+				lid = arrlid[3];
+			}
+		}
+		
 		event.preventDefault();
 		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
@@ -712,52 +735,41 @@ gb3d.edit.EditingTool3D = function(obj) {
 		}
 
 		if (intersects.length > 0) {
+			
+			var selectedObject = intersects[0];
+			var fid = selectedObject.object.userData.featureId;
+			var lidfromf;
+			if (fid) {
+				lidfromf = fid.split(".")[0];
+			}
+			if (lidfromf !== lid) {
+				return;
+			}
+			
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
-			var object = intersects[0].object;
+			var object = selectedObject.object;
 			that.pickedObject_ = object;
-			that.selectedObject["three"]["object"] = intersects[0].object;
-			that.selectedObject["three"]["distance"] = intersects[0].distance;
+			that.selectedObject["three"]["object"] = selectedObject.object;
+			that.selectedObject["three"]["distance"] = selectedObject.distance;
 			// console.log("three 객체의 거리는: "+intersects[0].distance);
 			that.applySelectedOutline(object);
 
 			that.threeTransformControls.attach(object);
-
+			// 선택 객체 저장
+			that.setSelected3DFeature(object);
 			that.syncSelect(object.uuid, true);
 			// that.updateAttributeTab(object);
 			// that.updateStyleTab(object);
 			// that.updateMaterialTab(object);
 
-			// ThreeJS Object User Data창 내용 갱신
-
-// $(that.attrTB_).empty();
-// var td1, td2, tform, tr;
-// for ( var i in userData) {
-// td1 = $("<td>").text(i);
-
-// tform = $("<input>").addClass("gb-edit-sel-alist").attr({
-// "type" : "text"
-// }).css({
-// "width" : "100%",
-// "border" : "none"
-// }).val(userData[i]).on("input", function(e) {
-// var key = $(this).parent().prev().text();
-// var val = $(this).val();
-// userData[key] = val;
-// });
-
-// td2 = $("<td>").append(tform);
-
-// tr = $("<tr>").append(td1).append(td2);
-// that.attrTB_.append(tr);
+// var userData = object.userData;
+// that.updateAttributePopup(userData);
+// if (that.getActiveTool()) {
+// that.attrPop_.setPositionY(55);
+// } else {
+// that.attrPop_.setPositionY(5);
 // }
-			var userData = object.userData;
-			that.updateAttributePopup(userData);
-			if (that.getActiveTool()) {
-				that.attrPop_.setPositionY(55);
-			} else {
-				that.attrPop_.setPositionY(5);	
-			}
-			that.attrPop_.open();
+// that.attrPop_.open();
 
 			if (object.userData.object !== undefined) {
 				// helper
@@ -799,6 +811,13 @@ gb3d.edit.EditingTool3D = function(obj) {
 				"distance" : undefined
 			}
 	};
+	/**
+	 * 현재 선택한 3차원 객체를 저장
+	 * 
+	 * @type {Cesium.Cesium3DTileFeature || THREE.Object3D}
+	 */
+	this.selected3DFeature = undefined;
+	
 	// ==============yijun end===============
 	var cviewer = this.map.getCesiumViewer();
 
@@ -913,7 +932,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// if (!Cesium.defined(name)) {
 			// name = pickedFeature.getProperty('id');
 			// }
-
+			
 			that.highlightObject["cesium"]["object"] = pickedFeature;
 			that.highlightObject["cesium"]["distance"] = distance;
 			// console.log("cesium 객체의 거리는: "+distance);
@@ -972,6 +991,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
+			that.setSelected3DFeature(pickedFeature);
 			that.selectTilesetFeatureSilhouette(pickedFeature, ctileset, movement);
 // if (pickedFeature) {
 // if (pickedFeature.primitive !== ctileset) {
@@ -1151,6 +1171,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 			}
 			// Pick a new feature
 			var pickedFeature = cviewer.scene.pick(movement.position);
+			that.setSelected3DFeature(pickedFeature);
 			that.selectTilesetFeatureNoSilhouette(pickedFeature, ctileset, movement);
 // if (pickedFeature) {
 // if (pickedFeature.primitive !== ctileset) {
@@ -1229,13 +1250,27 @@ gb3d.edit.EditingTool3D = function(obj) {
 			// that.updateStyleTab(undefined);
 			// that.updateMaterialTab(undefined);
 			that.pickedObject_ = undefined;
-			return;
+// return;
 		} else {
 			if(that.getMap().getPause()){
 				return;
 			}
 		}
 
+		var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+		var slayer;
+		var lid;
+		if (slayers.length === 0) {
+			return;
+		} else if (slayers.length === 1) {
+			slayer = slayers[0];
+			lid = slayer.get("id");
+			var arrlid = lid.split(":");
+			if (arrlid.length === 4) {
+				lid = arrlid[3];
+			}
+		}
+		
 		// event.preventDefault();
 		// mouse 클릭 이벤트 영역 좌표 추출. 영역내에서의 좌표값을 추출해야하므로 offset 인자를 사용한다.
 		mouse.x = (event.offsetX / eventDiv[0].clientWidth) * 2 - 1;
@@ -1253,6 +1288,14 @@ gb3d.edit.EditingTool3D = function(obj) {
 		if (intersects.length > 0) {
 			// 새로 선택된 객체 TransformControl에 추가 및 수정 횟수 증가
 			var selectedObject = intersects[0];
+			var fid = selectedObject.object.userData.featureId;
+			var lidfromf;
+			if (fid) {
+				lidfromf = fid.split(".")[0];
+			}
+			if (lidfromf !== lid) {
+				return;
+			}
 			that.highlightObject["three"]["object"] = selectedObject.object;
 			that.highlightObject["three"]["distance"] = selectedObject.distance;
 			// console.log("three 객체의 거리는: "+selectedObject.distance);
@@ -1529,7 +1572,8 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
-
+	latheMesh.userData.featureId = this.objectAttr.feature.getId();
+	
 	for ( var i in option) {
 		if (i === "type") {
 			continue;
@@ -1630,7 +1674,8 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
-
+	latheMesh.userData.featureId = this.objectAttr.feature.getId();
+	
 	obj3d = new gb3d.object.ThreeObject({
 		"object" : latheMesh,
 		"center" : [ x, y ],
@@ -1726,7 +1771,8 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 	// userData 저장(THREE.Object3D 객체 속성)
 	latheMesh.userData.type = this.objectAttr.type;
 	latheMesh.userData.depth = depth;
-
+	latheMesh.userData.featureId = this.objectAttr.feature.getId();
+	
 	obj3d = new gb3d.object.ThreeObject({
 		"object" : latheMesh,
 		"center" : [ x, y ],
@@ -1786,8 +1832,8 @@ gb3d.edit.EditingTool3D.prototype.selectThree = function(uuid){
 	this.threeTransformControls.attach( object );
 
 	// ThreeJS Object 속성창 가시화
-	that.updateAttributePopup(object.userData);
-	that.attrPop_.open();
+// that.updateAttributePopup(object.userData);
+// that.attrPop_.open();
 
 // this.updateAttributeTab( object );
 // this.updateStyleTab( object );
@@ -1905,17 +1951,19 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id, react){
 	var id = id;
 
 	var threeObject = this.getMap().getThreeObjectById(id);
-
+	var selected;
 	if(!threeObject){
 		threeObject = this.getMap().getThreeObjectByUuid(id);
 		if(!threeObject){
 			return;
 		}
+		selected = threeObject.getObject();
 		if (react) {
 			this.selectFeature(threeObject.getFeature().getId());	
 		}
 	} else {
 		this.selectThree(threeObject.getObject().uuid);
+		selected = threeObject.getObject();
 		if (react) {
 			this.selectFeature(threeObject.getFeature().getId());	
 		}
@@ -1926,6 +1974,10 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id, react){
 // this.cesiumViewer.camera.positionCartographic.height),
 // duration: 0
 // });
+	}
+	if (selected) {
+		// 선택 객체 저장
+		this.setSelected3DFeature(selected);
 	}
 }
 
@@ -1951,6 +2003,16 @@ gb3d.edit.EditingTool3D.prototype.syncUnselect = function(id){
 	if (threeObject) {
 		this.unselectFeature(threeObject.getFeature().getId());		
 	}
+	this.setSelected3DFeature(undefined);
+}
+
+/**
+ * 선택된 3D객체를 모두 해제한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#clearSelect
+ */
+gb3d.edit.EditingTool3D.prototype.clearSelect = function(){
+	var that = this;
 }
 
 /**
@@ -2336,13 +2398,13 @@ gb3d.edit.EditingTool3D.prototype.updateAttributePopup = function(userData) {
 
 		tform = $("<input>").addClass("gb-edit-sel-alist").attr({
 			"type" : "text"
-		}).css({
+		}).prop("readonly", true).css({
 			"width" : "100%",
 			"border" : "none"
 		}).val(userData[i]).on("input", function(e) {
-			var key = $(this).parent().prev().text();
-			var val = $(this).val();
-			userData[key] = val;
+// var key = $(this).parent().prev().text();
+// var val = $(this).val();
+// userData[key] = val;
 		});
 
 		td2 = $("<td>").append(tform);
@@ -2465,13 +2527,13 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeatureSilhouette = function(pick
 			obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
 		}
 		console.log(obj);
-		that.updateAttributePopup(obj);
-		if (that.getActiveTool()) {
-			that.attrPop_.setPositionY(55);
-		} else {
-			that.attrPop_.setPositionY(5);	
-		}
-		that.attrPop_.open();
+// that.updateAttributePopup(obj);
+// if (that.getActiveTool()) {
+// that.attrPop_.setPositionY(55);
+// } else {
+// that.attrPop_.setPositionY(5);
+// }
+// that.attrPop_.open();
 		// 2D 피처 선택
 		if (obj.hasOwnProperty("featureId")) {
 			var fid = obj["featureId"];
@@ -2745,6 +2807,12 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
  */
 gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(pickedFeature){
 	var that = this;
+	// threejs 객체 선택 해제
+	var selected = that.getSelected3DFeature();
+	if (selected instanceof THREE.Object3D) {
+		that.unselectThree(selected.uuid);
+	}
+	this.setSelected3DFeature(pickedFeature);
 	var cviewer = this.map.getCesiumViewer();
 	if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(cviewer.scene)) {
 
@@ -2770,18 +2838,18 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(pickedFeature)
 			// Set feature infobox description
 			var propNames = pickedFeature.getPropertyNames();
 			cviewer.selectedEntity = that.selectedEntity;
-			var obj = {};
-			for ( var i in propNames) {
-				obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
-			}
-			console.log(obj);
-			that.updateAttributePopup(obj);
-			if (that.getActiveTool()) {
-				that.attrPop_.setPositionY(55);
-			} else {
-				that.attrPop_.setPositionY(5);	
-			}
-			that.attrPop_.open();
+// var obj = {};
+// for ( var i in propNames) {
+// obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
+// }
+// console.log(obj);
+// that.updateAttributePopup(obj);
+// if (that.getActiveTool()) {
+// that.attrPop_.setPositionY(55);
+// } else {
+// that.attrPop_.setPositionY(5);
+// }
+// that.attrPop_.open();
 		
 	} else {
 
@@ -2815,18 +2883,18 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeature = function(pickedFeature)
 			// Set feature infobox description
 			var propNames = pickedFeature.getPropertyNames();
 			cviewer.selectedEntity = that.selectedEntity;
-			var obj = {};
-			for ( var i in propNames) {
-				obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
-			}
-			console.log(obj);
-			that.updateAttributePopup(obj);
-			if (that.getActiveTool()) {
-				that.attrPop_.setPositionY(55);
-			} else {
-				that.attrPop_.setPositionY(5);	
-			}
-			that.attrPop_.open();
+// var obj = {};
+// for ( var i in propNames) {
+// obj[propNames[i]] = pickedFeature.getProperty(propNames[i]);
+// }
+// console.log(obj);
+// that.updateAttributePopup(obj);
+// if (that.getActiveTool()) {
+// that.attrPop_.setPositionY(55);
+// } else {
+// that.attrPop_.setPositionY(5);
+// }
+// that.attrPop_.open();
 	}
 };
 
@@ -2898,4 +2966,44 @@ gb3d.edit.EditingTool3D.prototype.removeNode = function(id){
 		result = jstree.delete_node(node); 
 	}
 	return result;
+}
+
+/**
+ * 현재 선택한 객체를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getSelected3DFeature
+ * @return {Cesium.Cesium3DTileFeature || THREE.Object3D}
+ */
+gb3d.edit.EditingTool3D.prototype.getSelected3DFeature = function(){
+	return this.selected3DFeature; 
+}
+
+/**
+ * 현재 선택한 객체를 설정한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setSelected3DFeature
+ * @param {Cesium.Cesium3DTileFeature || THREE.Object3D} feature - 3차원 객체
+ */
+gb3d.edit.EditingTool3D.prototype.setSelected3DFeature = function(feature){
+	this.selected3DFeature = feature; 
+}
+
+/**
+ * 현재 threejs 객체 편집 가능 여부를 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getThreeEdit
+ * @return {boolean} 편집 가능 여부
+ */
+gb3d.edit.EditingTool3D.prototype.getThreeEdit = function(){
+	return this.threeEdit; 
+}
+
+/**
+ * 현재 threejs 객체 편집 가능 여부를 설정한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setThreeEdit
+ * @param {boolean} flag - 편집 가능 여부
+ */
+gb3d.edit.EditingTool3D.prototype.setThreeEdit = function(flag){
+	this.threeEdit = flag; 
 }

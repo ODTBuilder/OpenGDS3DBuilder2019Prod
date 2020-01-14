@@ -124,6 +124,10 @@ gb3d.edit.EditingTool2D = function(obj) {
 			"attr2DTitle" : {
 				"ko" : "2D 객체 속성",
 				"en" : "2D Feature Attribute"
+			},
+			"tilenotloaded" : {
+				"ko" : "3D Tile이 로드되지 않았습니다. 해당 영역으로 3차원 지도를 이동해주세요.",
+				"en" : "3D Tiles not loaded. The camera on the 3D map must look at the 3D tile."
 			}
 	};
 
@@ -532,7 +536,17 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 									var feature = recursiveSearch(root, fidnum);
 									if (feature) {
-										that.getEditingTool3D().selectTilesetFeature(feature);
+										if (feature.show) {
+											that.getEditingTool3D().selectTilesetFeature(feature);	
+										} else {
+											// three object 를 조회해서 threejs 객체가 있으면 선택 아니면 다른 이유에 의해
+											// 숨겨진 것이므로 넘어감
+											var three = that.getEditingTool3D().getMap().getThreeObjectById(fid);
+											var obj3d = three.getObject();
+											if (obj3d) {
+												that.getEditingTool3D().syncSelect(fid);
+											}
+										}
 									}
 								}
 							} else {
@@ -1463,6 +1477,10 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						var result;
 						if (tile instanceof Cesium.Cesium3DTile) {
 							var content = tile.content;
+							if (!content) {
+								alert(that.translation.tilenotloaded[that.locale]);
+								return;
+							}
 							var feature = content.getFeature(bid);
 							if (feature) {
 								result = feature;
@@ -1601,18 +1619,26 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 			var prop, notNull = {}, setProp = {};
 
 			if (!!source) {
-				var l = source.getFeatureById(source.get("git").treeID + ".new0")
-
+				var lid = source.get("git").layerID;
+				var split = lid.split(":");
+				var lname;
+				if (split.length === 4) {
+					lname = split[3];
+				} else if (split.length === 1) {
+					lname = split[0];
+				}
+				var l = source.getFeatureById(lname + ".new0")
+				var fid;
 				if (!l) {
-					var fid = source.get("git").treeID + ".new0";
+					fid = lname + ".new0";
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				} else {
 					var count = 1;
-					while(source.getFeatureById(source.get("git").treeID + ".new" + count) !== null){
+					while(source.getFeatureById(lname + ".new" + count) !== null){
 						count++;
 					}
-					var fid = source.get("git").treeID + ".new" + count;
+					fid = lname + ".new" + count;
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				}
@@ -1700,8 +1726,8 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						"title" : that.translation.attr2DTitle[that.locale],
 						"width" : 540,
 						"autoOpen" : source.get("git").attribute.length !== 0 ? true : false,
-								"body" : body,
-								"footer" : modalFooter
+						"body" : body,
+						"footer" : modalFooter
 					});
 
 					okBtn.click(function(){

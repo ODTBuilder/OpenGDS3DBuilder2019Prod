@@ -346,15 +346,15 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 				dLayer = git.tempLayer;
 				if (dLayer instanceof ol.layer.Vector) {
 					source2 = dLayer.getSource();
-				}				
+				}
 			} else {
 				git = source.get("git");
 				if (git) {
 					dLayer = git.tempLayer;
 					if (dLayer instanceof ol.layer.Vector) {
 						source2 = dLayer.getSource();
-					}				
-				}				
+					}
+				}
 			}
 		} else if (layer instanceof ol.layer.Vector) {
 			source2 = source;
@@ -363,39 +363,49 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var arr = source2.getFeatures() instanceof Array ? source2.getFeatures() : [];
 		var item = arr[0];
 		var prop, notNull = {}, setProp = {};
-
+		var fid;
 		if (!!source2) {
-			if (layer instanceof ol.layer.Tile) {
-				var l = source2.getFeatureById(source2.get("git").treeID + ".new0");
-				if (!l) {
-					var fid = source2.get("git").treeID + ".new0";
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
-				} else {
-					var count = 1;
-					while (source2.getFeatureById(source2.get("git").treeID + ".new" + count) !== null) {
-						count++;
-					}
-					var fid = source2.get("git").treeID + ".new" + count;
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
-				}
-			} else if (layer instanceof ol.layer.Vector) {
-				l = source2.getFeatureById(layer.get("treeid") + ".new0");
-				if (!l) {
-					var fid = layer.get("treeid") + ".new0";
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
-				} else {
-					var count = 1;
-					while (source2.getFeatureById(layer.get("treeid") + ".new" + count) !== null) {
-						count++;
-					}
-					var fid = layer.get("treeid") + ".new" + count;
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
-				}
+			
+			var lid = source2.get("git").layerID;
+			var split = lid.split(":");
+			var lname;
+			if (split.length === 4) {
+				lname = split[3];
+			} else if (split.length === 1) {
+				lname = split[0];
 			}
+			
+//			if (layer instanceof ol.layer.Tile) {
+				var l = source2.getFeatureById(lname + ".new0");
+				if (!l) {
+					fid = lname + ".new0";
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				} else {
+					var count = 1;
+					while (source2.getFeatureById(lname + ".new" + count) !== null) {
+						count++;
+					}
+					fid = lname + ".new" + count;
+					feature.setId(fid);
+					that.getFeatureRecord().create(layer, feature);
+				}
+//			} else if (layer instanceof ol.layer.Vector) {
+//				l = source2.getFeatureById(layer.get("treeid") + ".new0");
+//				if (!l) {
+//					var fid = layer.get("treeid") + ".new0";
+//					feature.setId(fid);
+//					that.getFeatureRecord().create(layer, feature);
+//				} else {
+//					var count = 1;
+//					while (source2.getFeatureById(layer.get("treeid") + ".new" + count) !== null) {
+//						count++;
+//					}
+//					var fid = layer.get("treeid") + ".new" + count;
+//					feature.setId(fid);
+//					that.getFeatureRecord().create(layer, feature);
+//				}
+//			}
 
 			gb.undo.pushAction({
 				undo : function(data) {
@@ -422,13 +432,15 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			});
 		}
 		// =============================
-		
-		if(evt.target.source_ !== undefined && evt.target.source_ instanceof ol.source.TileWMS){
-			evt.target.source_ = source2; 
+
+		if (evt.target.source_ !== undefined && evt.target.source_ instanceof ol.source.TileWMS) {
+			evt.target.source_ = source2;
 		}
 		// var cfeature = feature.clone();
 		evt.feature = undefined;
 		// feature.setId(that.object.uuid);
+		console.log(that.object.userData);
+		
 		var geometry = feature.getGeometry();
 		var coordinates = geometry.getCoordinates();
 		var obj3d = new gb3d.object.ThreeObject({
@@ -448,17 +460,28 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		position.copy(new THREE.Vector3(cart.x, cart.y, cart.z));
 		that.object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, that.axisVector, that.radian);
-
+		// 2D 피처의 각도와 맞춤
+		var axisy1 = turf.point([ 90, 0 ]);
+		var pickPoint = turf.point(center);
+		var bearing = turf.bearing(pickPoint, axisy1);
+		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+		var zaxis = new THREE.Vector3(0, 0, 1);
+		that.object.rotateZ(Cesium.Math.toRadians(bearing));
+		
 		// 오브젝트에서 메쉬를 꺼낸다
 		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
 		// 레이어 지오메트리 타입을 꺼낸다
 		var gtype = that.layer.get("git").geometry;
 		// 메쉬에 유저정보로 지오메트리 타입을 넣는다 - 폴리곤
 		that.object.userData.type = gtype;
+		// featureId 를 넣는다
+		that.object.userData.featureId = fid;
 		for (var i = 0; i < result.length; i++) {
 			result[i].userData.type = gtype;
+			// featureId 를 넣는다
+			result[i].userData.featureId = fid;
 		}
-
+		
 		console.log(that.object);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
@@ -467,73 +490,6 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 
-		// var floor = gb3d.io.ImporterThree.getFloorPlan(that.object, center, []);
-		// var features = turf.featureCollection(floor);
-		// var dissolved = undefined;
-		//
-		// try {
-		// dissolved = turf.dissolve(features);
-		// } catch (e) {
-		// // TODO: handle exception
-		// console.error(e);
-		// return;
-		// }
-		// var fea;
-		// if (dissolved) {
-		// if (dissolved.type === "FeatureCollection") {
-		// fea = [];
-		// for (var i = 0; i < dissolved.features.length; i++) {
-		// if (dissolved.features[i].geometry.type === 'Polygon') {
-		// if (that.layer.get("git").geometry === "Polygon") {
-		// var geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
-		// var feature = new ol.Feature(geom);
-		// feature.setId(that.object.uuid);
-		// obj3d["feature"] = feature;
-		// fea.push(feature);
-		// } else if (that.layer.get("git").geometry === "MultiPolygon") {
-		// var geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ],
-		// "XY");
-		// var feature = new ol.Feature(geom);
-		// feature.setId(that.object.uuid);
-		// obj3d["feature"] = feature;
-		// fea.push(feature);
-		// }
-		// } else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
-		// if (that.layer.get("git").geometry === "Polygon") {
-		// var outer = dissolved.features[i].geometry.coordinates;
-		// // for (var j = 0; j < 1; j++) {
-		// var polygon = outer[0];
-		// var geomPoly = new ol.geom.Polygon(polygon, "XY");
-		// var feature = new ol.Feature(geomPoly);
-		// feature.setId(that.object.uuid);
-		// fea.push(feature);
-		// obj3d["feature"] = feature;
-		// // }
-		// } else if (that.layer.get("git").geometry === "MultiPolygon") {
-		// var geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
-		// var feature = new ol.Feature(geom);
-		// feature.setId(that.object.uuid);
-		// obj3d["feature"] = feature;
-		// fea.push(feature);
-		// }
-		// }
-		//
-		// }
-		// source.addFeatures(fea);
-		// }
-		// }
-
-		// === 이준 시작 ===
-		var axisy1 = turf.point([ 90, 0 ]);
-		var pickPoint = turf.point(center);
-		var bearing = turf.bearing(pickPoint, axisy1);
-		console.log("y축 1과 객체 중점의 각도는: " + bearing);
-		var zaxis = new THREE.Vector3(0, 0, 1);
-		that.object.rotateZ(Cesium.Math.toRadians(bearing));
-
-		// that.gb3dMap.getThreeScene().add(that.object);
-		// that.gb3dMap.addThreeObject(obj3d);
-		// === 이준 끝 ===
 
 		var treeid = layer.get("treeid");
 
@@ -856,7 +812,7 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	var floor = gb3d.io.ImporterThree.getFloorPlan(threeObj.getObject(), center, []);
 	var features = turf.featureCollection(floor);
 	var dissolved = undefined;
-	
+
 	var finalSource;
 	if (layer instanceof ol.layer.Tile) {
 		var git = layer.get("git");
@@ -871,7 +827,7 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 	} else {
 		return;
 	}
-	
+
 	try {
 		dissolved = turf.dissolve(features);
 	} catch (e) {
@@ -967,75 +923,79 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	function(gltf) {
 		// 피처 id로 threeObject를 조회
 		var three = that.getGb3dMap().getThreeObjectById(opt["featureId"]);
+		
+		var scene = gltf.scene;
+		var children = scene.children;
+		var inputData;
+		if (children.length === 1) {
+			inputData = children[0];
+		} else if (children.length > 1) {
+			inputData = new THREE.Group();
+			for (var i = 0; i < children.length; i++) {
+				inputData.add(children[i]);
+			}
+		}
+		// 피처 아이디 입력
+		inputData.userData.featureId = opt["featureId"];
+		
+		var center = opt["featureCenter"];
+		var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
+		var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+
+		var position = inputData.position;
+		position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
+		inputData.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+
+		// === 이준 시작 ===
+		var axisy1 = turf.point([ 90, 0 ]);
+		var pickPoint = turf.point(center);
+		var bearing = turf.bearing(pickPoint, axisy1);
+		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+		inputData.rotateZ(Cesium.Math.toRadians(bearing));
+		// === 이준 끝 ===
+		
+		// 요청 성공시 선택 개체(b3dm) 숨김
+		opt["feature3D"].show = false;
+		
 		// 있으면 gltf를 three 모델에 추가
 		// 없으면 새로 만듬
 		var obj3d;
 		if (three) {
 			console.log(three);
+			obj3d = three;
+			obj3d.setObject(inputData);
+			// Map에 ThreeJS 객체 추가
+			that.getGb3dMap().getThreeScene().add(inputData);
 		} else {
 			console.log("no three");
-			var scene = gltf.scene;
-			var children = scene.children;
-			var group = new THREE.Group();
-			for (var i = 0; i < children.length; i++) {
-				group.add(children[i]);
-			}
-			
-			var center = opt["featureCenter"];
-			var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
-			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-
-			var position = group.position;
-			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
-			group.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-			
-			// === 이준 시작 ===
-			var axisy1 = turf.point([ 90, 0 ]);
-			var pickPoint = turf.point(center);
-			var bearing = turf.bearing(pickPoint, axisy1);
-			console.log("y축 1과 객체 중점의 각도는: " + bearing);
-			group.rotateZ(Cesium.Math.toRadians(bearing));
-			// === 이준 끝 ===
-			
 			obj3d = new gb3d.object.ThreeObject({
-				"object" : group,
+				"object" : inputData,
 				"center" : opt["featureCenter"],
 				"extent" : opt["featureExtent"],
 				"type" : opt["layer"].get("git").geometry,
 				"feature" : opt["feature"],
 				"file" : false
 			});
+			
+			// Map에 ThreeJS 객체 추가
+			that.getGb3dMap().getThreeScene().add(inputData);
+			
+			// threeobject 추가
+			that.getGb3dMap().addThreeObject(obj3d);
+			if (opt.threeTree) {
+				opt.threeTree.getJSTree().create_node(opt.layer.get("treeid"), {
+					"parent" : opt.layer.get("treeid"),
+					"id" : inputData.uuid,
+					"text" : opt.featureId,
+					"type" : "Three"
+				}, "last", false, false);
+				// gltf 선택 상태로 만듬
+				opt.threeTree.getJSTree().deselect_all();
+				opt.threeTree.getJSTree().select_node(inputData.uuid);
+			}
 		}
-		// 요청 성공시 선택 개체(b3dm) 숨김
-		opt["feature3D"].show = false;
-		// Map에 ThreeJS 객체 추가
-		that.getGb3dMap().getThreeScene().add(group);
-		// threeobject 추가
-		that.getGb3dMap().addThreeObject(obj3d);
-		if (opt.threeTree) {
-			opt.threeTree.getJSTree().create_node(opt.layer.get("treeid"), {
-				"parent" : opt.layer.get("treeid"),
-				"id" : group.uuid,
-				"text" : opt.featureId,
-				"type" : "Three"
-			}, "last", false, false);
-			// gltf 선택 상태로 만듬
-			opt.threeTree.getJSTree().deselect_all();
-			opt.threeTree.getJSTree().select_node(group.uuid);
-		}
+		// 스피너 해제
 		that.getGb3dMap().showSpinner(false);
-		// 맵에 추가
-		// 숨긴 선택 객체의 위치에 gltf객체를 보여줌
-		// 2d feature, 3d feature 가져오기
-
-		// scene.add(gltf.scene);
-		//
-		// gltf.animations; // Array<THREE.AnimationClip>
-		// gltf.scene; // THREE.Scene
-		// gltf.scenes; // Array<THREE.Scene>
-		// gltf.cameras; // Array<THREE.Camera>
-		// gltf.asset; // Object
-
 	},
 	// called while loading is progressing
 	function(xhr) {
