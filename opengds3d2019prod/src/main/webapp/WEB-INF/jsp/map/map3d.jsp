@@ -412,8 +412,14 @@ html, body {
 
 		$("#editTool").click(function(e) {
 			e.preventDefault();
-			epan.editToolToggle();
-			epan3d.editToolToggle();
+			if (epan.getActiveTool()) {
+				epan.editToolClose();
+			} else {
+				epan.editToolOpen();
+				epan3d.editToolOpen();
+			}
+// 			epan.editToolToggle();
+// 			epan3d.editToolToggle();
 		});
 
 		// feature list
