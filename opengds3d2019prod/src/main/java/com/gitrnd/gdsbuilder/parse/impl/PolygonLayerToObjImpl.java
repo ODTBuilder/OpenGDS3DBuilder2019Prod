@@ -661,7 +661,7 @@ public class PolygonLayerToObjImpl {
 				// threeGeom
 				vertices.add(new Vector3d(xDistance, yDistance, 0));
 				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
-				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
+				// vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
 				vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
 				// tri
 				allPoints.add(new PolygonPoint(xDistance, yDistance, 0));
@@ -698,7 +698,7 @@ public class PolygonLayerToObjImpl {
 						// threeGeom
 						vertices.add(new Vector3d(xDistance, yDistance, 0));
 						vCoordinates.add(new Vector2d(ringCoors[i].x, ringCoors[i].y));
-						vCoordinates.add(new Vector2d(ringCoors[i].x, ringCoors[i].y));
+						// vCoordinates.add(new Vector2d(ringCoors[i].x, ringCoors[i].y));
 						vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
 						// tri
 						ringPoints.add(new PolygonPoint(xDistance, yDistance, 0));
@@ -847,9 +847,9 @@ public class PolygonLayerToObjImpl {
 				List<Vector2d> innerFvt = new ArrayList<>();
 				Face3 face = threeGeom.faces.get(i);
 
-				Vector2d v1 = vCoordinates.get(face.a);
-				Vector2d v2 = vCoordinates.get(face.b);
-				Vector2d v3 = vCoordinates.get(face.c);
+				Vector2d v1 = vCoordinates.get(face.a - vCoordinates.size());
+				Vector2d v2 = vCoordinates.get(face.b - vCoordinates.size());
+				Vector2d v3 = vCoordinates.get(face.c - vCoordinates.size());
 
 				Vector2d vt1 = new Vector2d((v1.x() + offset2d.x()) / range2d.x() * 0.4,
 						(v1.y() + offset2d.y()) / range2d.y() * 0.4 + 0.6);
