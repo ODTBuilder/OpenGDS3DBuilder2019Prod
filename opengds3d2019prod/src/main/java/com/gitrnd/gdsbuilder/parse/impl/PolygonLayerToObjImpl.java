@@ -566,11 +566,9 @@ public class PolygonLayerToObjImpl {
 				while (batchIter.hasNext()) {
 					String batchKey = (String) batchIter.next();
 					JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-					Double max = (Double) Collections.max(propertiesArr);
-					Double min = (Double) Collections.min(propertiesArr);
 					JSONObject minmaxObj = new JSONObject();
-					minmaxObj.put("minimum", min);
-					minmaxObj.put("maximum", max);
+					minmaxObj.put("minimum", Collections.max(propertiesArr));
+					minmaxObj.put("maximum", Collections.min(propertiesArr));
 					tilesPropeties.put(batchKey, minmaxObj);
 				}
 				batchTable.put("featureId", batchIdArr);
@@ -616,7 +614,6 @@ public class PolygonLayerToObjImpl {
 		Geometry multipolygon = (Geometry) feature.getDefaultGeometry();
 		int numGeom = multipolygon.getNumGeometries();
 		for (int g = 0; g < numGeom; g++) {
-			// String featureID = "g " + feature.getID();
 			String featureID = "g " + feature.getID();
 			if (numGeom > 1) {
 				featureID += "_" + (g + 1) + "\n";
@@ -626,18 +623,24 @@ public class PolygonLayerToObjImpl {
 			idList.add(feature.getID());
 			// writer.write(featureID);
 			String gId = featureID;
+
+			writer.write(gId);
+			if (usemtl != null) {
+				writer.write("usemtl " + usemtl + "\n");
+			}
+
 			Geometry geom = multipolygon.getGeometryN(g);
 			geom.normalize();
 			Polygon pg = (Polygon) geom;
 
 			Coordinate[] coordinates = ShpToObjImpl.deleteInnerPoints(pg.getCoordinates());
 
-			// threeGeom
 			List<Face3> faces = new ArrayList<>();
 			StringBuilder vBuilder = new StringBuilder();
-			List<PolygonPoint> points = new ArrayList<>();
+			List<PolygonPoint> allPoints = new ArrayList<>();
 
 			// 바닥
+			List<PolygonPoint> contourPoints = new ArrayList<>();
 			List<Vector3d> coorList = new ArrayList<>();
 			for (int i = 0; i < coordinates.length; i++) {
 				GeodeticCalculator gc = new GeodeticCalculator();
@@ -655,16 +658,68 @@ public class PolygonLayerToObjImpl {
 				}
 				Vector3d vertice = new Vector3d(xDistance, yDistance, 0);
 				coorList.add(vertice);
-
 				// threeGeom
 				vertices.add(new Vector3d(xDistance, yDistance, 0));
 				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
-
 				vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
-
 				// tri
-				points.add(new PolygonPoint(xDistance, yDistance, 0));
+				allPoints.add(new PolygonPoint(xDistance, yDistance, 0));
 			}
+			contourPoints.addAll(allPoints);
+
+			// Prepare input data
+			org.poly2tri.geometry.polygon.Polygon polygon = new org.poly2tri.geometry.polygon.Polygon(allPoints);
+
+			// hole
+			List<PolygonPoint> holePoints = new ArrayList<>();
+			int holeSize = pg.getNumInteriorRing();
+			if (holeSize > 0) {
+				for (int h = 0; h < holeSize; h++) {
+					Coordinate[] ringCoors = ShpToObjImpl.deleteInnerPoints(pg.getInteriorRingN(h).getCoordinates());
+					List<PolygonPoint> ringPoints = new ArrayList<>();
+					for (int i = 0; i < ringCoors.length; i++) {
+						GeodeticCalculator gc = new GeodeticCalculator();
+						gc.setStartingGeographicPoint(centerX, ringCoors[i].y);
+						gc.setDestinationGeographicPoint(ringCoors[i].x, ringCoors[i].y);
+						double xDistance = gc.getOrthodromicDistance();
+						if (centerX > ringCoors[i].x) {
+							xDistance = -xDistance;
+						}
+						gc.setStartingGeographicPoint(ringCoors[i].x, centerY);
+						gc.setDestinationGeographicPoint(ringCoors[i].x, ringCoors[i].y);
+						double yDistance = gc.getOrthodromicDistance();
+						if (centerY > ringCoors[i].y) {
+							yDistance = -yDistance;
+						}
+
+						Vector3d vertice = new Vector3d(xDistance, yDistance, 0);
+						coorList.add(vertice);
+						// threeGeom
+						vertices.add(new Vector3d(xDistance, yDistance, 0));
+						vCoordinates.add(new Vector2d(ringCoors[i].x, ringCoors[i].y));
+						vCoordinates.add(new Vector2d(ringCoors[i].x, ringCoors[i].y));
+						vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
+						// tri
+						ringPoints.add(new PolygonPoint(xDistance, yDistance, 0));
+					}
+					org.poly2tri.geometry.polygon.Polygon hole = new org.poly2tri.geometry.polygon.Polygon(ringPoints);
+					polygon.addHole(hole);
+					holePoints.addAll(ringPoints);
+					allPoints.addAll(ringPoints);
+				}
+			}
+
+			// 천장
+			int s = coorList.size();
+			List<Vector3d> hCoorList = new ArrayList<>();
+			for (int i = 0; i < s; i++) {
+				Vector3d vertice = ShpToObjImpl.createLiftedCoordinate(coorList.get(i), defaultHeight);
+				hCoorList.add(vertice);
+				// threeGeom
+				vertices.add(new Vector3d(coorList.get(i).x(), coorList.get(i).y(), defaultHeight));
+				vBuilder.append("v " + coorList.get(i).x() + " " + coorList.get(i).y() + " " + defaultHeight + "\n");
+			}
+			writer.write(vBuilder.toString());
 
 			int bottomStart;
 			int bottomEnd;
@@ -672,23 +727,6 @@ public class PolygonLayerToObjImpl {
 			int topEnd;
 			int sideStart;
 			int sideEnd;
-
-			// 천장
-			int s = coorList.size();
-			List<Vector3d> hCoorList = new ArrayList<>();
-			for (int i = 0; i < s; i++) {
-				Vector3d vertice = ShpToObjImpl.createLiftedCoordinate(coorList.get(i), height);
-				hCoorList.add(vertice);
-				// threeGeom
-				vertices.add(new Vector3d(coorList.get(i).x(), coorList.get(i).y(), height));
-				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
-
-				vBuilder.append("v " + coorList.get(i).x() + " " + coorList.get(i).y() + " " + height + "\n");
-			}
-			writer.write(vBuilder.toString());
-
-			// Prepare input data
-			org.poly2tri.geometry.polygon.Polygon polygon = new org.poly2tri.geometry.polygon.Polygon(points);
 
 			// Launch tessellation
 			Poly2Tri.triangulate(polygon);
@@ -700,9 +738,10 @@ public class PolygonLayerToObjImpl {
 			for (int m = 0; m < triangles.size(); m++) {
 				DelaunayTriangle tri = triangles.get(m);
 				TriangulationPoint[] pts = tri.points;
-				int fFirIdx = vIdx + points.indexOf(pts[0]);
-				int fSecIdx = vIdx + points.indexOf(pts[1]);
-				int fThrIdx = vIdx + points.indexOf(pts[2]);
+
+				int fFirIdx = vIdx + allPoints.indexOf(pts[0]);
+				int fSecIdx = vIdx + allPoints.indexOf(pts[1]);
+				int fThrIdx = vIdx + allPoints.indexOf(pts[2]);
 				// threeGeom
 				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
 				faces.add(new Face3(fThrIdx, fSecIdx, fFirIdx, new Vector3d(0, 0, 0)));
@@ -714,9 +753,10 @@ public class PolygonLayerToObjImpl {
 			for (int m = 0; m < triangles.size(); m++) {
 				DelaunayTriangle tri = triangles.get(m);
 				TriangulationPoint[] pts = tri.points;
-				int fFirIdx = vIdx + s + points.indexOf(pts[0]);
-				int fSecIdx = vIdx + s + points.indexOf(pts[1]);
-				int fThrIdx = vIdx + s + points.indexOf(pts[2]);
+
+				int fFirIdx = vIdx + s + allPoints.indexOf(pts[0]);
+				int fSecIdx = vIdx + s + allPoints.indexOf(pts[1]);
+				int fThrIdx = vIdx + s + allPoints.indexOf(pts[2]);
 				// threeGeom
 				faces.add(new Face3(fFirIdx, fSecIdx, fThrIdx, new Vector3d(0, 0, 0)));
 				faces.add(new Face3(fThrIdx, fSecIdx, fFirIdx, new Vector3d(0, 0, 0)));
@@ -725,19 +765,47 @@ public class PolygonLayerToObjImpl {
 
 			// 옆면 face
 			sideStart = faces.size();
-			for (int f = 0; f < s; f++) {
-				if (f == 0) {
-					faces.add(new Face3(vIdx + 0, vIdx + s - 1, vIdx + s, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + s, vIdx + s - 1, vIdx + (2 * s - 1), new Vector3d(0, 0, 0)));
-
-					faces.add(new Face3(vIdx + s, vIdx + s - 1, vIdx + 0, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + (2 * s - 1), vIdx + s - 1, vIdx + s, new Vector3d(0, 0, 0)));
+			int contourPtSize = contourPoints.size();
+			int holePtSize = holePoints.size();
+			for (int c = 0; c < contourPtSize; c++) {
+				int cIdx = allPoints.indexOf(contourPoints.get(c));
+				if (c == 0) {
+					faces.add(new Face3(vIdx + 0, vIdx + contourPtSize - 1, vIdx + contourPtSize + holePtSize,
+							new Vector3d(0, 0, 0)));
+					faces.add(new Face3(vIdx + contourPtSize + holePtSize, vIdx + contourPtSize - 1,
+							vIdx + (contourPtSize * 2) - 1 + holePtSize, new Vector3d(0, 0, 0)));
 				} else {
-					faces.add(new Face3(vIdx + f, vIdx + f - 1, vIdx + f + s, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + f + s, vIdx + f - 1, vIdx + f - 1 + s, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(vIdx + cIdx, vIdx + cIdx - 1, vIdx + cIdx + contourPtSize + holePtSize,
+							new Vector3d(0, 0, 0)));
+					faces.add(new Face3(vIdx + cIdx + contourPtSize + holePtSize, vIdx + cIdx - 1,
+							vIdx + cIdx - 1 + contourPtSize + holePtSize, new Vector3d(0, 0, 0)));
+				}
+			}
+			// 옆면 hole face
+			if (holeSize > 0) {
+				List<org.poly2tri.geometry.polygon.Polygon> holeList = polygon.getHoles();
+				for (int h = 0; h < holeList.size(); h++) {
+					// if (h == 0) {
+					org.poly2tri.geometry.polygon.Polygon hole = holeList.get(h);
+					List<TriangulationPoint> holePts = hole.getPoints();
+					int hSize = holePts.size();
+					for (int hp = 0; hp < hSize; hp++) {
+						int hpIdx = allPoints.indexOf(holePts.get(hp));
+						if (hp == 0) {
+							int fir = vIdx + hpIdx;
+							int sec = vIdx + hpIdx + hSize - 1;
+							int thr = vIdx + hpIdx + s;
+							faces.add(new Face3(fir, sec, thr, new Vector3d(0, 0, 0)));
+							faces.add(new Face3(thr, sec, sec + s, new Vector3d(0, 0, 0)));
+						} else {
+							int fir = vIdx + hpIdx;
+							int sec = vIdx + hpIdx - 1;
+							int thr = vIdx + hpIdx + s;
 
-					faces.add(new Face3(vIdx + f + s, vIdx + f - 1, vIdx + f, new Vector3d(0, 0, 0)));
-					faces.add(new Face3(vIdx + f - 1 + s, vIdx + f - 1, vIdx + f + s, new Vector3d(0, 0, 0)));
+							faces.add(new Face3(fir, sec, thr, new Vector3d(0, 0, 0)));
+							faces.add(new Face3(thr, sec, sec + s, new Vector3d(0, 0, 0)));
+						}
+					}
 				}
 			}
 			sideEnd = faces.size();
@@ -749,11 +817,6 @@ public class PolygonLayerToObjImpl {
 			threeGeom.faces = faces;
 			threeGeom.vertices = vertices;
 			threeGeom.computeBoundingBox();
-
-			Vector3d max = threeGeom.boundingBox.getMax();
-
-			double rangeMaxX = max.x();
-			double rangeMaxY = max.y();
 
 			Envelope pgEv = pg.getEnvelopeInternal();
 			double range2dminX = pgEv.getMinX();
@@ -808,10 +871,10 @@ public class PolygonLayerToObjImpl {
 				Face3 face1 = threeGeom.faces.get(i);
 				Vector3d f1v1 = threeGeom.vertices.get(face1.a);
 				Vector3d f1v2 = threeGeom.vertices.get(face1.b);
-				Vector3d f1v3 = threeGeom.vertices.get(face1.c);
+				// Vector3d f1v3 = threeGeom.vertices.get(face1.c);
 
 				double f1from1to2 = f1v1.distanceTo(f1v2); // x축
-				double ratio12 = (f1from1to2 * 0.6) / rangeMaxY;
+				double ratio12 = f1from1to2 / height;
 				if (ratio12 > 1) {
 					ratio12 = 1;
 				}
@@ -854,10 +917,6 @@ public class PolygonLayerToObjImpl {
 		}
 		// f
 		if (threeGeom.faces != null) {
-			writer.write(gId);
-			if (usemtl != null) {
-				writer.write("usemtl " + usemtl + "\n");
-			}
 			StringBuilder vnBuilder = new StringBuilder();
 			StringBuilder fBuilder = new StringBuilder();
 			for (Face3 face : threeGeom.faces) {

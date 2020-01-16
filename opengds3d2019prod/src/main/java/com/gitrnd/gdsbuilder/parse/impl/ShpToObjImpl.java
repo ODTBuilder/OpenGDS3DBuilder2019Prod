@@ -271,18 +271,26 @@ public class ShpToObjImpl {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
 						this.wType, defaultHeight, defaultWidth, bufferParam, outputPath);
 				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
 						this.wType, defaultHeight, widthAttribute, bufferParam, outputPath);
 				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
 						this.wType, heightAttribute, defaultWidth, bufferParam, outputPath);
 				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
 						this.wType, heightAttribute, widthAttribute, bufferParam, outputPath);
 				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
 			}
 		}
 	}
