@@ -827,3 +827,32 @@ gb3d.edit.ModelRecord.prototype.resetRotationAndPosition = function(object) {
 	}
 	return object;
 };
+
+/**
+ * 객체의 텍스처 이미지를 base64로 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#resetRotationAndPosition
+ * @param {THREE.Object3D} object - 이미지를 가져올 객체 
+ * @return {string} base64코드 형태의 이미지
+ */
+gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object) {
+	var that = this;
+	var result;
+	// 객체에서 이미지를 꺼낸다
+	if (object instanceof THREE.Mesh) {
+		var material = object.material;
+		if (Array.isArray(material)) {
+			var map = material[0].map;
+			if (map) {
+				var img = 
+			}
+		} else {
+			
+		}
+	} else {
+		console.error("object is not mesh. ",object);
+	}
+	// 이미지를 base64로 변환한다.
+	
+	return result;
+};
