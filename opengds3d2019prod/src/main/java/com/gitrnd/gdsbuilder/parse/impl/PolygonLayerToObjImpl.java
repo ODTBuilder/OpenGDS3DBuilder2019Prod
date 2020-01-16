@@ -661,6 +661,7 @@ public class PolygonLayerToObjImpl {
 				// threeGeom
 				vertices.add(new Vector3d(xDistance, yDistance, 0));
 				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
+				vCoordinates.add(new Vector2d(coordinates[i].x, coordinates[i].y));
 				vBuilder.append("v " + xDistance + " " + yDistance + " " + 0 + "\n");
 				// tri
 				allPoints.add(new PolygonPoint(xDistance, yDistance, 0));
