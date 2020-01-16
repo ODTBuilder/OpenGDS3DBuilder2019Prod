@@ -79,6 +79,12 @@ gb.edit.FeatureRecord = function(obj) {
 	 * @type {gb.edit.EditingTool}
 	 */
 	this.editTool = undefined;
+	/**
+	 * gb3d.edit.EditingTool3D 객체
+	 * @protected
+	 * @type {gb3d.edit.EditingTool3D}
+	 */
+	this.editTool3D = undefined;
 }
 /**
  * 임시보관 중인 새로운 feature들을 반환한다.
@@ -637,10 +643,11 @@ gb.edit.FeatureRecord.prototype.deleteFeatureRemoved = function(layerId, feature
  * @param {gb.edit.EditingTool}
  *            editTool - gb.edit.EditingTool 객체
  */
-gb.edit.FeatureRecord.prototype.save = function(editTool){
+gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 	var that = this;
 	var edit = editTool;
 	this.editTool = editTool;
+	this.editTool3D = editTool3D;
 	
 	var row2 = $("<div>").addClass("row").append(this.translation.saveHint[this.locale])
 

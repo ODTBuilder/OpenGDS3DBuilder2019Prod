@@ -551,6 +551,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 								}
 							} else {
 								that.unselectFeature();
+								that.getEditingTool3D().removeSelectedOutline();
+								that.getEditingTool3D().removeSelectedOutlineCesium();
 							}
 						});
 					}				
@@ -4027,6 +4029,9 @@ gb3d.edit.EditingTool2D.prototype.editToolOpen = function(){
 		// 줌 레벨이 일정 이상이면 화면확대 요구 메세지창 생성
 		this.displayEditZoomHint(true);
 	}
+	
+	this.attrPop.close();
+	this.attrPop.setPositionY(55);
 }
 
 /**
@@ -4095,6 +4100,11 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
 	this.selectedSource = undefined;
 	this.vectorSourcesOfServer_ = {};
 	this.vectorSourcesOfVector_ = {};
+	
+	this.attrPop.close();
+	this.attrPop.setPositionY(5);
+	
+	this.getEditingTool3D().editToolClose();
 }
 
 /**
@@ -4104,13 +4114,10 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
  * @function
  */
 gb3d.edit.EditingTool2D.prototype.editToolToggle = function(){
-	this.attrPop.close();
 	if(this.getActiveTool()){
 		this.editToolClose();
-		this.attrPop.setPositionY(5);
 	} else {
 		this.editToolOpen();
-		this.attrPop.setPositionY(55);
 	}
 }
 
