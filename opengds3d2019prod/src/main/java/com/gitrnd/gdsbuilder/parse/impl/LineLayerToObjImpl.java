@@ -721,6 +721,23 @@ public class LineLayerToObjImpl {
 			lineCoors = geom.getCoordinates();
 		}
 
+//		for (int c = 0; c < lineCoors.length; c++) {
+//			GeodeticCalculator gc = new GeodeticCalculator();
+//			gc.setStartingGeographicPoint(centerX, lineCoors[c].y);
+//			gc.setDestinationGeographicPoint(lineCoors[c].x, lineCoors[c].y);
+//			double xDistance = gc.getOrthodromicDistance();
+//			if (centerX > lineCoors[c].x) {
+//				xDistance = -xDistance;
+//			}
+//			gc.setStartingGeographicPoint(lineCoors[c].x, centerY);
+//			gc.setDestinationGeographicPoint(lineCoors[c].x, lineCoors[c].y);
+//			double yDistance = gc.getOrthodromicDistance();
+//			if (centerY > lineCoors[c].y) {
+//				yDistance = -yDistance;
+//			}
+//			lineCoors[c] = new Coordinate[2];
+//		}
+
 		// line의 두 점씩 뽑아 사각형으로 생성
 		for (int c = 0; c < lineCoors.length - 1; c++) {
 
