@@ -714,11 +714,11 @@ public class PolygonLayerToObjImpl {
 			int s = coorList.size();
 			List<Vector3d> hCoorList = new ArrayList<>();
 			for (int i = 0; i < s; i++) {
-				Vector3d vertice = ShpToObjImpl.createLiftedCoordinate(coorList.get(i), defaultHeight);
+				Vector3d vertice = ShpToObjImpl.createLiftedCoordinate(coorList.get(i), height);
 				hCoorList.add(vertice);
 				// threeGeom
-				vertices.add(new Vector3d(coorList.get(i).x(), coorList.get(i).y(), defaultHeight));
-				vBuilder.append("v " + coorList.get(i).x() + " " + coorList.get(i).y() + " " + defaultHeight + "\n");
+				vertices.add(new Vector3d(coorList.get(i).x(), coorList.get(i).y(), height));
+				vBuilder.append("v " + coorList.get(i).x() + " " + coorList.get(i).y() + " " + height + "\n");
 			}
 			writer.write(vBuilder.toString());
 
