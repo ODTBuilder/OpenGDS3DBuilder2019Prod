@@ -629,6 +629,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
  * @return {Object} 현재 임시저장중인 편집이력
  */
 gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
+	var that = this;
 	var exporter = new THREE.OBJExporter();
 	var obj = {};
 	var cLayers = Object.keys(this.created);
@@ -668,6 +669,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 			var resetObj = this.resetRotationAndPosition(object);
 			var result = exporter.parse(resetObj);
 			obj[layer]["created"][feature]["obj"] = result;
+			that.getBase64FromObject(resetObj, obj[layer]["created"][feature]);
 		}
 	}
 
@@ -698,8 +700,20 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 
 			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
 
-			var result = exporter.parse(object);
-			obj[layer]["modified"][feature] = result;
+			// var result = exporter.parse(object);
+			// obj[layer]["modified"][feature] = result;
+
+			obj[layer]["modified"][feature] = {
+				"obj" : undefined,
+				"texture" : undefined,
+				"mbr" : threeObject.getExtent(),
+				"tileCenter" : undefined,
+				"modelCenter" : threeObject.getCenter()
+			};
+			var resetObj = this.resetRotationAndPosition(object);
+			var result = exporter.parse(resetObj);
+			obj[layer]["modified"][feature]["obj"] = result;
+			that.getBase64FromObject(resetObj, obj[layer]["modified"][feature]);
 		}
 	}
 
@@ -832,27 +846,91 @@ gb3d.edit.ModelRecord.prototype.resetRotationAndPosition = function(object) {
  * 객체의 텍스처 이미지를 base64로 반환한다.
  * 
  * @method gb3d.edit.ModelRecord#resetRotationAndPosition
- * @param {THREE.Object3D} object - 이미지를 가져올 객체 
+ * @param {THREE.Object3D} object - 이미지를 가져올 객체
  * @return {string} base64코드 형태의 이미지
  */
-gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object) {
+gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record) {
 	var that = this;
-	var result;
+	var img, result;
 	// 객체에서 이미지를 꺼낸다
 	if (object instanceof THREE.Mesh) {
 		var material = object.material;
 		if (Array.isArray(material)) {
 			var map = material[0].map;
 			if (map) {
-				var img = 
+				img = map.image;
 			}
 		} else {
-			
+			var map = material.map;
+			if (map) {
+				img = map.image;
+			}
 		}
 	} else {
-		console.error("object is not mesh. ",object);
+		console.error("object is not mesh. ", object);
 	}
 	// 이미지를 base64로 변환한다.
-	
+	// 소스가 base64인지 url인지
+	if (img) {
+		var src = $(img).attr("src");
+		if (substr(src, 0, 5) == 'data:') {
+			// base64일 때
+			// result = src;
+			record["texture"] = src;
+		} else {
+			// url일 때
+			// var toDataURL = function(src, callback, outputFormat) {
+			// var img = new Image();
+			// img.crossOrigin = 'Anonymous';
+			// img.onload = function() {
+			// var canvas = document.createElement('CANVAS');
+			// var ctx = canvas.getContext('2d');
+			// var dataURL;
+			// canvas.height = this.naturalHeight;
+			// canvas.width = this.naturalWidth;
+			// ctx.drawImage(this, 0, 0);
+			// dataURL = canvas.toDataURL(outputFormat);
+			// callback(dataURL);
+			// };
+			// img.src = src;
+			// if (img.complete || img.complete === undefined) {
+			// img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+			// img.src = src;
+			// }
+			// };
+			that.toDataURL(src, function(dataUrl, record) {
+				record["texture"] = dataUrl;
+			});
+		}
+	}
 	return result;
 };
+
+/**
+ * 이미지 url을 base64로 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#toDataURL
+ * @param {string} src - 이미지 URL
+ * @param {function} callback - 콜백함수
+ * @param {string} outputFormat - 내보낼 포맷
+ */
+gb3d.edit.ModelRecord.prototype.toDataURL = function(src, callback, outputFormat) {
+
+	var img = new Image();
+	img.crossOrigin = 'Anonymous';
+	img.onload = function() {
+		var canvas = document.createElement('CANVAS');
+		var ctx = canvas.getContext('2d');
+		var dataURL;
+		canvas.height = this.naturalHeight;
+		canvas.width = this.naturalWidth;
+		ctx.drawImage(this, 0, 0);
+		dataURL = canvas.toDataURL(outputFormat);
+		callback(dataURL);
+	};
+	img.src = src;
+	if (img.complete || img.complete === undefined) {
+		img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+		img.src = src;
+	}
+}
