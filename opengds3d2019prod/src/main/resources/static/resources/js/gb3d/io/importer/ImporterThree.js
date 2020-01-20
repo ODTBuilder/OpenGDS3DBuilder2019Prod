@@ -366,7 +366,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var fid;
 		if (!!source2) {
 			
-			var lid = source2.get("git").layerID;
+			var lid = source2.get("git").id;
 			var split = lid.split(":");
 			var lname;
 			if (split.length === 4) {
@@ -974,6 +974,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"extent" : opt["featureExtent"],
 				"type" : opt["layer"].get("git").geometry,
 				"feature" : opt["feature"],
+				"layer" : opt["layer"],
 				"file" : false
 			});
 			

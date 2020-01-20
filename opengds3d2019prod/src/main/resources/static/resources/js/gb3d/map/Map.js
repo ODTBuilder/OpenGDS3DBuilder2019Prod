@@ -513,16 +513,40 @@ gb3d.Map.prototype.addThreeObject = function(object){
  * @param {string} id - Feature ID
  * @return {gb3d.object.ThreeObject}
  */
-gb3d.Map.prototype.getThreeObjectById = function(id){
+gb3d.Map.prototype.getThreeObjectById = function(id, layer){
 	var threeObject = undefined,
 	featureId = id;
 
-	this.getThreeObjects().forEach(function(e){
+	var objs = this.getThreeObjects();
+	for (var i = 0; i < objs.length; i++) {
+		var e = objs[i];
 		if(e.getFeature().getId() === featureId){
-			threeObject = e;
+			if (layer) {
+				var mlayer = e.getLayer();
+				if (mlayer) {
+					var mtree = mlayer.get("treeid");
+					var ltree = layer.get("treeid");
+					if (!ltree) {
+						var source = layer.getSource();
+						if (source) {
+							var git = source.get("git");
+							ltree = git.treeid;
+						}
+					}
+					if(mtree === ltree){
+						threeObject = e;
+						break;
+					}
+				} else {
+					threeObject = e;
+					break;
+				}
+			} else {
+				threeObject = e;
+				break;
+			}
 		}
-	});
-
+	}
 	return threeObject;
 }
 
@@ -707,8 +731,7 @@ gb3d.Map.prototype.getBindingElement = function(){
  * 스피너를 보여준다.
  * 
  * @method gb3d.Map#showSpinner
- * @param {boolean}
- *            show - 스피너 표시 유무
+ * @param {boolean} show - 스피너 표시 유무
  */
 gb3d.Map.prototype.showSpinner = function(show) {
 	if (show) {

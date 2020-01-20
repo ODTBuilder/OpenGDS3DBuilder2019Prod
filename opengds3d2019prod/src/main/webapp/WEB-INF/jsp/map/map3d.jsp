@@ -259,7 +259,8 @@ html, body {
 		var mrecord = new gb3d.edit.ModelRecord({
 			//id : "feature_id",
 			locale : locale,
-			saveURL : "geoserver/tilesave.ajax?${_csrf.parameterName}=${_csrf.token}"
+			saveURL : "geoserver/tilesave.ajax?${_csrf.parameterName}=${_csrf.token}",
+			gb3dMap : gb3dMap
 		});
 
 		var frecord = new gb.edit.FeatureRecord({

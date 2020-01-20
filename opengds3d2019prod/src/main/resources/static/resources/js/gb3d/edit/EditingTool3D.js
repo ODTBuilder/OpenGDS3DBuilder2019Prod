@@ -1520,7 +1520,7 @@ gb3d.edit.EditingTool3D.prototype.removeSelectedOutlineCesium = function() {
  * @param {string} type - Feature type
  * @param {ol.Feature} feature - Openlayers feature 객체
  * @param {string} treeid - jstree node id
- * @param {string} layer - layer 객체 id
+ * @param {ol.layer.Base} layer - layer 객체
  */
 gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, treeid, layer) {
 	this.objectAttr.type = type;
@@ -2747,7 +2747,7 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
  * 
  * @method gb3d.edit.EditingTool3D#getGLTFfromServer
  */
-gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
+gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature, layer){
 	var that = this;
 	var extras = pickedFeature.content.tile.extras;
 	console.log(extras);
@@ -2769,14 +2769,10 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature){
 	}
 
 	// 현재 선택한 레이어를 가져온다
-	var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-	var slayer;
+//	var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+	var slayer = layer;
 	var ctileset;
-	if (slayers.length === 0) {
-		return;
-	} else if (slayers.length === 1) {
-		slayer = slayers[0];
-	} else {
+	if (!slayer) {
 		return;
 	}
 	// 2d 피처 조회

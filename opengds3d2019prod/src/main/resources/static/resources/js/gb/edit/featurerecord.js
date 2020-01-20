@@ -347,14 +347,21 @@ gb.edit.FeatureRecord.prototype.update = function(layer, feature) {
 	if(!feature.getId()){
 		return;
 	}
+	var mrecord = this.getModelRecord();
 	if (feature.getId().search(".new") !== -1) {
 		this.created[id][feature.getId()] = feature;
+		if (mrecord) {
+			mrecord.update3DByFeature(layer, feature, true);
+		}
 	} else {
 		if (!this.modified[id]) {
 			this.modified[id] = {};
 			this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.modified[id]);
 		}
 		this.modified[id][this.id ? feature.get(this.id) : feature.getId()] = feature;
+		if (mrecord) {
+			mrecord.update3DByFeature(layer, feature);
+		}
 	}
 }
 
@@ -777,7 +784,8 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
 		var mrecord = that.getModelRecord();
-		mrecord.save(mrecord);
+//		mrecord.save(mrecord);
+		mrecord.startLoadTextureBase64();
 	}
 	// 변경사항의 종류에 따라 저장 요청방식이 다르기 때문에 modified->removed->created 순으로 저장 요청을 한다.
 	if(Object.keys(this.modified).length !== 0){
@@ -1015,3 +1023,4 @@ gb.edit.FeatureRecord.prototype.getModelRecord = function(){
 gb.edit.FeatureRecord.prototype.setModelRecord = function(mrecord){
 	this.modelRecord = mrecord;
 }
+

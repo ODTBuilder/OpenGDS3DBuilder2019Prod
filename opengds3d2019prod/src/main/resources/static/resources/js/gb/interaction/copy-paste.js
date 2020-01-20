@@ -168,7 +168,7 @@ gb.interaction.Copypaste.createFeatureId = function(source){
 	var vectorSource = source;
 	var features = vectorSource.getFeatures();
 	var count = 0;
-	var newId = source.get("git") ? source.get("git").layerID + ".new" :
+	var newId = source.get("git") ? source.get("git").id + ".new" :
 		source.ol_uid + ".new";
 	var ids = [];
 	

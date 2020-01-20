@@ -90,6 +90,22 @@ gb3d.edit.ModelRecord = function(obj) {
 	 * @type {Object}
 	 */
 	this.history = undefined;
+
+	/**
+	 * 텍스처가 모두 base64로 로드 되었는지 확인하기 위한 변수
+	 * 
+	 * @type {Object}
+	 */
+	this.textureLoaded = {
+		"total" : 0,
+		"loaded" : 0
+	};
+	/**
+	 * gb3d.Map 객체
+	 * 
+	 * @type {gb3d.Map}
+	 */
+	this.gb3dMap = obj.gb3dMap ? obj.gb3dMap : undefined;
 };
 
 /**
@@ -455,7 +471,14 @@ gb3d.edit.ModelRecord.prototype.deleteModelRemoved = function(layerId, modelId) 
 gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var that = this;
 	var url = self.getSaveURL();
-	self.history = self.getStructureToOBJ();
+	// self.history = self.getStructureToOBJ();
+	var load = self.getTextureLoaded();
+	var total = load.total;
+	var loaded = load.loaded;
+	if (total !== loaded) {
+		console.error("texture not loaded ");
+		return;
+	}
 	console.log(self.history);
 	$.ajax({
 		type : "POST",
@@ -631,6 +654,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
 gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 	var that = this;
 	var exporter = new THREE.OBJExporter();
+	var load = that.getTextureLoaded();
 	var obj = {};
 	var cLayers = Object.keys(this.created);
 	for (var i = 0; i < cLayers.length; i++) {
@@ -664,11 +688,25 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 				"texture" : undefined,
 				"mbr" : threeObject.getExtent(),
 				"tileCenter" : undefined,
-				"modelCenter" : threeObject.getCenter()
+				"modelCenter" : threeObject.getCenter(),
+				"objPath" : undefined
 			};
+			load.total = load.total + 1;
 			var resetObj = this.resetRotationAndPosition(object);
 			var result = exporter.parse(resetObj);
 			obj[layer]["created"][feature]["obj"] = result;
+			var feature3d = threeObject.getFeature3D();
+			if (feature3d) {
+				if (feature3d.content) {
+					if (feature3d.content.tile) {
+						if (feature3d.content.tile.extras) {
+							var extras = feature3d.content.tile.extras;
+							obj[layer]["created"][feature]["tileCenter"] = [ extras["centerX"], extras["centerY"] ];
+							obj[layer]["created"][feature]["objPath"] = extras["originObjPath"];
+						}
+					}
+				}
+			}
 			that.getBase64FromObject(resetObj, obj[layer]["created"][feature]);
 		}
 	}
@@ -710,9 +748,22 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 				"tileCenter" : undefined,
 				"modelCenter" : threeObject.getCenter()
 			};
+			load.total = load.total + 1;
 			var resetObj = this.resetRotationAndPosition(object);
 			var result = exporter.parse(resetObj);
 			obj[layer]["modified"][feature]["obj"] = result;
+			var feature3d = threeObject.getFeature3D();
+			if (feature3d) {
+				if (feature3d.content) {
+					if (feature3d.content.tile) {
+						if (feature3d.content.tile.extras) {
+							var extras = feature3d.content.tile.extras;
+							obj[layer]["created"][feature]["tileCenter"] = [ extras["centerX"], extras["centerY"] ];
+							obj[layer]["created"][feature]["objPath"] = extras["originObjPath"];
+						}
+					}
+				}
+			}
 			that.getBase64FromObject(resetObj, obj[layer]["modified"][feature]);
 		}
 	}
@@ -872,35 +923,18 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record) {
 	// 이미지를 base64로 변환한다.
 	// 소스가 base64인지 url인지
 	if (img) {
-		var src = $(img).attr("src");
-		if (substr(src, 0, 5) == 'data:') {
+		var src = img.src;
+		if (src.substr(0, 5) == 'data:') {
 			// base64일 때
 			// result = src;
 			record["texture"] = src;
+			var load = that.getTextureLoaded();
+			load.loaded = load.loaded + 1;
+			if (load.total === load.loaded) {
+				that.save(that);
+			}
 		} else {
-			// url일 때
-			// var toDataURL = function(src, callback, outputFormat) {
-			// var img = new Image();
-			// img.crossOrigin = 'Anonymous';
-			// img.onload = function() {
-			// var canvas = document.createElement('CANVAS');
-			// var ctx = canvas.getContext('2d');
-			// var dataURL;
-			// canvas.height = this.naturalHeight;
-			// canvas.width = this.naturalWidth;
-			// ctx.drawImage(this, 0, 0);
-			// dataURL = canvas.toDataURL(outputFormat);
-			// callback(dataURL);
-			// };
-			// img.src = src;
-			// if (img.complete || img.complete === undefined) {
-			// img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-			// img.src = src;
-			// }
-			// };
-			that.toDataURL(src, function(dataUrl, record) {
-				record["texture"] = dataUrl;
-			});
+			that.toDataURL(src, record);
 		}
 	}
 	return result;
@@ -914,8 +948,8 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record) {
  * @param {function} callback - 콜백함수
  * @param {string} outputFormat - 내보낼 포맷
  */
-gb3d.edit.ModelRecord.prototype.toDataURL = function(src, callback, outputFormat) {
-
+gb3d.edit.ModelRecord.prototype.toDataURL = function(src, record, outputFormat) {
+	var that = this;
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
 	img.onload = function() {
@@ -926,11 +960,84 @@ gb3d.edit.ModelRecord.prototype.toDataURL = function(src, callback, outputFormat
 		canvas.width = this.naturalWidth;
 		ctx.drawImage(this, 0, 0);
 		dataURL = canvas.toDataURL(outputFormat);
-		callback(dataURL);
+		// callback(dataURL);
+		record["texture"] = dataURL;
+		var load = that.getTextureLoaded();
+		load.loaded = load.loaded + 1;
+		if (load.total === load.loaded) {
+			that.save(that);
+		}
 	};
 	img.src = src;
 	if (img.complete || img.complete === undefined) {
 		img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 		img.src = src;
+	}
+}
+
+/**
+ * 텍스처 카운팅 변수를 설정한다.
+ * 
+ * @method gb3d.edit.ModelRecord#setTextureLoaded
+ * @param {object} obj - 텍스처 카운팅 변수
+ */
+gb3d.edit.ModelRecord.prototype.setTextureLoaded = function(obj) {
+	this.textureLoaded = obj;
+}
+
+/**
+ * 텍스처 카운팅 변수를 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getTextureLoaded
+ * @return {object} 텍스처 카운팅 변수
+ */
+gb3d.edit.ModelRecord.prototype.getTextureLoaded = function() {
+	return this.textureLoaded;
+}
+
+/**
+ * 텍스처 카운팅 변수를 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#startLoadTextureBase64
+ */
+gb3d.edit.ModelRecord.prototype.startLoadTextureBase64 = function() {
+	this.history = this.getStructureToOBJ();
+}
+
+/**
+ * gb3dMap객체를 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getGb3dMap
+ * @return {gb3d.Map} gb3d.Map 객체
+ */
+gb3d.edit.ModelRecord.prototype.getGb3dMap = function() {
+	return this.gb3dMap;
+}
+
+/**
+ * gb3dMap객체를 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#setGb3dMap
+ * @param {gb3d.Map} map - gb3d.Map 객체
+ */
+gb3d.edit.ModelRecord.prototype.setGb3dMap = function(map) {
+	this.gb3dMap = map;
+}
+
+/**
+ * 2D피처를 통해 3D객체 편집이력을 업데이트 한다.
+ * 
+ * @method gb3d.edit.ModelRecord#update3DByFeature
+ */
+gb3d.edit.ModelRecord.prototype.update3DByFeature = function(layer, feature, isCreated) {
+	var that = this;
+	var map = this.getGb3dMap();
+	// 피처 아이디, 레이어 트리 아이디를 받아서 조회
+	var three = map.getThreeObjectById(feature.getId(), layer);
+	// 모디파이드 객체안에 있으면 넘기고 아니면 넣기
+	if (isCreated) {
+		this.create(three.getLayer(), three);
+	} else {
+		this.update(three.getLayer(), three);
 	}
 }

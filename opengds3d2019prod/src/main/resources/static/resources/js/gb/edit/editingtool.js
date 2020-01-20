@@ -1083,7 +1083,7 @@ gb.edit.EditingTool.prototype.select = function(source) {
 				var td1 = $("<td>").text(fno);
 				var feature = that.features.item(i);
 				var anc = $("<a>").addClass("gb-edit-sel-flist").css("cursor", "pointer").attr({
-					"value" : gitAttr.treeID + "," + feature.getId()
+					"value" : gitAttr.treeid + "," + feature.getId()
 				}).text("Selecting feature").click(function() {
 					var param = $(this).attr("value").split(",");
 					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
@@ -1596,18 +1596,18 @@ gb.edit.EditingTool.prototype.draw = function(layer) {
 			}
 			
 			if (!!source) {
-				var l = source.getFeatureById(source.get("git").treeID + ".new0")
+				var l = source.getFeatureById(source.get("git").treeid + ".new0")
 				
 				if (!l) {
-					var fid = source.get("git").treeID + ".new0";
+					var fid = source.get("git").treeid + ".new0";
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				} else {
 					var count = 1;
-					while(source.getFeatureById(source.get("git").treeID + ".new" + count) !== null){
+					while(source.getFeatureById(source.get("git").treeid + ".new" + count) !== null){
 						count++;
 					}
-					var fid = source.get("git").treeID + ".new" + count;
+					var fid = source.get("git").treeid + ".new" + count;
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				}
@@ -1660,9 +1660,9 @@ gb.edit.EditingTool.prototype.draw = function(layer) {
 			if (!!source) {
 				var feature = evt.feature;
 				var c = that.featureRecord.getCreated();
-				var l = c[source.get("git").layerID];
+				var l = c[source.get("git").id];
 				if (!l) {
-					var fid = source.get("git").layerID + ".new0";
+					var fid = source.get("git").id + ".new0";
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				} else {
@@ -1675,7 +1675,7 @@ gb.edit.EditingTool.prototype.draw = function(layer) {
 						var nposit = (id.search(".new")) + 4;
 						count = (parseInt(id.substr(nposit, id.length)) + 1);
 					}
-					var fid = source.get("git").layerID + ".new" + count;
+					var fid = source.get("git").id + ".new" + count;
 					feature.setId(fid);
 					that.featureRecord.create(layer, feature);
 				}
@@ -2182,7 +2182,7 @@ gb.edit.EditingTool.prototype.updateSelected = function() {
 	var prevTreeid;
 	if(prevSelected !== undefined){
 		if(!!prevSelected.get("git")){
-			prevTreeid = prevSelected.get("git").treeID || "";
+			prevTreeid = prevSelected.get("git").treeid || "";
 		}
 	}
 	
@@ -2208,8 +2208,8 @@ gb.edit.EditingTool.prototype.updateSelected = function() {
 //			}
 //			if(typeof source.get("git") !== "object"){
 //				source.set("git", {
-//					layerID: layer.get("id"),
-//					treeID: layer.get("treeid"),
+//					id: layer.get("id"),
+//					treeid: layer.get("treeid"),
 //					tempLayer: layer,
 //					editable: layer.get("git").editable,
 //					geometry: layer.get("git").geometry
@@ -2902,7 +2902,7 @@ gb.edit.EditingTool.prototype.addInteraction = function(options){
 				var prevTreeid;
 				if(prevSelected !== undefined){
 					if(!!prevSelected.get("git")){
-						prevTreeid = prevSelected.get("git").treeID || "";
+						prevTreeid = prevSelected.get("git").treeid || "";
 					}
 				}
 				
@@ -3458,8 +3458,8 @@ gb.edit.EditingTool.prototype.setVisibleVectorVector = function(bool){
 		if(!source){
 			continue;
 		}
-		if(!!tree.get_node(source.get("git").treeID)){
-			if(!tree.get_node(source.get("git").treeID).state.hiding){
+		if(!!tree.get_node(source.get("git").treeid)){
+			if(!tree.get_node(source.get("git").treeid).state.hiding){
 				vecLayers[i].setMap(set);
 			} else {
 				vecLayers[i].setMap(null);
@@ -3630,9 +3630,9 @@ gb.edit.EditingTool.prototype.setVectorSourceOfServer = function(obj, layerId, l
 			}
 		}
 
-		git.layerID = layerid;
+		git.id = layerid;
 		git.tempLayer = layer;
-		git.treeID = treeid;
+		git.treeid = treeid;
 		vectorSource.set("git", git);
 
 		return vectorSource;
@@ -3681,9 +3681,9 @@ gb.edit.EditingTool.prototype.setVectorSourceOfVector = function(obj, layerId, l
 		}
 // layer.setMap(this.map);
 
-		git.layerID = layerid;
+		git.id = layerid;
 		git.tempLayer = layer;
-		git.treeID = treeid;
+		git.treeid = treeid;
 		vectorSource.set("git", git);
 
 		return vectorSource;
@@ -3806,7 +3806,7 @@ gb.edit.EditingTool.prototype.editToolClose = function(){
 	var prevTreeid;
 	if(prevSelected !== undefined){
 		if(!!prevSelected.get("git")){
-			prevTreeid = prevSelected.get("git").treeID || "";
+			prevTreeid = prevSelected.get("git").treeid || "";
 		}
 	}
 	if(this.otree.getJSTree().get_node(prevTreeid)){
