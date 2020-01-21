@@ -1276,6 +1276,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 			var arrlid = lid.split(":");
 			if (arrlid.length === 4) {
 				lid = arrlid[3];
+			} else if (arrlid.length === 1) {
+				lid = arrlid[0];
 			}
 		}
 

@@ -449,6 +449,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			"extent" : geometry.getExtent(),
 			"type" : that.layer.get("git").geometry,
 			"feature" : feature,
+			"layer" : layer,
 			"file" : true
 		});
 		var center = [ coordinates[0], coordinates[1] ];
@@ -508,7 +509,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		}
 
 		source2.addFeature(feature);
-		var featureId = obj3d.feature.getId();
+		var featureId = obj3d.getFeature().getId();
 
 		that.threeTree.create_node(treeid, {
 			"parent" : treeid,
