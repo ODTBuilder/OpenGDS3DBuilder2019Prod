@@ -491,6 +491,10 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.gb3dMap.getThreeScene().add(that.object);
 		that.gb3dMap.addThreeObject(obj3d);
 
+		var record = that.getFeatureRecord().getModelRecord();
+		if (record instanceof gb3d.edit.ModelRecord) {
+			record.create(obj3d.getLayer(), obj3d);	
+		}
 
 		var treeid = layer.get("treeid");
 
