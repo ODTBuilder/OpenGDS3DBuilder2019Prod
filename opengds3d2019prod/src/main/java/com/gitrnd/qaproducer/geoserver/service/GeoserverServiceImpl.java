@@ -88,6 +88,7 @@ import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
+import com.rabbitmq.client.AMQP.Tx;
 import com.vividsolutions.jts.geom.Geometry;
 
 import it.geosolutions.geoserver.rest.decoder.RESTDataStore;
@@ -1179,7 +1180,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	@Override
 	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, String heightType, String heightValue)
+			String layerName, String user, String heightType, String heightValue, String texture)
 			throws FileNotFoundException, ParseException {
 
 		int puFlag = 500;
@@ -1220,22 +1221,23 @@ public class GeoserverServiceImpl implements GeoserverService {
 						String objPath = basePath + File.separator + "obj";
 						createFileDirectory(objPath);
 
-						// copy mtl, texture image to obj path
-						// polygon
-						String mtl = "building.mtl";
-						String image = "building.jpg";
-
-						InputStream mtlIs = this.getClass().getResourceAsStream("/textures/" + mtl);
-						OutputStream mtlOs = new FileOutputStream(objPath + File.separator + mtl);
-						fileCopy(mtlIs, mtlOs);
-						InputStream imageIs = this.getClass().getResourceAsStream("/textures/" + image);
-						OutputStream imageOs = new FileOutputStream(objPath + File.separator + image);
-						fileCopy(imageIs, imageOs);
-
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
-						shpToObj.setMtl(mtl);
-						
+
+						if (!texture.equals("notset")) {
+							// copy mtl, texture image to obj path
+							// polygon
+							String mtl = texture + ".mtl";
+							String image = texture + ".jpg";
+							InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/building/" + mtl);
+							OutputStream mtlOs = new FileOutputStream(objPath + File.separator + mtl);
+							fileCopy(mtlIs, mtlOs);
+							InputStream imageIs = this.getClass().getResourceAsStream("/img/texture/building/" + image);
+							OutputStream imageOs = new FileOutputStream(objPath + File.separator + image);
+							fileCopy(imageIs, imageOs);
+							shpToObj.setMtl(mtl);
+						}
+
 						// set height
 						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
 							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
@@ -1244,7 +1246,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							shpToObj.sethType(EnShpToObjHeightType.FIX);
 							shpToObj.setHeightAttribute(heightValue);
 						}
-						
+
 						try {
 							shpToObj.exec();
 						} catch (Exception e) {
@@ -1330,8 +1332,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	@Override
 	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, String heightType, String heightValue, String widthType, String widthValue)
-			throws Exception {
+			String layerName, String user, String heightType, String heightValue, String widthType, String widthValue,
+			String texture) throws Exception {
 
 		int puFlag = 500;
 		JSONObject returnJSON = new JSONObject();
