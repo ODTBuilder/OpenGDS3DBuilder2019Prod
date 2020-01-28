@@ -662,7 +662,9 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 			continue;
 		}
 		// 레이어별 키를 만듬
-		obj[cLayers[i]] = {};
+		if (!obj[cLayers[i]]) {
+			obj[cLayers[i]] = {};	
+		}
 	}
 
 	for (var j = 0; j < cLayers.length; j++) {
@@ -716,8 +718,10 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
 			continue;
 		}
-		// 레이어별 키를 만듬
-		obj[mLayers[i]] = {};
+		// 없으면 레이어별 키를 만듬
+		if (!obj[mLayers[i]]) {
+			obj[mLayers[i]] = {};	
+		}
 	}
 
 	for (var j = 0; j < mLayers.length; j++) {
@@ -758,8 +762,8 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 					if (feature3d.content.tile) {
 						if (feature3d.content.tile.extras) {
 							var extras = feature3d.content.tile.extras;
-							obj[layer]["created"][feature]["tileCenter"] = [ extras["centerX"], extras["centerY"] ];
-							obj[layer]["created"][feature]["objPath"] = extras["originObjPath"];
+							obj[layer]["modified"][feature]["tileCenter"] = [ extras["centerX"], extras["centerY"] ];
+							obj[layer]["modified"][feature]["objPath"] = extras["originObjPath"];
 						}
 					}
 				}
@@ -773,8 +777,10 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function() {
 		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
 			continue;
 		}
-		// 레이어별 키를 만듬
-		obj[rLayers[i]] = {};
+		// 없으면 레이어별 키를 만듬
+		if (!obj[rLayers[i]]) {
+			obj[rLayers[i]] = {};			
+		}
 	}
 
 	for (var j = 0; j < rLayers.length; j++) {

@@ -975,6 +975,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"extent" : opt["featureExtent"],
 				"type" : opt["layer"].get("git").geometry,
 				"feature" : opt["feature"],
+				"feature3D" : opt["feature3D"],
 				"layer" : opt["layer"],
 				"file" : false
 			});

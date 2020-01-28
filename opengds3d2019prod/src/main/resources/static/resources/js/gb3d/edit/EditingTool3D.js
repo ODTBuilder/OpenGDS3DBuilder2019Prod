@@ -2549,7 +2549,12 @@ gb3d.edit.EditingTool3D.prototype.selectTilesetFeatureSilhouette = function(pick
 
 	if (that.getActiveTool()) {
 		// 선택한 객체에 해당하는 gltf를 요청
-		that.getGLTFfromServer(pickedFeature);
+		var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+		if(slayers.length === 1){
+			var slayer = slayers[0];
+			that.getGLTFfromServer(pickedFeature, slayer);
+		}
+		
 
 	} else {
 		// Save the selected feature's original color
