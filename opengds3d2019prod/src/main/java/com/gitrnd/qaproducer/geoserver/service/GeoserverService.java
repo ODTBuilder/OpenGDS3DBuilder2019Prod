@@ -368,10 +368,10 @@ public interface GeoserverService {
 	public List<String> getStyleList(DTGeoserverManager geoserverManager, String workspace);
 
 	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
-			String datastore, String layerName, String username, String heightType, String heightValue)
+			String datastore, String layerName, String username, String heightType, String heightValue, String texture)
 			throws Exception;
 
 	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
 			String layerName, String username, String heightType, String heightValue, String widthType,
-			String widthValue) throws Exception;
+			String widthValue, String texture) throws Exception;
 }

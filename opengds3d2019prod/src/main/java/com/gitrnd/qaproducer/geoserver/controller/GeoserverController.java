@@ -876,6 +876,8 @@ public class GeoserverController extends AbstractController {
 		String datastore = (String) jsonObject.get("datastore");
 		String layerName = (String) jsonObject.get("layerName");
 		String geom = (String) jsonObject.get("geometry2d");
+		String texture = (String) jsonObject.get("texture");
+		
 		// String srs = (String) request.getParameter("srs");
 		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
 		String heightValue = (String) jsonObject.get("depthValue");
@@ -883,13 +885,13 @@ public class GeoserverController extends AbstractController {
 		JSONObject returnJson = new JSONObject();
 		if (geom.equals("Polygon")) {
 			returnJson = geoserverService.geoPolygonlayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), heightType, heightValue);
+					loginUser.getUsername(), heightType, heightValue, texture);
 		}
 		if (geom.equals("LineString")) {
 			String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default)
 			String widthValue = (String) jsonObject.get("widthValue");
 			returnJson = geoserverService.geoLinelayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), heightType, heightValue, widthType, widthValue);
+					loginUser.getUsername(), heightType, heightValue, widthType, widthValue, texture);
 		}
 		return returnJson;
 	}
