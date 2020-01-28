@@ -933,6 +933,8 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record) {
 			if (load.total === load.loaded) {
 				that.save(that);
 			}
+		} else if (src.substr(0, 5) == 'blob:') {
+			that.toDataURLFromBlobURL(img, record);
 		} else {
 			that.toDataURL(src, record);
 		}
@@ -972,6 +974,54 @@ gb3d.edit.ModelRecord.prototype.toDataURL = function(src, record, outputFormat) 
 	if (img.complete || img.complete === undefined) {
 		img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 		img.src = src;
+	}
+}
+
+/**
+ * blob을 base64로 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#toDataURLFromBlob
+ * @param {string} src - 이미지 URL
+ * @param {function} callback - 콜백함수
+ */
+gb3d.edit.ModelRecord.prototype.toDataURLFromBlob = function(src, record) {
+	var that = this;
+	var reader = new FileReader();
+	reader.onloadend = function() {
+		var base64data = reader.result;
+		console.log(base64data);
+		record["texture"] = base64data;
+		var load = that.getTextureLoaded();
+		load.loaded = load.loaded + 1;
+		if (load.total === load.loaded) {
+			that.save(that);
+		}
+	}
+	reader.readAsDataURL(src);
+}
+
+/**
+ * blob 이미지 url을 base64로 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#toDataURLFromBlobURL
+ * @param {string} src - 이미지 URL
+ * @param {function} callback - 콜백함수
+ */
+gb3d.edit.ModelRecord.prototype.toDataURLFromBlobURL = function(img, record) {
+	var that = this;
+	var canvas = document.createElement('CANVAS');
+	var ctx = canvas.getContext('2d');
+	var dataURL;
+	canvas.height = img.height;
+	canvas.width = img.width;
+	ctx.drawImage(img, 0, 0);
+	dataURL = canvas.toDataURL();
+	// callback(dataURL);
+	record["texture"] = dataURL;
+	var load = that.getTextureLoaded();
+	load.loaded = load.loaded + 1;
+	if (load.total === load.loaded) {
+		that.save(that);
 	}
 }
 

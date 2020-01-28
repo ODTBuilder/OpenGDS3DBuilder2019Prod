@@ -389,8 +389,8 @@ html, body {
 			getGLTFURL : "objToGltf.ajax?${_csrf.parameterName}=${_csrf.token}",
 			importer : importThree,
 			texture : {
-				"building" : "${pageContext.request.contextPath}/resources/img/texture/buildings/building1.jpg",
-				"road" : "${pageContext.request.contextPath}/resources/img/texture/roads/road.jpg"
+				"building" : "${pageContext.request.contextPath}/resources/img/texture/building/building1.jpg",
+				"road" : "${pageContext.request.contextPath}/resources/img/texture/road/road.jpg"
 			}
 		// 			texture : {
 		// 				"building" : "${pageContext.request.contextPath}/geoserver/textureImages.ajax?${_csrf.parameterName}=${_csrf.token}&type=building",

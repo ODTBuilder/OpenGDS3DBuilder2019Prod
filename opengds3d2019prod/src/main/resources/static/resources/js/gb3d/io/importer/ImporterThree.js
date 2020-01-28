@@ -274,7 +274,7 @@ gb3d.io.ImporterThree.prototype.loadFile = function(file) {
 			geometry.sourceFile = file.name;
 
 			var material = new THREE.MeshStandardMaterial({
-				side : THREE.DoubleSide
+				side : THREE.FrontSide
 			});
 
 			var mesh = new THREE.Mesh(geometry, material);
