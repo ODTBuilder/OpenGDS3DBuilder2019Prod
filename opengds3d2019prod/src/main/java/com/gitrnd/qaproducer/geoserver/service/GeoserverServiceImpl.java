@@ -88,7 +88,6 @@ import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
-import com.rabbitmq.client.AMQP.Tx;
 import com.vividsolutions.jts.geom.Geometry;
 
 import it.geosolutions.geoserver.rest.decoder.RESTDataStore;
