@@ -365,7 +365,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var prop, notNull = {}, setProp = {};
 		var fid;
 		if (!!source2) {
-			
+
 			var lid = source2.get("git").id;
 			var split = lid.split(":");
 			var lname;
@@ -374,38 +374,38 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			} else if (split.length === 1) {
 				lname = split[0];
 			}
-			
-//			if (layer instanceof ol.layer.Tile) {
-				var l = source2.getFeatureById(lname + ".new0");
-				if (!l) {
-					fid = lname + ".new0";
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
-				} else {
-					var count = 1;
-					while (source2.getFeatureById(lname + ".new" + count) !== null) {
-						count++;
-					}
-					fid = lname + ".new" + count;
-					feature.setId(fid);
-					that.getFeatureRecord().create(layer, feature);
+
+			// if (layer instanceof ol.layer.Tile) {
+			var l = source2.getFeatureById(lname + ".new0");
+			if (!l) {
+				fid = lname + ".new0";
+				feature.setId(fid);
+				that.getFeatureRecord().create(layer, feature);
+			} else {
+				var count = 1;
+				while (source2.getFeatureById(lname + ".new" + count) !== null) {
+					count++;
 				}
-//			} else if (layer instanceof ol.layer.Vector) {
-//				l = source2.getFeatureById(layer.get("treeid") + ".new0");
-//				if (!l) {
-//					var fid = layer.get("treeid") + ".new0";
-//					feature.setId(fid);
-//					that.getFeatureRecord().create(layer, feature);
-//				} else {
-//					var count = 1;
-//					while (source2.getFeatureById(layer.get("treeid") + ".new" + count) !== null) {
-//						count++;
-//					}
-//					var fid = layer.get("treeid") + ".new" + count;
-//					feature.setId(fid);
-//					that.getFeatureRecord().create(layer, feature);
-//				}
-//			}
+				fid = lname + ".new" + count;
+				feature.setId(fid);
+				that.getFeatureRecord().create(layer, feature);
+			}
+			// } else if (layer instanceof ol.layer.Vector) {
+			// l = source2.getFeatureById(layer.get("treeid") + ".new0");
+			// if (!l) {
+			// var fid = layer.get("treeid") + ".new0";
+			// feature.setId(fid);
+			// that.getFeatureRecord().create(layer, feature);
+			// } else {
+			// var count = 1;
+			// while (source2.getFeatureById(layer.get("treeid") + ".new" + count) !== null) {
+			// count++;
+			// }
+			// var fid = layer.get("treeid") + ".new" + count;
+			// feature.setId(fid);
+			// that.getFeatureRecord().create(layer, feature);
+			// }
+			// }
 
 			gb.undo.pushAction({
 				undo : function(data) {
@@ -440,7 +440,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		evt.feature = undefined;
 		// feature.setId(that.object.uuid);
 		console.log(that.object.userData);
-		
+
 		var geometry = feature.getGeometry();
 		var coordinates = geometry.getCoordinates();
 		var obj3d = new gb3d.object.ThreeObject({
@@ -466,9 +466,9 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		var pickPoint = turf.point(center);
 		var bearing = turf.bearing(pickPoint, axisy1);
 		console.log("y축 1과 객체 중점의 각도는: " + bearing);
-		var zaxis = new THREE.Vector3(0, 0, 1);
+		// var zaxis = new THREE.Vector3(0, 0, 1);
 		that.object.rotateZ(Cesium.Math.toRadians(bearing));
-		
+
 		// 오브젝트에서 메쉬를 꺼낸다
 		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
 		// 레이어 지오메트리 타입을 꺼낸다
@@ -482,7 +482,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			// featureId 를 넣는다
 			result[i].userData.featureId = fid;
 		}
-		
+
 		console.log(that.object);
 
 		that.gb2dMap.getUpperMap().removeInteraction(draw);
@@ -493,7 +493,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		var record = that.getFeatureRecord().getModelRecord();
 		if (record instanceof gb3d.edit.ModelRecord) {
-			record.create(obj3d.getLayer(), obj3d);	
+			record.create(obj3d.getLayer(), obj3d);
 		}
 
 		var treeid = layer.get("treeid");
@@ -618,37 +618,43 @@ gb3d.io.ImporterThree.applyAxisAngleToAllMesh = function(obj, axis, radian) {
 			}
 		}
 	} else {
-		// 원점을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
-		// var quaternion = object.quaternion.clone();
-		// // 쿼터니언각을 뒤집는다
-		// quaternion.inverse();
-		// // 모든 지오메트리 버텍스에
-		var points = [];
-		var normalPoints = [];
-		var vertices = object.geometry.attributes.position.array;
-		var normal = object.geometry.attributes.normal ? object.geometry.attributes.normal.array : false;
-		var normalFlag = normal ? true : false;
-		for (var j = 0; j < vertices.length; j = j + 3) {
-			var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
-			vertex.applyAxisAngle(axis, radian);
-			points.push(vertex.x);
-			points.push(vertex.y);
-			points.push(vertex.z);
-			if (normalFlag) {
-				var norm = new THREE.Vector3(normal[j], normal[j + 1], normal[j + 2]);
-				norm.applyAxisAngle(axis, radian);
-				normalPoints.push(norm.x);
-				normalPoints.push(norm.y);
-				normalPoints.push(norm.z);
+		var geom = object.geometry;
+		if (geom instanceof THREE.Geometry) {
+			var vertices = object.geometry.vertices;
+			for (var j = 0; j < vertices.length; j++) {
+				var vertex = vertices[j];
+				vertex.applyAxisAngle(axis, radian);
+				// normal 값이 있으면 그것도 회전
 			}
+			console.log("mesh modified success");
+		} else if (geom instanceof THREE.BufferGeometry) {
+			var points = [];
+			var normalPoints = [];
+			var vertices = object.geometry.attributes.position.array;
+			var normal = object.geometry.attributes.normal ? object.geometry.attributes.normal.array : false;
+			var normalFlag = normal ? true : false;
+			for (var j = 0; j < vertices.length; j = j + 3) {
+				var vertex = new THREE.Vector3(vertices[j], vertices[j + 1], vertices[j + 2]);
+				vertex.applyAxisAngle(axis, radian);
+				points.push(vertex.x);
+				points.push(vertex.y);
+				points.push(vertex.z);
+				if (normalFlag) {
+					var norm = new THREE.Vector3(normal[j], normal[j + 1], normal[j + 2]);
+					norm.applyAxisAngle(axis, radian);
+					normalPoints.push(norm.x);
+					normalPoints.push(norm.y);
+					normalPoints.push(norm.z);
+				}
+			}
+			var newVertices = new Float32Array(points);
+			object.geometry.addAttribute('position', new THREE.Float32BufferAttribute(newVertices, 3));
+			if (normalFlag) {
+				var newNormalVertices = new Float32Array(normalPoints);
+				object.geometry.addAttribute('normal', new THREE.BufferAttribute(newNormalVertices, 3));
+			}
+			console.log("mesh modified success");
 		}
-		var newVertices = new Float32Array(points);
-		object.geometry.addAttribute('position', new THREE.Float32BufferAttribute(newVertices, 3));
-		if (normalFlag) {
-			var newNormalVertices = new Float32Array(normalPoints);
-			object.geometry.addAttribute('normal', new THREE.BufferAttribute(newNormalVertices, 3));
-		}
-		console.log("mesh modified success");
 	}
 }
 
@@ -928,7 +934,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	function(gltf) {
 		// 피처 id로 threeObject를 조회
 		var three = that.getGb3dMap().getThreeObjectById(opt["featureId"]);
-		
+
 		var scene = gltf.scene;
 		var children = scene.children;
 		var inputData;
@@ -942,7 +948,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 		}
 		// 피처 아이디 입력
 		inputData.userData.featureId = opt["featureId"];
-		
+
 		var center = opt["featureCenter"];
 		var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
 		var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
@@ -958,10 +964,10 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 		console.log("y축 1과 객체 중점의 각도는: " + bearing);
 		inputData.rotateZ(Cesium.Math.toRadians(bearing));
 		// === 이준 끝 ===
-		
+
 		// 요청 성공시 선택 개체(b3dm) 숨김
 		opt["feature3D"].show = false;
-		
+
 		// 있으면 gltf를 three 모델에 추가
 		// 없으면 새로 만듬
 		var obj3d;
@@ -983,10 +989,10 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"layer" : opt["layer"],
 				"file" : false
 			});
-			
+
 			// Map에 ThreeJS 객체 추가
 			that.getGb3dMap().getThreeScene().add(inputData);
-			
+
 			// threeobject 추가
 			that.getGb3dMap().addThreeObject(obj3d);
 			if (opt.threeTree) {

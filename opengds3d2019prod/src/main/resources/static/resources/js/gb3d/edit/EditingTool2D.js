@@ -1613,7 +1613,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 		this.interaction.draw.on("drawstart", function(evt) {
 			gb.undo.setActive(false);
 		});
-
+		// 사용
 		this.interaction.draw.on("drawend", function(evt) {
 			console.log(evt);
 			gb.undo.setActive(true);

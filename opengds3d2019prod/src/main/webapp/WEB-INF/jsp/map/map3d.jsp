@@ -259,7 +259,7 @@ html, body {
 		var mrecord = new gb3d.edit.ModelRecord({
 			//id : "feature_id",
 			locale : locale,
-			saveURL : "geoserver/tilesave.ajax?${_csrf.parameterName}=${_csrf.token}",
+			saveURL : "edit3dLayers.do?${_csrf.parameterName}=${_csrf.token}",
 			gb3dMap : gb3dMap
 		});
 
@@ -390,7 +390,7 @@ html, body {
 			importer : importThree,
 			texture : {
 				"building" : "${pageContext.request.contextPath}/resources/img/texture/building/building1.jpg",
-				"road" : "${pageContext.request.contextPath}/resources/img/texture/road/road.jpg"
+				"road" : "${pageContext.request.contextPath}/resources/img/texture/road/road1.jpg"
 			}
 		// 			texture : {
 		// 				"building" : "${pageContext.request.contextPath}/geoserver/textureImages.ajax?${_csrf.parameterName}=${_csrf.token}&type=building",
