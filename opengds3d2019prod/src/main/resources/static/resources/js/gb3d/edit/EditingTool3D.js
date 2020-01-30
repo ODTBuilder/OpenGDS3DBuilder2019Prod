@@ -2301,20 +2301,12 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 		geometry = meshes[i].geometry;
 		// 2차원 객체가 포인트인 경우
 		if (opt.type === "MultiPoint" || opt.type === "Point") {
-//			geometry = new THREE.BoxGeometry(parseInt(opt.width), parseInt(opt.height),
-//			parseInt(opt.depth));
-//			geometry.vertices.forEach(function(vert, v){
-//			vert.z += opt.depth/2;
-//			});
-//			object.geometry = geometry;
 			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
 			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-
 		} else {
 			// 2차원 객체가 포인트가 아닌 경우
 			var a, b, cp;
 			if(geometry instanceof THREE.Geometry){
-//				geometry = new THREE.Geometry();
 				if(opt.type === "MultiPolygon"){
 					if (!isFile) {
 						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
@@ -2346,28 +2338,6 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 				} else {
 					return;
 				}
-
-//				geometry.vertices = result.points;
-//				geometry.faces = result.faces;
-				// geometry.translate(-centerCart.x, -centerCart.y,
-				// -centerCart.z);
-
-//				object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-//				// 지구 밖을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
-//				var quaternion = object.quaternion.clone();
-//				// 쿼터니언각을 뒤집는다
-//				quaternion.inverse();
-//				// 모든 지오메트리 버텍스에
-//				var vertices = geometry.vertices;
-//				for (var i = 0; i < vertices.length; i++) {
-//				var vertex = vertices[i];
-//				// 뒤집은 쿼터니언각을 적용한다
-//				vertex.applyQuaternion(quaternion);
-//				}
-//				object.geometry = geometry;
-
-				// compute face Normals
-				geometry.computeFaceNormals();
 			} else if (geometry instanceof THREE.BufferGeometry) {
 				if(opt.type === "MultiPolygon"){
 					if (!isFile) {
@@ -2397,31 +2367,27 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 					return;
 				}
 			}
-			
-			if (!isFile) {
-				geometry = new THREE.Geometry();
-				geometry.vertices = result.points;
-				geometry.faces = result.faces;
-				// geometry.translate(-centerCart.x, -centerCart.y,
-				// -centerCart.z);
 
-				object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-				var quaternion = object.quaternion.clone();
-				// 쿼터니언각을 뒤집는다
-				quaternion.inverse();
-				// 모든 지오메트리 버텍스에
-				var vertices = geometry.vertices;
-				for (var i = 0; i < vertices.length; i++) {
-					var vertex = vertices[i];
-					// 뒤집은 쿼터니언각을 적용한다
-					vertex.applyQuaternion(quaternion);
-				}
+			geometry = new THREE.Geometry();
+			geometry.vertices = result.points;
+			geometry.faces = result.faces;
 
-				object.geometry = geometry;
-				// compute face Normals
-				geometry.computeFaceNormals();
+			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			var quaternion = object.quaternion.clone();
+			// 쿼터니언각을 뒤집는다
+			quaternion.inverse();
+			// 모든 지오메트리 버텍스에
+			var vertices = geometry.vertices;
+			for (var i = 0; i < vertices.length; i++) {
+				var vertex = vertices[i];
+				// 뒤집은 쿼터니언각을 적용한다
+				vertex.applyQuaternion(quaternion);
 			}
-			
+
+			object.geometry = geometry;
+			// compute face Normals
+			geometry.computeFaceNormals();
+
 			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
 
 //			var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
