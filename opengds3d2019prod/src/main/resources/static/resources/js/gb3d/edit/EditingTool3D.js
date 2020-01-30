@@ -1606,6 +1606,19 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 	// latheMesh.scale.set(1, 1, 1);
 	latheMesh.position.copy(centerCart);
 	latheMesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+	
+	// 2D 피처의 각도와 맞춤
+	var axisy1 = turf.point([ 90, 0 ]);
+	var pickPoint = turf.point([x, y]);
+	var bearing = turf.bearing(pickPoint, axisy1);
+	var bearingNeg = bearing * -1;
+	var zaxis = new THREE.Vector3(0, 0, 1);
+	console.log("y축 1과 객체 중점의 각도는: " + bearing);
+//	버텍스를 돌리고
+//	gb3d.io.ImporterThree.applyAxisAngleToAllMesh(latheMesh, zaxis, Cesium.Math.toRadians(bearingNeg));
+//	 z축 회전
+	latheMesh.rotateZ(Cesium.Math.toRadians(bearing));
+	
 	this.getMap().getThreeScene().add(latheMesh);
 
 	// userData 저장(THREE.Object3D 객체 속성)
@@ -1714,7 +1727,7 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 	// this.getThreeScene().add(vnh);
 
 	// geometry.computeVertexNormals();
-	geometry.computeFlatVertexNormals();
+//	geometry.computeFlatVertexNormals();
 	geometry.computeFaceNormals();
 
 	this.getMap().getThreeScene().add(latheMesh);
@@ -2207,11 +2220,24 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
 
 	if( type === "Point" || type === "MultiPoint" ){
 		position.copy(new THREE.Vector3(cart.x + vec, cart.y + vec, cart.z + vec));
+		
+//		// 2D 피처의 각도와 맞춤
+//		var axisy1 = turf.point([ 90, 0 ]);
+//		var pickPoint = turf.point(center);
+//		var bearing = turf.bearing(pickPoint, axisy1);
+//		var bearingNeg = bearing * -1;
+//		var zaxis = new THREE.Vector3(0, 0, 1);
+//		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+////		버텍스를 돌리고
+//		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(model, zaxis, Cesium.Math.toRadians(bearingNeg));
+////		 z축 회전
+//		model.rotateZ(Cesium.Math.toRadians(bearing));
+		
 	} else {
 		cp = gb3d.Math.crossProductFromDegrees(a, b, centerCoord);
 		position.copy(new THREE.Vector3(cart.x + (cp.u/cp.s)*vec, cart.y + (cp.v/cp.s)*vec, cart.z + (cp.w/cp.s)*vec));
 	}
-
+	
 	threeObject.upModCount();
 	threeObject.setCenter(centerCoord);
 	var record = that.getModelRecord();
@@ -2239,8 +2265,8 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 	points = [],
 	threeObject,
 	object = undefined,
-	result,
-	geometry,
+//	result,
+//	geometry,
 	shape,
 	geom,
 	cart;
@@ -2252,10 +2278,10 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 	}
 
 	var lastCenter = threeObject.getCenter();
-	var position = threeObject.getObject().position;
+//	var position = threeObject.getObject().position;
 	var lastCart = Cesium.Cartesian3.fromDegrees(lastCenter[0], lastCenter[1]);
 //	var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
-	var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
+//	var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
 
 	// === 이준 시작 ===
 	object = threeObject.getObject();
@@ -2298,40 +2324,64 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 	var meshes = recursive(object, []);
 	// 그린 객체인 경우 그룹안에 있는 모든 메쉬에 대해
 	for (var i = 0; i < meshes.length; i++) {
-		geometry = meshes[i].geometry;
+		var mesh = meshes[i];
+		var position = mesh.position; 
+		var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) + Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
+		var geometry = mesh.geometry;
+		var newGeom;
 		// 2차원 객체가 포인트인 경우
 		if (opt.type === "MultiPoint" || opt.type === "Point") {
 			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
-			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			mesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
 		} else {
 			// 2차원 객체가 포인트가 아닌 경우
 			var a, b, cp;
 			if(geometry instanceof THREE.Geometry){
 				if(opt.type === "MultiPolygon"){
 					if (!isFile) {
-						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
-						gb3d.Math.createUVVerticeOnPolygon(geometry, result);
+						var result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
+						newGeom = new THREE.Geometry();
+						newGeom.vertices = result.points;
+						newGeom.faces = result.faces;
+						gb3d.Math.createUVVerticeOnPolygon(newGeom, result);
+						
+						mesh.geometry = newGeom;
 						a = coord[0][0][0];
 						b = coord[0][0][1];
 					}
 				} else if (opt.type === "Polygon") {
 					if (!isFile) {
-						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
-						gb3d.Math.createUVVerticeOnPolygon(geometry, result);
+						var result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
+						newGeom = new THREE.Geometry();
+						newGeom.vertices = result.points;
+						newGeom.faces = result.faces;
+						gb3d.Math.createUVVerticeOnPolygon(newGeom, result);
+						
+						mesh.geometry = newGeom;
 						a = coord[0][0];
 						b = coord[0][1];
 					}
 				} else if(opt.type === "MultiLineString"){
 					if (!isFile) {
-						result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], threeObject.getBuffer(), center, parseFloat(opt.depth));
-						gb3d.Math.createUVVerticeOnLineString(geometry, result);
+						var result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], threeObject.getBuffer(), center, parseFloat(opt.depth));
+						newGeom = new THREE.Geometry();
+						newGeom.vertices = result.points;
+						newGeom.faces = result.faces;
+						gb3d.Math.createUVVerticeOnLineString(newGeom, result);
+						
+						mesh.geometry = newGeom;
 						a = coord[0][0];
 						b = coord[0][1];
 					}
 				} else if(opt.type === "LineString"){
 					if (!isFile) {
-						result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord, threeObject.getBuffer(), center, parseFloat(opt.depth));
-						gb3d.Math.createUVVerticeOnLineString(geometry, result);
+						var result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord, threeObject.getBuffer(), center, parseFloat(opt.depth));
+						newGeom = new THREE.Geometry();
+						newGeom.vertices = result.points;
+						newGeom.faces = result.faces;
+						gb3d.Math.createUVVerticeOnLineString(newGeom, result);
+						
+						mesh.geometry = newGeom;
 						a = coord[0];
 						b = coord[1];
 					}
@@ -2341,25 +2391,25 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 			} else if (geometry instanceof THREE.BufferGeometry) {
 				if(opt.type === "MultiPolygon"){
 					if (!isFile) {
-						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
+						var result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0][0], center, parseFloat(opt.depth));
 						a = coord[0][0][0];
 						b = coord[0][0][1];
 					}
 				} else if (opt.type === "Polygon") {
 					if (!isFile) {
-						result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
+						var result = gb3d.Math.getPolygonVertexAndFaceFromDegrees(coord[0], center, parseFloat(opt.depth));
 						a = coord[0][0];
 						b = coord[0][1];
 					}
 				} else if(opt.type === "MultiLineString"){
 					if (!isFile) {
-						result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], threeObject.getBuffer(), center, parseFloat(opt.depth));
+						var result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord[0], threeObject.getBuffer(), center, parseFloat(opt.depth));
 						a = coord[0];
 						b = coord[1];
 					}
 				} else if(opt.type === "LineString"){
 					if (!isFile) {
-						result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord, threeObject.getBuffer(), center, parseFloat(opt.depth));
+						var result = gb3d.Math.getLineStringVertexAndFaceFromDegrees(coord, threeObject.getBuffer(), center, parseFloat(opt.depth));
 						a = coord[0];
 						b = coord[1];
 					}
@@ -2367,50 +2417,70 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 					return;
 				}
 			}
-
-			geometry = new THREE.Geometry();
-			geometry.vertices = result.points;
-			geometry.faces = result.faces;
-
-			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
-			var quaternion = object.quaternion.clone();
+			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
+//			position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
+			position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
+			// 지구 밖을 바라보도록 설정한다
+			mesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			// 지구 밖을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+			var quaternion = mesh.quaternion.clone();
 			// 쿼터니언각을 뒤집는다
 			quaternion.inverse();
 			// 모든 지오메트리 버텍스에
-			var vertices = geometry.vertices;
+			var vertices = newGeom.vertices;
 			for (var i = 0; i < vertices.length; i++) {
 				var vertex = vertices[i];
 				// 뒤집은 쿼터니언각을 적용한다
 				vertex.applyQuaternion(quaternion);
 			}
 
-			object.geometry = geometry;
 			// compute face Normals
-			geometry.computeFaceNormals();
-
-			cp = gb3d.Math.crossProductFromDegrees(a, b, center);
-
-//			var lastCart = Cesium.Cartesian3.fromDegrees(x, y);
-//			var vec = Math.sqrt(Math.pow(position.x - lastCart.x, 2) +
-//			Math.pow(position.y - lastCart.y, 2) + Math.pow(position.z - lastCart.z, 2));
-
-			position.copy(new THREE.Vector3(centerCart.x + (cp.u/cp.s)*vec, centerCart.y + (cp.v/cp.s)*vec, centerCart.z + (cp.w/cp.s)*vec));
-//			position.copy(new THREE.Vector3(lastCart.x, lastCart.y, lastCart.z));
-//			object.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+			newGeom.computeFaceNormals();
+			newGeom.computeBoundingSphere();
+			
+//			// 2D 피처의 각도와 맞춤
+//			var axisy1 = turf.point([ 90, 0 ]);
+//			var pickPoint = turf.point(center);
+//			var bearing = turf.bearing(pickPoint, axisy1);
+//			var bearingNeg = bearing * -1;
+//			var zaxis = new THREE.Vector3(0, 0, 1);
+//			console.log("y축 1과 객체 중점의 각도는: " + bearing);
+////			 버텍스를 돌리고
+//			gb3d.io.ImporterThree.applyAxisAngleToAllMesh(mesh, zaxis, Cesium.Math.toRadians(bearingNeg));
+////			 z축 회전
+//			mesh.rotateZ(Cesium.Math.toRadians(bearing));
 		}
 
+//		position.copy(new THREE.Vector3(centerCart.x, centerCart.y, centerCart.z));
+//		// 지구 밖을 바라보도록 설정한다
+//		mesh.lookAt(new THREE.Vector3(centerHigh.x, centerHigh.y, centerHigh.z));
+//		// 지구 밖을 바라보는 상태에서 버텍스, 쿼터니언을 뽑는다
+//		var quaternion = mesh.quaternion.clone();
+//		// 쿼터니언각을 뒤집는다
+//		quaternion.inverse();
+//		// 모든 지오메트리 버텍스에
+//		var vertices = newGeom.vertices;
+//		for (var i = 0; i < vertices.length; i++) {
+//			var vertex = vertices[i];
+//			// 뒤집은 쿼터니언각을 적용한다
+//			vertex.applyQuaternion(quaternion);
+//		}
+//
+//		// compute face Normals
+//		newGeom.computeFaceNormals();
+//		newGeom.computeBoundingSphere();
+		
 		// 2D 피처의 각도와 맞춤
-//		var axisy1 = turf.point([ 90, 0 ]);
-//		var pickPoint = turf.point([x, y]);
-//		var bearing = turf.bearing(pickPoint, axisy1);
-//		var bearingNeg = bearing * -1;
-//		var zaxis = new THREE.Vector3(0, 0, 1);
-//		console.log("y축 1과 객체 중점의 각도는: " + bearing);
-		// 버텍스를 돌리고
-//		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(object, zaxis, Cesium.Math.toRadians(bearingNeg));
-		// z축 회전
-//		object.rotateZ(Cesium.Math.toRadians(bearing));
-
+		var axisy1 = turf.point([ 90, 0 ]);
+		var pickPoint = turf.point(center);
+		var bearing = turf.bearing(pickPoint, axisy1);
+		var bearingNeg = bearing * -1;
+		var zaxis = new THREE.Vector3(0, 0, 1);
+		console.log("y축 1과 객체 중점의 각도는: " + bearing);
+//		 버텍스를 돌리고
+		gb3d.io.ImporterThree.applyAxisAngleToAllMesh(mesh, zaxis, Cesium.Math.toRadians(bearingNeg));
+//		 z축 회전
+		mesh.rotateZ(Cesium.Math.toRadians(bearing));
 		// threeObject 수정 횟수 증가, Center 값 재설정
 		threeObject.upModCount();
 		threeObject.setCenter(center);
