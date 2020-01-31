@@ -33,7 +33,9 @@ gb3d.Map = function(obj) {
 	 * 
 	 * @type {HTMLElement}
 	 */
-	this.cesiumElem = $("<div>").addClass("gb3d-map-cesium-area")[0];
+	this.cesiumElem = $("<div>").attr({
+		"id" : "gb3d-map-cesium-area"
+	}).addClass("gb3d-map-cesium-area")[0];
 	/**
 	 * three 영역 엘리먼트
 	 * 

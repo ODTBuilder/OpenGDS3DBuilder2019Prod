@@ -1,0 +1,32 @@
+{
+	"attributes": {
+		"isPhysical": false,
+		"nodeType": "root",
+		"projectType": "LX",
+        "specularLighting": true
+	},
+	"children": [
+		{
+			"attributes": {
+				"isPhysical": true,
+				"nodeType": "LX"
+			},
+			"children": [],
+			"data_key": "LX1F",
+			"data_name": "LX1F",
+			"mapping_type": "origin",
+            "latitude": 35.8379798441118,
+            "longitude": 127.06514705661012,
+            "height": 0,
+            "heading": 0,
+            "pitch": 0,
+			"roll": 0
+		}
+	],
+	"parent": 0,
+	"depth": 1,
+	"view_order": 2,
+	"data_key": "LX",
+	"data_name": "LX",
+    "mapping_type": "origin"
+}

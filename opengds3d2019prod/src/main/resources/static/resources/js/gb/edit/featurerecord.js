@@ -1,7 +1,5 @@
 /**
- * @classdesc
- * 피처 편집 이력을 관리하는 객체이다.
- * 
+ * @classdesc 피처 편집 이력을 관리하는 객체이다.
  * @class gb.edit.FeatureRecord
  * @memberof gb.edit
  * @param {Object} obj - 생성자 옵션을 담은 객체
@@ -15,53 +13,56 @@
  */
 gb.edit.FeatureRecord = function(obj) {
 	this.translation = {
-		"cancel" : {
-			"ko" : "취소",
-			"en" : "Cancel"
-		},
-		"save" : {
-			"ko" : "저장",
-			"en" : "Save"
-		},
-		"discard" : {
-			"ko" : "무시",
-			"en" : "Discard"
-		},
-		"saveHint" : {
-			"ko" : "변경사항을 저장하시겠습니까?",
-			"en" : "Do you want to save your changes?"
-		},
-		"wfstUrlHint" : {
-			"ko" : "'wfstURL'은 필수 입력항목입니다.",
-			"en" : "'wfstURL' is a required field."
-		},
-		"layerInfoUrlHint" : {
-			"ko" : "'layerInfoURL'은 필수 입력항목입니다.",
-			"en" : "'layerInfoURL' is a required field."
-		}
+			"cancel" : {
+				"ko" : "취소",
+				"en" : "Cancel"
+			},
+			"save" : {
+				"ko" : "저장",
+				"en" : "Save"
+			},
+			"discard" : {
+				"ko" : "무시",
+				"en" : "Discard"
+			},
+			"saveHint" : {
+				"ko" : "변경사항을 저장하시겠습니까?",
+				"en" : "Do you want to save your changes?"
+			},
+			"wfstUrlHint" : {
+				"ko" : "'wfstURL'은 필수 입력항목입니다.",
+				"en" : "'wfstURL' is a required field."
+			},
+			"layerInfoUrlHint" : {
+				"ko" : "'layerInfoURL'은 필수 입력항목입니다.",
+				"en" : "'layerInfoURL' is a required field."
+			}
 	};
-	
+
 	/**
 	 * 새로 생성된 객체들을 담은 변수
+	 * 
 	 * @private
 	 * @type {Object.<string, ol.Feature>}
 	 */
 	this.created = {};
-	
+
 	/**
 	 * 편집된 객체들을 담은 변수
+	 * 
 	 * @private
 	 * @type {Object.<string, ol.Feature>}
 	 */
 	this.modified = {};
-	
+
 	/**
 	 * 삭제된 객체들을 담은 변수
+	 * 
 	 * @private
 	 * @type {Object.<string, ol.Feature>}
 	 */
 	this.removed = {};
-	
+
 	this.locale = obj.locale || "en";
 	this.id = obj.id ? obj.id : false;
 	this.wfstURL = obj.wfstURL || false;
@@ -73,14 +74,18 @@ gb.edit.FeatureRecord = function(obj) {
 		console.error("gb.edit.FeatureRecord: " + this.translation.layerInfoUrlHint[this.locale]);
 	}
 	this.modelRecord = obj.modelRecord ? obj.modelRecord : undefined; 
+	this.featureNumberURL = obj.featureNumberURL ? obj.featureNumberURL : undefined;
+
 	/**
 	 * gb.edit.EditingTool 객체
+	 * 
 	 * @protected
 	 * @type {gb.edit.EditingTool}
 	 */
 	this.editTool = undefined;
 	/**
 	 * gb3d.edit.EditingTool3D 객체
+	 * 
 	 * @protected
 	 * @type {gb3d.edit.EditingTool3D}
 	 */
@@ -159,8 +164,7 @@ gb.edit.FeatureRecord.prototype.clearRemoved = function() {
  * 
  * @method gb.edit.FeatureRecord#isEditing
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집이력을 확인할 layer 객체
+ * @param {ol.layer.Base} layer - 편집이력을 확인할 layer 객체
  * @return {Boolean} 해당 레이어의 편집이력 존재 여부
  */
 gb.edit.FeatureRecord.prototype.isEditing = function(layer) {
@@ -211,10 +215,8 @@ gb.edit.FeatureRecord.prototype.isEditing = function(layer) {
  * 
  * @method gb.edit.FeatureRecord#isRemoved
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집이력(삭제)에서 확인할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력(삭제)에서 확인할 feature 객체
+ * @param {ol.layer.Base} layer - 편집이력(삭제)에서 확인할 layer 객체
+ * @param {ol.Feature} feature - 편집이력(삭제)에서 확인할 feature 객체
  * @return {Boolean} 해당 feature의 편집이력(삭제) 존재 여부
  */
 gb.edit.FeatureRecord.prototype.isRemoved = function(layer, feature) {
@@ -237,22 +239,20 @@ gb.edit.FeatureRecord.prototype.isRemoved = function(layer, feature) {
  * 
  * @method gb.edit.FeatureRecord#create
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {ol.layer.Base} layer - 편집이력에 임시저장할 layer 객체
+ * @param {ol.Feature} feature - 편집이력에 임시저장할 feature 객체
  */
 gb.edit.FeatureRecord.prototype.create = function(layer, feature) {
 	var id = layer.get("id");
-	
+
 	if(!id){
 		return;
 	}
-	
+
 	if(!id.split(":")[1] || !id.split(":")[3]){
 		return;
 	}
-	
+
 	if (!this.created[id]) {
 		this.created[id] = {};
 		this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.created[id]);
@@ -264,22 +264,20 @@ gb.edit.FeatureRecord.prototype.create = function(layer, feature) {
  * 
  * @method gb.edit.FeatureRecord#remove
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {ol.layer.Base} layer - 편집이력에 임시저장할 layer 객체
+ * @param {ol.Feature} feature - 편집이력에 임시저장할 feature 객체
  */
 gb.edit.FeatureRecord.prototype.remove = function(layer, feature) {
 	var id = layer.get("id");
-	
+
 	if(!id){
 		return;
 	}
-	
+
 	if(!id.split(":")[1] || !id.split(":")[3]){
 		return;
 	}
-	
+
 	if (!this.removed[id]) {
 		this.removed[id] = {};
 		this.requestLayerInfo(id.split(":")[0], id.split(":")[1], id.split(":")[3], this.removed[id]);
@@ -306,8 +304,7 @@ gb.edit.FeatureRecord.prototype.remove = function(layer, feature) {
  * 
  * @method gb.edit.FeatureRecord#removeByLayer
  * @function
- * @param {String}
- *            layerId - 삭제할 Layer의 ID
+ * @param {String} layerId - 삭제할 Layer의 ID
  */
 gb.edit.FeatureRecord.prototype.removeByLayer = function(layerId) {
 	if (this.removed.hasOwnProperty(layerId)) {
@@ -325,22 +322,20 @@ gb.edit.FeatureRecord.prototype.removeByLayer = function(layerId) {
  * 
  * @method gb.edit.FeatureRecord#update
  * @function
- * @param {ol.layer.Base}
- *            layer - 편집이력에 임시저장할 layer 객체
- * @param {ol.Feature}
- *            feature - 편집이력에 임시저장할 feature 객체
+ * @param {ol.layer.Base} layer - 편집이력에 임시저장할 layer 객체
+ * @param {ol.Feature} feature - 편집이력에 임시저장할 feature 객체
  */
 gb.edit.FeatureRecord.prototype.update = function(layer, feature) {
 	var id = layer.get("id");
-	
+
 	if(!id){
 		return;
 	}
-	
+
 	if(!id.split(":")[1] || !id.split(":")[3]){
 		return;
 	}
-	
+
 	if (!this.modified) {
 		this.modified = {};
 	}
@@ -370,23 +365,19 @@ gb.edit.FeatureRecord.prototype.update = function(layer, feature) {
  * 
  * @method gb.edit.FeatureRecord#requestLayerInfo
  * @function
- * @param {String}
- *            serverName - Geoserver name
- * @param {String}
- *            workspace - Workspace name
- * @param {String}
- *            layer - Layer name
- * @param {Object}
- *            object - Geometry Key 값을 저장할 객체
+ * @param {String} serverName - Geoserver name
+ * @param {String} workspace - Workspace name
+ * @param {String} layer - Layer name
+ * @param {Object} object - Geometry Key 값을 저장할 객체
  */
 gb.edit.FeatureRecord.prototype.requestLayerInfo = function(serverName, workspace, layer, object){
 	var obj = object;
 	var a = {
-		serverName: serverName,
-		workspace: workspace,
-		geoLayerList: [layer]
+			serverName: serverName,
+			workspace: workspace,
+			geoLayerList: [layer]
 	};
-	
+
 	$.ajax({
 		method : "POST",
 		url: this.layerInfoURL,
@@ -483,8 +474,7 @@ gb.edit.FeatureRecord.prototype.getStructure = function() {
  * 
  * @method gb.edit.FeatureRecord#getPartStructure
  * @function
- * @param {String[]}
- *            bringLayer - 레이어 ID들의 배열
+ * @param {String[]} bringLayer - 레이어 ID들의 배열
  * @return {Object} 현재 임시저장중인 편집이력
  */
 gb.edit.FeatureRecord.prototype.getPartStructure = function(bringLayer) {
@@ -583,10 +573,8 @@ gb.edit.FeatureRecord.prototype.getPartStructure = function(bringLayer) {
  * 
  * @method gb.edit.FeatureRecord#deleteFeatureCreated
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @param {String}
- *            featureId - Feature ID
+ * @param {String} layerId - Layer ID
+ * @param {String} featureId - Feature ID
  * @return {ol.Feature} 생성 임시 저장 목록에서 삭제된 ol.Feature 객체
  */
 gb.edit.FeatureRecord.prototype.deleteFeatureCreated = function(layerId, featureId) {
@@ -604,10 +592,8 @@ gb.edit.FeatureRecord.prototype.deleteFeatureCreated = function(layerId, feature
  * 
  * @method gb.edit.FeatureRecord#deleteFeatureModified
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @param {String}
- *            featureId - Feature ID
+ * @param {String} layerId - Layer ID
+ * @param {String} featureId - Feature ID
  * @return {ol.Feature} 편집 임시 저장 목록에서 삭제된 ol.Feature 객체
  */
 gb.edit.FeatureRecord.prototype.deleteFeatureModified = function(layerId, featureId) {
@@ -625,10 +611,8 @@ gb.edit.FeatureRecord.prototype.deleteFeatureModified = function(layerId, featur
  * 
  * @method gb.edit.FeatureRecord#deleteFeatureRemoved
  * @function
- * @param {String}
- *            layerId - Layer ID
- * @param {String}
- *            featureId - Feature ID
+ * @param {String} layerId - Layer ID
+ * @param {String} featureId - Feature ID
  * @return {ol.Feature} 삭제 임시 저장 목록에서 삭제된 ol.Feature 객체
  */
 gb.edit.FeatureRecord.prototype.deleteFeatureRemoved = function(layerId, featureId) {
@@ -642,20 +626,18 @@ gb.edit.FeatureRecord.prototype.deleteFeatureRemoved = function(layerId, feature
 	return feature;
 };
 /**
- * Geoserver Layer에 대한 변경사항을 저장 요청하는 창을 생성한다.
- * 변경사항 무시를 선택하면 변경사항 이전으로 되돌린다.
+ * Geoserver Layer에 대한 변경사항을 저장 요청하는 창을 생성한다. 변경사항 무시를 선택하면 변경사항 이전으로 되돌린다.
  * 
  * @method gb.edit.FeatureRecord#save
  * @function
- * @param {gb.edit.EditingTool}
- *            editTool - gb.edit.EditingTool 객체
+ * @param {gb.edit.EditingTool} editTool - gb.edit.EditingTool 객체
  */
 gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 	var that = this;
 	var edit = editTool;
 	this.editTool = editTool;
 	this.editTool3D = editTool3D;
-	
+
 	var row2 = $("<div>").addClass("row").append(this.translation.saveHint[this.locale])
 
 	var well = $("<div>").addClass("well").append(row2);
@@ -692,23 +674,24 @@ gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 	});
 
 	$(okBtn).click(function() {
-		
+
 		// loading div 생성
 		$("body").append(
-			$("<div id='shp-upload-loading' class='gb-body-loading'>").append(
-				$("<i>").addClass("gb-body-loading-icon").addClass("fas fa-spinner fa-spin fa-5x")
-			)
+				$("<div id='shp-upload-loading' class='gb-body-loading'>").append(
+						$("<i>").addClass("gb-body-loading-icon").addClass("fas fa-spinner fa-spin fa-5x")
+				)
 		);
-		
-		that.sendWFSTTransaction(edit);
-		
+		that.getNumberOfFeatures();
+
+//		that.sendWFSTTransaction(edit);
+
 		if(gb.undo){
 			gb.undo.invalidateAll();
 		}
-		
+
 		openSaveModal.close();
 	});
-	
+
 	$(discardBtn).click(function() {
 		that.created = {};
 		that.modified = {};
@@ -721,17 +704,16 @@ gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 	});
 }
 /**
- * 모든 변경사항 목록이 비어있다면 로딩창과 gb.edit.EditingTool 창을 닫는다. 
+ * 모든 변경사항 목록이 비어있다면 로딩창과 gb.edit.EditingTool 창을 닫는다.
  * 
  * @method gb.edit.FeatureRecord#closeEditTool
  * @function
- * @param {gb.edit.EditingTool}
- *            editTool - gb.edit.EditingTool 객체
+ * @param {gb.edit.EditingTool} editTool - gb.edit.EditingTool 객체
  */
 gb.edit.FeatureRecord.prototype.closeEditTool = function(editTool){
 	var count = 0;
 	var edit = editTool;
-	
+
 	for(var i in this.created){
 		for(var j in this.created[i]){
 			if(j !== "geomKey"){
@@ -739,7 +721,7 @@ gb.edit.FeatureRecord.prototype.closeEditTool = function(editTool){
 			}
 		}
 	}
-	
+
 	for(var i in this.modified){
 		for(var j in this.modified[i]){
 			if(j !== "geomKey"){
@@ -747,7 +729,7 @@ gb.edit.FeatureRecord.prototype.closeEditTool = function(editTool){
 			}
 		}
 	}
-	
+
 	for(var i in this.removed){
 		for(var j in this.removed[i]){
 			if(j !== "geomKey"){
@@ -755,7 +737,7 @@ gb.edit.FeatureRecord.prototype.closeEditTool = function(editTool){
 			}
 		}
 	}
-	
+
 	if(!count){
 		this.created = {};
 		this.modified = {};
@@ -769,8 +751,7 @@ gb.edit.FeatureRecord.prototype.closeEditTool = function(editTool){
  * 
  * @method gb.edit.FeatureRecord#sendWFSTTransaction
  * @function
- * @param {gb.edit.EditingTool}
- *            editTool - gb.edit.EditingTool 객체
+ * @param {gb.edit.EditingTool} editTool - gb.edit.EditingTool 객체
  */
 gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	var that = this;
@@ -780,7 +761,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	var arr = [];
 	var edit = editTool;
 	var format = new ol.format.WFS();
-	
+
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
 		var mrecord = that.getModelRecord();
@@ -795,7 +776,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 			if(feature === "geomKey"){
 				continue;
 			}
-			
+
 			var geomKey = this.modified[layerid][feature].getGeometryName();
 			this.modified[layerid][feature].setGeometryName(this.modified[layerid].geomKey);
 			this.modified[layerid][feature].set(this.modified[layerid].geomKey, this.modified[layerid][feature].get(geomKey));
@@ -811,7 +792,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 				if(feature === "geomKey"){
 					continue;
 				}
-				
+
 				geomKey = this.removed[layerid][feature].getGeometryName();
 				this.removed[layerid][feature].setGeometryName(this.removed[layerid].geomKey);
 				this.removed[layerid][feature].set(this.removed[layerid].geomKey, this.removed[layerid][feature].get(geomKey));
@@ -827,7 +808,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 					if(feature === "geomKey"){
 						continue;
 					}
-					
+
 					geomKey = this.created[layerid][feature].getGeometryName();
 					this.created[layerid][feature].setGeometryName(this.created[layerid].geomKey);
 					this.created[layerid][feature].set(this.created[layerid].geomKey, this.created[layerid][feature].get(geomKey));
@@ -841,59 +822,59 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 			}
 		}
 	}
-	
+
 	split = layerid.split(":");
 	geoserver = layerid.split(":")[0];
 	workspace = layerid.split(":")[1];
 	repo = layerid.split(":")[2];
 	layername = "";
-	
+
 	for(var i in split){
 		if(i > 2){
 			layername += "_" + split[i];
 		}
 	}
-	
+
 	layername = layername.substring(1);
-	
+
 	switch(type){
-		case "created":
-			node = format.writeTransaction(arr, null, null, {
-				"featureNS": workspace,
-				"featurePrefix": workspace,
-				"featureType": layername,
-				"version": gb.module.serviceVersion.WFS
-			});
-			break;
-		case "modified":
-			// modified는 레이어단위로 저장 요청이 가능하지않으므로 객체별로 요청한다.
-			this.wfstCallback(arr, "modified", {
-				geoserver: geoserver,
-				workspace: workspace,
-				layername: layername,
-				layer: layerid
-			});
-			break;
-		case "removed":
-			node = format.writeTransaction(null, null, arr, {
-				"featureNS": workspace,
-				"featurePrefix": workspace,
-				"featureType": layername,
-				"version": gb.module.serviceVersion.WFS
-			});
-			break;
-		default:
-			return
+	case "created":
+		node = format.writeTransaction(arr, null, null, {
+			"featureNS": workspace,
+			"featurePrefix": workspace,
+			"featureType": layername,
+			"version": gb.module.serviceVersion.WFS
+		});
+		break;
+	case "modified":
+		// modified는 레이어단위로 저장 요청이 가능하지않으므로 객체별로 요청한다.
+		this.wfstCallback(arr, "modified", {
+			geoserver: geoserver,
+			workspace: workspace,
+			layername: layername,
+			layer: layerid
+		});
+		break;
+	case "removed":
+		node = format.writeTransaction(null, null, arr, {
+			"featureNS": workspace,
+			"featurePrefix": workspace,
+			"featureType": layername,
+			"version": gb.module.serviceVersion.WFS
+		});
+		break;
+	default:
+		return
 	}
-	
+
 	// created, removed는 레이어단위로 저장 요청이 가능하므로 바로 요청한다.
 	if(type === "created" || type === "removed"){
 		param = {
-			"serverName": geoserver,
-			"workspace": workspace,
-			"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
+				"serverName": geoserver,
+				"workspace": workspace,
+				"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
 		};
-		
+
 		$.ajax({
 			type: "POST",
 			url: this.wfstURL,
@@ -916,20 +897,13 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
  * 
  * @method gb.edit.FeatureRecord#wfstCallback
  * @function
- * @param {Array<ol.Feature>}
- *            array - 변경사항이 있는 ol.Feature 객체들의 배열
- * @param {String}
- *            type - 변경사항의 종류("created", "modified", "removed")
- * @param {Object}
- *            options - Geoserver WFS-T 저장 요청을 위한 정보
- * @param {String}
- *            options.geoserver - 저장을 요청할 Geoserver의 이름
- * @param {String}
- *            options.workspace - 저장을 요청할 Workspace의 이름
- * @param {String}
- *            options.layername - 저장을 요청할 Layer의 이름
- * @param {String}
- *            options.layer - 저장을 요청할 Layer의 ID
+ * @param {Array<ol.Feature>} array - 변경사항이 있는 ol.Feature 객체들의 배열
+ * @param {String} type - 변경사항의 종류("created", "modified", "removed")
+ * @param {Object} options - Geoserver WFS-T 저장 요청을 위한 정보
+ * @param {String} options.geoserver - 저장을 요청할 Geoserver의 이름
+ * @param {String} options.workspace - 저장을 요청할 Workspace의 이름
+ * @param {String} options.layername - 저장을 요청할 Layer의 이름
+ * @param {String} options.layer - 저장을 요청할 Layer의 ID
  */
 gb.edit.FeatureRecord.prototype.wfstCallback = function(array, type, options){
 	var that = this;
@@ -938,57 +912,57 @@ gb.edit.FeatureRecord.prototype.wfstCallback = function(array, type, options){
 	var t = type;
 	var opt = options;
 	var format = new ol.format.WFS();
-	
+
 	if(!(arr instanceof Array)){
 		return;
 	}
-	
+
 	if(arr.length === 0){
 		this.sendWFSTTransaction(this.editTool);
 		return;
 	}
-	
+
 	if(!(opt instanceof Object)){
 		return;
 	}
-	
+
 	feature = arr.pop();
-	
+
 	switch(t){
-		case "created":
-			node = format.writeTransaction([feature], null, null, {
-				"featureNS": opt.workspace,
-				"featurePrefix": opt.workspace,
-				"featureType": opt.layername,
-				"version": gb.module.serviceVersion.WFS
-			});
-			break;
-		case "modified":
-			node = format.writeTransaction(null, [feature], null, {
-				"featureNS": opt.workspace,
-				"featurePrefix": opt.workspace,
-				"featureType": opt.layername,
-				"version": gb.module.serviceVersion.WFS
-			});
-			break;
-		case "removed":
-			node = format.writeTransaction(null, null, [feature], {
-				"featureNS": opt.workspace,
-				"featurePrefix": opt.workspace,
-				"featureType": opt.layername,
-				"version": gb.module.serviceVersion.WFS
-			});
-			break;
-		default:
-			return
+	case "created":
+		node = format.writeTransaction([feature], null, null, {
+			"featureNS": opt.workspace,
+			"featurePrefix": opt.workspace,
+			"featureType": opt.layername,
+			"version": gb.module.serviceVersion.WFS
+		});
+		break;
+	case "modified":
+		node = format.writeTransaction(null, [feature], null, {
+			"featureNS": opt.workspace,
+			"featurePrefix": opt.workspace,
+			"featureType": opt.layername,
+			"version": gb.module.serviceVersion.WFS
+		});
+		break;
+	case "removed":
+		node = format.writeTransaction(null, null, [feature], {
+			"featureNS": opt.workspace,
+			"featurePrefix": opt.workspace,
+			"featureType": opt.layername,
+			"version": gb.module.serviceVersion.WFS
+		});
+		break;
+	default:
+		return
 	}
-	
+
 	param = {
-		"serverName": opt.geoserver,
-		"workspace": opt.workspace,
-		"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
+			"serverName": opt.geoserver,
+			"workspace": opt.workspace,
+			"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
 	};
-	
+
 	$.ajax({
 		type: "POST",
 		url: this.wfstURL,
@@ -1024,3 +998,100 @@ gb.edit.FeatureRecord.prototype.setModelRecord = function(mrecord){
 	this.modelRecord = mrecord;
 }
 
+/**
+ * featureNumberURL를 반환한다.
+ * 
+ * @method gb.edit.FeatureRecord#getFeatureNumberURL
+ */
+gb.edit.FeatureRecord.prototype.getFeatureNumberURL = function(){
+	return this.featureNumberURL;
+}
+
+/**
+ * featureNumberURL 를 할당한다.
+ * 
+ * @method gb.edit.FeatureRecord#setFeatureNumberURL
+ */
+gb.edit.FeatureRecord.prototype.setFeatureNumberURL = function(featureNumberURL){
+	this.featureNumberURL = featureNumberURL;
+}
+
+/**
+ * 저장전 편집 레이어의 피처 개수를 가져온 후 편집 이력을 저장 요청한다.
+ * 
+ * @method gb.edit.FeatureRecord#getNumberOfFeatures
+ */
+gb.edit.FeatureRecord.prototype.getNumberOfFeatures = function(){
+	var that = this;
+	var url = that.getFeatureNumberURL();
+
+	var layerids;
+
+//	if(Object.keys(that.modified).length !== 0){
+//	layerids = Object.keys(that.modified)[0];
+//	} else if(Object.keys(that.removed).length !== 0){
+//	layerids = Object.keys(that.removed)[0];
+//	} else
+	if(Object.keys(that.created).length !== 0){
+		layerids = Object.keys(that.created);
+		var params = {
+				"serverName" : undefined,
+				"workspace" : undefined,
+				"layers" : []
+		};
+		var fullids = [];
+		for (var i = 0; i < layerids.length; i++) {
+			var layerid = layerids[i];
+			fullids.push(layerids[i]);
+			var split = layerid.split(":");
+			var geoserver = split[0];
+			var workspace = split[1];
+			var datastore = split[2];
+			var layername = split[3];
+			if (i === 0) {
+				params["serverName"] = geoserver;
+				params["workspace"] = workspace; 
+			}
+			params["layers"].push(layername);
+		}
+
+		// String serverName = (String) jsonObject.get("serverName");
+		// String workspace = (String) jsonObject.get("workspace");
+		// String[] layers = (String[]) jsonObject.get("layers");
+
+		$.ajax({
+			method : "POST",
+			url: url,
+			data: JSON.stringify(params),
+			contentType: 'application/json; charset=utf-8',
+			success: function(data, textStatus, jqXHR) {
+				if (data.success === true) {
+					// 피처 개수 임시 저장후
+					console.log(data.layers);
+					console.log(fullids);
+					var numbers = [];
+					for (var i = 0; i < data.layers.length; i++) {
+						var layer = data.layers[i];
+						numbers.push(layer.totalFeatures);
+					}
+					// 편집 저장 요청
+					var numStructure = {};
+					if (fullids.length === numbers.length) {
+						for (var i = 0; i < fullids.length; i++) {
+							numStructure[fullids[i]] = numbers[i]; 
+						}	
+					}
+					console.log(numStructure);
+//					this.sendWFSTTransaction(this.editTool);
+				}
+			},
+			error: function(e) {
+				var errorMsg = e? (e.status + ' ' + e.statusText) : "";
+				console.log(errorMsg);
+			},
+		});
+
+	} else {
+		this.sendWFSTTransaction(this.editTool);
+	}
+}

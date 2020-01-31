@@ -226,7 +226,69 @@ html, body {
 			"target" : $(".area-3d")[0],
 			"initPosition" : [ 127.03250885009764, 37.51989305019379 ]
 		});
+		//==========================
+		// mago3d init
+// 		var managerFactory = null;
+// 		var insertIssueEnable = false;
 
+// 		var imagePath = "/images/ko";
+// 		var dataInformationUrl = "resources/json/";
+// // 		magoStart(gb3dMap.getCesiumViewer(), "cesiumContainer", imagePath);
+
+// 		// mago3d start, policy loading
+// 		function magoStart(viewer, renderDivId, imagePath) {
+// 			$.ajax({
+// 				url : dataInformationUrl + "workshop-policy-cesium.json",
+// 				type : "GET",
+// 				dataType : "json",
+// 				success : function(serverPolicy) {
+// 					loadData(viewer, renderDivId, serverPolicy);
+// 				},
+// 				error : function(e) {
+// 					alert(e.responseText);
+// 				}
+// 			});
+// 		}
+
+// 		// init project load
+// 		function loadData(viewer, renderDivId, serverPolicy) {
+// 			if (serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
+// 				managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
+// 			} else {
+// 				var defaultProjectArray = serverPolicy.geo_data_default_projects;
+// 				var projectIdArray = new Array(defaultProjectArray.length);
+// 				var projectDataArray = new Array(defaultProjectArray.length);
+// 				var projectDataFolderArray = new Array(defaultProjectArray.length);
+
+// 				var dataCount = 0;
+// 				defaultProjectArray.forEach(function(projectId, index) {
+// 					projectIdArray[index] = projectId;
+// 					console.log("url = " + dataInformationUrl + projectId);
+// 					$.ajax({
+// 						url : dataInformationUrl + projectId,
+// 						type : "GET",
+// 						dataType : "json",
+// 						success : function(serverData) {
+// 							console.log("index = " + index + ", data = " + serverData);
+// 							projectDataArray[index] = serverData;
+// 							projectDataFolderArray[index] = serverData.data_key;
+// 							if (defaultProjectArray.length === (dataCount + 1)) {
+// 								createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+// 							}
+// 							dataCount++;
+// 						},
+// 						error : function(e) {
+// 							alert(e.responseText);
+// 						}
+// 					});
+// 				});
+// 			}
+// 		}
+
+// 		function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
+// 			managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+// 		}
+		//==========================
 		// ThreeJS Eidtor
 		var threeEditor = new Editor(gb3dMap.getThreeCamera(), gb3dMap.getThreeScene());
 		var threeSidebar = new Sidebar(threeEditor);
@@ -266,6 +328,7 @@ html, body {
 		var frecord = new gb.edit.FeatureRecord({
 			//id : "feature_id",
 			locale : locale,
+			featureNumberURL : "geoserver/getNumberOfFeatures.ajax?${_csrf.parameterName}=${_csrf.token}",
 			wfstURL : urlList.wfst + urlList.token,
 			layerInfoURL : urlList.getLayerInfo + urlList.token,
 			modelRecord : mrecord
@@ -279,12 +342,12 @@ html, body {
 		var threeTree = new gb3d.tree.Three({
 			"target" : "#attrObject",
 			"map" : gb3dMap,
-// 			"otree" : otree,
+			// 			"otree" : otree,
 			"editingTool3D" : function() {
 				return epan3d;
 			}
 		});
-		
+
 		var otree = new gb3d.tree.OpenLayers({
 			"locale" : locale || "en",
 			"append" : $(".builderLayerClientPanel")[0],
@@ -300,7 +363,7 @@ html, body {
 			},
 			"threeTree" : threeTree
 		});
-		
+
 		var tilesetManager = new gb3d.edit.TilesetManager({
 			map : gb3dMap,
 			clientTree : otree
@@ -419,8 +482,8 @@ html, body {
 				epan.editToolOpen();
 				epan3d.editToolOpen();
 			}
-// 			epan.editToolToggle();
-// 			epan3d.editToolToggle();
+			// 			epan.editToolToggle();
+			// 			epan3d.editToolToggle();
 		});
 
 		// feature list
@@ -482,6 +545,13 @@ html, body {
 		});
 
 		$(document).ready(function() {
+// 	 		var managerFactory = null;
+// 	 		var insertIssueEnable = false;
+
+// 	 		var imagePath = "/images/ko";
+// 	 		var dataInformationUrl = "resources/json/";
+// 	 		magoStart(gb3dMap.getCesiumViewer(), $(gb3dMap.cesiumElem).attr("id"), imagePath);
+			
 			var gitrnd = {
 				resize : function() {
 					//현재 보이는 브라우저 내부 영역의 높이

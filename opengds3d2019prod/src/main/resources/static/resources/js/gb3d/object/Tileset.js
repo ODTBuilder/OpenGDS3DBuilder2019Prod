@@ -20,6 +20,7 @@ gb3d.object.Tileset = function(obj) {
 	// this.tileId = options.tileId ? options.tileId : undefined;
 	this.cesiumTileset = options.cesiumTileset instanceof Cesium.Cesium3DTileset ? options.cesiumTileset : undefined;
 
+//	this.path = options.path ? options.path : undefined;
 	if (!this.layer || !this.cesiumTileset) {
 		console.error("constructor parameter should not be empty");
 	}

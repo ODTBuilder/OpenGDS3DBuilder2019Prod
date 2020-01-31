@@ -45,7 +45,10 @@ package com.gitrnd.gdsbuilder.geoserver;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Base64;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -53,7 +56,19 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 
+import com.gitrnd.gdsbuilder.geogig.GeogigCommandException;
+import com.gitrnd.gdsbuilder.geogig.type.GeogigGeoserverDataStore;
 import com.gitrnd.gdsbuilder.geoserver.data.DTGeoserverManagerList;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree;
 import com.gitrnd.gdsbuilder.geoserver.data.tree.DTGeoserverTree.EnTreeType;
@@ -64,7 +79,9 @@ import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
 import com.gitrnd.gdsbuilder.geoserver.service.en.EnFeatureTypeList;
+import com.gitrnd.gdsbuilder.geoserver.service.en.EnWFSOutputFormat;
 import com.gitrnd.gdsbuilder.geoserver.service.inf.DTGeoserverInfo;
+import com.gitrnd.gdsbuilder.geoserver.service.wfs.WFSGetFeature;
 
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
@@ -110,7 +127,7 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		this.username = username;
 		this.password = password;
 	}
-	
+
 	/**
 	 * GET Geoserver ID
 	 * @author SG.LEE
@@ -155,8 +172,8 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 	public String getBaseurl() {
 		return baseurl;
 	}
-	
-	
+
+
 
 	/**
 	 * REST 요청을 통한 Geoserver Layer정보 조회   
@@ -357,8 +374,8 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		}
 		return RESTFeatureTypeList.build(load(url));
 	}
-	
-	
+
+
 	/**
 	 * Geoserver 상세정보 조회
 	 * @author SG.LEE
@@ -377,7 +394,7 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		try {
 			obj = parser.parse( result );
 			JSONObject jsonObj = (JSONObject) obj;
-			
+
 			JSONObject serverInfoDetail = new JSONObject();
 			serverInfoDetail.put("url", this.baseurl);
 			serverInfoDetail.put("id", this.username);
@@ -389,8 +406,8 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		}
 		return result;
 	}
-	
-	
+
+
 	/**
 	 * Geoserver 이용가능한 레이어 존재여부(발행만 안된상태) 
 	 * @author SG.Lee
@@ -433,7 +450,7 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Geoserver FeatureType 리스트 조회
 	 * @author SG.LEE
@@ -448,7 +465,7 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		}
 		return RESTFeatureTypeList.build(load(url));
 	}
-	
+
 	private String load(String url) {
 		LOGGER.info("Loading from REST path " + url);
 		String response = HTTPUtils.get(baseurl + url, username, password);
@@ -461,4 +478,38 @@ public class DTGeoserverReader extends GeoServerRESTReader {
 		return response;
 	}
 
+	public ResponseEntity<String> getNumberOfFeatures(String version, String typeName){
+
+		WFSGetFeature getFeatureObj = new WFSGetFeature(this.getBaseurl()+"/wfs", version, typeName);
+		getFeatureObj.setMaxFeatures(1);
+		getFeatureObj.setOutputformat(EnWFSOutputFormat.JSON);
+		String url = getFeatureObj.getWFSGetFeatureURL();
+
+		// restTemplate
+		HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+		factory.setReadTimeout(5000);
+		factory.setConnectTimeout(3000);
+		CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100).setMaxConnPerRoute(5).build();
+		factory.setHttpClient(httpClient);
+		RestTemplate restTemplate = new RestTemplate(factory);
+
+		// header
+		HttpHeaders headers = new HttpHeaders();
+		String user = username + ":" + password;
+		String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(user.getBytes());
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Authorization", encodedAuth);
+
+		// request
+		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(headers);
+		ResponseEntity<String> responseEntity = null;
+		try {
+			responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+		} catch (RestClientResponseException e) {
+			throw new GeogigCommandException(e.getMessage(), e.getResponseBodyAsString(), e.getRawStatusCode());
+		} catch (ResourceAccessException e) {
+			throw new GeogigCommandException(e.getMessage());
+		}
+		return responseEntity;
+	}
 }

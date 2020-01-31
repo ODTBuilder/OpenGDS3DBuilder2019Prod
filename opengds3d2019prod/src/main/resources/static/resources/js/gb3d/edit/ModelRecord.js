@@ -1106,7 +1106,7 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record, c
 		} else if (src.substr(0, 5) == 'blob:') {
 			that.toDataURLFromBlobURL(img, record, callback, history);
 		} else {
-			that.toDataURL(src, record, callback, history);
+			that.toDataURL(src, record, undefined, callback, history);
 		}
 	}
 	return result;

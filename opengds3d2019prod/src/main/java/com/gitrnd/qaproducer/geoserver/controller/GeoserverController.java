@@ -33,6 +33,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
+import com.gitrnd.gdsbuilder.geoserver.DTGeoserverReader;
 import com.gitrnd.gdsbuilder.geoserver.data.DTGeoserverManagerList;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoGroupLayerList;
@@ -213,6 +215,57 @@ public class GeoserverController extends AbstractController {
 		return geoserverService.requestWFSTransaction(dtGeoserverManager, workspace, wfstXml);
 	}
 
+	/**
+	 * Geoserver WFST요청 처리
+	 * 
+	 * @author SG.Lee
+	 * @since 2018. 7. 20. 오후 2:59:37
+	 * @param request   {@link HttpServletRequest}
+	 * @param loginUser 사용자 정보
+	 * @return String WFST 요청 결과
+	 * @throws IOException
+	 * @throws ParseException 
+	 */
+	@SuppressWarnings({ "unchecked", "static-access" })
+	@RequestMapping(value = "/getNumberOfFeatures.ajax", method = RequestMethod.POST)
+	@ResponseBody
+	public JSONObject getNumberOfFeaturesByLayers(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {
+		if (loginUser == null) {
+			response.sendError(600);
+			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
+		}
+		
+		String serverName = (String) jsonObject.get("serverName");
+		String workspace = (String) jsonObject.get("workspace");
+		ArrayList<String> layers = (ArrayList<String>) jsonObject.get("layers");
+		
+		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
+		
+		// 피처 개수 가져오기
+		String url = dtGeoserverManager.getRestURL();
+		String user = dtGeoserverManager.getUsername();
+		String password = dtGeoserverManager.getPassword();
+		DTGeoserverReader reader = new DTGeoserverReader(url, user, password);
+
+		String version = "1.0.0";
+		JSONArray arr = new JSONArray(); 
+		for (int i = 0; i < layers.size(); i++) {
+			String jsonstr = reader.getNumberOfFeatures(version, workspace+":"+layers.get(i)).getBody();
+			JSONParser parse = new JSONParser();
+			JSONObject layer = (JSONObject) parse.parse(jsonstr);
+			arr.add(layer);	
+		}
+		// 피처 개수 가져오기
+		JSONObject result = new JSONObject();
+		if (arr.size() > 0) {
+			result.put("success", true);
+			result.put("layers", arr);
+		} else {
+			result.put("success", false);
+		}
+		return result;
+	}
 	/**
 	 * Geoserver Layer update요청 처리
 	 * 
