@@ -1113,6 +1113,10 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 			that.getBase64FromObject(resetObj, obj[layer]["modified"][feature], callback, obj);
 		}
 	}
+	if (cLayers.length ===0 && mLayers.length === 0 && that.getRemoveCheck()) {
+		callback(obj);
+		that.save(that);
+	}
 }
 
 /**
