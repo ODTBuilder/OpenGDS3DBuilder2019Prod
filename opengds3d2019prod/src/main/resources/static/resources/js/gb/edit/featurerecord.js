@@ -90,6 +90,14 @@ gb.edit.FeatureRecord = function(obj) {
 	 * @type {gb3d.edit.EditingTool3D}
 	 */
 	this.editTool3D = undefined;
+	
+	/**
+	 * 레이어 총 피처 개수 객체
+	 * 
+	 * @protected
+	 * @type {Object}
+	 */
+	this.totalFeatures = undefined;
 }
 /**
  * 임시보관 중인 새로운 feature들을 반환한다.
@@ -683,7 +691,7 @@ gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 		);
 		that.getNumberOfFeatures();
 
-//		that.sendWFSTTransaction(edit);
+// that.sendWFSTTransaction(edit);
 
 		if(gb.undo){
 			gb.undo.invalidateAll();
@@ -765,7 +773,8 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
 		var mrecord = that.getModelRecord();
-//		mrecord.save(mrecord);
+// mrecord.save(mrecord);
+		mrecord.setTotalFeatures(that.getTotalFeatures());
 		mrecord.startLoadTextureBase64();
 	}
 	// 변경사항의 종류에 따라 저장 요청방식이 다르기 때문에 modified->removed->created 순으로 저장 요청을 한다.
@@ -1027,11 +1036,11 @@ gb.edit.FeatureRecord.prototype.getNumberOfFeatures = function(){
 
 	var layerids;
 
-//	if(Object.keys(that.modified).length !== 0){
-//	layerids = Object.keys(that.modified)[0];
-//	} else if(Object.keys(that.removed).length !== 0){
-//	layerids = Object.keys(that.removed)[0];
-//	} else
+// if(Object.keys(that.modified).length !== 0){
+// layerids = Object.keys(that.modified)[0];
+// } else if(Object.keys(that.removed).length !== 0){
+// layerids = Object.keys(that.removed)[0];
+// } else
 	if(Object.keys(that.created).length !== 0){
 		layerids = Object.keys(that.created);
 		var params = {
@@ -1082,7 +1091,8 @@ gb.edit.FeatureRecord.prototype.getNumberOfFeatures = function(){
 						}	
 					}
 					console.log(numStructure);
-//					this.sendWFSTTransaction(this.editTool);
+					that.setTotalFeatures(numStructure);
+					that.sendWFSTTransaction(that.editTool);
 				}
 			},
 			error: function(e) {
@@ -1092,6 +1102,27 @@ gb.edit.FeatureRecord.prototype.getNumberOfFeatures = function(){
 		});
 
 	} else {
+		this.setTotalFeatures(false);
 		this.sendWFSTTransaction(this.editTool);
 	}
+}
+
+/**
+ * 총 피처 개수를 반환한다.
+ * 
+ * @method gb.edit.FeatureRecord#getTotalFeatures
+ * @return {Object} 총 피처 개수
+ */
+gb.edit.FeatureRecord.prototype.getTotalFeatures = function(){
+	return this.totalFeatures;
+}
+
+/**
+ * 총 피처 개수를 할당한다.
+ * 
+ * @method gb.edit.FeatureRecord#setTotalFeatures
+ * @param {Object} 총 피처 개수
+ */
+gb.edit.FeatureRecord.prototype.setTotalFeatures = function(features){
+	this.totalFeatures = features;
 }
