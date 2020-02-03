@@ -119,23 +119,23 @@ html, body {
 		</div>
 		<div class="collapse navbar-collapse" id="navbar-collapse-2">
 			<ul class="nav navbar-nav">
-				<li class="dropdown"><a href="#" title="File" class="dropdown-toggle" data-toggle="dropdown" role="button"
-					aria-haspopup="true" aria-expanded="false"> <i class="fas fa-folder-open fa-lg" style="color: #bfbfbf;"></i> <spring:message
-							code="lang.file" /><span class="caret"></span>
-				</a>
-					<ul class="dropdown-menu">
-						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li>
-						<li><a href="#" id="importB3dmBtn"><spring:message code="lang.importZip"></spring:message></a></li>
-						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li>
-					</ul></li>
-				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
-						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
-				</a></li>
+<!-- 				<li class="dropdown"><a href="#" title="File" class="dropdown-toggle" data-toggle="dropdown" role="button" -->
+<%-- 					aria-haspopup="true" aria-expanded="false"> <i class="fas fa-folder-open fa-lg" style="color: #bfbfbf;"></i> <spring:message --%>
+<%-- 							code="lang.file" /><span class="caret"></span> --%>
+<!-- 				</a> -->
+<!-- 					<ul class="dropdown-menu"> -->
+<%-- 						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li> --%>
+<%-- 						<li><a href="#" id="importB3dmBtn"><spring:message code="lang.importZip"></spring:message></a></li> --%>
+<%-- 						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li> --%>
+<!-- 					</ul></li> -->
 				<li><a href="#" title="Geoserver" data-toggle="modal" data-target="#geoserverModal"> <i
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
 				</a></li>
 				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
 							code="lang.edit" /> </a></li>
+				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
+						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
+				</a></li>
 				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
 						<spring:message code="lang.baseMap" />
 				</a></li>
@@ -233,9 +233,8 @@ html, body {
 
 // 		var imagePath = "/images/ko";
 // 		var dataInformationUrl = "resources/json/";
-// // 		magoStart(gb3dMap.getCesiumViewer(), "cesiumContainer", imagePath);
 
-// 		// mago3d start, policy loading
+		// mago3d start, policy loading
 // 		function magoStart(viewer, renderDivId, imagePath) {
 // 			$.ajax({
 // 				url : dataInformationUrl + "workshop-policy-cesium.json",
@@ -545,11 +544,6 @@ html, body {
 		});
 
 		$(document).ready(function() {
-// 	 		var managerFactory = null;
-// 	 		var insertIssueEnable = false;
-
-// 	 		var imagePath = "/images/ko";
-// 	 		var dataInformationUrl = "resources/json/";
 // 	 		magoStart(gb3dMap.getCesiumViewer(), $(gb3dMap.cesiumElem).attr("id"), imagePath);
 			
 			var gitrnd = {

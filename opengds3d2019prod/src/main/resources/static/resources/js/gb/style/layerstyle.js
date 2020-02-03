@@ -22,8 +22,8 @@ gb.style.LayerStyle = function(obj) {
 	var that = this;
 	obj.width = 192;
 	obj.height = 420;
-	obj.positionX = 380;
-	obj.positionY = 535;
+	obj.positionX = obj.positionX ? obj.positionX : 380;
+	obj.positionY = obj.positionY ? obj.positionY : 535;
 	gb.panel.PanelBase.call(this, obj);
 	var options = obj ? obj : {};
 	this.layer = options.layer instanceof ol.layer.Base ? options.layer : undefined;

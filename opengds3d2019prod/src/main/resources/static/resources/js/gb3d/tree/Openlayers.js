@@ -533,15 +533,18 @@ gb3d.tree.OpenLayers = function(obj) {
 				},
 				"layerproperties" : {
 					"properties" : undefined,
-					"navigator" : new gb.layer.Navigator({
+					"navigator" : new gb3d.layer.Navigator({
 						map : this.map,
+						map3D : this.gb3dMap,
 						token : this.token,
 						getWFSFeature : "geoserver/geoserverWFSGetFeature.ajax"
 					}),
 					"layerRecord" : undefined,
 					"featureRecord" : this.frecord,
 					"style" : new gb.style.LayerStyle({
-						"locale" : this.locale
+						"locale" : this.locale,
+						"positionX" : 1408, 
+						"positionY" : 96
 					}),
 					"editingTool" : this.editingTool,
 					"threeTree" : this.threeJSTree

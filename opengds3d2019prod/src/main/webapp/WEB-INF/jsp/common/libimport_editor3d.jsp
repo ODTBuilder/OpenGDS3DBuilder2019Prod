@@ -143,7 +143,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb/geoserver/uploadgeojson.js"></script>
 <!-- gb.layer-->
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/attributeinfo.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb/layer/navigator.js"></script>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/gb/layer/navigator.js"></script> --%>
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/featureList.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/imageLayer.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/label.js"></script>
@@ -251,3 +251,4 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/style/Declarative.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/io/importer/ImporterThree.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb3d/edit/ModelRecord.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/layer/Navigator.js"></script>

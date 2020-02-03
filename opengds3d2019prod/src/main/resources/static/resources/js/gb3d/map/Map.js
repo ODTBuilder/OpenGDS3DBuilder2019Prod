@@ -166,8 +166,7 @@ gb3d.Map = function(obj) {
 	// cesium 카메라를 지도 중심으로 이동
 
 	this.cesiumViewer.camera.flyTo({
-		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],
-				this.initPosition[1], this.initPosition[2])
+		destination : Cesium.Cartesian3.fromDegrees(this.initPosition[0],this.initPosition[1], this.initPosition[2])
 	});
 
 	/**
