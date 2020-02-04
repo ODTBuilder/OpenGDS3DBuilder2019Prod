@@ -44,8 +44,6 @@ public class Edit3dController extends AbstractController {
 			@RequestBody JSONObject params, @AuthenticationPrincipal LoginUser loginUser)
 			throws IOException, ParseException {
 
-//		@return {"path":"175.116.181.32:8888/guest/upload/20191213_185342/gltf/featureId.gltf", "succ": true}
-
 		String objPath = (String) params.get("objPath");
 		List objCenterArr = (ArrayList) params.get("objCenter");
 		String featureId = (String) params.get("featureId");
@@ -69,7 +67,7 @@ public class Edit3dController extends AbstractController {
 		JSONParser parser = new JSONParser();
 		JSONObject editInfoObj = (JSONObject) parser.parse(editInfo);
 		JSONObject resultJSON = new JSONObject();
-		
+
 		Iterator objIter = editInfoObj.keySet().iterator();
 		while (objIter.hasNext()) {
 			String geoInfo = (String) objIter.next(); // "geo42:testworkspace:testdatastore:TN_BULD_TEST"
@@ -85,5 +83,5 @@ public class Edit3dController extends AbstractController {
 			resultJSON.put(layer, layerResult);
 		}
 		return resultJSON;
-	} 
+	}
 }

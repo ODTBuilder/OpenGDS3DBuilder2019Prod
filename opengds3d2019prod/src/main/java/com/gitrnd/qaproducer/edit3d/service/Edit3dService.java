@@ -257,7 +257,7 @@ public class Edit3dService {
 		FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
 		String nodeURL = "http://" + nodeHost + ":" + nodePort + "/convert/editObjTo3dtiles";
 		JSONObject resultJSON = new JSONObject();
-		resultJSON.put(layerId, tilesetPath);
+		resultJSON.put("path", tilesetPath);
 
 		int downReNum = new GeneralMapExport(serverURL, workspace, layerId, editBasePath, "EPSG:4326").export();
 		if (downReNum == 200) {
@@ -272,6 +272,12 @@ public class Edit3dService {
 				JSONObject createdFeatureObj = (JSONObject) editObjJSON.get("created");
 				totalFeautresStr = editObjJSON.get("totalFeatures").toString();
 				int feautreCount = Integer.valueOf(totalFeautresStr);
+
+				if (editObjJSON.get("removed") != null) {
+					JSONObject deletedInfo = (JSONObject) editObjJSON.get("removed");
+					int deletedSize = deletedInfo.keySet().size();
+					feautreCount = feautreCount - deletedSize;
+				}
 
 				File tilesetParent = tilesetFile.getParentFile();
 				int dirnum = 0;
@@ -798,66 +804,18 @@ public class Edit3dService {
 				}
 				resultJSON.put("modified", modifiedResult);
 			}
-			if (editObjJSON.get("deleted") != null) {
+			if (editObjJSON.get("removed") != null) {
 
 				JSONObject deletedResult = new JSONObject();
-
-				JSONObject deletedFeatureObj = (JSONObject) editObjJSON.get("deleted");
+				JSONObject deletedFeatureObj = (JSONObject) editObjJSON.get("removed");
 				Iterator featureIter = deletedFeatureObj.keySet().iterator();
 				while (featureIter.hasNext()) {
 
 					String featureId = (String) featureIter.next(); // "TN_BULD_TEST.2796"
 					JSONObject editInfo = (JSONObject) deletedFeatureObj.get(featureId);
 
-					// mbr
-					JSONArray mbrArr = (JSONArray) editInfo.get("mbr");
-					double minX = (double) mbrArr.get(0);
-					double minY = (double) mbrArr.get(1);
-					double maxX = (double) mbrArr.get(2);
-					double maxY = (double) mbrArr.get(3);
-
-					// write edit obj file
-					String editObjStr = (String) editInfo.get("obj");
-					String editObjPath = editBasePath + File.separator + featureId + ".obj";
-					File editObjFile = new File(editObjPath);
-					FileOutputStream outputStream = new FileOutputStream(editObjFile);
-					byte[] strToBytes = editObjStr.getBytes();
-					outputStream.write(strToBytes);
-					outputStream.close();
-
-					// write edit text file
-					String editTextureStr = (String) editInfo.get("texture");
-					String editTexturePath = null;
-					if (!editTextureStr.equals("notset")) {
-						editTexturePath = editBasePath + File.separator + featureId + ".jpg";
-						String data = editTextureStr.split(",")[1];
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
-						bos.write(Base64.decodeBase64(data));
-						bos.close();
-					}
-
 					// obj path param
 					String objPath = (String) editInfo.get("objPath"); // "20191212_173635/obj/1.obj"
-
-					// 최상위 tileset edit(dir 구조인 경우)
-					boolean isDir = false;
-					boolean isTilesetChaged = false;
-					JSONObject tilesetObj = null;
-					JSONObject root = null;
-					JSONObject boundingVolume = null;
-					JSONArray editRegionArr = null;
-
-					File tilesFolderFile = new File(tilesetLocalPath).getParentFile();
-					File[] folderList = tilesFolderFile.listFiles();
-					for (int f = 0; f < folderList.length; f++) {
-						if (folderList[f].isDirectory()) {
-							isDir = true;
-							tilesetObj = (JSONObject) jsonParser.parse(new FileReader(tilesetLocalPath));
-							root = (JSONObject) tilesetObj.get("root");
-							boundingVolume = (JSONObject) root.get("boundingVolume");
-							editRegionArr = (JSONArray) boundingVolume.get("region");
-						}
-					}
 
 					// 원본 obj read
 					String originObjPath = uploadPath + File.separator + objPath;
@@ -869,60 +827,8 @@ public class Edit3dService {
 					String originTilePath = originObjPath.replace(".obj", "tile.json");
 					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
 
-					// 원본 타일셋 영역
-					double originSouth = (double) tileObj.get("south");
-					double originNorth = (double) tileObj.get("north");
-					double originEast = (double) tileObj.get("east");
-					double originWest = (double) tileObj.get("west");
-					double originMaxHeight = (double) tileObj.get("maxHeight");
-
-					// 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신
-					double minXRaidan = Math.toRadians(minX);
-					double minYRaidan = Math.toRadians(minY);
-					double maxXRaidan = Math.toRadians(maxX);
-					double maxYRaidan = Math.toRadians(maxY);
-
-					if (minYRaidan < originSouth) {
-						tileObj.put("south", minYRaidan);
-					}
-					if (maxYRaidan > originNorth) {
-						tileObj.put("north", maxYRaidan);
-					}
-					if (maxXRaidan > originEast) {
-						tileObj.put("east", maxXRaidan);
-					}
-					if (minXRaidan < originWest) {
-						tileObj.put("west", minXRaidan);
-					}
-
-					// 최상위 tileset 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신 (dir 구조인 경우)
-					if (isDir) {
-						double west = (double) editRegionArr.get(0);
-						double south = (double) editRegionArr.get(1);
-						double east = (double) editRegionArr.get(2);
-						double north = (double) editRegionArr.get(3);
-						double minheight = (double) editRegionArr.get(4);
-
-						if (minXRaidan < west) {
-							editRegionArr.add(0, minXRaidan);
-							isTilesetChaged = true;
-						}
-						if (minYRaidan < south) {
-							editRegionArr.add(1, minYRaidan);
-							isTilesetChaged = true;
-						}
-						if (maxXRaidan > east) {
-							editRegionArr.add(2, maxXRaidan);
-							isTilesetChaged = true;
-						}
-						if (maxYRaidan > north) {
-							editRegionArr.add(3, maxYRaidan);
-							isTilesetChaged = true;
-						}
-						editRegionArr.add(4, minheight);
-					}
 					// parse edit obj
-					ObjParser parser = new ObjParser(originMaxHeight);
+					ObjParser parser = new ObjParser();
 					Obj resultObj = parser.deleteObj(originObj, featureId);
 					// batch에 feature id 제거
 					JSONArray idProperties = (JSONArray) batchObj.get("featureId");
@@ -951,19 +857,6 @@ public class Edit3dService {
 					// write batch.json
 					try (FileWriter file = new FileWriter(originBatchPath)) {
 						file.write(batchObj.toJSONString());
-					}
-					// write tile.json
-					try (FileWriter file = new FileWriter(originTilePath)) {
-						file.write(tileObj.toJSONString());
-					}
-					// write tileset.json
-					if (isDir && isTilesetChaged) {
-						boundingVolume.put("region", editRegionArr);
-						root.put("boundingVolume", boundingVolume);
-						tilesetObj.put("root", root);
-						try (FileWriter file = new FileWriter(tilesetPath)) {
-							file.write(tilesetObj.toJSONString());
-						}
 					}
 
 					// 편집 obj 파일 -> 3d tiles로 변환
@@ -1010,7 +903,7 @@ public class Edit3dService {
 						deletedResult.put(featureId, "success");
 					}
 				}
-				resultJSON.put("deleted", deletedResult);
+				resultJSON.put("removed", deletedResult);
 			}
 		}
 		return resultJSON;
