@@ -34,8 +34,8 @@ public class App {
 		Filter filter = Filter.INCLUDE;
 
 		try {
-			new ShpToObjImpl(buildingFile, filter, 50, "D:\\node\\objTo3d-tiles-master\\bin\\shptoobj\\hoho\\obj")
-					.exec();
+//			new ShpToObjImpl(buildingFile, filter, 50, "D:\\node\\objTo3d-tiles-master\\bin\\shptoobj\\hoho\\obj")
+//					.exec();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

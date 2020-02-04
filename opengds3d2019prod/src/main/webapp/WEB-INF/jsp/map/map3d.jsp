@@ -228,65 +228,65 @@ html, body {
 		});
 		//==========================
 		// mago3d init
-// 		var managerFactory = null;
-// 		var insertIssueEnable = false;
+		var managerFactory = null;
+		var insertIssueEnable = false;
 
-// 		var imagePath = "/images/ko";
-// 		var dataInformationUrl = "resources/json/";
+		var imagePath = "/images/ko";
+		var dataInformationUrl = "resources/json/";
 
 		// mago3d start, policy loading
-// 		function magoStart(viewer, renderDivId, imagePath) {
-// 			$.ajax({
-// 				url : dataInformationUrl + "workshop-policy-cesium.json",
-// 				type : "GET",
-// 				dataType : "json",
-// 				success : function(serverPolicy) {
-// 					loadData(viewer, renderDivId, serverPolicy);
-// 				},
-// 				error : function(e) {
-// 					alert(e.responseText);
-// 				}
-// 			});
-// 		}
+		function magoStart(viewer, renderDivId, imagePath) {
+			$.ajax({
+				url : dataInformationUrl + "workshop-policy-cesium.json",
+				type : "GET",
+				dataType : "json",
+				success : function(serverPolicy) {
+					loadData(viewer, renderDivId, serverPolicy);
+				},
+				error : function(e) {
+					alert(e.responseText);
+				}
+			});
+		}
 
-// 		// init project load
-// 		function loadData(viewer, renderDivId, serverPolicy) {
-// 			if (serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
-// 				managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
-// 			} else {
-// 				var defaultProjectArray = serverPolicy.geo_data_default_projects;
-// 				var projectIdArray = new Array(defaultProjectArray.length);
-// 				var projectDataArray = new Array(defaultProjectArray.length);
-// 				var projectDataFolderArray = new Array(defaultProjectArray.length);
+		// init project load
+		function loadData(viewer, renderDivId, serverPolicy) {
+			if (serverPolicy.geo_data_default_projects === null || serverPolicy.geo_data_default_projects.length < 1) {
+				managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, null, null, null, imagePath);
+			} else {
+				var defaultProjectArray = serverPolicy.geo_data_default_projects;
+				var projectIdArray = new Array(defaultProjectArray.length);
+				var projectDataArray = new Array(defaultProjectArray.length);
+				var projectDataFolderArray = new Array(defaultProjectArray.length);
 
-// 				var dataCount = 0;
-// 				defaultProjectArray.forEach(function(projectId, index) {
-// 					projectIdArray[index] = projectId;
-// 					console.log("url = " + dataInformationUrl + projectId);
-// 					$.ajax({
-// 						url : dataInformationUrl + projectId,
-// 						type : "GET",
-// 						dataType : "json",
-// 						success : function(serverData) {
-// 							console.log("index = " + index + ", data = " + serverData);
-// 							projectDataArray[index] = serverData;
-// 							projectDataFolderArray[index] = serverData.data_key;
-// 							if (defaultProjectArray.length === (dataCount + 1)) {
-// 								createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
-// 							}
-// 							dataCount++;
-// 						},
-// 						error : function(e) {
-// 							alert(e.responseText);
-// 						}
-// 					});
-// 				});
-// 			}
-// 		}
+				var dataCount = 0;
+				defaultProjectArray.forEach(function(projectId, index) {
+					projectIdArray[index] = projectId;
+					console.log("url = " + dataInformationUrl + projectId);
+					$.ajax({
+						url : dataInformationUrl + projectId,
+						type : "GET",
+						dataType : "json",
+						success : function(serverData) {
+							console.log("index = " + index + ", data = " + serverData);
+							projectDataArray[index] = serverData;
+							projectDataFolderArray[index] = serverData.data_key;
+							if (defaultProjectArray.length === (dataCount + 1)) {
+								createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+							}
+							dataCount++;
+						},
+						error : function(e) {
+							alert(e.responseText);
+						}
+					});
+				});
+			}
+		}
 
-// 		function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
-// 			managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
-// 		}
+		function createManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath) {
+			managerFactory = new Mago3D.ManagerFactory(viewer, renderDivId, serverPolicy, projectIdArray, projectDataArray, projectDataFolderArray, imagePath);
+		}
 		//==========================
 		// ThreeJS Eidtor
 		var threeEditor = new Editor(gb3dMap.getThreeCamera(), gb3dMap.getThreeScene());
@@ -544,7 +544,7 @@ html, body {
 		});
 
 		$(document).ready(function() {
-// 	 		magoStart(gb3dMap.getCesiumViewer(), $(gb3dMap.cesiumElem).attr("id"), imagePath);
+	 		magoStart(gb3dMap.getCesiumViewer(), $(gb3dMap.cesiumElem).attr("id"), imagePath);
 			
 			var gitrnd = {
 				resize : function() {

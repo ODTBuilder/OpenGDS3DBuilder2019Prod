@@ -149,12 +149,12 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb/layer/label.js"></script>
 
 <!-- cesium -->
-<script src="${pageContext.request.contextPath}/resources/js/cesium/Cesium.js"></script>
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium/Widgets/widgets.css" />
-<%-- <script src="${pageContext.request.contextPath}/resources/js/cesium-mago/Cesium.js"></script> --%>
-<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium-mago/Widgets/widgets.css" /> --%>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/cesium/Cesium.js"></script> --%>
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium/Widgets/widgets.css" /> --%>
+<script src="${pageContext.request.contextPath}/resources/js/cesium-mago/Cesium.js"></script>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/js/cesium-mago/Widgets/widgets.css" />
 <!-- mago3d -->
-<%-- <script src="${pageContext.request.contextPath}/resources/js/mago3d/mago3d.js"></script> --%>
+<script src="${pageContext.request.contextPath}/resources/js/mago3d/mago3d.js"></script>
 <!-- three -->
 <script src="${pageContext.request.contextPath}/resources/js/three/three.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/three/thirdparty/controls/OrbitControls.js"></script>
