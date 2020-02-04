@@ -131,16 +131,16 @@ html, body {
 				<li><a href="#" title="Geoserver" data-toggle="modal" data-target="#geoserverModal"> <i
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
 				</a></li>
-				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #bfbfbf;"></i> <spring:message
+				<li><a href="#" title="Edit" id="editTool"><i class="fas fa-edit fa-lg" style="color: #344762;"></i> <spring:message
 							code="lang.edit" /> </a></li>
-				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i
-						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" />
-				</a></li>
-				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #91d050;"></i>
+<!-- 				<li class="dropdown"><a href="#" id="savePart" data-toggle="modal" data-target="#saveChanges"> <i -->
+<%-- 						class="fas fa-save fa-lg" style="color: #4dadf7;"></i> <spring:message code="lang.save" /> --%>
+<!-- 				</a></li> -->
+				<li><a href="#" title="Base map" id="changeBase"> <i class="fas fa-map fa-lg" style="color: #4dadf7;"></i>
 						<spring:message code="lang.baseMap" />
 				</a></li>
 				<li><a href="#" title="Validation" id="validation"> <i class="fas fa-clipboard-check fa-lg"
-						style="color: #344762;"></i> <spring:message code="lang.validation" />
+						style="color: #946c6c;"></i> <spring:message code="lang.validation" />
 				</a></li>
 				<li><a href="#" title="Information" id="binfo" data-toggle="modal" data-target="#infoModal"> <i
 						class="fas fa-info-circle fa-lg" style="color: #ffc000;"></i> <spring:message code="lang.info" />

@@ -173,6 +173,11 @@ gb3d.edit.EditingTool3D = function(obj) {
 	this.importer = obj.importer ? obj.importer : undefined;
 
 	this.threeTree = obj.threeTree ? obj.threeTree : undefined; 
+	
+	this.scale = undefined;
+	
+	this.rotation = undefined;
+	
 	/**
 	 * ThreeJS 객체의 편집 활성화 여부
 	 */
@@ -612,9 +617,40 @@ gb3d.edit.EditingTool3D = function(obj) {
 			if (object.geometry instanceof THREE.BufferGeometry || !object.geometry) {
 				return;
 			}
-			that.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
+//			that.modifyObject2Dfrom3D(object.geometry.vertices, object.uuid);
+			var threeObject = that.getMap().getThreeObjectByUuid(object.uuid);
+			var feature = threeObject.getFeature();
+//			gb3d.io.ImporterThree.injectFloorPlan(feature, object);
+//			console.log(object.scale);
+			var scale = that.getScale();
+//			console.log("현재 스케일은: ", scale);
+			if (scale) {
+				var x = object.scale.x / scale.x;
+				var y = object.scale.y / scale.y;
+				that.setScale(object.scale.clone());
+//				console.log("변경된 스케일은: ", object.scale);
+				feature.getGeometry().scale(x, y);
+			}
 			break;
 		case "rotate":
+			var threeObject = that.getMap().getThreeObjectByUuid(object.uuid);
+			var feature = threeObject.getFeature();
+			var rotation = that.getRotation();
+//			console.log("현재 스케일은: ", scale);
+			if (rotation) {
+//				var x = object.scale.x / scale.x;
+//				var y = object.scale.y / scale.y;
+				that.setRotation(object.rotation.clone());
+//				console.log("변경된 스케일은: ", object.scale);
+				var geom = feature.getGeometry();
+				var extent = geom.getExtent();
+				var x = (extent[0] + extent[2]) / 2;
+				var y = (extent[1] + extent[3]) / 2;
+				var center = [x, y];
+				var angle = object.rotation.z - rotation.z;
+				console.log("이전 각도에서부터: ", angle);
+				feature.getGeometry().rotate(angle, center);
+			}
 			break;
 		case "translate":
 			that.moveObject2Dfrom3D(object.position, object.uuid);
@@ -622,17 +658,23 @@ gb3d.edit.EditingTool3D = function(obj) {
 		default:
 		}
 
-		that.getMap().getThreeObjects().forEach(function(e) {
-			if (e.getObject().uuid === object.uuid) {
+		var objs = that.getMap().getThreeObjects();
+		for (var i = 0; i < objs.length; i++) {
+			var elem = objs[i];
+			if (elem.getObject().uuid === object.uuid) {
 				// 평면도 수정
-
+//				var threeObject = that.getMap().getThreeObjectByUuid(object.uuid);
+//				var threeObject = elem;
+//				var feature = threeObject.getFeature();
+//				gb3d.io.ImporterThree.injectFloorPlan(feature, object);
 				// 선택된 객체의 수정횟수를 증가시킨다.
-				e.upModCount();
+				elem.upModCount();
 
 				var record = that.getModelRecord();
-				record.update(e.getLayer(), e);
+				record.update(elem.getLayer(), elem);
+				break;
 			}
-		});
+		}
 	});
 
 	// transform 컨트롤 Three Scene에 추가
@@ -762,6 +804,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// 3축 가이드
 				that.threeTransformControls.attach(object);
 				that.syncSelect(object.uuid, true);
+				that.setScale(object.scale.clone());
+				that.setRotation(object.rotation.clone());
 				// that.updateAttributeTab(object);
 				// that.updateStyleTab(object);
 				// that.updateMaterialTab(object);
@@ -3126,4 +3170,40 @@ gb3d.edit.EditingTool3D.prototype.getThreeEdit = function(){
  */
 gb3d.edit.EditingTool3D.prototype.setThreeEdit = function(flag){
 	this.threeEdit = flag; 
+}
+
+/**
+ * 현재 선택한 객체의 스케일값을 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getScale
+ */
+gb3d.edit.EditingTool3D.prototype.getScale = function(){
+	return this.scale; 
+}
+
+/**
+ * 현재 선택한 객체의 스케일값을 저장한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setScale
+ */
+gb3d.edit.EditingTool3D.prototype.setScale = function(scale){
+	this.scale = scale; 
+}
+
+/**
+ * 현재 선택한 객체의 스케일값을 반환한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#getRotation
+ */
+gb3d.edit.EditingTool3D.prototype.getRotation = function(){
+	return this.rotation; 
+}
+
+/**
+ * 현재 선택한 객체의 스케일값을 저장한다.
+ * 
+ * @method gb3d.edit.EditingTool3D#setRotation
+ */
+gb3d.edit.EditingTool3D.prototype.setRotation = function(rotation){
+	this.rotation = rotation; 
 }

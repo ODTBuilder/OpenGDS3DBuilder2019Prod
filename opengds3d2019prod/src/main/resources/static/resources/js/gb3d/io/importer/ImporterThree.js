@@ -805,6 +805,76 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 			result.push(poly);
 			worldPts = [];
 		}
+	} else if (object.geometry instanceof THREE.Geometry) {
+		// 겹치지 않아서 못 합친 폴리곤 모음
+		var mergeYet = [];
+		// pos = object.geometry.attributes.position.array;
+		var object = obj.clone();
+		var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+
+		gb3d.Math.resetMatrixWorld(object, object.rotation, centerHigh);
+		object = gb3d.Math.resetRotationAndPosition(object);
+
+		var geometry = object.geometry;
+		var vertices = geometry.vertices;
+		var faces = geometry.faces;
+
+		for (var i = 0; i < faces.length; i++) {
+
+			var worldPts = [];
+			// 중점설정
+			var centerPoint = turf.point(center);
+
+			var face = faces[i];
+			var threeVertice = [vertices[face.a], vertices[face.b], vertices[face.c]];
+			for (var j = 0; j < threeVertice.length; j++) {
+				var oneVertex = threeVertice[j];
+				
+				// 좌표를 미터로 간주하고 킬로미터로 절대값 변환
+				var distance = Math.abs(oneVertex.x / 1000);
+				
+				// 진행방향 각도 x 축이면 서쪽 -90 또는 동쪽 90
+				var bearing;
+				if (oneVertex.x < 0) {
+					bearing = -90;
+				} else {
+					bearing = 90;
+				}
+				
+				// 중점으로부터 x좌표 만큼 이동한 곳
+				var offsetx = turf.destination(centerPoint, distance, bearing);
+				// x좌표 만큼 이동한 곳을 중점으로 y만큼 이동하기
+				// 좌표를 미터로 간주하고 킬로미터로 변환
+				var distance = Math.abs(oneVertex.y / 1000);
+				// 진행방향 각도 y 축이면 남쪽 180 또는 북쪽 0
+				var bearing;
+				if (oneVertex.y < 0) {
+					bearing = 180;
+				} else {
+					bearing = 0;
+				}
+				// x오프셋 으로부터 y좌표 만큼 이동한 곳
+				var destination = turf.destination(offsetx, distance, bearing);
+				destination = turf.point([ parseFloat(destination.geometry.coordinates[0].toFixed(6)), parseFloat(destination.geometry.coordinates[1].toFixed(6)) ]);
+				worldPts.push(destination);
+			}
+			
+			var pt1 = worldPts[0];
+			var pt2 = worldPts[1];
+			var pt3 = worldPts[2];
+			var flag1 = turf.booleanEqual(pt1, pt2);
+			var flag2 = turf.booleanEqual(pt1, pt3);
+			var flag3 = turf.booleanEqual(pt2, pt3);
+			if (pt1 === undefined || pt2 === undefined || pt3 === undefined) {
+				continue;
+			}
+			if (flag1 || flag2 || flag3) {
+				continue;
+			}
+			var poly = turf.polygon([ [ turf.getCoord(worldPts[0]), turf.getCoord(worldPts[1]), turf.getCoord(worldPts[2]), turf.getCoord(worldPts[0]) ] ]);
+			result.push(poly);
+			worldPts = [];
+		}
 	}
 	return result;
 }
@@ -894,6 +964,92 @@ gb3d.io.ImporterThree.refreshFloorPlan = function(layer, threeObj) {
 
 			}
 			finalSource.addFeatures(fea);
+		}
+	}
+
+	// var axisy1 = turf.point([ 90, 0 ]);
+	// var pickPoint = turf.point(center);
+	// var bearing = turf.bearing(pickPoint, axisy1);
+	// console.log("y축 1과 객체 중점의 각도는: " + bearing);
+	// // var zaxis = new THREE.Vector3(0, 0, 1);
+	// // gb3d.io.ImporterThree.applyAxisAngleToAllMesh(that.object, zaxis,
+	// // Cesium.Math.toRadians(bearing));
+	// that.object.rotateZ(Cesium.Math.toRadians(bearing));
+};
+
+/**
+ * 3D 객체의 평면도를 뽑아서 Dissolve 한 후 피처에 적용한다.
+ * 
+ * @method gb3d.io.ImporterThree#injectFloorPlan
+ * @param {ol.Feature} feature - 평면도를 입력할 피처
+ * @param {THREE.Object3D} threeObj - 평면도를 만들 객체
+ */
+gb3d.io.ImporterThree.injectFloorPlan = function(feature, threeObj) {
+	// var center = threeObj.getCenter();
+	var center;
+	var geometry = feature.getGeometry();
+	if (geometry instanceof ol.geom.Point) {
+		center = geometry.getCoordinates();
+	} else {
+		var extent = geometry.getExtent();
+		var x = (extent[0] + extent[2]) / 2;
+		var y = (extent[1] + extent[3]) / 2;
+		center = [ x, y ];
+	}
+	var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
+	var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+
+	var floor = gb3d.io.ImporterThree.getFloorPlan(threeObj, center, []);
+	var features = turf.featureCollection(floor);
+	var dissolved = undefined;
+
+	try {
+		dissolved = turf.dissolve(features);
+	} catch (e) {
+		// TODO: handle exception
+		console.error(e);
+		var bbox = turf.bbox(features);
+		var bboxPolygon = turf.bboxPolygon(bbox);
+		var geom = new ol.geom.Polygon(bboxPolygon.geometry.coordinates, "XY");
+		if (feature instanceof ol.Feature) {
+			feature.setGeometry(geom);
+		}
+		return;
+	}
+	var fea;
+	var featureType;
+	if (feature.getGeometry() instanceof ol.geom.Polygon) {
+		featureType = "Polygon";
+	} else if (feature.getGeometry() instanceof ol.geom.MultiPolygon) {
+		featureType = "MultiPolygon";
+	}
+	if (dissolved) {
+		if (dissolved.type === "FeatureCollection") {
+			fea = [];
+			for (var i = 0; i < dissolved.features.length; i++) {
+				var geom;
+				if (dissolved.features[i].geometry.type === 'Polygon') {
+					if (featureType === "Polygon") {
+						geom = new ol.geom.Polygon(dissolved.features[i].geometry.coordinates, "XY");
+					} else if (featureType === "MultiPolygon") {
+						geom = new ol.geom.MultiPolygon([ dissolved.features[i].geometry.coordinates ], "XY");
+					}
+				} else if (dissolved.features[i].geometry.type === 'MultiPolygon') {
+					if (featureType === "Polygon") {
+						var outer = dissolved.features[i].geometry.coordinates;
+						// for (var j = 0; j < 1; j++) {
+						var polygon = outer[0];
+						geom = new ol.geom.Polygon(polygon, "XY");
+						// }
+					} else if (featureType === "MultiPolygon") {
+						geom = new ol.geom.MultiPolygon(dissolved.features[i].geometry.coordinates, "XY");
+					}
+				}
+				if (feature instanceof ol.Feature) {
+//					feature.getGeometry().setCoordinates(geom.getCoordinates());
+					feature.setGeometry(geom);
+				}
+			}
 		}
 	}
 

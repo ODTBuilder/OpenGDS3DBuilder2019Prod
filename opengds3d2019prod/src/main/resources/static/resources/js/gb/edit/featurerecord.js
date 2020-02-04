@@ -773,7 +773,6 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
 		var mrecord = that.getModelRecord();
-// mrecord.save(mrecord);
 		mrecord.setTotalFeatures(that.getTotalFeatures());
 		mrecord.startLoadTextureBase64();
 	}
