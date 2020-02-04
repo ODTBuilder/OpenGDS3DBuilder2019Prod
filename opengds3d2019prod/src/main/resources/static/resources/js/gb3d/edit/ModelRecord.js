@@ -876,14 +876,19 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 		
 		var layer = rLayers[j];
 		
-		if (!Array.isArray(obj[layer]["removed"])) {
-			obj[layer]["removed"] = [];
+		if (!obj[layer]["removed"]) {
+			obj[layer]["removed"] = {};
 		}
 		
 		var featureid = Object.keys(this.removed[layer]);
 		for (var o = 0; o < featureid.length; o++) {
 			var feature = featureid[o];
-			obj[layer]["removed"].push(feature);
+			
+			if(!obj[layer]["removed"][feature]){
+				obj[layer]["removed"][feature] = {};
+			}
+			
+//			obj[layer]["removed"].push(feature);
 			
 			var threeObject = this.removed[layer][feature];
 			
@@ -910,6 +915,19 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 					}
 				}
 				obj[layer]["tileset"] = tileset;
+			}
+			
+			var feature3d = threeObject.getFeature3D();
+			if (feature3d) {
+				if (feature3d.content) {
+					if (feature3d.content.tile) {
+						if (feature3d.content.tile.extras) {
+							var extras = feature3d.content.tile.extras;
+							obj[layer]["removed"][feature]["tileCenter"] = [ extras["centerX"], extras["centerY"] ];
+							obj[layer]["removed"][feature]["objPath"] = extras["originObjPath"];
+						}
+					}
+				}
 			}
 		}
 	}
