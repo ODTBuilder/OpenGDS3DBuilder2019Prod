@@ -42,15 +42,15 @@ server:
     whitelabel:
       enabled: false
 gitrnd:
-  serverhost: 175.116.181.32
+  serverhost: 175.116.181.34
   apache:
-    host: 175.116.181.32
+    host: 175.116.181.34
     port: 8888
     basedir: gdofiles
     basedrive: C
   node:
     protocol: http
-    host: 127.0.0.1
+    host: 175.116.181.32
     port: 3000
 mybatis:
   config-location: classpath:config/mybatis.xml
