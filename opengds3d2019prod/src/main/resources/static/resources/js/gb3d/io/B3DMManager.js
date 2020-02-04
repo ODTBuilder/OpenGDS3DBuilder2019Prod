@@ -121,6 +121,8 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 			// that.open();
 			// that.resultTable(data.layers);
 			// that.callback();
+			// 타일 경로를 받아서
+			// addtileset
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			that.printMessage(that.translation.err[that.locale]);
