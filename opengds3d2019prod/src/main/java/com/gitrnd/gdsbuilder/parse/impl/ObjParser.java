@@ -262,6 +262,9 @@ public class ObjParser {
 				useMtl = materialName;
 			}
 		}
+		if (group == null) {
+			group = originObj.getGroup(featureId);
+		}
 
 		// 단일 obj 파일로 write
 		Obj groupObj = Objs.create();

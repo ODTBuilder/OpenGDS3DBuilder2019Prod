@@ -91,6 +91,13 @@ public class FileController extends AbstractController {
 		return flag;
 	}
 
+	@RequestMapping(value = "/download3dtiles.do", method = RequestMethod.GET)
+	public void download3dtiles(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam("time") String time, @RequestParam("file") String file, @RequestParam("user") String user)
+			throws IOException {
+		downloadService.download3dtiles(response, time, file, user);
+	}
+
 	@RequestMapping(value = "/downloadObj.do", method = RequestMethod.GET)
 	public void downloadObj(HttpServletRequest request, HttpServletResponse response, @RequestParam("time") String time,
 			@RequestParam("file") String file, @RequestParam("user") String user) throws IOException {

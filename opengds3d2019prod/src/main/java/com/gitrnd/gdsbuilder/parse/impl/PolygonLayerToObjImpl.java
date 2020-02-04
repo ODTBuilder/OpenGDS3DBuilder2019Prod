@@ -1,11 +1,15 @@
 package com.gitrnd.gdsbuilder.parse.impl;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -75,22 +79,21 @@ public class PolygonLayerToObjImpl {
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
 	private String mtl;
 	private String usemtl;
+	private String texture;
 
-	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, double defaultHeight, String outputPath) {
+	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, double defaultHeight, String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.hType = hType;
 		this.defaultHeight = defaultHeight;
 		this.outputPath = outputPath;
 	}
 
-	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, String attribute, String outputPath) {
+	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, String attribute, String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.hType = hType;
 		this.attribute = attribute;
 		this.outputPath = outputPath;
@@ -152,6 +155,15 @@ public class PolygonLayerToObjImpl {
 		this.usemtl = usemtl;
 	}
 
+	public String getTexture() {
+		return texture;
+	}
+
+	public void setTexture(String texture) {
+		this.texture = texture;
+	}
+
+	@SuppressWarnings("unchecked")
 	public void parseToObjFile() throws UnsupportedEncodingException, FileNotFoundException, IOException,
 			FactoryException, TransformException {
 
@@ -225,6 +237,21 @@ public class PolygonLayerToObjImpl {
 					envList.add(enPath);
 					innerEnvs.add(envList);
 
+					if (texture != null) {
+						String mtl = texture + ".mtl";
+						this.mtl = mtl;
+
+						String image = texture + ".jpg";
+						InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + mtl);
+						OutputStream mtlOs = new FileOutputStream(enPath + File.separator + mtl);
+						fileCopy(mtlIs, mtlOs);
+						InputStream imageIs = this.getClass()
+								.getResourceAsStream("/img/texture/" + texture + "/" + image);
+						OutputStream imageOs = new FileOutputStream(enPath + File.separator + image);
+						fileCopy(imageIs, imageOs);
+						this.usemtl = texture;
+					}
+
 					// folder
 					int halftmp = 1;
 					for (int en = 0; en < innerEnvs.size(); en++) {
@@ -247,10 +274,12 @@ public class PolygonLayerToObjImpl {
 								try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 										new FileOutputStream(enPath + File.separator + halftmp + ".obj"), "utf-8"))) {
 									this.writer = writer;
+
 									writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
 									if (mtl != null) {
 										writer.write("mtllib " + mtl + "\n");
 									}
+
 									vertices = new ArrayList<>();
 									vCoordinates = new ArrayList<>();
 									vIdx = 0;
@@ -387,8 +416,10 @@ public class PolygonLayerToObjImpl {
 										try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 												new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 												"utf-8"))) {
+
 											this.writer = writer;
 											writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
+
 											if (mtl != null) {
 												writer.write("mtllib " + mtl + "\n");
 											}
@@ -500,6 +531,20 @@ public class PolygonLayerToObjImpl {
 		} else {
 			objfilenum++;
 
+			if (texture != null) {
+				String mtl = texture + ".mtl";
+				this.mtl = mtl;
+
+				String image = texture + ".jpg";
+				InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + mtl);
+				OutputStream mtlOs = new FileOutputStream(outputPath + File.separator + mtl);
+				fileCopy(mtlIs, mtlOs);
+				InputStream imageIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + image);
+				OutputStream imageOs = new FileOutputStream(outputPath + File.separator + image);
+				fileCopy(imageIs, imageOs);
+				this.usemtl = texture;
+			}
+
 			// obj file
 			ReferencedEnvelope reEnv = buildingCollection.getBounds();
 			Coordinate center = reEnv.centre();
@@ -512,11 +557,13 @@ public class PolygonLayerToObjImpl {
 			JSONObject tilesPropeties = new JSONObject();
 			try (BufferedWriter writer = new BufferedWriter(
 					new OutputStreamWriter(new FileOutputStream(outputPath + File.separator + 1 + ".obj"), "utf-8"))) {
+
 				this.writer = writer;
 				writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
 				if (mtl != null) {
 					writer.write("mtllib " + mtl + "\n");
 				}
+
 				vertices = new ArrayList<>();
 				vCoordinates = new ArrayList<>();
 				vIdx = 0;
@@ -943,6 +990,20 @@ public class PolygonLayerToObjImpl {
 			}
 			writer.write(vnBuilder.toString());
 			writer.write(fBuilder.toString());
+		}
+	}
+
+	public void fileCopy(InputStream is, OutputStream os) {
+		try {
+			int data = 0;
+			while ((data = is.read()) != -1) {
+				os.write(data);
+			}
+			is.close();
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

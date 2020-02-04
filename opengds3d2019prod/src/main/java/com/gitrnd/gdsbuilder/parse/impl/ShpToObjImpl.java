@@ -49,6 +49,7 @@ public class ShpToObjImpl {
 
 	private String mtl;
 	private String usemtl;
+	private String texture;
 
 	public int getObjfilenum() {
 		return objfilenum;
@@ -128,29 +129,37 @@ public class ShpToObjImpl {
 
 	public void setMtl(String mtl) {
 		this.mtl = mtl;
-		String usemtl = null;
-		try {
-			// 파일 객체 생성
-			File mtlfile = new File(outputPath + File.separator + mtl);
-			// 입력 스트림 생성
-			FileReader filereader = new FileReader(mtlfile);
-			// 입력 버퍼 생성
-			BufferedReader bufReader = new BufferedReader(filereader);
-			String line = "";
+//		String usemtl = null;
+//		try {
+//			// 파일 객체 생성
+//			File mtlfile = new File(outputPath + File.separator + mtl);
+//			// 입력 스트림 생성
+//			FileReader filereader = new FileReader(mtlfile);
+//			// 입력 버퍼 생성
+//			BufferedReader bufReader = new BufferedReader(filereader);
+//			String line = "";
+//
+//			while ((line = bufReader.readLine()) != null) {
+//				if (line.startsWith("newmtl ")) {
+//					usemtl = line.replace("newmtl ", "");
+//				}
+//			}
+//			// .readLine()은 끝에 개행문자를 읽지 않는다.
+//			bufReader.close();
+//		} catch (FileNotFoundException e) {
+//			// TODO: handle exception
+//		} catch (IOException e) {
+//			System.out.println(e);
+//		}
+//		this.usemtl = usemtl;
+	}
 
-			while ((line = bufReader.readLine()) != null) {
-				if (line.startsWith("newmtl ")) {
-					usemtl = line.replace("newmtl ", "");
-				}
-			}
-			// .readLine()은 끝에 개행문자를 읽지 않는다.
-			bufReader.close();
-		} catch (FileNotFoundException e) {
-			// TODO: handle exception
-		} catch (IOException e) {
-			System.out.println(e);
-		}
-		this.usemtl = usemtl;
+	public String getTexture() {
+		return texture;
+	}
+
+	public void setTexture(String texture) {
+		this.texture = texture;
 	}
 
 	/**
@@ -248,13 +257,13 @@ public class ShpToObjImpl {
 
 		if (geomType.contains("Polygon") || geomType.contains("MultiPolygon")) {
 			if (this.hType == EnShpToObjHeightType.DEFAULT) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
 						defaultHeight, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
 				this.objfilenum = polyToObj.getObjfilenum();
 			} else if (this.hType == EnShpToObjHeightType.FIX) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
+				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
 						heightAttribute, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
@@ -267,31 +276,31 @@ public class ShpToObjImpl {
 			bufferParam.setEndCapStyle(bufferParam.CAP_ROUND);
 			bufferParam.setJoinStyle(bufferParam.JOIN_ROUND);
 
-			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						this.wType, defaultHeight, defaultWidth, bufferParam, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						this.wType, defaultHeight, widthAttribute, bufferParam, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						this.wType, heightAttribute, defaultWidth, bufferParam, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, mtl, usemtl, this.hType,
-						this.wType, heightAttribute, widthAttribute, bufferParam, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			}
+//			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
+//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+//						this.wType, defaultHeight, defaultWidth, bufferParam, outputPath);
+//				lineToObj.parseToObjFile();
+//				this.outputPath = lineToObj.getOutputPath();
+//				this.objfilenum = lineToObj.getObjfilenum();
+//			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
+//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+//						this.wType, defaultHeight, widthAttribute, bufferParam, outputPath);
+//				lineToObj.parseToObjFile();
+//				this.outputPath = lineToObj.getOutputPath();
+//				this.objfilenum = lineToObj.getObjfilenum();
+//			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
+//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+//						this.wType, heightAttribute, defaultWidth, bufferParam, outputPath);
+//				lineToObj.parseToObjFile();
+//				this.outputPath = lineToObj.getOutputPath();
+//				this.objfilenum = lineToObj.getObjfilenum();
+//			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
+//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+//						this.wType, heightAttribute, widthAttribute, bufferParam, outputPath);
+//				lineToObj.parseToObjFile();
+//				this.outputPath = lineToObj.getOutputPath();
+//				this.objfilenum = lineToObj.getObjfilenum();
+//			}
 		}
 	}
 

@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().ignoringAntMatchers("/uploaderror.do").and().csrf().ignoringAntMatchers("/mobile/validate.do").and()
 				.csrf().ignoringAntMatchers("/uploadGsError.do").and().csrf().ignoringAntMatchers("/upload3dtiles.do")
 				.and().csrf().ignoringAntMatchers("/uploadGltf.do").and().csrf()
-				.ignoringAntMatchers("/uploadEdit3dtiles.do");
+				.ignoringAntMatchers("/uploadEdit3dtiles.do").and().csrf().ignoringAntMatchers("/edit3dLayers.do");
 	}
 
 	@Bean

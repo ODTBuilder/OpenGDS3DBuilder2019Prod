@@ -2,12 +2,14 @@ package com.gitrnd.qaproducer.edit3d.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.qaproducer.common.security.LoginUser;
@@ -62,42 +63,27 @@ public class Edit3dController extends AbstractController {
 
 	@RequestMapping(value = "/edit3dLayers.do", method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject editSingleObj(MultipartHttpServletRequest request, HttpServletResponse response,
-			@RequestBody JSONObject editInfo, @AuthenticationPrincipal LoginUser loginUser) throws Exception {
+	public JSONObject editSingleObj(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody String editInfo, @AuthenticationPrincipal LoginUser loginUser) throws Exception {
 
-//			{
-//			  "geoserver": {
-//			    "serverName": "geo32",
-//			    "workspace": "node",
-//			    "datastore": "nodetest"
-//			  },
-//			  "layer": {
-//			    "gis_osm_buildings_3052": [
-//			      {
-//			        "featureId": "gis_osm_buildings_3052.2165",
-//			        "objPath": "20191212_172111/1/1.obj",
-//			        "centerXedit": 126.71496054348651,
-//			        "centerYedit": 37.521413807577844,
-//			        "centerXtile": 126.72189935,
-//			        "centerYtile": 37.50048405,
-//			        "edit": "modify" or "delete" or "create"
-//			      }
-//			    ]
-//			  }
-//			}
- 
-		// geoserver 2d layer shp 파일 조회
-		JSONObject geoserverInfo = (JSONObject) editInfo.get("geoserver");
-		String serverName = (String) geoserverInfo.get("serverName");
-		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		String workspace = (String) geoserverInfo.get("workspace");
-		String datastore = (String) geoserverInfo.get("datastore");
+		JSONParser parser = new JSONParser();
+		JSONObject editInfoObj = (JSONObject) parser.parse(editInfo);
+		JSONObject resultJSON = new JSONObject();
+		
+		Iterator objIter = editInfoObj.keySet().iterator();
+		while (objIter.hasNext()) {
+			String geoInfo = (String) objIter.next(); // "geo42:testworkspace:testdatastore:TN_BULD_TEST"
+			String[] infos = geoInfo.split(":");
+			String geoserver = infos[0];
+			String workspace = infos[1];
+			String datastore = infos[2];
+			String layer = infos[3];
 
-		// edit obj 파일 아파치 경로 저장, 저장경로 return
-		JSONObject objFiles = uploadService.saveObjFiles(request, loginUser.getFname());
-		JSONObject layerInfo = (JSONObject) editInfo.get("layer");
-
-		return edit3dSevice.editObjFiles(request, loginUser.getFname(), dtGeoserverManager, workspace, datastore,
-				objFiles, layerInfo);
-	}
+			DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, geoserver);
+			JSONObject layerResult = edit3dSevice.editObjFiles(dtGeoserverManager, workspace, datastore, layer,
+					loginUser.getUsername(), (JSONObject) editInfoObj.get(geoInfo));
+			resultJSON.put(layer, layerResult);
+		}
+		return resultJSON;
+	} 
 }
