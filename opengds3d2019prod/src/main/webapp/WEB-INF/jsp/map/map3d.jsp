@@ -295,11 +295,6 @@ html, body {
 
 		var gbCam = gb3dMap.getCamera();
 
-		var uploadB3DM = new gb3d.io.B3DMManager({
-			"locale" : locale !== "" ? locale : "en",
-			"gb3dMap" : gb3dMap
-		});
-
 		$("#importB3dmBtn").click(function() {
 			uploadB3DM.open();
 		});
@@ -367,6 +362,13 @@ html, body {
 			map : gb3dMap,
 			clientTree : otree
 		});
+		
+		var uploadB3DM = new gb3d.io.B3DMManager({
+			"locale" : locale !== "" ? locale : "en",
+			"gb3dMap" : gb3dMap,
+			"tilesetManager" : tilesetManager
+		});
+
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instancedmodel/tileset.json", "testLayer" );
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Batched1/tileset.json", "testLayerTile1", "testLayer" );
 		//tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instanced4326_1/tileset.json", "testLayerTile1", "testLayer" );
