@@ -50,7 +50,7 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
  * 
  * @method gb3d.io.TilesDownloader#download
  */
-gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
+gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL, fileName) {
 	var that = this;
 	var params = {
 		"path" : jsonURL
@@ -60,7 +60,7 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	xhr.onreadystatechange = function(){
 	    if (this.readyState == 4 && this.status == 200){
 	      
-	      var filename = "";
+	      var filename =  fileName+".zip";
 	       var disposition = xhr.getResponseHeader('Content-Disposition');
 	         if (disposition && disposition.indexOf('attachment') !== -1) {
 	             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
@@ -70,8 +70,9 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	      
 	        //this.response is what you're looking for
 	        console.log(this.response, typeof this.response);
+	        this.response = this.response.slice(0, this.response, "application/zip");
 	        var a = document.createElement("a");
-	        var url = URL.createObjectURL(this.response)
+	        var url = URL.createObjectURL(this.response);
 	        a.href = url;
 	        a.download = filename;
 	        document.body.appendChild(a);

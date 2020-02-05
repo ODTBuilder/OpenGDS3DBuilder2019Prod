@@ -635,11 +635,11 @@ gb3d.tree.OpenLayers = function(obj) {
 										.reference(data.reference), obj = inst
 										.get_node(data.reference);
 										var layer = inst.get_LayerById(obj.id);
-//										var lid = layer.get("id");
-//										var server = lid.split(":")[0];
-//										var work = lid.split(":")[1];
-//										var store = lid.split(":")[2];
-//										var layer = lid.split(":")[3];
+										var lid = layer.get("id");
+										var server = lid.split(":")[0];
+										var work = lid.split(":")[1];
+										var store = lid.split(":")[2];
+										var layerName = lid.split(":")[3];
 										var url;
 										var git = layer.get("git"); 
 										if (git) {
@@ -661,7 +661,7 @@ gb3d.tree.OpenLayers = function(obj) {
 										}
 										if (url) {
 											var downloader = that.getTilesDownloader();
-											downloader.downloadTiles(url);	
+											downloader.downloadTiles(url, layerName);	
 										}
 									}
 							};
