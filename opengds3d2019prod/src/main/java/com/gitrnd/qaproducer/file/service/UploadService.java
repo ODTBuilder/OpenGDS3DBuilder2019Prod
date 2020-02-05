@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -134,6 +136,46 @@ public class UploadService {
 			}
 		}
 		return files;
+	}
+
+	public JSONObject upload3dtilesZip(MultipartHttpServletRequest request, String user) {
+
+		JSONObject returnJson = new JSONObject();
+
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
+		Date time = new Date();
+		String timeStr = format.format(time);
+		String basePath = baseDrive + ":" + File.separator + baseDir + File.separator + user + File.separator + "upload"
+				+ File.separator + timeStr + File.separator + "3dtiles";
+
+		File path = new File(basePath);
+		if (!path.exists()) {
+			path.mkdirs();
+		}
+
+		boolean isSucc = true;
+
+		// 1. build an iterator
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile mpf = null;
+		// 2. get each file
+		while (itr.hasNext()) {
+			// 2.1 get next MultipartFile
+			mpf = request.getFile(itr.next());
+			String name = mpf.getOriginalFilename();
+			LOGGER.info("{} uploaded!", name);
+			try {
+				String uploadPath = path + File.separator + name;
+				LOGGER.info("저장 파일 경로:{}", uploadPath);
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(uploadPath));
+				returnJson.put("path", uploadPath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				isSucc = false;
+			}
+		}
+		returnJson.put("path", isSucc);
+		return returnJson;
 	}
 
 	public JSONObject saveObjFiles(MultipartHttpServletRequest request, String user) {
