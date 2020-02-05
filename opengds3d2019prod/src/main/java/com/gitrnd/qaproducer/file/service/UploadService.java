@@ -148,13 +148,15 @@ public class UploadService {
 		String basePath = baseDrive + ":" + File.separator + baseDir + File.separator + user + File.separator + "upload"
 				+ File.separator + timeStr + File.separator + "3dtiles";
 
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
+				+ "3dtiles" + "/" + "tileset.json";
+
 		File path = new File(basePath);
 		if (!path.exists()) {
 			path.mkdirs();
 		}
 
 		boolean isSucc = true;
-
 		// 1. build an iterator
 		Iterator<String> itr = request.getFileNames();
 		MultipartFile mpf = null;
@@ -162,19 +164,52 @@ public class UploadService {
 		while (itr.hasNext()) {
 			// 2.1 get next MultipartFile
 			mpf = request.getFile(itr.next());
-			String name = mpf.getOriginalFilename();
-			LOGGER.info("{} uploaded!", name);
+			LOGGER.info("{} uploaded!", mpf.getOriginalFilename());
 			try {
-				String uploadPath = path + File.separator + name;
-				LOGGER.info("저장 파일 경로:{}", uploadPath);
-				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(uploadPath));
-				returnJson.put("path", uploadPath);
+				String zipFile = path + File.separator + mpf.getOriginalFilename();
+				LOGGER.info("저장 파일 경로:{}", zipFile);
+				// copy file to local disk (make sure the path "e.g.
+				// D:/temp/files" exists)
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
+				try {
+					decompress(zipFile, basePath);
+					// tileset.json 유무 확인
+					File baseFile = new File(basePath);
+					boolean isture = false;
+					File[] files = baseFile.listFiles();
+					for (File file : files) {
+						if (!file.isDirectory()) {
+							if (file.getName().contains("tileset.json")) {
+								isture = true;
+							}
+						}
+					}
+					if (!isture) {
+						isSucc = false;
+						deleteDirectory(baseFile);
+					}
+					// zip 파일 삭제
+					File file = new File(zipFile);
+					file.delete();
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					isSucc = false;
+				}
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 				isSucc = false;
 			}
 		}
-		returnJson.put("path", isSucc);
+
+		if (!isSucc) {
+			deleteDirectory(path.getParentFile());
+		}
+
+		returnJson.put("succ", isSucc);
+		returnJson.put("path", apachePath);
+
 		return returnJson;
 	}
 
@@ -442,7 +477,11 @@ public class UploadService {
 					file.mkdirs();
 				} else {
 					// 파일이면 파일 만들기
-					createFile(file, zis);
+					if (file.getName().contains(".mtl") || file.getName().contains(".jpg")) {
+						continue;
+					} else {
+						createFile(file, zis);
+					}
 				}
 			}
 		} catch (Throwable e) {
@@ -482,4 +521,18 @@ public class UploadService {
 		}
 	}
 
+	private void deleteDirectory(File dir) {
+
+		if (dir.exists()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					file.delete();
+				}
+			}
+		}
+		dir.delete();
+	}
 }

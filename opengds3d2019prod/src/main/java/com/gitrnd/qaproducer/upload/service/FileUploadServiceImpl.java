@@ -39,26 +39,23 @@ import com.gitrnd.qaproducer.common.security.LoginUser;
 @Service("fileService")
 public class FileUploadServiceImpl implements FileUploadService {
 
-	private static final String dirPath = System.getProperty("user.home")+"\\.val";
-	
+	private static final String dirPath = System.getProperty("user.home") + "\\.val";
+
 //	private static final String dirPath = "D:\\files";
 
-	
-	
 	@Autowired
 	@Qualifier("shpFileuploadService")
 	private SHPFileUploadService shpFileService;
 
-
 	/*
-	 * public FileServiceImpl(UserVO userVO) { // TODO Auto-generated
-	 * constructor stub id = userVO.getId(); qa20FileService = new
+	 * public FileServiceImpl(UserVO userVO) { // TODO Auto-generated constructor
+	 * stub id = userVO.getId(); qa20FileService = new
 	 * QA20FileUploadServiceImpl(userVO); qa10FileService = new
 	 * QA10FileUploadServiceImpl(userVO); fileDAO = new FileDAOImpl(userVO); }
 	 */
 
-	public LinkedList<FileMeta> filesUpload(DTGeoserverManager dtGeoManager, LoginUser loginUser, MultipartHttpServletRequest request,
-			HttpServletResponse response) throws Throwable {
+	public LinkedList<FileMeta> filesUpload(DTGeoserverManager dtGeoManager, LoginUser loginUser,
+			MultipartHttpServletRequest request, HttpServletResponse response) throws Throwable {
 		String fullDirPath = dirPath + "\\" + loginUser.getUsername();
 		File dir = new File(dirPath);
 		File targetDir = new File(fullDirPath);
@@ -103,8 +100,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 				String wsName = request.getParameter("workspace");
 				String dsName = request.getParameter("datastore");
 				// 2.3 create new fileMeta
-				
-				
+
 				fileMeta.setFileName(mpf.getOriginalFilename().substring(0, pos));
 				fileMeta.setFileSize(mpf.getSize() / 1024 + " Kb");
 				fileMeta.setFileType(ext);
@@ -117,7 +113,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 					if (ext.endsWith("zip")) {
 						saveFilePath = fullDirPath + "\\shp\\" + mpf.getOriginalFilename();
 					}
-				} else{
+				} else {
 					saveFilePath = fullDirPath + "\\other\\" + mpf.getOriginalFilename();
 				}
 
@@ -125,18 +121,18 @@ public class FileUploadServiceImpl implements FileUploadService {
 				// D:/temp/files" exists)
 				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(saveFilePath));
 				fileMeta.setFilePath(saveFilePath);
-				if(dtGeoManager==null){
+				if (dtGeoManager == null) {
 					files.add(fileMeta);
 					fileMeta.setUploadFlag(603);
-				}else{
+				} else {
 					files.add(fileMeta);
 					files = this.filesPublish(dtGeoManager, wsName, dsName, files);
 					fileMeta.setUploadFlag(200);
 				}
-				targetDir.deleteOnExit();//작업완료후 디렉토리 삭제
+				targetDir.deleteOnExit();// 작업완료후 디렉토리 삭제
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				targetDir.deleteOnExit();//작업완료후 디렉토리 삭제
+				targetDir.deleteOnExit();// 작업완료후 디렉토리 삭제
 				fileMeta.setUploadFlag(500);
 			}
 			// 2.4 add to files
@@ -145,7 +141,8 @@ public class FileUploadServiceImpl implements FileUploadService {
 		return files;
 	}
 
-	private LinkedList<FileMeta> filesPublish(DTGeoserverManager dtGeoManager, String wsName, String dsName, LinkedList<FileMeta> fileMetaList) throws Throwable {
+	private LinkedList<FileMeta> filesPublish(DTGeoserverManager dtGeoManager, String wsName, String dsName,
+			LinkedList<FileMeta> fileMetaList) throws Throwable {
 		LinkedList<FileMeta> fileMetas = fileMetaList;
 
 		for (int i = 0; i < fileMetas.size(); i++) {
