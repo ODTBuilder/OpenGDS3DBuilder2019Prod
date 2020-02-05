@@ -1800,7 +1800,7 @@ gb3d.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var gNameInput = $("<input>").attr({
 		"type" : "text",
 		"placeholder" : "EX) Geoserver",
-		"value" : "geo42"
+		"value" : "geo32"
 	}).addClass("gb-geoserver-add-input");
 	var gNameInputDiv = $("<div>").append(gNameInput).addClass("gb-geoserver-add-input-cell");
 	var gNameArea = $("<div>").append(gName).append(gNameInputDiv).addClass("gb-geoserver-add-row");
@@ -1809,7 +1809,7 @@ gb3d.tree.GeoServer.prototype.openAddGeoServer = function() {
 	var gURLInput = $("<input>").attr({
 		"type" : "text",
 		"placeholder" : "EX) http://127.0.0.1:9990/geoserver",
-		"value" : "http://175.116.181.42:9990/geoserver"
+		"value" : "http://175.116.181.32:9999/geoserver"
 	}).addClass("gb-geoserver-add-input");
 	var gURLInputDiv = $("<div>").append(gURLInput).addClass("gb-geoserver-add-input-cell");
 	var gURLArea = $("<div>").append(gURL).append(gURLInputDiv).addClass("gb-geoserver-add-row");
