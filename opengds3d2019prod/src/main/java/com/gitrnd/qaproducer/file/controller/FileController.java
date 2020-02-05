@@ -93,11 +93,10 @@ public class FileController extends AbstractController {
 	}
 
 	@RequestMapping(value = "/tilesdownload.ajax", method = RequestMethod.POST)
-	@ResponseBody
-	public JSONObject download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
+	public void download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody JSONObject params) throws IOException {
 		String path = (String) params.get("path");
-		return downloadService.download3dtilesZip(path);
+		downloadService.download3dtilesZip(path);
 	}
 
 	@RequestMapping(value = "/tilesupload.ajax", method = RequestMethod.POST)
