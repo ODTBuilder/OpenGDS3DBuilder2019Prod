@@ -84,19 +84,18 @@ if (!gb.validation)
 			"en" : "The validation request failed."
 		}
 	};
-	
+
 	/**
-	 * 검수 요청 방식 INDEX
-	 * 0: error
-	 * 1: workspace를 여러개 선택하여 검수를 요청할 수 있음
-	 * 2: 한 개의 workspace만 검수를 요청할 수 있음
+	 * 검수 요청 방식 INDEX 0: error 1: workspace를 여러개 선택하여 검수를 요청할 수 있음 2: 한 개의 workspace만 검수를 요청할 수 있음
+	 * 
 	 * @type {number}
 	 * @private
 	 */
 	var presetIndex_ = 0;
-	
+
 	/**
 	 * Preset Index 목록
+	 * 
 	 * @type {Object.<string, number>}
 	 * @private
 	 */
@@ -111,6 +110,7 @@ if (!gb.validation)
 
 	/**
 	 * 검수 버전, 타입값
+	 * 
 	 * @type {Object.<string, Object.<string, string>>}
 	 * @private
 	 */
@@ -138,8 +138,7 @@ if (!gb.validation)
 	};
 
 	/**
-	 * @classdesc
-	 * Web 검수 요청 모듈. Geoserver 레이어 목록을 불러와 레이어 선택하고 검수를 요청한다.
+	 * @classdesc Web 검수 요청 모듈. Geoserver 레이어 목록을 불러와 레이어 선택하고 검수를 요청한다.
 	 * @class gb.validation.Validation
 	 * @memberof gb.validation
 	 * @constructor
@@ -161,50 +160,56 @@ if (!gb.validation)
 
 		/**
 		 * Geoserver JSTree
+		 * 
 		 * @type {gb.tree.GeoServer}
 		 * @private
 		 */
 		this.geoserverTree = undefined;
-		
+
 		/**
-		 * Working JSTree. Geoserver JSTree에서 선택한 노드를 옮겨놓는 트리.
-		 * 검수요청 시 Working JSTree에 추가되어 있는 노드들이 요청되어진다.
+		 * Working JSTree. Geoserver JSTree에서 선택한 노드를 옮겨놓는 트리. 검수요청 시 Working JSTree에 추가되어 있는 노드들이
+		 * 요청되어진다.
+		 * 
 		 * @type {$.jstree.plugins.wholerow}
 		 * @private
 		 */
 		this.workingTree = undefined;
-		
+
 		/**
 		 * 작업 도움말 Element Tag
+		 * 
 		 * @type {HTMLElement}
 		 * @private
 		 */
 		this.messageContent = undefined;
-		
+
 		/**
 		 * 로딩중인 Geoserver 레이어 노드 리스트
+		 * 
 		 * @type {Array.<Object.<string, boolean>>}
 		 * @private
 		 */
 		this.loadingList = [];
-		
+
 		/**
 		 * 로딩되야할 자식노드의 개수 리스트
+		 * 
 		 * @type {Array.<number>}
 		 * @private
 		 */
 		this.loadingNumber = [];
-		
+
 		/**
 		 * 저장된 검수 설정 목록 Select Tag
+		 * 
 		 * @type {HTMLElement}
 		 * @private
 		 */
 		this.presetSelectTag = $("<select class='form-control'>");
 
 		/**
-		 * 검수 종류 Select Tag
-		 * 수치지도, 지하시설물, 임상도
+		 * 검수 종류 Select Tag 수치지도, 지하시설물, 임상도
+		 * 
 		 * @type {HTMLElement}
 		 * @private
 		 */
@@ -212,22 +217,23 @@ if (!gb.validation)
 			"width" : "100%",
 			"display" : "inline-flex"
 		});
-		
+
 		/**
 		 * 좌표계 Select Tag
+		 * 
 		 * @type {HTMLElement}
 		 * @private
 		 */
 		this.srsSelectTag = $("<select class='form-control'>");
-		
+
 		var options = obj || {};
 		this.url = options.url || "";
-		if(this.url === ""){
+		if (this.url === "") {
 			console.error("gb.validation.Validation: 'url' is a required field.");
 		}
 		this.isEditing = options.isEditing || undefined;
 		this.locale = locale = options.locale || "en";
-		
+
 		var button = $("<button id='ug5' class='version-btn'>").attr("data-index", 2).addClass("gb-validation-btn").text(translation.under[this.locale]);
 		this.verSelectTag.append(button);
 
@@ -253,7 +259,7 @@ if (!gb.validation)
 			} else if ($(this).data("index") === 2) {
 				that.messageContent.html($(this).text() + " " + translation.selectNodeHint[locale]);
 			}
-			var nowPidx  = parseInt($(this).attr("data-index"));
+			var nowPidx = parseInt($(this).attr("data-index"));
 			if (nowPidx !== presetIndex_) {
 				var arr = that.workingTree.get_node("#").children || [];
 				for (var t = 0; t < arr.length; t++) {
@@ -263,8 +269,8 @@ if (!gb.validation)
 			presetIndex_ = nowPidx;
 			console.log(presetIndex_);
 		});
-		
-		this.srsSelectTag.append($("<option>").text(translation.selectCrsHint[this.locale]));
+
+		this.srsSelectTag.append($("<option>").val("notset").text(translation.selectCrsHint[this.locale]));
 		this.srsSelectTag.append($("<option>").val("5186").text("중부원점 투영좌표계(Central Belt 2010)"));
 		this.srsSelectTag.append($("<option>").val("4737").text("GRS80 경위도 좌표계(Korean 2000)"));
 		this.srsSelectTag.append($("<option>").val("4326").text("WGS84 경위도 좌표계(전지구 좌표계)"));
@@ -285,6 +291,7 @@ if (!gb.validation)
 
 	/**
 	 * 검수 요청창을 연다.
+	 * 
 	 * @method gb.validation.Validation#open
 	 * @function
 	 */
@@ -292,14 +299,22 @@ if (!gb.validation)
 		if (this.isEditing instanceof Object) {
 			if (this.isEditing.get()) {
 				this.isEditing.alert();
-				return			}
+				return;
+			}
 		}
 		this.geoserverTree.refresh();
+		$(this.messageContent).html(translation.selectUserOptionHint[this.locale]);
+		$(".gb-validation-message").css({
+			"background" : "#fffaf3",
+			"color" : "#573a08",
+			"box-shadow" : "0 0 0 1px #c9ba9b inset, 0 0 0 0 transparent"
+		});
 		gb.modal.ModalBase.prototype.open.call(this);
 	}
-	
+
 	/**
 	 * 검수 요청창에서 선택한 값들을 반환한다.
+	 * 
 	 * @method gb.validation.Validation#getParameter
 	 * @function
 	 * @return {Object.<string, string|Object>}
@@ -328,8 +343,13 @@ if (!gb.validation)
 			}
 		}
 
-		if (!srs.val()) {
+		if (srs.val() === "notset") {
 			this.messageContent.html(translation.selectCrsHint[this.locale]);
+			$(".gb-validation-message").css({
+				"background" : "rgb(255, 211, 211)",
+				"color" : "rgb(70, 70, 70)",
+				"box-shadow" : "rgb(255, 0, 0) 0px 0px 0px 1px inset, transparent 0px 0px 0px 0px"
+			});
 			return false;
 		} else {
 			params.crs = "EPSG:" + srs.val();
@@ -337,6 +357,11 @@ if (!gb.validation)
 
 		if (!preset.data("prid")) {
 			this.messageContent.html(translation.nonePresetHint[this.locale]);
+			$(".gb-validation-message").css({
+				"background" : "rgb(255, 211, 211)",
+				"color" : "rgb(70, 70, 70)",
+				"box-shadow" : "rgb(255, 0, 0) 0px 0px 0px 1px inset, transparent 0px 0px 0px 0px"
+			});
 			return false;
 		} else {
 			params.prid = preset.data("prid").toString();
@@ -354,6 +379,11 @@ if (!gb.validation)
 		} else {
 			if (!preset.data("cat")) {
 				this.messageContent.html(translation.noneCategoryHint[this.locale]);
+				$(".gb-validation-message").css({
+					"background" : "rgb(255, 211, 211)",
+					"color" : "rgb(70, 70, 70)",
+					"box-shadow" : "rgb(255, 0, 0) 0px 0px 0px 1px inset, transparent 0px 0px 0px 0px"
+				});
 				return false;
 			} else {
 				params.cat = preset.data("cat");
@@ -361,12 +391,13 @@ if (!gb.validation)
 				params.qaType = QATYPE[preset.data("cat").toString()].type;
 			}
 		}
-
+		
 		return params;
 	}
 
 	/**
 	 * 사용하지않는 함수
+	 * 
 	 * @method gb.validation.Validation#createStepDiv
 	 * @function
 	 * @private
@@ -397,8 +428,8 @@ if (!gb.validation)
 	}
 
 	/**
-	 * 검수 요청 Layout에 Geoserver Tree, 검수 옵션 선택자, Working Tree를 생성한다.
-	 * Body Tag 하위에 생성
+	 * 검수 요청 Layout에 Geoserver Tree, 검수 옵션 선택자, Working Tree를 생성한다. Body Tag 하위에 생성
+	 * 
 	 * @method gb.validation.Validation#createContent
 	 * @function
 	 */
@@ -424,7 +455,7 @@ if (!gb.validation)
 			"width" : "700px"
 		});
 		this.setModalBody(body);
-		
+
 		var footer = this.createModalFooter();
 		this.setModalFooter(footer);
 
@@ -434,8 +465,8 @@ if (!gb.validation)
 	}
 
 	/**
-	 * Geoserver JSTree 패널을 생성하여 반환한다.
-	 * {@link gb.tree.GeoServer} 모듈 필수
+	 * Geoserver JSTree 패널을 생성하여 반환한다. {@link gb.tree.GeoServer} 모듈 필수
+	 * 
 	 * @method gb.validation.Validation#createJSTreePanel
 	 * @function
 	 * @return {HTMLElement}
@@ -464,19 +495,17 @@ if (!gb.validation)
 
 		var icon = $("<i class='fas fa-plus'>")
 
-		var panelFooter = $("<div>")
-			.addClass("gb-validation-footer")
-			.hover(function() {
-				$(this).css({
-					"background-color" : "#cacbcd",
-					"color" : "rgba(0,0,0,.8)"
-				})
-			}, function() {
-				$(this).css({
-					"background-color" : "#e0e1e2",
-					"color" : "#333"
-				})
-			}).append(icon).append(translation.add[this.locale]);
+		var panelFooter = $("<div>").addClass("gb-validation-footer").hover(function() {
+			$(this).css({
+				"background-color" : "#cacbcd",
+				"color" : "rgba(0,0,0,.8)"
+			})
+		}, function() {
+			$(this).css({
+				"background-color" : "#e0e1e2",
+				"color" : "#333"
+			})
+		}).append(icon).append(translation.add[this.locale]);
 
 		panelFooter.on("click", function(e) {
 			var i, arr, children;
@@ -559,6 +588,7 @@ if (!gb.validation)
 
 	/**
 	 * 중복되는 노드 삭제
+	 * 
 	 * @method gb.validation.Validation#removeSameTypeNode
 	 * @function
 	 * @param {Object} node - JSTree 노드 정보
@@ -585,6 +615,7 @@ if (!gb.validation)
 
 	/**
 	 * 선택된 노드의 자식 노드들을 전부 Working Tree에 추가한다.
+	 * 
 	 * @method gb.validation.Validation#createChildren
 	 * @function
 	 * @param {gb.tree.GeoServer} geoTree - Geoserver JSTree
@@ -614,15 +645,16 @@ if (!gb.validation)
 	}
 
 	/**
-	 * Working Tree의 자식 노드들을 적절한 부모 노드 아래로 이동.
-	 * 자식 노드가 이미 Working Tree에 로드되어 있는 상태에서 부모 노드가 추가될때 사용되는 함수.
+	 * Working Tree의 자식 노드들을 적절한 부모 노드 아래로 이동. 자식 노드가 이미 Working Tree에 로드되어 있는 상태에서 부모 노드가 추가될때 사용되는
+	 * 함수.
+	 * 
 	 * @method gb.validation.Validation#updateChildren
 	 * @function
 	 * @param {gb.tree.GeoServer} geoTree - Geoserver JSTree
 	 * @param {$.jstree.plugins.wholerow} workingTree - 검수 요청 JSTree
 	 * @param {Array} children - 자식 노드 리스트
 	 */
-	gb.validation.Validation.prototype.updateChildren = function(geoTree, workingTree, children){
+	gb.validation.Validation.prototype.updateChildren = function(geoTree, workingTree, children) {
 		var that = this;
 		var i, node;
 		var tree = geoTree;
@@ -642,6 +674,7 @@ if (!gb.validation)
 
 	/**
 	 * Working JSTree 패널을 생성하여 반환한다.
+	 * 
 	 * @method gb.validation.Validation#createWorkTreePanel
 	 * @function
 	 * @return {HTMLElement}
@@ -713,9 +746,7 @@ if (!gb.validation)
 		var titleArea = $("<div>").append(panelTitle)
 		var panelHead = $("<div>").addClass("gb-article-head").append(titleArea);
 
-		var panelFooter = $("<div>")
-		.addClass("gb-validation-footer")
-		.hover(function() {
+		var panelFooter = $("<div>").addClass("gb-validation-footer").hover(function() {
 			$(this).css({
 				"background-color" : "#cacbcd",
 				"color" : "rgba(0,0,0,.8)"
@@ -744,6 +775,7 @@ if (!gb.validation)
 
 	/**
 	 * 검수 옵션 선택 패널을 생성하여 반환한다.
+	 * 
 	 * @method gb.validation.Validation#createOptionPanel
 	 * @function
 	 * @return {HTMLElement}
@@ -776,6 +808,7 @@ if (!gb.validation)
 
 	/**
 	 * 검수 요청 Layout의 footer tag를 생성하여 반환한다.
+	 * 
 	 * @method gb.validation.Validation#createModalFooter
 	 * @function
 	 * @return {HTMLElement}
@@ -793,11 +826,11 @@ if (!gb.validation)
 			"float" : "right"
 		}).addClass("gb-button").addClass("gb-button-primary").text(translation.start[this.locale]).click(function(e) {
 			var params = that.getParameter();
-			
-			if(!params){
+
+			if (!params) {
 				return;
 			}
-			
+
 			var deferredObj = $.ajax({
 				url : that.url.requestValidate + that.url.token,
 				type : "POST",
@@ -805,9 +838,7 @@ if (!gb.validation)
 				dataType : "json",
 				cache : false,
 				beforeSend : function() {
-					that.modal.append($("<div id='validate-request-loading'>")
-							.addClass("gb-body-loading")
-							.append($("<i>").addClass("fas fa-spinner fa-spin fa-5x").addClass("gb-body-loading-icon")));
+					that.modal.append($("<div id='validate-request-loading'>").addClass("gb-body-loading").append($("<i>").addClass("fas fa-spinner fa-spin fa-5x").addClass("gb-body-loading-icon")));
 				},
 				complete : function() {
 					// $("body").css("cursor", "default");
@@ -835,6 +866,7 @@ if (!gb.validation)
 
 	/**
 	 * 검수 요청 Layout의 footer tag를 생성하여 반환한다.
+	 * 
 	 * @function requestPreset
 	 * @param {gb.validation.Validation} that
 	 * @param {HTMLElement} obj - 저장된 검수 옵션 Select Tag
@@ -853,13 +885,11 @@ if (!gb.validation)
 				var option = $("<option>").val("false").text(translation.selectUserOptionHint[locale]);
 				select.append(option);
 
-				option = $("<option>").attr("data-title", "nonset").attr("data-cat", 0).attr("data-prid", "nonset").val("nonset").text(
-						"not set");
+				option = $("<option>").attr("data-title", "nonset").attr("data-cat", 0).attr("data-prid", "nonset").val("nonset").text("not set");
 				select.append(option);
 
 				for (var i = 0; i < data.length; i++) {
-					option = $("<option>").val(data[i].pid).attr("data-title", data[i].title).attr("data-cat", data[i].cat).attr(
-							"data-prid", data[i].pid).text(data[i].name);
+					option = $("<option>").val(data[i].pid).attr("data-title", data[i].title).attr("data-cat", data[i].cat).attr("data-prid", data[i].pid).text(data[i].name);
 
 					select.append(option);
 
@@ -871,6 +901,7 @@ if (!gb.validation)
 
 	/**
 	 * Select Tag 이벤트 처리 함수
+	 * 
 	 * @function customSelect
 	 * @param {HTMLElement} selectDiv - 저장된 검수 옵션 Select Tag를 감싼 Div Tag
 	 * @param {string} message - 작업 진행 도움말
@@ -883,7 +914,7 @@ if (!gb.validation)
 		// look for any elements with the class "custom-select":
 		x = selectDiv;
 		selElmnt = x.find("select")[0];
-		
+
 		// for each element, create a new DIV that will act as the selected
 		// item:
 		a = $("<div>").addClass("gb-validation-select-selected");
@@ -892,14 +923,14 @@ if (!gb.validation)
 		// for each element, create a new DIV that will contain the option list:
 		b = $("<div>").addClass("gb-validation-select-items gb-validation-select-hide");
 		for (j = 1; j < selElmnt.length; j++) {
-			
+
 			// for each option in the original select element, create a new DIV
 			// that will act as an option item:
-			
+
 			c = $("<div>");
 			c.html(selElmnt.options[j].innerHTML);
 			c.on("click", function(e) {
-				
+
 				// when an item is clicked, update the original select box, and
 				// the selected item:
 				var y, i, k, s, h, l, list;
@@ -968,6 +999,7 @@ if (!gb.validation)
 
 	/**
 	 * Select Tag 내용 업데이트 함수
+	 * 
 	 * @function updateFormatSelect
 	 * @param {Array} list - Select Tag options
 	 * @private
@@ -1004,6 +1036,7 @@ if (!gb.validation)
 
 	/**
 	 * Select Tag를 닫는 함수
+	 * 
 	 * @function closeAllSelect
 	 * @param {HTMLElement} elmnt - 선택된 Select Tag
 	 * @private
@@ -1031,17 +1064,13 @@ if (!gb.validation)
 
 /**
  * 노드를 마지막 자식 노드까지 로드한다.
+ * 
  * @method gb.validation.Validation#openNodeRecursive
- * @param {Number}
- *            idx - 레이어 목록에서 선택한 노드들의 인덱스
- * @param {Object}
- *            node - 열려는 노드
- * @param {Object}
- *            topNode - 레이어 목록에서 선택한 노드
- * @param {Function}
- *            afterOpen - 로드후 실행할 콜백함수
- * @param {Boolean}
- *            each - 각 노드를 불러왔을 때마다 콜백 함수를 실행할지 지정
+ * @param {Number} idx - 레이어 목록에서 선택한 노드들의 인덱스
+ * @param {Object} node - 열려는 노드
+ * @param {Object} topNode - 레이어 목록에서 선택한 노드
+ * @param {Function} afterOpen - 로드후 실행할 콜백함수
+ * @param {Boolean} each - 각 노드를 불러왔을 때마다 콜백 함수를 실행할지 지정
  */
 gb.validation.Validation.prototype.openNodeRecursive = function(idx, node, topNode, afterOpen, each) {
 	var that = this;
@@ -1087,6 +1116,7 @@ gb.validation.Validation.prototype.openNodeRecursive = function(idx, node, topNo
 
 /**
  * loadingNumber 객체를 반환한다.
+ * 
  * @method gb.validation.Validation#getLoadingNumber
  * @return {Object} 로딩할 노드목록을 가진 객체
  */
@@ -1096,6 +1126,7 @@ gb.validation.Validation.prototype.getLoadingNumber = function() {
 
 /**
  * loadingNumber 객체를 설정한다.
+ * 
  * @method gb.validation.Validation#setLoadingNumber
  * @param {number} idx - 레이어 목록에서 선택한 노드들의 인덱스
  * @param {number} num - 설정할 값
@@ -1106,6 +1137,7 @@ gb.validation.Validation.prototype.setLoadingNumber = function(idx, num) {
 
 /**
  * loadingNumber 객체를 초기화한다.
+ * 
  * @method gb.validation.Validation#initLoadingNumber
  */
 gb.validation.Validation.prototype.initLoadingNumber = function() {
@@ -1114,6 +1146,7 @@ gb.validation.Validation.prototype.initLoadingNumber = function() {
 
 /**
  * loadingList 객체를 반환한다.
+ * 
  * @method gb.validation.Validation#getLoadingList
  * @return {Object} 로딩할 노드목록을 가진 객체
  */
@@ -1123,6 +1156,7 @@ gb.validation.Validation.prototype.getLoadingList = function() {
 
 /**
  * loadingList 객체를 설정한다.
+ * 
  * @method gb.validation.Validation#setLoadingList
  * @param {Array.<Object.<string, boolean>>} list - 로딩중인 Geoserver 레이어 노드 리스트
  */
@@ -1132,6 +1166,7 @@ gb.validation.Validation.prototype.setLoadingList = function(list) {
 
 /**
  * loadingList 목록에 추가한다.
+ * 
  * @param {Number} idx - 레이어 목록에서 선택한 노드들의 인덱스
  * @param {string} nodeId - JSTree 노드 아이디
  * @method gb.validation.Validation#addNodeToLoadingList
@@ -1151,6 +1186,7 @@ gb.validation.Validation.prototype.addNodeToLoadingList = function(idx, nodeId) 
 
 /**
  * loadingList 객체를 초기화한다.
+ * 
  * @method gb.validation.Validation#initLoadingList
  */
 gb.validation.Validation.prototype.initLoadingList = function() {
@@ -1159,6 +1195,7 @@ gb.validation.Validation.prototype.initLoadingList = function() {
 
 /**
  * loadingList 객체에 노드를 추가한다.
+ * 
  * @param {Number} idx - 레이어 목록에서 선택한 노드들의 인덱스
  * @param {string} nodeId - JSTree 노드 아이디
  * @param {boolean} flag

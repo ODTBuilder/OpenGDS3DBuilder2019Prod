@@ -510,7 +510,9 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
 			console.log(data);
 			self.history = undefined;
 			// 변경된 타일셋 주소로 타일셋 업데이트 
+			
 			// 히스토리상의 threejs 객체 제거
+			self.removeMeshAll();
 		},
 		error : function(e) {
 			var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
@@ -1497,9 +1499,69 @@ gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
 			var three = created[layer][feature];
 			var mesh = three.getObject();
 			if (mesh) {
+				that.getGb3dMap().getThreeScene().remove(mesh);
 				three.setObject(undefined);
 			}
 		}
 	}
 }
 
+/**
+ * modified 목록에 있는 메쉬 객체를 삭제한다.
+ * 
+ * @method gb3d.edit.ModelRecord#removeMeshModified
+ */
+gb3d.edit.ModelRecord.prototype.removeMeshModified = function() {
+	var that = this;
+	var modified = that.getModified();
+	var layers = Object.keys(modified);
+	for (var i = 0; i < layers.length; i++) {
+		var layer = layers[i];
+		var features = Object.keys(modified[layer]);
+		for (var j = 0; j < features.length; j++) {
+			var feature = features[j];
+			var three = modified[layer][feature];
+			var mesh = three.getObject();
+			if (mesh) {
+				that.getGb3dMap().getThreeScene().remove(mesh);
+				three.setObject(undefined);
+			}
+		}
+	}
+}
+
+/**
+ * modified 목록에 있는 메쉬 객체를 삭제한다.
+ * 
+ * @method gb3d.edit.ModelRecord#removeMeshRemoved
+ */
+gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function() {
+	var that = this;
+	var removed = that.getRemoved();
+	var layers = Object.keys(removed);
+	for (var i = 0; i < layers.length; i++) {
+		var layer = layers[i];
+		var features = Object.keys(removed[layer]);
+		for (var j = 0; j < features.length; j++) {
+			var feature = features[j];
+			var three = removed[layer][feature];
+			var mesh = three.getObject();
+			if (mesh) {
+				that.getGb3dMap().getThreeScene().remove(mesh);
+				three.setObject(undefined);
+			}
+		}
+	}
+}
+
+/**
+ * 목록에 있는 모든 메쉬 객체를 삭제한다.
+ * 
+ * @method gb3d.edit.ModelRecord#removeMeshAll
+ */
+gb3d.edit.ModelRecord.prototype.removeMeshAll = function() {
+	var that = this;
+	that.removeMeshCreated();
+	that.removeMeshModified();
+	that.removeMeshRemoved();
+}
