@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -66,7 +65,6 @@ import de.javagl.obj.ObjGroup;
 import de.javagl.obj.ObjUtils;
 import de.javagl.obj.ObjWriter;
 import de.javagl.obj.Objs;
-import net.sf.json.JSON;
 
 @Service
 @PropertySources({ @PropertySource(value = "classpath:application.yml", ignoreResourceNotFound = true),

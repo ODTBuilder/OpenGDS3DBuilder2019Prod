@@ -15,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -91,18 +92,27 @@ public class FileController extends AbstractController {
 		return flag;
 	}
 
+	@RequestMapping(value = "/tilesdownload.ajax", method = RequestMethod.GET)
+	@ResponseBody
+	public JSONObject download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody JSONObject params) throws IOException {
+		String path = (String) params.get("path");
+		return downloadService.download3dtilesZip(path);
+	}
+
+	@RequestMapping(value = "/tilesupload.ajax", method = RequestMethod.GET)
+	@ResponseBody
+	public JSONObject upload3dtilesZip(MultipartHttpServletRequest request, HttpServletResponse response,
+			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
+		String user = loginUser.getUsername();
+		return uploadService.upload3dtilesZip(request, user);
+	}
+
 	@RequestMapping(value = "/download3dtiles.do", method = RequestMethod.GET)
 	public void download3dtiles(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("time") String time, @RequestParam("file") String file, @RequestParam("user") String user)
 			throws IOException {
 		downloadService.download3dtiles(response, time, file, user);
-	}
-
-	@RequestMapping(value = "/download3dtilesZip.do", method = RequestMethod.GET)
-	public void download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam("path") String path) throws IOException {
-		
-		downloadService.download3dtilesZip(response, path);
 	}
 
 	@RequestMapping(value = "/downloadObj.do", method = RequestMethod.GET)
