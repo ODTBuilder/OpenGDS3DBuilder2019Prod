@@ -92,7 +92,7 @@ public class FileController extends AbstractController {
 		return flag;
 	}
 
-	@RequestMapping(value = "/tilesdownload.ajax", method = RequestMethod.GET)
+	@RequestMapping(value = "/tilesdownload.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody JSONObject params) throws IOException {
@@ -100,7 +100,7 @@ public class FileController extends AbstractController {
 		return downloadService.download3dtilesZip(path);
 	}
 
-	@RequestMapping(value = "/tilesupload.ajax", method = RequestMethod.GET)
+	@RequestMapping(value = "/tilesupload.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject upload3dtilesZip(MultipartHttpServletRequest request, HttpServletResponse response,
 			@AuthenticationPrincipal LoginUser loginUser) throws IOException {
