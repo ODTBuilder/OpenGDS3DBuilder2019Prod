@@ -110,12 +110,14 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 		},
 		success : function(data) {
 			console.log(data);
-			that.printMessage(that.translation.succ[that.locale]);
-			that.close();
-			// 타일 경로를 받아서
-			// var path = ??
-			// 타일셋 추가 후 줌인
-			// that.getTilesetManager().addTileset(path, "", true);
+			// that.printMessage(that.translation.succ[that.locale]);
+			if (data.succ === true) {
+				that.close();
+				// 타일 경로를 받아서
+				var path = data.path;
+				// 타일셋 추가 후 줌인
+				that.getTilesetManager().addTileset(path, "temp", true);
+			}
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			that.printMessage(that.translation.err[that.locale]);
