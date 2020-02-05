@@ -1588,7 +1588,7 @@ gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
 	var map2d = map3d.getGbMap();
 	var olMap = map2d.getUpperMap();
 	var layers = olMap.getLayers();
-	for (var i = 0; i < layers.size(); i++) {
+	for (var i = 0; i < layers.getLength(); i++) {
 		var layer = layers.item(i);
 		var id = layer.get("id");
 		var newPath;
@@ -1620,12 +1620,18 @@ gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
 		if (!newPath) {
 			continue;
 		}
+		if (!git) {
+			git = layer.get("git");
+		}
 		var tileset = git.tileset;
 		if (tileset instanceof gb3d.object.Tileset) {
 			var ctileset = tileset.getCesiumTileset();
 			if (ctileset instanceof Cesium.Cesium3DTileset) {
 				// 현재 타일셋 삭제 후
-				ctileset.destroy();
+				ctileset.show = false;
+//				if(!ctileset.isDestroyed()){
+//					ctileset.destroy();	
+//				}
 				// 레이어가 가진 타일셋 키 삭제 후
 				git.tileset = undefined;
 				// 새로운 타일셋 추가
