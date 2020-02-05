@@ -53,18 +53,14 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
 gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	var that = this;
 	var params = {
-			"path" : encodeURIComponent(jsonURL)
+			"path" : jsonURL
 	};
 
 	$.ajax({
 		url : this.getDownloadTilesURL(),
-		method : "POST",
-		// enctype : 'multipart/form-data',
-		// contentType : false,
+		type : "POST",
 		contentType : "application/json; charset=UTF-8",
-		// data : formData,
 		data : JSON.stringify(params),
-		// processData : false,
 		beforeSend : function() {
 			$("body").css("cursor", "wait");
 			// that.showSpinner(true, that);
