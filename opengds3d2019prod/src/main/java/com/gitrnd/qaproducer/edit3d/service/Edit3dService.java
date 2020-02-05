@@ -59,13 +59,13 @@ import com.gitrnd.gdsbuilder.geoserver.converter.type.GeneralMapExport;
 import com.gitrnd.gdsbuilder.parse.impl.ObjParser;
 import com.gitrnd.gdsbuilder.parse.impl.test.DefaultObjFace;
 import com.gitrnd.gdsbuilder.parse.impl.test.ObjReader;
+import com.gitrnd.gdsbuilder.parse.impl.test.ObjWriter;
 
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Obj;
 import de.javagl.obj.ObjFace;
 import de.javagl.obj.ObjGroup;
 import de.javagl.obj.ObjUtils;
-import de.javagl.obj.ObjWriter;
 import de.javagl.obj.Objs;
 
 @Service
@@ -336,19 +336,23 @@ public class Edit3dService {
 					String originTilePath = originObjPath.replace(".obj", "tile.json");
 					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
 
+					// 수정 후 zip path
+					String zipPath = new File(originObjPath).getParent();
+
 					// write edit text file
 					String editTextureStr = (String) editInfo.get("texture");
 					String editTexturePath = null;
+					String editMtlPath = null;
 					String useMtl = null;
 					if (!editTextureStr.equals("notset")) {
-						editTexturePath = editBasePath + File.separator + featureId + ".jpg";
+						editTexturePath = zipPath + File.separator + featureId + ".jpg";
 						String data = editTextureStr.split(",")[1];
 						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
 						bos.write(Base64.decodeBase64(data));
 						bos.close();
-
-						File originMtlPath = new File(new File(originObjPath).getParentFile().getPath() + File.separator
-								+ originObj.getMtlFileNames().get(0));
+						editMtlPath = new File(originObjPath).getParentFile().getPath() + File.separator
+								+ originObj.getMtlFileNames().get(0);
+						File originMtlPath = new File(editMtlPath);
 						try (PrintWriter out = new PrintWriter(
 								new BufferedWriter(new FileWriter(originMtlPath, true)))) {
 							String mtl = "\n" + "newmtl " + featureId + "\n";
@@ -356,7 +360,7 @@ public class Edit3dService {
 							mtl += "Kd 1 1 1" + "\n";
 							mtl += "Ks 0.5 0.5 0.5" + "\n";
 							mtl += "illum 2" + "\n";
-							mtl += featureId + ".jpg" + "\n";
+							mtl += "map_Kd " + featureId + ".jpg" + "\n";
 							out.println(mtl);
 						} catch (IOException e) {
 							// exception handling left as an exercise for the reader
@@ -423,7 +427,7 @@ public class Edit3dService {
 					FeatureIterator<SimpleFeature> fcIter = collection.features();
 					SimpleFeature feature = fcIter.next();
 
-					Obj modifyObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(editObjPath)));
+					Obj modifyObj = ObjReader.read(new FileInputStream(editObjPath));
 					Obj resultObj = parser.modifyObj(originObj, modifyObj, featureId, modelX, modelY, tileX, tileY,
 							useMtl);
 					// set MaxHeight
@@ -483,12 +487,7 @@ public class Edit3dService {
 					// 편집 obj 파일 -> 3d tiles로 변환
 					// obj 압축
 					String zipfile = "edit_obj.zip";
-					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
-					List<File> zipFiles = new ArrayList<File>();
-					zipFiles.add(new File(originObjPath));
-					zipFiles.add(new File(originBatchPath));
-					zipFiles.add(new File(originTilePath));
-					createZipFile(zipFiles, zipPath);
+					createZipFile(zipPath, zipPath + File.separator + zipfile);
 
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
 							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -581,14 +580,10 @@ public class Edit3dService {
 
 					// 편집 obj 파일 -> 3d tiles로 변환
 					// obj 압축
+					// 수정 후 zip path
+					String zipPath = new File(originObjPath).getParent();
 					String zipfile = "edit_obj.zip";
-					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
-					List<File> zipFiles = new ArrayList<File>();
-					zipFiles.add(new File(originObjPath));
-					zipFiles.add(new File(originBatchPath));
-					zipFiles.add(new File(originTilePath));
-					createZipFile(zipFiles, zipPath);
-
+					createZipFile(zipPath, zipPath + File.separator + zipfile);
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
 							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 					// body
@@ -706,6 +701,7 @@ public class Edit3dService {
 					// write edit texture file
 					String editTextureStr = (String) editInfo.get("texture");
 					String editTexturePath = null;
+					String editMtlPath = null;
 					if (!editTextureStr.equals("notset")) {
 						editTexturePath = objBasePath + File.separator + featureId + ".jpg";
 						String data = editTextureStr.split(",")[1];
@@ -718,8 +714,10 @@ public class Edit3dService {
 						mtl += "Kd 1 1 1" + "\n";
 						mtl += "Ks 0.5 0.5 0.5" + "\n";
 						mtl += "illum 2" + "\n";
-						mtl += featureId + ".jpg" + "\n";
-						File file = new File(objBasePath + File.separator + featureId + ".mtl");
+						mtl += "map_Kd " + featureId + ".jpg" + "\n";
+
+						editMtlPath = objBasePath + File.separator + featureId + ".mtl";
+						File file = new File(editMtlPath);
 						FileWriter writer = null;
 						writer = new FileWriter(file, false);
 						writer.write(mtl);
@@ -850,6 +848,12 @@ public class Edit3dService {
 					zipFiles.add(new File(originObjPath));
 					zipFiles.add(new File(originBatchPath));
 					zipFiles.add(new File(originTilePath));
+					if (editTexturePath != null) {
+						zipFiles.add(new File(editTexturePath));
+					}
+					if (editMtlPath != null) {
+						zipFiles.add(new File(editMtlPath));
+					}
 					createZipFile(zipFiles, zipPath);
 
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"

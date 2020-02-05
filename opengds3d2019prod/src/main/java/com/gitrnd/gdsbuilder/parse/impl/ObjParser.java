@@ -94,6 +94,40 @@ public class ObjParser {
 	public Obj modifyObj(Obj originObj, Obj modifyObj, String featureId, double centerXedit, double centerYedit,
 			double centerXtile, double centerYtile, String usemtl) {
 
+		Obj newOriginObj = Objs.create();
+
+		// vertex
+		for (int v = 0; v < originObj.getNumVertices(); v++) {
+			newOriginObj.addVertex(originObj.getVertex(v));
+		}
+		// texCoordIndices
+		for (int t = 0; t < originObj.getNumVertices(); t++) {
+			newOriginObj.addTexCoord(originObj.getTexCoord(t));
+		}
+		// normalIndex
+		for (int n = 0; n < originObj.getNumVertices(); n++) {
+			newOriginObj.addNormal(originObj.getNormal(n));
+		}
+		List<String> groupNames = new ArrayList<>();
+		int numGroups = originObj.getNumGroups();
+		for (int g = 0; g < numGroups; g++) {
+			ObjGroup group = originObj.getGroup(g);
+			if (!group.getName().equals(featureId)) {
+				groupNames.add(group.getName());
+				for (int f = 0; f < group.getNumFaces(); f++) {
+					ObjFace face = group.getFace(f);
+					Set<String> activatedGroupNames = originObj.getActivatedGroupNames(face);
+					if (activatedGroupNames != null) {
+						newOriginObj.setActiveGroupNames(activatedGroupNames);
+					}
+					String activatedMaterialGroupName = originObj.getActivatedMaterialGroupName(face);
+					if (activatedMaterialGroupName != null) {
+						newOriginObj.setActiveMaterialGroupName(activatedMaterialGroupName);
+					}
+					newOriginObj.addFace(face);
+				}
+			}
+		}
 		GeodeticCalculator gc = new GeodeticCalculator();
 		gc.setStartingGeographicPoint(centerXtile, centerYedit);
 		gc.setDestinationGeographicPoint(centerXedit, centerYedit);
@@ -141,43 +175,10 @@ public class ObjParser {
 			}
 		}
 
-		Obj newOriginObj = Objs.create();
-		// vertex
-		for (int v = 0; v < originObj.getNumVertices(); v++) {
-			newOriginObj.addVertex(originObj.getVertex(v));
-		}
-		// texCoordIndices
-		for (int t = 0; t < originObj.getNumVertices(); t++) {
-			newOriginObj.addTexCoord(originObj.getTexCoord(t));
-		}
-		// normalIndex
-		for (int n = 0; n < originObj.getNumVertices(); n++) {
-			newOriginObj.addNormal(originObj.getNormal(n));
-		}
-		List<String> groupNames = new ArrayList<>();
-		int numGroups = originObj.getNumGroups();
-		for (int g = 0; g < numGroups; g++) {
-			ObjGroup group = originObj.getGroup(g);
-			if (!group.getName().equals(featureId)) {
-				groupNames.add(group.getName());
-				for (int f = 0; f < group.getNumFaces(); f++) {
-					ObjFace face = group.getFace(f);
-					Set<String> activatedGroupNames = originObj.getActivatedGroupNames(face);
-					if (activatedGroupNames != null) {
-						newOriginObj.setActiveGroupNames(activatedGroupNames);
-					}
-					String activatedMaterialGroupName = originObj.getActivatedMaterialGroupName(face);
-					if (activatedMaterialGroupName != null) {
-						newOriginObj.setActiveMaterialGroupName(activatedMaterialGroupName);
-					}
-					newOriginObj.addFace(face);
-				}
-			}
-		}
-
 		Obj combinedObj = Objs.create();
-		ObjUtils.add(newOriginObj, combinedObj);
 		ObjUtils.add(newModifytObj, combinedObj);
+		ObjUtils.add(newOriginObj, combinedObj);
+		combinedObj.setMtlFileNames(originObj.getMtlFileNames());
 
 		return combinedObj;
 	}
@@ -217,6 +218,8 @@ public class ObjParser {
 				}
 			}
 		}
+		newOriginObj.setMtlFileNames(originObj.getMtlFileNames());
+
 		return newOriginObj;
 	}
 
