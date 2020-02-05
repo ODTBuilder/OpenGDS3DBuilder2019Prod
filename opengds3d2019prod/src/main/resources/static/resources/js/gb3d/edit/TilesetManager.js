@@ -174,8 +174,9 @@ gb3d.edit.TilesetManager.prototype.update3DTilesetStyle = function(element, tile
  * @function
  * @param {string} url - Tileset 파일 경로
  * @param {string} layerid - Openlayers layer ID
+ * @param {boolean} zoom - 줌 여부
  */
-gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
+gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid, zoom) {
 	var that = this;
 	var url = url;
 	var tileset = new Cesium.Cesium3DTileset({
@@ -196,7 +197,9 @@ gb3d.edit.TilesetManager.prototype.addTileset = function(url, layerid) {
 	}
 
 	this.viewer.scene.primitives.add(tileset);
-//	 this.viewer.zoomTo( tileset );
+	if (zoom) {
+		this.viewer.zoomTo(tileset);
+	}
 
 	tileset.allTilesLoaded.addEventListener(function() {
 		that.tilesetUI.addTilesPanel(tilesetVO);

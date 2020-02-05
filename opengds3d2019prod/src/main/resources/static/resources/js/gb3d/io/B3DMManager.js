@@ -49,7 +49,7 @@ gb3d.io.B3DMManager = function(obj) {
 	this.locale = options.locale ? options.locale : "en";
 	this.url = options.url ? options.url : undefined;
 	this.tilesetManager = options.tilesetManager ? options.tilesetManager : undefined;
-	
+
 	obj.width = 368;
 	obj.autoOpen = false;
 	obj.title = this.translation.upb3dm[this.locale];
@@ -91,7 +91,7 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 
 	var form = $("<form>");
 	var formData = new FormData(form[0]);
-	formData.append("file", this.inputFile);
+	formData.append("file", $(this.inputFile)[0]);
 
 	$.ajax({
 		url : this.getUploadURL(),
@@ -111,15 +111,11 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 		success : function(data) {
 			console.log(data);
 			that.printMessage(that.translation.succ[that.locale]);
-			// modal.close();
-			// that.open();
-			// that.resultTable(data.layers);
-			// that.callback();
+			that.close();
 			// 타일 경로를 받아서
-//			var path = ??
-			// addtileset
-//			that.getTilesetManager().addTileset(path, "");
-			
+			// var path = ??
+			// 타일셋 추가 후 줌인
+			// that.getTilesetManager().addTileset(path, "", true);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			that.printMessage(that.translation.err[that.locale]);
