@@ -804,8 +804,8 @@ gb3d.edit.EditingTool3D = function(obj) {
 				// 3축 가이드
 				that.threeTransformControls.attach(object);
 				that.syncSelect(object.uuid, true);
-				that.setScale(object.scale.clone());
-				that.setRotation(object.rotation.clone());
+//				that.setScale(object.scale.clone());
+//				that.setRotation(object.rotation.clone());
 				// that.updateAttributeTab(object);
 				// that.updateStyleTab(object);
 				// that.updateMaterialTab(object);
@@ -2099,6 +2099,9 @@ gb3d.edit.EditingTool3D.prototype.syncSelect = function(id, react){
 	if (selected) {
 		// 선택 객체 저장
 		this.setSelected3DFeature(selected);
+		// 크기, 회전값 저장
+		this.setScale(selected.scale.clone());
+		this.setRotation(selected.rotation.clone());
 	}
 }
 
