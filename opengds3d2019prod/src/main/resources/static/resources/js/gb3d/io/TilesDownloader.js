@@ -53,7 +53,7 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
 gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	var that = this;
 	var params = {
-		"path" : jsonURL
+		"path" : encodeURI(jsonURL)
 	};
 
 	$.ajax({

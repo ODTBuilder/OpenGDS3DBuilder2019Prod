@@ -38,7 +38,7 @@ gb3d.io.B3DMManager = function(obj) {
 		},
 		"err" : {
 			"ko" : "업로드 중 오류가 발생하였습니다.",
-			"en" : "There was an error uploading."
+			"en" : "There was an error while uploading."
 		},
 		"succ" : {
 			"ko" : "업로드를 완료하였습니다.",
