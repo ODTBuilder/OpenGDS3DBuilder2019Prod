@@ -21,22 +21,22 @@ gb3d.io.TilesDownloader = function(obj) {
 	 * @type {Object}
 	 */
 	this.translation = {
-		"close" : {
-			"ko" : "닫기",
-			"en" : "Close"
-		},
-		"download" : {
-			"ko" : "다운로드",
-			"en" : "Download"
-		},
-		"errdown" : {
-			"ko" : "다운로드 중 오류가 발생하였습니다.",
-			"en" : "There was an error downloading."
-		},
-		"err" : {
-			"ko" : "오류",
-			"en" : "Error"
-		}
+			"close" : {
+				"ko" : "닫기",
+				"en" : "Close"
+			},
+			"download" : {
+				"ko" : "다운로드",
+				"en" : "Download"
+			},
+			"errdown" : {
+				"ko" : "다운로드 중 오류가 발생하였습니다.",
+				"en" : "There was an error downloading."
+			},
+			"err" : {
+				"ko" : "오류",
+				"en" : "Error"
+			}
 	};
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
@@ -53,12 +53,12 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
 gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	var that = this;
 	var params = {
-		"path" : encodeURIComponent(jsonURL)
+			"path" : encodeURIComponent(jsonURL)
 	};
 
 	$.ajax({
 		url : this.getDownloadTilesURL(),
-		// method : "POST",
+		method : "POST",
 		// enctype : 'multipart/form-data',
 		// contentType : false,
 		contentType : "application/json; charset=UTF-8",
@@ -99,8 +99,8 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 gb3d.io.TilesDownloader.prototype.upload = function() {
 	var that = this;
 	var params = {
-		"key1" : "val1",
-		"key2" : "val2",
+			"key1" : "val1",
+			"key2" : "val2",
 	};
 
 	var finalParams = {};
