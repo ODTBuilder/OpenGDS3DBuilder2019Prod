@@ -80,7 +80,7 @@ public class Edit3dController extends AbstractController {
 			DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, geoserver);
 			JSONObject layerResult = edit3dSevice.editObjFiles(dtGeoserverManager, workspace, datastore, layer,
 					loginUser.getUsername(), (JSONObject) editInfoObj.get(geoInfo));
-			resultJSON.put(layer, layerResult);
+			resultJSON.put(geoInfo, layerResult);
 		}
 		return resultJSON;
 	}
