@@ -609,36 +609,36 @@ gb3d.tree.GeoServer = function(obj) {
 							}
 						}
 						// 3d임포트 zip과 함께
-						if (o.type === "point" || o.type === "multipoint"
-							|| o.type === "linestring" || o.type === "multilinestring" || o.type ===
-								"polygon"
-								|| o.type === "multipolygon") {
-							var importObj = {
-									"separator_before" : true,
-									"icon" : "fas fa-file-archive",
-									"separator_after" : true,
-									"label" : that.translation.importwz[that.locale],
-									"action" : function(data) {
-										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
-										// Edit Tool 활성화 상태시 실행 중지
-										if(isEdit instanceof Object){
-											if(isEdit.get()){
-												isEdit.alert();
-												return
-											}
-										}
-
-										var inst = $.jstree.reference(data.reference), obj =
-											inst.get_node(data.reference);
-										var nodes = inst.get_selected();
-
-										console.log(obj);
-										console.log(nodes);
-										that.getMultiOBJManager().open();
-									}
-							};
-							totalObj["importzip"] = importObj;
-						}
+//						if (o.type === "point" || o.type === "multipoint"
+//							|| o.type === "linestring" || o.type === "multilinestring" || o.type ===
+//								"polygon"
+//								|| o.type === "multipolygon") {
+//							var importObj = {
+//									"separator_before" : true,
+//									"icon" : "fas fa-file-archive",
+//									"separator_after" : true,
+//									"label" : that.translation.importwz[that.locale],
+//									"action" : function(data) {
+//										var isEdit = gb? (gb.module ? gb.module.isEditing : undefined) : undefined;
+//										// Edit Tool 활성화 상태시 실행 중지
+//										if(isEdit instanceof Object){
+//											if(isEdit.get()){
+//												isEdit.alert();
+//												return
+//											}
+//										}
+//
+//										var inst = $.jstree.reference(data.reference), obj =
+//											inst.get_node(data.reference);
+//										var nodes = inst.get_selected();
+//
+//										console.log(obj);
+//										console.log(nodes);
+//										that.getMultiOBJManager().open();
+//									}
+//							};
+//							totalObj["importzip"] = importObj;
+//						}
 						// 3d임포트 as 3d
 						if (o.type === "point" || o.type === "multipoint") {
 							var importObj = {

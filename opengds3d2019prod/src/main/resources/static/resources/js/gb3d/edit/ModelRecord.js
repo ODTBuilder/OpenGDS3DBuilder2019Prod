@@ -510,7 +510,7 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
 			console.log(data);
 			self.history = undefined;
 			// 변경된 타일셋 주소로 타일셋 업데이트 
-			// 이전 타일셋 삭제
+			// 히스토리상의 threejs 객체 제거
 		},
 		error : function(e) {
 			var errorMsg = e ? (e.status + ' ' + e.statusText) : "";

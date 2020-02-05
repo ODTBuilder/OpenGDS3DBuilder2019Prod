@@ -48,7 +48,8 @@ gb3d.io.B3DMManager = function(obj) {
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
 	this.url = options.url ? options.url : undefined;
-
+	this.tilesetManager = options.tilesetManager ? options.tilesetManager : undefined;
+	
 	obj.width = 368;
 	obj.autoOpen = false;
 	obj.title = this.translation.upb3dm[this.locale];
@@ -89,7 +90,7 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 	};
 
 	var finalParams = {};
-	$.extend(finalParams, params, {});
+//	$.extend(finalParams, params, {});
 
 	var form = $("<form>");
 	var formData = new FormData(form[0]);
@@ -122,7 +123,10 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 			// that.resultTable(data.layers);
 			// that.callback();
 			// 타일 경로를 받아서
+//			var path = ??
 			// addtileset
+//			that.getTilesetManager().addTileset(path, "");
+			
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			that.printMessage(that.translation.err[that.locale]);
@@ -167,4 +171,24 @@ gb3d.io.B3DMManager.prototype.getUploadURL = function() {
 gb3d.io.B3DMManager.prototype.printMessage = function(msg) {
 	$(this.complete).empty();
 	$(this.complete).text(msg);
+};
+
+/**
+ * 타일 매니저 객체를 반환한다.
+ * 
+ * @method gb3d.io.B3DMManager#getTilesetManager
+ * @return {gb3d.edit.TilesetManager} 타일 매니저 객체
+ */
+gb3d.io.B3DMManager.prototype.getTilesetManager = function() {
+	return this.tilesetManager;
+};
+
+/**
+ * 타일 매니저 객체를 설정한다.
+ * 
+ * @method gb3d.io.B3DMManager#setTilesetManager
+ * @param {gb3d.edit.TilesetManager} tm - 타일 매니저 객체
+ */
+gb3d.io.B3DMManager.prototype.setTilesetManager = function(tm) {
+	this.tilesetManager = tm;
 };
