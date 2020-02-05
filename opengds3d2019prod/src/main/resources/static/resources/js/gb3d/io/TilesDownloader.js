@@ -50,13 +50,10 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
  * 
  * @method gb3d.io.TilesDownloader#download
  */
-gb3d.io.TilesDownloader.prototype.downloadTiles = function(geo, work, store, layer) {
+gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	var that = this;
 	var params = {
-		"serverName" : geo,
-		"workspace" : work,
-		"datastore" : store,
-		"layer" : layer
+		"path" : jsonURL
 	};
 
 	$.ajax({
@@ -79,11 +76,7 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(geo, work, store, lay
 		success : function(data) {
 			console.log(data);
 			$("body").css("cursor", "auto");
-			// that.printMessage(that.translation.succ[that.locale]);
-			// modal.close();
-			// that.open();
-			// that.resultTable(data.layers);
-			// that.callback();
+			// 파일 다운로드
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			$("body").css("cursor", "auto");
