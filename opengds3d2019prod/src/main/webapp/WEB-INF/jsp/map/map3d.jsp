@@ -330,7 +330,7 @@ html, body {
 
 		var tilesDownloader = new gb3d.io.TilesDownloader({
 			"locale" : locale || "en",
-			"downloadTilesUrl" : "geoserver/tilesdownload.ajax?${_csrf.parameterName}=${_csrf.token}"
+			"downloadTilesUrl" : "tilesdownload.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
 
 		var threeTree = new gb3d.tree.Three({

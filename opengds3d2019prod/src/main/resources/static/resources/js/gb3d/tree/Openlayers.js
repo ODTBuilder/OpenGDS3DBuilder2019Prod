@@ -635,13 +635,34 @@ gb3d.tree.OpenLayers = function(obj) {
 										.reference(data.reference), obj = inst
 										.get_node(data.reference);
 										var layer = inst.get_LayerById(obj.id);
-										var lid = layer.get("id");
-										var server = lid.split(":")[0];
-										var work = lid.split(":")[1];
-										var store = lid.split(":")[2];
-										var layer = lid.split(":")[3];
-										var downloader = that.getTilesDownloader();
-										downloader.downloadTiles(server, work, store, layer);
+//										var lid = layer.get("id");
+//										var server = lid.split(":")[0];
+//										var work = lid.split(":")[1];
+//										var store = lid.split(":")[2];
+//										var layer = lid.split(":")[3];
+										var url;
+										var git = layer.get("git"); 
+										if (git) {
+											var tileset = git.tileset;
+											if (tileset instanceof gb3d.object.Tileset) {
+												if (tileset.getCesiumTileset() instanceof Cesium.Cesium3DTileset) {
+													url = tileset.getCesiumTileset().url;
+												}	
+											}
+										} else {
+											var source = layer.getSource();
+											var git = source.get("git");
+											var tileset = git.tileset;
+											if (tileset instanceof gb3d.object.Tileset) {
+												if (tileset.getCesiumTileset() instanceof Cesium.Cesium3DTileset) {
+													url = tileset.getCesiumTileset().url;
+												}	
+											}
+										}
+										if (url) {
+											var downloader = that.getTilesDownloader();
+											downloader.downloadTiles(url);	
+										}
 									}
 							};
 						}
