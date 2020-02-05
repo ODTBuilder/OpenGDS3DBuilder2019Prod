@@ -366,7 +366,8 @@ html, body {
 		var uploadB3DM = new gb3d.io.B3DMManager({
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap,
-			"tilesetManager" : tilesetManager
+			"tilesetManager" : tilesetManager,
+			"url" : "tilesupload.ajax?${_csrf.parameterName}=${_csrf.token}"
 		});
 
 		// 		tilesetManager.addTileset( "${pageContext.request.contextPath}/resources/testtileset/Instancedmodel/tileset.json", "testLayer" );

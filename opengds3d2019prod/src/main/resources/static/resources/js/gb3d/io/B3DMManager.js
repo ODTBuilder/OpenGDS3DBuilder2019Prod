@@ -90,7 +90,7 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 	};
 
 	var finalParams = {};
-	$.extend(finalParams, params, {});
+//	$.extend(finalParams, params, {});
 
 	var form = $("<form>");
 	var formData = new FormData(form[0]);
