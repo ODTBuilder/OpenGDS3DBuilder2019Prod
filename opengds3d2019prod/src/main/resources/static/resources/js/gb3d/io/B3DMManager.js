@@ -89,16 +89,9 @@ gb3d.io.B3DMManager.prototype.upload = function() {
 		"key2" : "val2",
 	};
 
-	var finalParams = {};
-//	$.extend(finalParams, params, {});
-
 	var form = $("<form>");
 	var formData = new FormData(form[0]);
 	formData.append("file", this.inputFile);
-	var keys = Object.keys(finalParams);
-	for (var i = 0; i < keys.length; i++) {
-		formData.append(keys[i], finalParams[keys[i]]);
-	}
 
 	$.ajax({
 		url : this.getUploadURL(),
