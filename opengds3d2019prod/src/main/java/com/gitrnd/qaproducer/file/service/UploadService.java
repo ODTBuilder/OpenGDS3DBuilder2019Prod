@@ -148,8 +148,8 @@ public class UploadService {
 		String basePath = baseDrive + ":" + File.separator + baseDir + File.separator + user + File.separator + "upload"
 				+ File.separator + timeStr + File.separator + "3dtiles";
 
-		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + time + "/"
-				+ "3dtiles" + "/" + "tileset.json";
+		String apachePath = "http://" + apachehost + ":" + apacheport + "/" + user + "/" + "upload" + "/" + timeStr
+				+ "/" + "3dtiles" + "/" + "tileset.json";
 
 		File path = new File(basePath);
 		if (!path.exists()) {
@@ -158,50 +158,52 @@ public class UploadService {
 
 		boolean isSucc = true;
 		// 1. build an iterator
-		Iterator<String> itr = request.getFileNames();
-		MultipartFile mpf = null;
-		// 2. get each file
-		while (itr.hasNext()) {
-			// 2.1 get next MultipartFile
-			mpf = request.getFile(itr.next());
-			LOGGER.info("{} uploaded!", mpf.getOriginalFilename());
+		//Iterator<String> itr = request.getFileNames();
+		MultipartFile mpf = request.getFile("file");
+
+//		MultipartFile mpf = null;
+//		// 2. get each file
+//		while (itr.hasNext()) {
+		// 2.1 get next MultipartFile
+//			mpf = request.getFile(itr.next());
+		LOGGER.info("{} uploaded!", mpf.getOriginalFilename());
+		try {
+			String zipFile = path + File.separator + mpf.getOriginalFilename();
+			LOGGER.info("저장 파일 경로:{}", zipFile);
+			// copy file to local disk (make sure the path "e.g.
+			// D:/temp/files" exists)
+			FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
 			try {
-				String zipFile = path + File.separator + mpf.getOriginalFilename();
-				LOGGER.info("저장 파일 경로:{}", zipFile);
-				// copy file to local disk (make sure the path "e.g.
-				// D:/temp/files" exists)
-				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
-				try {
-					decompress(zipFile, basePath);
-					// tileset.json 유무 확인
-					File baseFile = new File(basePath);
-					boolean isture = false;
-					File[] files = baseFile.listFiles();
-					for (File file : files) {
-						if (!file.isDirectory()) {
-							if (file.getName().contains("tileset.json")) {
-								isture = true;
-							}
+				decompress(zipFile, basePath);
+				// tileset.json 유무 확인
+				File baseFile = new File(basePath);
+				boolean isture = false;
+				File[] files = baseFile.listFiles();
+				for (File file : files) {
+					if (!file.isDirectory()) {
+						if (file.getName().contains("tileset.json")) {
+							isture = true;
 						}
 					}
-					if (!isture) {
-						isSucc = false;
-						deleteDirectory(baseFile);
-					}
-					// zip 파일 삭제
-					File file = new File(zipFile);
-					file.delete();
-				} catch (Throwable e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					isSucc = false;
 				}
-			} catch (IOException e) {
+				if (!isture) {
+					isSucc = false;
+					deleteDirectory(baseFile);
+				}
+				// zip 파일 삭제
+				File file = new File(zipFile);
+				file.delete();
+			} catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				isSucc = false;
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			isSucc = false;
 		}
+//		}
 
 		if (!isSucc) {
 			deleteDirectory(path.getParentFile());

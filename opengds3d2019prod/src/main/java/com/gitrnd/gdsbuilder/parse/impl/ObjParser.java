@@ -92,7 +92,7 @@ public class ObjParser {
 	}
 
 	public Obj modifyObj(Obj originObj, Obj modifyObj, String featureId, double centerXedit, double centerYedit,
-			double centerXtile, double centerYtile) {
+			double centerXtile, double centerYtile, String usemtl) {
 
 		GeodeticCalculator gc = new GeodeticCalculator();
 		gc.setStartingGeographicPoint(centerXtile, centerYedit);
@@ -133,14 +133,10 @@ public class ObjParser {
 			groupNamesEdt.add(group.getName());
 			for (int f = 0; f < group.getNumFaces(); f++) {
 				ObjFace face = group.getFace(f);
-				Set<String> activatedGroupNames = modifyObj.getActivatedGroupNames(face);
-				if (activatedGroupNames != null) {
-					newModifytObj.setActiveGroupNames(activatedGroupNames);
-				}
-				String activatedMaterialGroupName = modifyObj.getActivatedMaterialGroupName(face);
-				if (activatedMaterialGroupName != null) {
-					newModifytObj.setActiveMaterialGroupName(activatedMaterialGroupName);
-				}
+				List<String> gnames = new ArrayList<>();
+				gnames.add(featureId);
+				newModifytObj.setActiveGroupNames(gnames);
+				newModifytObj.setActiveMaterialGroupName(usemtl);
 				newModifytObj.addFace(face);
 			}
 		}

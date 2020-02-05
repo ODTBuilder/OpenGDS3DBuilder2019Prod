@@ -3,6 +3,7 @@ package com.gitrnd.qaproducer.edit3d.service;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -262,6 +264,367 @@ public class Edit3dService {
 			// get shp collection
 			String shpPath = editBasePath + File.separator + layerId + ".shp";
 			String totalFeautresStr = null;
+
+			if (editObjJSON.get("modified") != null) {
+
+				JSONObject modifiedResult = new JSONObject();
+
+				JSONObject modifiedFeatureObj = (JSONObject) editObjJSON.get("modified");
+				totalFeautresStr = editObjJSON.get("totalFeatures").toString();
+
+				Iterator featureIter = modifiedFeatureObj.keySet().iterator();
+				while (featureIter.hasNext()) {
+
+					String featureId = (String) featureIter.next(); // "TN_BULD_TEST.2796"
+					JSONObject editInfo = (JSONObject) modifiedFeatureObj.get(featureId);
+
+					// mbr
+					JSONArray mbrArr = (JSONArray) editInfo.get("mbr");
+					double minX = (double) mbrArr.get(0);
+					double minY = (double) mbrArr.get(1);
+					double maxX = (double) mbrArr.get(2);
+					double maxY = (double) mbrArr.get(3);
+
+					// model center
+					JSONArray modelCenterArr = (JSONArray) editInfo.get("modelCenter");
+					double modelX = (double) modelCenterArr.get(0);
+					double modelY = (double) modelCenterArr.get(1);
+
+					// write edit obj file
+					String editObjStr = (String) editInfo.get("obj");
+					String editObjPath = editBasePath + File.separator + featureId + ".obj";
+					File editObjFile = new File(editObjPath);
+					FileOutputStream outputStream = new FileOutputStream(editObjFile);
+					byte[] strToBytes = editObjStr.getBytes();
+					outputStream.write(strToBytes);
+					outputStream.close();
+
+					// tile center param
+					JSONArray tileCenterArr = (JSONArray) editInfo.get("tileCenter");
+					double tileX = (double) tileCenterArr.get(0);
+					double tileY = (double) tileCenterArr.get(1);
+
+					// 최상위 tileset edit(dir 구조인 경우)
+					boolean isDir = false;
+					boolean isTilesetChaged = false;
+					JSONObject tilesetObj = null;
+					JSONObject root = null;
+					JSONObject boundingVolume = null;
+					JSONArray editRegionArr = null;
+
+					File tilesFolderFile = new File(tilesetLocalPath).getParentFile();
+					File[] folderList = tilesFolderFile.listFiles();
+					for (int f = 0; f < folderList.length; f++) {
+						if (folderList[f].isDirectory()) {
+							isDir = true;
+							tilesetObj = (JSONObject) jsonParser.parse(new FileReader(tilesetLocalPath));
+							root = (JSONObject) tilesetObj.get("root");
+							boundingVolume = (JSONObject) root.get("boundingVolume");
+							editRegionArr = (JSONArray) boundingVolume.get("region");
+						}
+					}
+					// obj path param
+					String objPath = (String) editInfo.get("objPath"); // "20191212_173635/obj/1.obj"
+
+					// 원본 obj read
+					String originObjPath = uploadPath + File.separator + objPath;
+					Obj originObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(originObjPath)));
+					// 원본 batch.json read
+					String originBatchPath = originObjPath.replace(".obj", "batch.json");
+					JSONObject batchObj = (JSONObject) jsonParser.parse(new FileReader(originBatchPath));
+					// 원본 tile.json read
+					String originTilePath = originObjPath.replace(".obj", "tile.json");
+					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
+
+					// write edit text file
+					String editTextureStr = (String) editInfo.get("texture");
+					String editTexturePath = null;
+					String useMtl = null;
+					if (!editTextureStr.equals("notset")) {
+						editTexturePath = editBasePath + File.separator + featureId + ".jpg";
+						String data = editTextureStr.split(",")[1];
+						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
+						bos.write(Base64.decodeBase64(data));
+						bos.close();
+
+						File originMtlPath = new File(new File(originObjPath).getParentFile().getPath() + File.separator
+								+ originObj.getMtlFileNames().get(0));
+						try (PrintWriter out = new PrintWriter(
+								new BufferedWriter(new FileWriter(originMtlPath, true)))) {
+							String mtl = "\n" + "newmtl " + featureId + "\n";
+							mtl += "Ka 0.5 0.5 0.5" + "\n";
+							mtl += "Kd 1 1 1" + "\n";
+							mtl += "Ks 0.5 0.5 0.5" + "\n";
+							mtl += "illum 2" + "\n";
+							mtl += featureId + ".jpg" + "\n";
+							out.println(mtl);
+						} catch (IOException e) {
+							// exception handling left as an exercise for the reader
+						}
+						useMtl = featureId;
+					}
+
+					// 원본 타일셋 영역
+					double originSouth = Double.valueOf(tileObj.get("south").toString());
+					double originNorth = Double.valueOf(tileObj.get("north").toString());
+					double originEast = Double.valueOf(tileObj.get("east").toString());
+					double originWest = Double.valueOf(tileObj.get("west").toString());
+					double originMaxHeight = Double.valueOf(tileObj.get("maxHeight").toString());
+
+					// 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신
+					double minXRaidan = Math.toRadians(minX);
+					double minYRaidan = Math.toRadians(minY);
+					double maxXRaidan = Math.toRadians(maxX);
+					double maxYRaidan = Math.toRadians(maxY);
+
+					if (minYRaidan < originSouth) {
+						tileObj.put("south", minYRaidan);
+					}
+					if (maxYRaidan > originNorth) {
+						tileObj.put("north", maxYRaidan);
+					}
+					if (maxXRaidan > originEast) {
+						tileObj.put("east", maxXRaidan);
+					}
+					if (minXRaidan < originWest) {
+						tileObj.put("west", minXRaidan);
+					}
+
+					// 최상위 tileset 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신 (dir 구조인 경우)
+					if (isDir) {
+						double west = Double.valueOf(editRegionArr.get(0).toString());
+						double south = Double.valueOf(editRegionArr.get(1).toString());
+						double east = Double.valueOf(editRegionArr.get(2).toString());
+						double north = Double.valueOf(editRegionArr.get(3).toString());
+						double minheight = Double.valueOf(editRegionArr.get(4).toString());
+
+						if (minXRaidan < west) {
+							editRegionArr.add(0, minXRaidan);
+							isTilesetChaged = true;
+						}
+						if (minYRaidan < south) {
+							editRegionArr.add(1, minYRaidan);
+							isTilesetChaged = true;
+						}
+						if (maxXRaidan > east) {
+							editRegionArr.add(2, maxXRaidan);
+							isTilesetChaged = true;
+						}
+						if (maxYRaidan > north) {
+							editRegionArr.add(3, maxYRaidan);
+							isTilesetChaged = true;
+						}
+						editRegionArr.add(4, minheight);
+					}
+					// parse edit obj
+					ObjParser parser = new ObjParser(originMaxHeight);
+					FeatureCollection<SimpleFeatureType, SimpleFeature> collection = getFeatureCollectionFromFileWithFilter(
+							new File(shpPath), ff.id(Collections.singleton(ff.featureId(featureId))));
+					FeatureIterator<SimpleFeature> fcIter = collection.features();
+					SimpleFeature feature = fcIter.next();
+
+					Obj modifyObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(editObjPath)));
+					Obj resultObj = parser.modifyObj(originObj, modifyObj, featureId, modelX, modelY, tileX, tileY,
+							useMtl);
+					// set MaxHeight
+					if (parser.getMaxHeight() > originMaxHeight) {
+						tileObj.put("maxHeight", parser.getMaxHeight());
+						if (isDir) {
+							double maxheight = (double) editRegionArr.get(5);
+							if (parser.getMaxHeight() > maxheight) {
+								editRegionArr.add(5, maxheight);
+								isTilesetChaged = true;
+							}
+						}
+					}
+
+					// batch에 feature id 찾아서
+					JSONArray idProperties = (JSONArray) batchObj.get("featureId");
+					int featureIdx = idProperties.indexOf(featureId);
+
+					// batch에 feature id 제외한 속성 수정
+					JSONObject tileProperties = (JSONObject) tileObj.get("properties");
+					Iterator batchIter = batchObj.keySet().iterator();
+					while (batchIter.hasNext()) {
+						String batchKey = (String) batchIter.next();
+						if (!batchKey.equals("featureId")) {
+							// batch.json
+							JSONArray batchProperty = (JSONArray) batchObj.get(batchKey);
+							batchProperty.set(featureIdx, feature.getProperty(batchKey).getValue());
+							batchObj.put(batchKey, batchProperty);
+							// tile.json
+							JSONObject tileProperty = (JSONObject) tileProperties.get(batchKey);
+							tileProperty.put("minimum", Collections.max(batchProperty));
+							tileProperty.put("maximum", Collections.min(batchProperty));
+							tileObj.put("properties", tileProperties);
+						}
+					}
+
+					// write obj
+					ObjWriter.write(resultObj, new FileOutputStream(originObjPath));
+					// write batch.json
+					try (FileWriter file = new FileWriter(originBatchPath)) {
+						file.write(batchObj.toJSONString());
+					}
+					// write tile.json
+					try (FileWriter file = new FileWriter(originTilePath)) {
+						file.write(tileObj.toJSONString());
+					}
+					// write tileset.json
+					if (isDir && isTilesetChaged) {
+						boundingVolume.put("region", editRegionArr);
+						root.put("boundingVolume", boundingVolume);
+						tilesetObj.put("root", root);
+						try (FileWriter file = new FileWriter(tilesetPath)) {
+							file.write(tilesetObj.toJSONString());
+						}
+					}
+
+					// 편집 obj 파일 -> 3d tiles로 변환
+					// obj 압축
+					String zipfile = "edit_obj.zip";
+					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
+					List<File> zipFiles = new ArrayList<File>();
+					zipFiles.add(new File(originObjPath));
+					zipFiles.add(new File(originBatchPath));
+					zipFiles.add(new File(originTilePath));
+					createZipFile(zipFiles, zipPath);
+
+					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
+							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
+					// body
+					JSONObject bodyJson = new JSONObject();
+					bodyJson.put("user", user);
+					bodyJson.put("time", timeStr);
+					bodyJson.put("file", zipfile);
+					bodyJson.put("path", downloadURL);
+					bodyJson.put("originObjFolder", new File(originObjPath).getParent().replace("obj", "3dtiles")); // "objPath":"20191212_172111/obj/1
+					String bodyString = bodyJson.toJSONString();
+
+					// restTemplate
+					HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+					factory.setReadTimeout(0);
+					factory.setConnectTimeout(0);
+					CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
+							.setMaxConnPerRoute(5).build();
+					factory.setHttpClient(httpClient);
+					RestTemplate restTemplate = new RestTemplate(factory);
+
+					// header
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.APPLICATION_JSON);
+
+					HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
+					ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
+							String.class);
+					Object obj = jsonParser.parse(res.getBody());
+					JSONObject reJSON = (JSONObject) obj;
+					if ((boolean) reJSON.get("succ")) {
+						modifiedResult.put(featureId, "success");
+					}
+				}
+				resultJSON.put("modified", modifiedResult);
+			}
+			if (editObjJSON.get("removed") != null) {
+
+				JSONObject deletedResult = new JSONObject();
+				JSONObject deletedFeatureObj = (JSONObject) editObjJSON.get("removed");
+				Iterator featureIter = deletedFeatureObj.keySet().iterator();
+				while (featureIter.hasNext()) {
+
+					String featureId = (String) featureIter.next(); // "TN_BULD_TEST.2796"
+					JSONObject editInfo = (JSONObject) deletedFeatureObj.get(featureId);
+
+					// obj path param
+					String objPath = (String) editInfo.get("objPath"); // "20191212_173635/obj/1.obj"
+					// 원본 obj read
+					String originObjPath = uploadPath + File.separator + objPath;
+					Obj originObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(originObjPath)));
+					// 원본 batch.json read
+					String originBatchPath = originObjPath.replace(".obj", "batch.json");
+					JSONObject batchObj = (JSONObject) jsonParser.parse(new FileReader(originBatchPath));
+					// 원본 tile.json read
+					String originTilePath = originObjPath.replace(".obj", "tile.json");
+					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
+
+					// parse edit obj
+					ObjParser parser = new ObjParser();
+					Obj resultObj = parser.deleteObj(originObj, featureId);
+					// batch에 feature id 제거
+					JSONArray idProperties = (JSONArray) batchObj.get("featureId");
+					int featureIdx = idProperties.indexOf(featureId);
+					idProperties.remove(featureIdx);
+					batchObj.put("featureId", idProperties);
+					// batch에 feature id 에 해당하는 속성 제거
+					JSONObject tileProperties = (JSONObject) tileObj.get("properties");
+					Iterator batchIter = batchObj.keySet().iterator();
+					while (batchIter.hasNext()) {
+						String batchKey = (String) batchIter.next();
+						if (!batchKey.equals("featureId")) {
+							// batch.json
+							JSONArray batchProperty = (JSONArray) batchObj.get(batchKey);
+							batchProperty.remove(featureIdx);
+							batchObj.put(batchKey, batchProperty);
+							// tile.json
+							JSONObject tileProperty = (JSONObject) tileProperties.get(batchKey);
+							tileProperty.put("minimum", Collections.max(batchProperty));
+							tileProperty.put("maximum", Collections.min(batchProperty));
+							tileObj.put("properties", tileProperties);
+						}
+					}
+					// write obj
+					ObjWriter.write(resultObj, new FileOutputStream(originObjPath));
+					// write batch.json
+					try (FileWriter file = new FileWriter(originBatchPath)) {
+						file.write(batchObj.toJSONString());
+					}
+
+					// 편집 obj 파일 -> 3d tiles로 변환
+					// obj 압축
+					String zipfile = "edit_obj.zip";
+					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
+					List<File> zipFiles = new ArrayList<File>();
+					zipFiles.add(new File(originObjPath));
+					zipFiles.add(new File(originBatchPath));
+					zipFiles.add(new File(originTilePath));
+					createZipFile(zipFiles, zipPath);
+
+					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
+							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
+					// body
+					JSONObject bodyJson = new JSONObject();
+					bodyJson.put("user", user);
+					bodyJson.put("time", timeStr);
+					bodyJson.put("file", zipfile);
+					bodyJson.put("path", downloadURL);
+					bodyJson.put("originObjFolder", new File(originObjPath).getParent().replace("obj", "3dtiles")); // "objPath":"20191212_172111/obj/1
+					String bodyString = bodyJson.toJSONString();
+
+					// restTemplate
+					HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+					factory.setReadTimeout(0);
+					factory.setConnectTimeout(0);
+					CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
+							.setMaxConnPerRoute(5).build();
+					factory.setHttpClient(httpClient);
+					RestTemplate restTemplate = new RestTemplate(factory);
+
+					// header
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.APPLICATION_JSON);
+
+					HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
+					ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
+							String.class);
+					Object obj = jsonParser.parse(res.getBody());
+					JSONObject reJSON = (JSONObject) obj;
+
+					if ((boolean) reJSON.get("succ")) {
+						deletedResult.put(featureId, "success");
+					}
+				}
+				resultJSON.put("removed", deletedResult);
+			}
 
 			// editkey
 			if (editObjJSON.get("created") != null) {
@@ -558,350 +921,6 @@ public class Edit3dService {
 					}
 				}
 				resultJSON.put("created", createResult);
-			}
-			if (editObjJSON.get("modified") != null) {
-
-				JSONObject modifiedResult = new JSONObject();
-
-				JSONObject modifiedFeatureObj = (JSONObject) editObjJSON.get("modified");
-				totalFeautresStr = editObjJSON.get("totalFeatures").toString();
-
-				Iterator featureIter = modifiedFeatureObj.keySet().iterator();
-				while (featureIter.hasNext()) {
-
-					String featureId = (String) featureIter.next(); // "TN_BULD_TEST.2796"
-					JSONObject editInfo = (JSONObject) modifiedFeatureObj.get(featureId);
-
-					// mbr
-					JSONArray mbrArr = (JSONArray) editInfo.get("mbr");
-					double minX = (double) mbrArr.get(0);
-					double minY = (double) mbrArr.get(1);
-					double maxX = (double) mbrArr.get(2);
-					double maxY = (double) mbrArr.get(3);
-
-					// model center
-					JSONArray modelCenterArr = (JSONArray) editInfo.get("modelCenter");
-					double modelX = (double) modelCenterArr.get(0);
-					double modelY = (double) modelCenterArr.get(1);
-
-					// write edit obj file
-					String editObjStr = (String) editInfo.get("obj");
-					String editObjPath = editBasePath + File.separator + featureId + ".obj";
-					File editObjFile = new File(editObjPath);
-					FileOutputStream outputStream = new FileOutputStream(editObjFile);
-					byte[] strToBytes = editObjStr.getBytes();
-					outputStream.write(strToBytes);
-					outputStream.close();
-
-					// write edit text file
-					String editTextureStr = (String) editInfo.get("texture");
-					String editTexturePath = null;
-					if (!editTextureStr.equals("notset")) {
-						editTexturePath = editBasePath + File.separator + featureId + ".jpg";
-						String data = editTextureStr.split(",")[1];
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
-						bos.write(Base64.decodeBase64(data));
-						bos.close();
-					}
-
-					// obj path param
-					String objPath = (String) editInfo.get("objPath"); // "20191212_173635/obj/1.obj"
-
-					// tile center param
-					JSONArray tileCenterArr = (JSONArray) editInfo.get("tileCenter");
-					double tileX = (double) tileCenterArr.get(0);
-					double tileY = (double) tileCenterArr.get(1);
-
-					// 최상위 tileset edit(dir 구조인 경우)
-					boolean isDir = false;
-					boolean isTilesetChaged = false;
-					JSONObject tilesetObj = null;
-					JSONObject root = null;
-					JSONObject boundingVolume = null;
-					JSONArray editRegionArr = null;
-
-					File tilesFolderFile = new File(tilesetLocalPath).getParentFile();
-					File[] folderList = tilesFolderFile.listFiles();
-					for (int f = 0; f < folderList.length; f++) {
-						if (folderList[f].isDirectory()) {
-							isDir = true;
-							tilesetObj = (JSONObject) jsonParser.parse(new FileReader(tilesetLocalPath));
-							root = (JSONObject) tilesetObj.get("root");
-							boundingVolume = (JSONObject) root.get("boundingVolume");
-							editRegionArr = (JSONArray) boundingVolume.get("region");
-						}
-					}
-
-					// 원본 obj read
-					String originObjPath = uploadPath + File.separator + objPath;
-					Obj originObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(originObjPath)));
-					// 원본 batch.json read
-					String originBatchPath = originObjPath.replace(".obj", "batch.json");
-					JSONObject batchObj = (JSONObject) jsonParser.parse(new FileReader(originBatchPath));
-					// 원본 tile.json read
-					String originTilePath = originObjPath.replace(".obj", "tile.json");
-					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
-
-					// 원본 타일셋 영역
-					double originSouth = (double) tileObj.get("south");
-					double originNorth = (double) tileObj.get("north");
-					double originEast = (double) tileObj.get("east");
-					double originWest = (double) tileObj.get("west");
-					double originMaxHeight = (double) tileObj.get("maxHeight");
-
-					// 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신
-					double minXRaidan = Math.toRadians(minX);
-					double minYRaidan = Math.toRadians(minY);
-					double maxXRaidan = Math.toRadians(maxX);
-					double maxYRaidan = Math.toRadians(maxY);
-
-					if (minYRaidan < originSouth) {
-						tileObj.put("south", minYRaidan);
-					}
-					if (maxYRaidan > originNorth) {
-						tileObj.put("north", maxYRaidan);
-					}
-					if (maxXRaidan > originEast) {
-						tileObj.put("east", maxXRaidan);
-					}
-					if (minXRaidan < originWest) {
-						tileObj.put("west", minXRaidan);
-					}
-
-					// 최상위 tileset 편집 전 타일셋 영역을 편집 후 객체의 영역으로 갱신 (dir 구조인 경우)
-					if (isDir) {
-						double west = (double) editRegionArr.get(0);
-						double south = (double) editRegionArr.get(1);
-						double east = (double) editRegionArr.get(2);
-						double north = (double) editRegionArr.get(3);
-						double minheight = (double) editRegionArr.get(4);
-
-						if (minXRaidan < west) {
-							editRegionArr.add(0, minXRaidan);
-							isTilesetChaged = true;
-						}
-						if (minYRaidan < south) {
-							editRegionArr.add(1, minYRaidan);
-							isTilesetChaged = true;
-						}
-						if (maxXRaidan > east) {
-							editRegionArr.add(2, maxXRaidan);
-							isTilesetChaged = true;
-						}
-						if (maxYRaidan > north) {
-							editRegionArr.add(3, maxYRaidan);
-							isTilesetChaged = true;
-						}
-						editRegionArr.add(4, minheight);
-					}
-					// parse edit obj
-					ObjParser parser = new ObjParser(originMaxHeight);
-					FeatureCollection<SimpleFeatureType, SimpleFeature> collection = getFeatureCollectionFromFileWithFilter(
-							new File(shpPath), ff.id(Collections.singleton(ff.featureId(featureId))));
-					FeatureIterator<SimpleFeature> fcIter = collection.features();
-					SimpleFeature feature = fcIter.next();
-
-					Obj modifyObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(editObjPath)));
-					Obj resultObj = parser.modifyObj(originObj, modifyObj, featureId, modelX, modelY, tileX, tileY);
-					// set MaxHeight
-					if (parser.getMaxHeight() > originMaxHeight) {
-						tileObj.put("maxHeight", parser.getMaxHeight());
-						if (isDir) {
-							double maxheight = (double) editRegionArr.get(5);
-							if (parser.getMaxHeight() > maxheight) {
-								editRegionArr.add(5, maxheight);
-								isTilesetChaged = true;
-							}
-						}
-					}
-
-					// batch에 feature id 찾아서
-					JSONArray idProperties = (JSONArray) batchObj.get("featureId");
-					int featureIdx = idProperties.indexOf(featureId);
-
-					// batch에 feature id 제외한 속성 수정
-					JSONObject tileProperties = (JSONObject) tileObj.get("properties");
-					Iterator batchIter = batchObj.keySet().iterator();
-					while (batchIter.hasNext()) {
-						String batchKey = (String) batchIter.next();
-						if (!batchKey.equals("featureId")) {
-							// batch.json
-							JSONArray batchProperty = (JSONArray) batchObj.get(batchKey);
-							batchProperty.set(featureIdx, feature.getProperty(batchKey).getValue());
-							batchObj.put(batchKey, batchProperty);
-							// tile.json
-							JSONObject tileProperty = (JSONObject) tileProperties.get(batchKey);
-							tileProperty.put("minimum", Collections.max(batchProperty));
-							tileProperty.put("maximum", Collections.min(batchProperty));
-							tileObj.put("properties", tileProperties);
-						}
-					}
-
-					// write obj
-					ObjWriter.write(resultObj, new FileOutputStream(originObjPath));
-					// write batch.json
-					try (FileWriter file = new FileWriter(originBatchPath)) {
-						file.write(batchObj.toJSONString());
-					}
-					// write tile.json
-					try (FileWriter file = new FileWriter(originTilePath)) {
-						file.write(tileObj.toJSONString());
-					}
-					// write tileset.json
-					if (isDir && isTilesetChaged) {
-						boundingVolume.put("region", editRegionArr);
-						root.put("boundingVolume", boundingVolume);
-						tilesetObj.put("root", root);
-						try (FileWriter file = new FileWriter(tilesetPath)) {
-							file.write(tilesetObj.toJSONString());
-						}
-					}
-
-					// 편집 obj 파일 -> 3d tiles로 변환
-					// obj 압축
-					String zipfile = "edit_obj.zip";
-					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
-					List<File> zipFiles = new ArrayList<File>();
-					zipFiles.add(new File(originObjPath));
-					zipFiles.add(new File(originBatchPath));
-					zipFiles.add(new File(originTilePath));
-					createZipFile(zipFiles, zipPath);
-
-					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
-							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
-					// body
-					JSONObject bodyJson = new JSONObject();
-					bodyJson.put("user", user);
-					bodyJson.put("time", timeStr);
-					bodyJson.put("file", zipfile);
-					bodyJson.put("path", downloadURL);
-					bodyJson.put("originObjFolder", new File(originObjPath).getParent().replace("obj", "3dtiles")); // "objPath":"20191212_172111/obj/1
-					String bodyString = bodyJson.toJSONString();
-
-					// restTemplate
-					HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-					factory.setReadTimeout(0);
-					factory.setConnectTimeout(0);
-					CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
-							.setMaxConnPerRoute(5).build();
-					factory.setHttpClient(httpClient);
-					RestTemplate restTemplate = new RestTemplate(factory);
-
-					// header
-					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.APPLICATION_JSON);
-
-					HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
-					ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
-							String.class);
-					Object obj = jsonParser.parse(res.getBody());
-					JSONObject reJSON = (JSONObject) obj;
-					if ((boolean) reJSON.get("succ")) {
-						modifiedResult.put(featureId, "success");
-					}
-				}
-				resultJSON.put("modified", modifiedResult);
-			}
-			if (editObjJSON.get("removed") != null) {
-
-				JSONObject deletedResult = new JSONObject();
-				JSONObject deletedFeatureObj = (JSONObject) editObjJSON.get("removed");
-				Iterator featureIter = deletedFeatureObj.keySet().iterator();
-				while (featureIter.hasNext()) {
-
-					String featureId = (String) featureIter.next(); // "TN_BULD_TEST.2796"
-					JSONObject editInfo = (JSONObject) deletedFeatureObj.get(featureId);
-
-					// obj path param
-					String objPath = (String) editInfo.get("objPath"); // "20191212_173635/obj/1.obj"
-
-					// 원본 obj read
-					String originObjPath = uploadPath + File.separator + objPath;
-					Obj originObj = ObjUtils.convertToRenderable(ObjReader.read(new FileInputStream(originObjPath)));
-					// 원본 batch.json read
-					String originBatchPath = originObjPath.replace(".obj", "batch.json");
-					JSONObject batchObj = (JSONObject) jsonParser.parse(new FileReader(originBatchPath));
-					// 원본 tile.json read
-					String originTilePath = originObjPath.replace(".obj", "tile.json");
-					JSONObject tileObj = (JSONObject) jsonParser.parse(new FileReader(originTilePath));
-
-					// parse edit obj
-					ObjParser parser = new ObjParser();
-					Obj resultObj = parser.deleteObj(originObj, featureId);
-					// batch에 feature id 제거
-					JSONArray idProperties = (JSONArray) batchObj.get("featureId");
-					int featureIdx = idProperties.indexOf(featureId);
-					idProperties.remove(featureIdx);
-					batchObj.put("featureId", idProperties);
-					// batch에 feature id 에 해당하는 속성 제거
-					JSONObject tileProperties = (JSONObject) tileObj.get("properties");
-					Iterator batchIter = batchObj.keySet().iterator();
-					while (batchIter.hasNext()) {
-						String batchKey = (String) batchIter.next();
-						if (!batchKey.equals("featureId")) {
-							// batch.json
-							JSONArray batchProperty = (JSONArray) batchObj.get(batchKey);
-							batchProperty.remove(featureIdx);
-							batchObj.put(batchKey, batchProperty);
-							// tile.json
-							JSONObject tileProperty = (JSONObject) tileProperties.get(batchKey);
-							tileProperty.put("minimum", Collections.max(batchProperty));
-							tileProperty.put("maximum", Collections.min(batchProperty));
-							tileObj.put("properties", tileProperties);
-						}
-					}
-					// write obj
-					ObjWriter.write(resultObj, new FileOutputStream(originObjPath));
-					// write batch.json
-					try (FileWriter file = new FileWriter(originBatchPath)) {
-						file.write(batchObj.toJSONString());
-					}
-
-					// 편집 obj 파일 -> 3d tiles로 변환
-					// obj 압축
-					String zipfile = "edit_obj.zip";
-					String zipPath = new File(originObjPath).getParent() + File.separator + zipfile;
-					List<File> zipFiles = new ArrayList<File>();
-					zipFiles.add(new File(originObjPath));
-					zipFiles.add(new File(originBatchPath));
-					zipFiles.add(new File(originTilePath));
-					createZipFile(zipFiles, zipPath);
-
-					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
-							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
-					// body
-					JSONObject bodyJson = new JSONObject();
-					bodyJson.put("user", user);
-					bodyJson.put("time", timeStr);
-					bodyJson.put("file", zipfile);
-					bodyJson.put("path", downloadURL);
-					bodyJson.put("originObjFolder", new File(originObjPath).getParent().replace("obj", "3dtiles")); // "objPath":"20191212_172111/obj/1
-					String bodyString = bodyJson.toJSONString();
-
-					// restTemplate
-					HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-					factory.setReadTimeout(0);
-					factory.setConnectTimeout(0);
-					CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
-							.setMaxConnPerRoute(5).build();
-					factory.setHttpClient(httpClient);
-					RestTemplate restTemplate = new RestTemplate(factory);
-
-					// header
-					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.APPLICATION_JSON);
-
-					HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
-					ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
-							String.class);
-					Object obj = jsonParser.parse(res.getBody());
-					JSONObject reJSON = (JSONObject) obj;
-
-					if ((boolean) reJSON.get("succ")) {
-						deletedResult.put(featureId, "success");
-					}
-				}
-				resultJSON.put("removed", deletedResult);
 			}
 		}
 		return resultJSON;
