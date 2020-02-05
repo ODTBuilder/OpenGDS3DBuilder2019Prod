@@ -49,7 +49,7 @@ public class DownloadService {
 	@Value("${gitrnd.apache.basedir}")
 	private String apacheBasedir;
 
-	public JSONObject download3dtilesZip(String path) {
+	public JSONObject download3dtilesZip(String path, HttpServletResponse response) {
 
 		// http://175.116.181.32:9999/upload/20200204_154449/3dtiles/tileset.json
 
@@ -59,17 +59,45 @@ public class DownloadService {
 		String localpath = path.replace("http://", "").replace(apachepath, apachelocalpath).replace("/", "\\");
 		String tilespath = new File(localpath).getParentFile().getPath();
 		String zipname = "3dtiles.zip";
-		String zippath = tilespath + File.pathSeparator + zipname;
-		boolean succ = createZipPathFile(tilespath, zippath);
+		String zippath = tilespath + ".zip";
+		createZipPathFile(tilespath, zippath);
 
-		zippath = "http://" + zippath;
 		zippath = zippath.replace(apachelocalpath, apachepath);
+		zippath = zippath.replace("\\", "/");
+		zippath = "http://" + zippath;
 
-		JSONObject returnJson = new JSONObject();
-		returnJson.put("path", zippath);
-		returnJson.put("succ", succ);
-
-		return returnJson;
+		URL url = null;
+		try {
+			url = new URL(zippath);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if (url != null) {
+			try {
+				InputStream in = url.openStream();
+				IOUtils.copy(in, response.getOutputStream());
+				response.setContentType("application/octet-stream");
+				String txt = zipname;
+				char[] txtChar = txt.toCharArray();
+				for (int j = 0; j < txtChar.length; j++) {
+					if (txtChar[j] >= '\uAC00' && txtChar[j] <= '\uD7A3') {
+						String targetText = String.valueOf(txtChar[j]);
+						try {
+							txt = txt.replace(targetText, URLEncoder.encode(targetText, "UTF-8"));
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				response.setHeader("Content-disposition", "attachment; filename=" + txt);
+				response.flushBuffer();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	public void download3dtiles(HttpServletResponse response, String time, String file, String user)
