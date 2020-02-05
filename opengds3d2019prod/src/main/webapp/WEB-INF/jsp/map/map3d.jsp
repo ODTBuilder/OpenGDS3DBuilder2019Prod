@@ -124,9 +124,9 @@ html, body {
 							code="lang.file" /><span class="caret"></span>
 				</a>
 					<ul class="dropdown-menu">
-<%-- 						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li> --%>
+						<%-- 						<li><a href="#"><spring:message code="lang.importFile"></spring:message></a></li> --%>
 						<li><a href="#" id="importB3dmBtn"><spring:message code="lang.importZip"></spring:message></a></li>
-<%-- 						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li> --%>
+						<%-- 						<li><a href="#"><spring:message code="lang.importF4D"></spring:message></a></li> --%>
 					</ul></li>
 				<li><a href="#" title="Geoserver" data-toggle="modal" data-target="#geoserverModal"> <i
 						class="fas fa-server fa-lg" style="color: #91d050;"></i> <spring:message code="lang.geoserver" />
@@ -312,11 +312,15 @@ html, body {
 
 		var epan3d;
 
+		var tilesetManager;
 		var mrecord = new gb3d.edit.ModelRecord({
 			//id : "feature_id",
 			locale : locale,
 			saveURL : "edit3dLayers.do?${_csrf.parameterName}=${_csrf.token}",
-			gb3dMap : gb3dMap
+			gb3dMap : gb3dMap,
+			tilesetManager : function() {
+				return tilesetManager;
+			}
 		});
 
 		var frecord = new gb.edit.FeatureRecord({
@@ -358,11 +362,11 @@ html, body {
 			"threeTree" : threeTree
 		});
 
-		var tilesetManager = new gb3d.edit.TilesetManager({
+		tilesetManager = new gb3d.edit.TilesetManager({
 			map : gb3dMap,
 			clientTree : otree
 		});
-		
+
 		var uploadB3DM = new gb3d.io.B3DMManager({
 			"locale" : locale !== "" ? locale : "en",
 			"gb3dMap" : gb3dMap,

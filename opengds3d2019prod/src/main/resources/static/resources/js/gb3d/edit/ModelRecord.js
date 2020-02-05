@@ -115,12 +115,19 @@ gb3d.edit.ModelRecord = function(obj) {
 	this.gb3dMap = obj.gb3dMap ? obj.gb3dMap : undefined;
 
 	/**
+	 * TilesetManager 객체
+	 * 
+	 * @type {gb3d.edit.TilesetManager}
+	 */
+	this.tilesetManager = obj.tilesetManager ? obj.tilesetManager : undefined;
+
+	/**
 	 * 총 피처 개수 객체
 	 * 
 	 * @type {Object}
 	 */
 	this.totalFeatures = undefined;
-	
+
 	/**
 	 * 삭제 피처 로딩 여부 객체
 	 * 
@@ -509,8 +516,8 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
 		success : function(data) {
 			console.log(data);
 			self.history = undefined;
-			// 변경된 타일셋 주소로 타일셋 업데이트 
-			
+			// 변경된 타일셋 주소로 타일셋 업데이트
+			self.replace3DTileset(data);
 			// 히스토리상의 threejs 객체 제거
 			self.removeMeshAll();
 		},
@@ -573,100 +580,100 @@ gb3d.edit.ModelRecord.prototype.closeEditTool = function(editTool) {
  * @return {Object} 현재 임시저장중인 편집이력
  */
 gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
-//	var exporter = new THREE.GLTFExporter();
-//	var obj = {};
-//	var cLayers = Object.keys(this.created);
-//	for (var i = 0; i < cLayers.length; i++) {
-//		if (Object.keys(this.created[cLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 레이어별 키를 만듬
-//		obj[cLayers[i]] = {};
-//	}
-//
-//	for (var j = 0; j < cLayers.length; j++) {
-//		var layer = cLayers[j];
-//		// created 키가 없으면
-//		if (!obj[layer].hasOwnProperty("created")) {
-//			// 빈 객체로 키를 만듬
-//			obj[layer]["created"] = {};
-//		}
-//		var featureid = Object.keys(this.created[layer]);
-//		for (var o = 0; o < featureid.length; o++) {
-//			var feature = featureid[o];
-//			var threeObject = this.created[layer][feature];
-//
-//			var object = threeObject.getObject().clone();
-//			var center = threeObject.getCenter();
-//			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-//
-//			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
-//
-//			exporter.parse(object, function(result) {
-//				obj[layer]["created"][feature] = result;
-//			});
-//		}
-//	}
-//
-//	var mLayers = Object.keys(this.modified);
-//	for (var i = 0; i < mLayers.length; i++) {
-//		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 레이어별 키를 만듬
-//		obj[mLayers[i]] = {};
-//	}
-//
-//	for (var j = 0; j < mLayers.length; j++) {
-//		var layer = mLayers[j];
-//		// modified 키가 없으면
-//		if (!obj[layer].hasOwnProperty("modified")) {
-//			// 빈 객체로 키를 만듬
-//			obj[layer]["modified"] = {};
-//		}
-//		var featureid = Object.keys(this.modified[layer]);
-//		for (var o = 0; o < featureid.length; o++) {
-//			var feature = featureid[o];
-//			var threeObject = this.modified[layer][feature];
-//
-//			var object = threeObject.getObject().clone();
-//			var center = threeObject.getCenter();
-//			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-//
-//			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
-//
-//			exporter.parse(object, function(result) {
-//				obj[layer]["modified"][feature] = result;
-//			});
-//		}
-//	}
-//
-//	var rLayers = Object.keys(this.removed);
-//	for (var i = 0; i < rLayers.length; i++) {
-//		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 레이어별 키를 만듬
-//		obj[rLayers[i]] = {};
-//	}
-//
-//	for (var j = 0; j < rLayers.length; j++) {
-//		var layer = rLayers[j];
-//		// removed 키가 없으면
-//		if (!obj[layer].hasOwnProperty("removed")) {
-//			// 빈 객체로 키를 만듬
-//			obj[layer]["removed"] = {};
-//		}
-//		if (!Array.isArray(obj[layer]["removed"])) {
-//			obj[layer]["removed"] = [];
-//		}
-//		var featureid = Object.keys(this.removed[layer]);
-//		for (var o = 0; o < featureid.length; o++) {
-//			var feature = featureid[o];
-//			obj[layer]["removed"].push(feature);
-//		}
-//	}
-//	return obj;
+	// var exporter = new THREE.GLTFExporter();
+	// var obj = {};
+	// var cLayers = Object.keys(this.created);
+	// for (var i = 0; i < cLayers.length; i++) {
+	// if (Object.keys(this.created[cLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 레이어별 키를 만듬
+	// obj[cLayers[i]] = {};
+	// }
+	//
+	// for (var j = 0; j < cLayers.length; j++) {
+	// var layer = cLayers[j];
+	// // created 키가 없으면
+	// if (!obj[layer].hasOwnProperty("created")) {
+	// // 빈 객체로 키를 만듬
+	// obj[layer]["created"] = {};
+	// }
+	// var featureid = Object.keys(this.created[layer]);
+	// for (var o = 0; o < featureid.length; o++) {
+	// var feature = featureid[o];
+	// var threeObject = this.created[layer][feature];
+	//
+	// var object = threeObject.getObject().clone();
+	// var center = threeObject.getCenter();
+	// var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+	//
+	// gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
+	//
+	// exporter.parse(object, function(result) {
+	// obj[layer]["created"][feature] = result;
+	// });
+	// }
+	// }
+	//
+	// var mLayers = Object.keys(this.modified);
+	// for (var i = 0; i < mLayers.length; i++) {
+	// if (Object.keys(this.modified[mLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 레이어별 키를 만듬
+	// obj[mLayers[i]] = {};
+	// }
+	//
+	// for (var j = 0; j < mLayers.length; j++) {
+	// var layer = mLayers[j];
+	// // modified 키가 없으면
+	// if (!obj[layer].hasOwnProperty("modified")) {
+	// // 빈 객체로 키를 만듬
+	// obj[layer]["modified"] = {};
+	// }
+	// var featureid = Object.keys(this.modified[layer]);
+	// for (var o = 0; o < featureid.length; o++) {
+	// var feature = featureid[o];
+	// var threeObject = this.modified[layer][feature];
+	//
+	// var object = threeObject.getObject().clone();
+	// var center = threeObject.getCenter();
+	// var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+	//
+	// gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
+	//
+	// exporter.parse(object, function(result) {
+	// obj[layer]["modified"][feature] = result;
+	// });
+	// }
+	// }
+	//
+	// var rLayers = Object.keys(this.removed);
+	// for (var i = 0; i < rLayers.length; i++) {
+	// if (Object.keys(this.removed[rLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 레이어별 키를 만듬
+	// obj[rLayers[i]] = {};
+	// }
+	//
+	// for (var j = 0; j < rLayers.length; j++) {
+	// var layer = rLayers[j];
+	// // removed 키가 없으면
+	// if (!obj[layer].hasOwnProperty("removed")) {
+	// // 빈 객체로 키를 만듬
+	// obj[layer]["removed"] = {};
+	// }
+	// if (!Array.isArray(obj[layer]["removed"])) {
+	// obj[layer]["removed"] = [];
+	// }
+	// var featureid = Object.keys(this.removed[layer]);
+	// for (var o = 0; o < featureid.length; o++) {
+	// var feature = featureid[o];
+	// obj[layer]["removed"].push(feature);
+	// }
+	// }
+	// return obj;
 }
 
 /**
@@ -824,7 +831,6 @@ gb3d.edit.ModelRecord.prototype.readTextureFromObject = function() {
 		}
 	}
 
-	
 	return obj;
 }
 
@@ -840,28 +846,29 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 	var exporter = new THREE.OBJExporter();
 	var load = that.getTextureLoaded();
 	var obj = {};
-	
+
 	var totalFeautes = that.getTotalFeatures();
 	var totalLayerKeys = Object.keys(totalFeautes);
-	
+
 	if (Object.keys(this.removed) > 0) {
 		that.setRemoveCheck(false);
 	}
-	
+
 	var rLayers = Object.keys(this.removed);
-//	for (var i = 0; i < rLayers.length; i++) {
-//		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 없으면 레이어별 키를 만듬
-//		if (!obj[rLayers[i]]) {
-//			obj[rLayers[i]] = {};
-//		}
-//		// modified 또는 removed일 때 피처 개수를 입력
-//		if (obj[rLayers[i]]["totalFeatures"] === undefined || obj[rLayers[i]]["totalFeatures"] === null) {
-//			obj[rLayers[i]]["totalFeatures"] = false;
-//		}
-//	}
+	// for (var i = 0; i < rLayers.length; i++) {
+	// if (Object.keys(this.removed[rLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 없으면 레이어별 키를 만듬
+	// if (!obj[rLayers[i]]) {
+	// obj[rLayers[i]] = {};
+	// }
+	// // modified 또는 removed일 때 피처 개수를 입력
+	// if (obj[rLayers[i]]["totalFeatures"] === undefined || obj[rLayers[i]]["totalFeatures"] ===
+	// null) {
+	// obj[rLayers[i]]["totalFeatures"] = false;
+	// }
+	// }
 
 	for (var j = 0; j < rLayers.length; j++) {
 		if (Object.keys(this.removed[rLayers[j]]).length < 1) {
@@ -875,25 +882,25 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 		if (obj[rLayers[j]]["totalFeatures"] === undefined || obj[rLayers[j]]["totalFeatures"] === null) {
 			obj[rLayers[j]]["totalFeatures"] = false;
 		}
-		
+
 		var layer = rLayers[j];
-		
+
 		if (!obj[layer]["removed"]) {
 			obj[layer]["removed"] = {};
 		}
-		
+
 		var featureid = Object.keys(this.removed[layer]);
 		for (var o = 0; o < featureid.length; o++) {
 			var feature = featureid[o];
-			
-			if(!obj[layer]["removed"][feature]){
+
+			if (!obj[layer]["removed"][feature]) {
 				obj[layer]["removed"][feature] = {};
 			}
-			
-//			obj[layer]["removed"].push(feature);
-			
+
+			// obj[layer]["removed"].push(feature);
+
 			var threeObject = this.removed[layer][feature];
-			
+
 			// 타일셋 경로 없으면 넣기
 			if (!obj[layer]["tileset"]) {
 				var tlayer = threeObject.getLayer();
@@ -918,7 +925,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 				}
 				obj[layer]["tileset"] = tileset;
 			}
-			
+
 			var feature3d = threeObject.getFeature3D();
 			if (feature3d) {
 				if (feature3d.content) {
@@ -934,23 +941,23 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 		}
 	}
 	that.setRemoveCheck(true);
-	
-//	for (var i = 0; i < cLayers.length; i++) {
-//		if (Object.keys(this.created[cLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 레이어별 키를 만듬
-//		if (!obj[cLayers[i]]) {
-//			obj[cLayers[i]] = {};
-//		}
-//		// create일 때 피처 개수를 입력
-//		if (totalLayerKeys.indexOf(cLayers[i]) !== -1) {
-//			obj[cLayers[i]]["totalFeatures"] = totalFeautes[cLayers[i]];
-//		}
-//	}
+
+	// for (var i = 0; i < cLayers.length; i++) {
+	// if (Object.keys(this.created[cLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 레이어별 키를 만듬
+	// if (!obj[cLayers[i]]) {
+	// obj[cLayers[i]] = {};
+	// }
+	// // create일 때 피처 개수를 입력
+	// if (totalLayerKeys.indexOf(cLayers[i]) !== -1) {
+	// obj[cLayers[i]]["totalFeatures"] = totalFeautes[cLayers[i]];
+	// }
+	// }
 
 	var cLayers = Object.keys(this.created);
-	
+
 	for (var j = 0; j < cLayers.length; j++) {
 		if (Object.keys(this.created[cLayers[j]]).length < 1) {
 			continue;
@@ -963,7 +970,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 		if (totalLayerKeys.indexOf(cLayers[j]) !== -1) {
 			obj[cLayers[j]]["totalFeatures"] = totalFeautes[cLayers[j]];
 		}
-		
+
 		var layer = cLayers[j];
 		// created 키가 없으면
 		if (!obj[layer].hasOwnProperty("created")) {
@@ -1034,20 +1041,21 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 	}
 
 	var mLayers = Object.keys(this.modified);
-//	for (var i = 0; i < mLayers.length; i++) {
-//		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
-//			continue;
-//		}
-//		// 없으면 레이어별 키를 만듬
-//		if (!obj[mLayers[i]]) {
-//			obj[mLayers[i]] = {};
-//		}
-//
-//		// modified 또는 removed일 때 피처 개수를 입력
-//		if (obj[mLayers[i]]["totalFeatures"] === undefined || obj[mLayers[i]]["totalFeatures"] === null) {
-//			obj[mLayers[i]]["totalFeatures"] = false;
-//		}
-//	}
+	// for (var i = 0; i < mLayers.length; i++) {
+	// if (Object.keys(this.modified[mLayers[i]]).length < 1) {
+	// continue;
+	// }
+	// // 없으면 레이어별 키를 만듬
+	// if (!obj[mLayers[i]]) {
+	// obj[mLayers[i]] = {};
+	// }
+	//
+	// // modified 또는 removed일 때 피처 개수를 입력
+	// if (obj[mLayers[i]]["totalFeatures"] === undefined || obj[mLayers[i]]["totalFeatures"] ===
+	// null) {
+	// obj[mLayers[i]]["totalFeatures"] = false;
+	// }
+	// }
 
 	for (var j = 0; j < mLayers.length; j++) {
 		if (Object.keys(this.modified[mLayers[j]]).length < 1) {
@@ -1062,7 +1070,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 		if (obj[mLayers[j]]["totalFeatures"] === undefined || obj[mLayers[j]]["totalFeatures"] === null) {
 			obj[mLayers[j]]["totalFeatures"] = false;
 		}
-		
+
 		var layer = mLayers[j];
 		// modified 키가 없으면
 		if (!obj[layer].hasOwnProperty("modified")) {
@@ -1133,7 +1141,7 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 			that.getBase64FromObject(resetObj, obj[layer]["modified"][feature], callback, obj);
 		}
 	}
-	if (cLayers.length ===0 && mLayers.length === 0 && that.getRemoveCheck()) {
+	if (cLayers.length === 0 && mLayers.length === 0 && that.getRemoveCheck()) {
 		callback(obj);
 		that.save(that);
 	}
@@ -1564,4 +1572,82 @@ gb3d.edit.ModelRecord.prototype.removeMeshAll = function() {
 	that.removeMeshCreated();
 	that.removeMeshModified();
 	that.removeMeshRemoved();
+}
+
+/**
+ * 타일셋 URL을 변경하여 타일을 다시 로드한다.
+ * 
+ * @method gb3d.edit.ModelRecord#replace3DTileset
+ * @param {Object} result - 편집 저장후 서버의 결과 객체
+ */
+gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
+	var that = this;
+	var resultLayers = Object.keys(result);
+
+	var map3d = that.getGb3dMap();
+	var map2d = map3d.getGbMap();
+	var olMap = map2d.getUpperMap();
+	var layers = olMap.getLayers();
+	for (var i = 0; i < layers.size(); i++) {
+		var layer = layers.item(i);
+		var id = layer.get("id");
+		var newPath;
+		var git;
+		if (!id) {
+			// 아이디가 없는 경우 git, 소스에서 찾아야함
+			git = layer.get("git");
+			if (git) {
+				id = git.id;
+				if (!id) {
+					id = layer.getSource().get("id");
+					if (!id) {
+						if (git.tempLayer) {
+							id = git.tempLayer.get("id");
+						}
+					}
+				}
+			}
+		}
+		if (!id) {
+			continue;
+		}
+		for (var j = 0; j < resultLayers.length; j++) {
+			if (id === resultLayers[j]) {
+				newPath = result[resultLayers[j]]["path"];
+				break;
+			}
+		}
+		if (!newPath) {
+			continue;
+		}
+		var tileset = git.tileset;
+		if (tileset instanceof gb3d.object.Tileset) {
+			var ctileset = tileset.getCesiumTileset();
+			if (ctileset instanceof Cesium.Cesium3DTileset) {
+				// 현재 타일셋 삭제 후
+				ctileset.destroy();
+				// 레이어가 가진 타일셋 키 삭제 후
+				git.tileset = undefined;
+				// 새로운 타일셋 추가
+				var tm = that.getTilesetManager();
+				tm.addTileset(newPath, id);
+			}
+		}
+	}
+}
+
+/**
+ * 타일셋 매니저 객체를 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getTilesetManager
+ */
+gb3d.edit.ModelRecord.prototype.getTilesetManager = function() {
+	var that = this;
+	var result;
+	if (typeof that.tilesetManager === "function") {
+		result = that.tilesetManager();
+	} else {
+		result = that.tilesetManager;
+	}
+	return result;
 }
