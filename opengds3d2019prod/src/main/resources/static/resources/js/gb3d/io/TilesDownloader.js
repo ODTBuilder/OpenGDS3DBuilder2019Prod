@@ -21,22 +21,22 @@ gb3d.io.TilesDownloader = function(obj) {
 	 * @type {Object}
 	 */
 	this.translation = {
-			"close" : {
-				"ko" : "닫기",
-				"en" : "Close"
-			},
-			"download" : {
-				"ko" : "다운로드",
-				"en" : "Download"
-			},
-			"errdown" : {
-				"ko" : "다운로드 중 오류가 발생하였습니다.",
-				"en" : "There was an error downloading."
-			},
-			"err" : {
-				"ko" : "오류",
-				"en" : "Error"
-			}
+		"close" : {
+			"ko" : "닫기",
+			"en" : "Close"
+		},
+		"download" : {
+			"ko" : "다운로드",
+			"en" : "Download"
+		},
+		"errdown" : {
+			"ko" : "다운로드 중 오류가 발생하였습니다.",
+			"en" : "There was an error downloading."
+		},
+		"err" : {
+			"ko" : "오류",
+			"en" : "Error"
+		}
 	};
 	var options = obj ? obj : {};
 	this.locale = options.locale ? options.locale : "en";
@@ -53,38 +53,78 @@ gb3d.io.TilesDownloader.prototype.constructor = gb3d.io.TilesDownloader;
 gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 	var that = this;
 	var params = {
-			"path" : jsonURL
+		"path" : jsonURL
 	};
 
-	$.ajax({
-		url : this.getDownloadTilesURL(),
-		type : "POST",
-		contentType : "application/json; charset=UTF-8",
-		data : JSON.stringify(params),
-		beforeSend : function() {
-			$("body").css("cursor", "wait");
-			// that.showSpinner(true, that);
-		},
-		complete : function() {
-			$("body").css("cursor", "auto");
-			// that.showSpinner(false, that);
-		},
-		success : function(data) {
-			console.log(data);
-			$("body").css("cursor", "auto");
-			// 파일 다운로드
-		},
-		error : function(jqXHR, textStatus, errorThrown) {
-			$("body").css("cursor", "auto");
-			if (jqXHR.responseJSON) {
-				if (jqXHR.responseJSON.status) {
-					that.errorModal(jqXHR.responseJSON.status);
-				}
-			} else {
-				that.messageModal(that.translation["err"][that.locale], that.translation["errdown"][that.locale] + "<br>" + jqXHR.status + " " + jqXHR.statusText);
-			}
-		}
-	});
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+	    if (this.readyState == 4 && this.status == 200){
+	      
+	      var filename = "";
+	       var disposition = xhr.getResponseHeader('Content-Disposition');
+	         if (disposition && disposition.indexOf('attachment') !== -1) {
+	             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+	             var matches = filenameRegex.exec(disposition);
+	             if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+	         }
+	      
+	        //this.response is what you're looking for
+	        console.log(this.response, typeof this.response);
+	        var a = document.createElement("a");
+	        var url = URL.createObjectURL(this.response)
+	        a.href = url;
+	        a.download = filename;
+	        document.body.appendChild(a);
+	        a.click();
+	        window.URL.revokeObjectURL(url);
+	    }
+	}
+	xhr.open('POST', this.getDownloadTilesURL());
+	xhr.responseType = 'blob'; // !!필수!!
+	
+	var form = $("<form>");
+	var formData = new FormData(form[0]);
+	var keys = Object.keys(params);
+	for (var i = 0; i < keys.length; i++) {
+		formData.append(keys[i], params[keys[i]]);
+	}
+	xhr.send(formData);
+	
+//	$.ajax({
+//		url : this.getDownloadTilesURL(),
+//		type : "POST",
+//		contentType : "application/json; charset=UTF-8",
+//		dataType : 'binary',
+//		data : JSON.stringify(params),
+//		beforeSend : function() {
+//			$("body").css("cursor", "wait");
+//			// that.showSpinner(true, that);
+//		},
+//		complete : function() {
+//			$("body").css("cursor", "auto");
+//			// that.showSpinner(false, that);
+//		},
+//		success : function(data) {
+//			// console.log(data);
+//			$("body").css("cursor", "auto");
+//			// 파일 다운로드
+//			var blob = new Blob(data);
+//			var link = document.createElement('a');
+//			link.href = window.URL.createObjectURL(blob);
+//			link.download = "myTileset.zip";
+//			link.click();
+//		},
+//		error : function(jqXHR, textStatus, errorThrown) {
+//			$("body").css("cursor", "auto");
+//			if (jqXHR.responseJSON) {
+//				if (jqXHR.responseJSON.status) {
+//					that.errorModal(jqXHR.responseJSON.status);
+//				}
+//			} else {
+//				that.messageModal(that.translation["err"][that.locale], that.translation["errdown"][that.locale] + "<br>" + jqXHR.status + " " + jqXHR.statusText);
+//			}
+//		}
+//	});
 };
 
 /**
@@ -95,8 +135,8 @@ gb3d.io.TilesDownloader.prototype.downloadTiles = function(jsonURL) {
 gb3d.io.TilesDownloader.prototype.upload = function() {
 	var that = this;
 	var params = {
-			"key1" : "val1",
-			"key2" : "val2",
+		"key1" : "val1",
+		"key2" : "val2",
 	};
 
 	var finalParams = {};
