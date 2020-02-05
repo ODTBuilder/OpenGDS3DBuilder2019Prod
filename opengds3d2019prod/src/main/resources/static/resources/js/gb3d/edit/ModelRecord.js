@@ -571,100 +571,100 @@ gb3d.edit.ModelRecord.prototype.closeEditTool = function(editTool) {
  * @return {Object} 현재 임시저장중인 편집이력
  */
 gb3d.edit.ModelRecord.prototype.getStructureToGLTF = function() {
-	var exporter = new THREE.GLTFExporter();
-	var obj = {};
-	var cLayers = Object.keys(this.created);
-	for (var i = 0; i < cLayers.length; i++) {
-		if (Object.keys(this.created[cLayers[i]]).length < 1) {
-			continue;
-		}
-		// 레이어별 키를 만듬
-		obj[cLayers[i]] = {};
-	}
-
-	for (var j = 0; j < cLayers.length; j++) {
-		var layer = cLayers[j];
-		// created 키가 없으면
-		if (!obj[layer].hasOwnProperty("created")) {
-			// 빈 객체로 키를 만듬
-			obj[layer]["created"] = {};
-		}
-		var featureid = Object.keys(this.created[layer]);
-		for (var o = 0; o < featureid.length; o++) {
-			var feature = featureid[o];
-			var threeObject = this.created[layer][feature];
-
-			var object = threeObject.getObject().clone();
-			var center = threeObject.getCenter();
-			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-
-			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
-
-			exporter.parse(object, function(result) {
-				obj[layer]["created"][feature] = result;
-			});
-		}
-	}
-
-	var mLayers = Object.keys(this.modified);
-	for (var i = 0; i < mLayers.length; i++) {
-		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
-			continue;
-		}
-		// 레이어별 키를 만듬
-		obj[mLayers[i]] = {};
-	}
-
-	for (var j = 0; j < mLayers.length; j++) {
-		var layer = mLayers[j];
-		// modified 키가 없으면
-		if (!obj[layer].hasOwnProperty("modified")) {
-			// 빈 객체로 키를 만듬
-			obj[layer]["modified"] = {};
-		}
-		var featureid = Object.keys(this.modified[layer]);
-		for (var o = 0; o < featureid.length; o++) {
-			var feature = featureid[o];
-			var threeObject = this.modified[layer][feature];
-
-			var object = threeObject.getObject().clone();
-			var center = threeObject.getCenter();
-			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
-
-			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
-
-			exporter.parse(object, function(result) {
-				obj[layer]["modified"][feature] = result;
-			});
-		}
-	}
-
-	var rLayers = Object.keys(this.removed);
-	for (var i = 0; i < rLayers.length; i++) {
-		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
-			continue;
-		}
-		// 레이어별 키를 만듬
-		obj[rLayers[i]] = {};
-	}
-
-	for (var j = 0; j < rLayers.length; j++) {
-		var layer = rLayers[j];
-		// removed 키가 없으면
-		if (!obj[layer].hasOwnProperty("removed")) {
-			// 빈 객체로 키를 만듬
-			obj[layer]["removed"] = {};
-		}
-		if (!Array.isArray(obj[layer]["removed"])) {
-			obj[layer]["removed"] = [];
-		}
-		var featureid = Object.keys(this.removed[layer]);
-		for (var o = 0; o < featureid.length; o++) {
-			var feature = featureid[o];
-			obj[layer]["removed"].push(feature);
-		}
-	}
-	return obj;
+//	var exporter = new THREE.GLTFExporter();
+//	var obj = {};
+//	var cLayers = Object.keys(this.created);
+//	for (var i = 0; i < cLayers.length; i++) {
+//		if (Object.keys(this.created[cLayers[i]]).length < 1) {
+//			continue;
+//		}
+//		// 레이어별 키를 만듬
+//		obj[cLayers[i]] = {};
+//	}
+//
+//	for (var j = 0; j < cLayers.length; j++) {
+//		var layer = cLayers[j];
+//		// created 키가 없으면
+//		if (!obj[layer].hasOwnProperty("created")) {
+//			// 빈 객체로 키를 만듬
+//			obj[layer]["created"] = {};
+//		}
+//		var featureid = Object.keys(this.created[layer]);
+//		for (var o = 0; o < featureid.length; o++) {
+//			var feature = featureid[o];
+//			var threeObject = this.created[layer][feature];
+//
+//			var object = threeObject.getObject().clone();
+//			var center = threeObject.getCenter();
+//			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+//
+//			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
+//
+//			exporter.parse(object, function(result) {
+//				obj[layer]["created"][feature] = result;
+//			});
+//		}
+//	}
+//
+//	var mLayers = Object.keys(this.modified);
+//	for (var i = 0; i < mLayers.length; i++) {
+//		if (Object.keys(this.modified[mLayers[i]]).length < 1) {
+//			continue;
+//		}
+//		// 레이어별 키를 만듬
+//		obj[mLayers[i]] = {};
+//	}
+//
+//	for (var j = 0; j < mLayers.length; j++) {
+//		var layer = mLayers[j];
+//		// modified 키가 없으면
+//		if (!obj[layer].hasOwnProperty("modified")) {
+//			// 빈 객체로 키를 만듬
+//			obj[layer]["modified"] = {};
+//		}
+//		var featureid = Object.keys(this.modified[layer]);
+//		for (var o = 0; o < featureid.length; o++) {
+//			var feature = featureid[o];
+//			var threeObject = this.modified[layer][feature];
+//
+//			var object = threeObject.getObject().clone();
+//			var center = threeObject.getCenter();
+//			var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
+//
+//			gb3d.Math.resetMatrixWorld(object, threeObject.getObject().rotation, centerHigh);
+//
+//			exporter.parse(object, function(result) {
+//				obj[layer]["modified"][feature] = result;
+//			});
+//		}
+//	}
+//
+//	var rLayers = Object.keys(this.removed);
+//	for (var i = 0; i < rLayers.length; i++) {
+//		if (Object.keys(this.removed[rLayers[i]]).length < 1) {
+//			continue;
+//		}
+//		// 레이어별 키를 만듬
+//		obj[rLayers[i]] = {};
+//	}
+//
+//	for (var j = 0; j < rLayers.length; j++) {
+//		var layer = rLayers[j];
+//		// removed 키가 없으면
+//		if (!obj[layer].hasOwnProperty("removed")) {
+//			// 빈 객체로 키를 만듬
+//			obj[layer]["removed"] = {};
+//		}
+//		if (!Array.isArray(obj[layer]["removed"])) {
+//			obj[layer]["removed"] = [];
+//		}
+//		var featureid = Object.keys(this.removed[layer]);
+//		for (var o = 0; o < featureid.length; o++) {
+//			var feature = featureid[o];
+//			obj[layer]["removed"].push(feature);
+//		}
+//	}
+//	return obj;
 }
 
 /**
@@ -1479,3 +1479,27 @@ gb3d.edit.ModelRecord.prototype.getRemoveCheck = function() {
 gb3d.edit.ModelRecord.prototype.setRemoveCheck = function(bool) {
 	this.removeCheck = bool;
 }
+
+/**
+ * created 목록에 있는 메쉬 객체를 삭제한다.
+ * 
+ * @method gb3d.edit.ModelRecord#removeMeshCreated
+ */
+gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
+	var that = this;
+	var created = that.getCreated();
+	var layers = Object.keys(created);
+	for (var i = 0; i < layers.length; i++) {
+		var layer = layers[i];
+		var features = Object.keys(created[layer]);
+		for (var j = 0; j < features.length; j++) {
+			var feature = features[j];
+			var three = created[layer][feature];
+			var mesh = three.getObject();
+			if (mesh) {
+				three.setObject(undefined);
+			}
+		}
+	}
+}
+
