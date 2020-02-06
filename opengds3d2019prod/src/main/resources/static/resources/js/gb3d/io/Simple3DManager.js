@@ -553,7 +553,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
 	var opt2 = $("<option>").attr("value", "road1").text(this.translation.road[this.locale] + ":" + this.translation.type1[this.locale]);
 //	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale] + ":" + this.translation.type2[this.locale]);
-	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2).append(opt3);
+	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2);
 	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
 	var textureArea = $("<div>").addClass("gb3d-modal-to3d-row").append(textureLabel).append(textureSelectArea);
