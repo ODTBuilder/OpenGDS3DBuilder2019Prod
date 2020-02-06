@@ -267,8 +267,9 @@ gb3d.io.Simple3DManager = function(obj) {
  * @param {String} work - 레이어가 포함된 워크스페이스 이름
  * @param {String} store - 레이어가 포함된 데이터스토어 이름
  * @param {String} layer - 레이어 이름
+ * @param {Function} callback - 요청이 완료된 후 수행될 콜백 함수
  */
-gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store, layer) {
+gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store, layer, callback) {
 	var that = this;
 	var typeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.type[this.locale]);
 
@@ -503,8 +504,9 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
  * @param {String} work - 레이어가 포함된 워크스페이스 이름
  * @param {String} store - 레이어가 포함된 데이터스토어 이름
  * @param {String} layer - 레이어 이름
+ * @param {Function} callback - 요청이 완료된 후 수행될 콜백 함수
  */
-gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, store, layer) {
+gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, store, layer, callback) {
 	var that = this;
 
 	var radiusTypeLabel = $("<span>").addClass("gb3d-modal-to3d-label").text(this.translation.wtype[this.locale]);
@@ -608,16 +610,16 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 		};
 
 		if ($(radiusType).val() === "default") {
-			geom["radius"] = $(radiusInput).val();
+			geom["widthValue"] = $(radiusInput).val();
 		} else if ($(radiusType).val() === "fix") {
-			geom["radiusAttr"] = $(attrKeyRadius).val();
+			geom["widthType"] = $(attrKeyRadius).val();
 		}
 		if ($(depthType).val() === "default") {
-			geom["depth"] = $(depthInput).val();
+			geom["depthValue"] = $(depthInput).val();
 		} else if ($(depthType).val() === "fix") {
-			geom["depthAttr"] = $(attrKey).val();
+			geom["depthType"] = $(attrKey).val();
 		}
-		that.get3DTileset(geo, work, store, layer, geom, lineModal);
+		that.get3DTileset(geo, work, store, layer, geom, lineModal, callback);
 	});
 
 	this.getLayerInfo(geo, work, layer, attrKey, lineModal);
@@ -780,11 +782,11 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 			}
 		}
 	} else if (geom.geometry2d === "LineString") {
-		if (geom["radius"]) {
-			params["radius"] = geom["radius"] ? geom["radius"] : undefined;
+		if (geom["widthType"]) {
+			params["widthType"] = geom["widthType"] ? geom["widthType"] : undefined;
 		}
-		if (geom["radiusAttr"]) {
-			params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;
+		if (geom["widthValue"]) {
+			params["widthValue"] = geom["widthValue"] ? geom["widthValue"] : undefined;
 		}
 	}
 	console.log(layerid);
