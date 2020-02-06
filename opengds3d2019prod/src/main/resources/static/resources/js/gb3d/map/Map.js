@@ -526,6 +526,13 @@ gb3d.Map.prototype.getThreeObjectById = function(id, layer){
 				var mlayer = e.getLayer();
 				if (mlayer) {
 					var mtree = mlayer.get("treeid");
+					if (!mtree) {
+						var source = mlayer.getSource();
+						if (source) {
+							var git = source.get("git");
+							mtree = git.treeid;
+						}
+					}
 					var ltree = layer.get("treeid");
 					if (!ltree) {
 						var source = layer.getSource();

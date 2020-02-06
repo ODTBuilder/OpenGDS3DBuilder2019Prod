@@ -1268,7 +1268,8 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record, c
 			}
 		}
 	} else {
-		console.error("object is not mesh. ", object);
+		console.log("object is not mesh. ", object);
+		return;
 	}
 	// 이미지를 base64로 변환한다.
 	// 소스가 base64인지 url인지
