@@ -552,7 +552,7 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 	var textureLabel = $("<span>").addClass("gb3d-modal-to3d-label").addClass("gb3d-modal-to3d-label-texture").text(this.translation.texture[this.locale]);
 	var opt1 = $("<option>").attr("value", "notset").text(this.translation.notset[this.locale]);
 	var opt2 = $("<option>").attr("value", "road1").text(this.translation.road[this.locale] + ":" + this.translation.type1[this.locale]);
-	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale] + ":" + this.translation.type2[this.locale]);
+//	var opt3 = $("<option>").attr("value", "road2").text(this.translation.road[this.locale] + ":" + this.translation.type2[this.locale]);
 	var textureSelect = $("<select>").addClass("gb-form").append(opt1).append(opt2).append(opt3);
 	var textureSelectArea = $("<span>").addClass("gb3d-modal-to3d-value").append(textureSelect);
 
@@ -608,16 +608,17 @@ gb3d.io.Simple3DManager.prototype.showLineStringTo3DModal = function(geo, work, 
 			"geometry2d" : "LineString",
 			"texture" : $(textureSelect).val()
 		};
-
+		geom["widthType"] = $(radiusType).val();
 		if ($(radiusType).val() === "default") {
 			geom["widthValue"] = $(radiusInput).val();
 		} else if ($(radiusType).val() === "fix") {
-			geom["widthType"] = $(attrKeyRadius).val();
+			geom["widthValue"] = $(attrKeyRadius).val();
 		}
+		geom["depthType"] = $(depthType).val();
 		if ($(depthType).val() === "default") {
 			geom["depthValue"] = $(depthInput).val();
 		} else if ($(depthType).val() === "fix") {
-			geom["depthType"] = $(attrKey).val();
+			geom["depthValue"] = $(attrKey).val();
 		}
 		that.get3DTileset(geo, work, store, layer, geom, lineModal, callback);
 	});
