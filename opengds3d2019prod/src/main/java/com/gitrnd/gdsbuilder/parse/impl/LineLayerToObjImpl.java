@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -48,18 +50,15 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.buffer.BufferOp;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class LineLayerToObjImpl {
 
-	int tmp = 0;
-
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
 	private String mtl;
 	private String usemtl;
+	private String texture;
+
 	private String outputPath;
 
 	private EnShpToObjHeightType hType;
@@ -70,8 +69,6 @@ public class LineLayerToObjImpl {
 
 	private String heightAttribute;
 	private String widthAttribute;
-
-	private BufferParameters bufferParam;
 
 	private static BufferedWriter writer;
 
@@ -154,14 +151,6 @@ public class LineLayerToObjImpl {
 		this.defaultWidth = defaultWidth;
 	}
 
-	public BufferParameters getBufferParam() {
-		return bufferParam;
-	}
-
-	public void setBufferParam(BufferParameters bufferParam) {
-		this.bufferParam = bufferParam;
-	}
-
 	public static BufferedWriter getWriter() {
 		return writer;
 	}
@@ -178,51 +167,43 @@ public class LineLayerToObjImpl {
 		this.objfilenum = objfilenum;
 	}
 
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, EnShpToObjWidthType wType, double defaultHeight,
-			double defaultWidth, BufferParameters bufferParam, String outputPath) {
+	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, EnShpToObjWidthType wType, double defaultHeight, double defaultWidth,
+			String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.defaultHeight = defaultHeight;
 		this.defaultWidth = defaultWidth;
-		this.bufferParam = bufferParam;
 		this.outputPath = outputPath;
 	}
 
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, EnShpToObjWidthType wType, double defaultHeight,
-			String widthAttribute, BufferParameters bufferParam, String outputPath) {
+	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, EnShpToObjWidthType wType, double defaultHeight, String widthAttribute,
+			String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.defaultHeight = defaultHeight;
 		this.widthAttribute = widthAttribute;
-		this.bufferParam = bufferParam;
 		this.outputPath = outputPath;
 	}
 
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, EnShpToObjWidthType wType, String heightAttribute,
-			double defaultWidth, BufferParameters bufferParam, String outputPath) {
+	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, EnShpToObjWidthType wType, String heightAttribute, double defaultWidth,
+			String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.heightAttribute = heightAttribute;
 		this.defaultWidth = defaultWidth;
-		this.bufferParam = bufferParam;
 		this.outputPath = outputPath;
 	}
 
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String mtl,
-			String usemtl, EnShpToObjHeightType hType, EnShpToObjWidthType wType, String heightAttribute,
-			String widthAttribute, BufferParameters bufferParam, String outputPath) {
+	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
+			EnShpToObjHeightType hType, EnShpToObjWidthType wType, String heightAttribute, String widthAttribute,
+			String outputPath) {
 		this.buildingCollection = buildingCollection;
-		this.mtl = mtl;
-		this.usemtl = usemtl;
+		this.texture = texture;
 		this.heightAttribute = heightAttribute;
 		this.widthAttribute = widthAttribute;
-		this.bufferParam = bufferParam;
 		this.outputPath = outputPath;
 	}
 
@@ -286,7 +267,6 @@ public class LineLayerToObjImpl {
 
 				int dfcSize = dfc.size();
 				if (dfcSize > 0) {
-					// D:\node\objTo3d-tiles-master\bin\shptoobj\obj\tmp
 					String enPath = this.outputPath + File.separator + tmp;
 					ShpToObjImpl.createFileDirectory(enPath);
 					tmp++;
@@ -298,6 +278,21 @@ public class LineLayerToObjImpl {
 					envList.add(envelope);
 					envList.add(enPath);
 					innerEnvs.add(envList);
+
+					if (texture != null) {
+						String mtl = texture + ".mtl";
+						this.mtl = mtl;
+
+						String image = texture + ".jpg";
+						InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + mtl);
+						OutputStream mtlOs = new FileOutputStream(enPath + File.separator + mtl);
+						fileCopy(mtlIs, mtlOs);
+						InputStream imageIs = this.getClass()
+								.getResourceAsStream("/img/texture/" + texture + "/" + image);
+						OutputStream imageOs = new FileOutputStream(enPath + File.separator + image);
+						fileCopy(imageIs, imageOs);
+						this.usemtl = texture;
+					}
 
 					// folder
 					int halftmp = 1;
@@ -464,6 +459,7 @@ public class LineLayerToObjImpl {
 										try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
 												new FileOutputStream(enPath + File.separator + halftmp + ".obj"),
 												"utf-8"))) {
+
 											this.writer = writer;
 											writer.write("o " + buildingCollection.getSchema().getTypeName() + "\n");
 											if (mtl != null) {
@@ -579,6 +575,21 @@ public class LineLayerToObjImpl {
 			}
 		} else {
 			objfilenum++;
+
+			if (texture != null) {
+				String mtl = texture + ".mtl";
+				this.mtl = mtl;
+
+				String image = texture + ".jpg";
+				InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + mtl);
+				OutputStream mtlOs = new FileOutputStream(outputPath + File.separator + mtl);
+				fileCopy(mtlIs, mtlOs);
+				InputStream imageIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + image);
+				OutputStream imageOs = new FileOutputStream(outputPath + File.separator + image);
+				fileCopy(imageIs, imageOs);
+				this.usemtl = texture;
+			}
+
 			// set center
 			ReferencedEnvelope reEnv = buildingCollection.getBounds();
 			Coordinate center = reEnv.centre();
@@ -687,26 +698,7 @@ public class LineLayerToObjImpl {
 		}
 	}
 
-	DefaultFeatureCollection dfc = new DefaultFeatureCollection();
-	int g = 1;
 	GeometryFactory gf = new GeometryFactory();
-
-	private Coordinate getDistanceCoordinate(Coordinate coordinate, double defaultHeight) {
-		GeodeticCalculator gc = new GeodeticCalculator();
-		gc.setStartingGeographicPoint(centerX, coordinate.y);
-		gc.setDestinationGeographicPoint(coordinate.x, coordinate.y);
-		double xDistance = gc.getOrthodromicDistance();
-		if (centerX > coordinate.x) {
-			xDistance = -xDistance;
-		}
-		gc.setStartingGeographicPoint(coordinate.x, centerY);
-		gc.setDestinationGeographicPoint(coordinate.x, coordinate.y);
-		double yDistance = gc.getOrthodromicDistance();
-		if (centerY > coordinate.y) {
-			yDistance = -yDistance;
-		}
-		return new Coordinate(xDistance, yDistance, defaultHeight);
-	}
 
 	private List<String> buildingFeatureToObjGroup(SimpleFeature feature, double defaultWidth, double defaultHeight)
 			throws FactoryException, TransformException, IOException {
@@ -724,6 +716,7 @@ public class LineLayerToObjImpl {
 			}
 			idList.add(feature.getID());
 			String gId = featureID;
+
 			writer.write(gId);
 			if (usemtl != null) {
 				writer.write("usemtl " + usemtl + "\n");
@@ -3374,7 +3367,6 @@ public class LineLayerToObjImpl {
 		if (threeGeom.faces != null) {
 			StringBuilder vnBuilder = new StringBuilder();
 			StringBuilder fBuilder = new StringBuilder();
-			int t = 1;
 			for (Face3 face : threeGeom.faces) {
 				// vn
 				Vector3d normal = face.normal;
@@ -3386,8 +3378,6 @@ public class LineLayerToObjImpl {
 				int b = face.b + 1;
 				int c = face.c + 1;
 
-				// fBuilder.append("f " + a + " " + b + " " + c + "\n");
-
 				fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
 				vtIdx++;
 				vnIdx++;
@@ -3397,53 +3387,24 @@ public class LineLayerToObjImpl {
 				fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
 				vtIdx++;
 				vnIdx++;
-//				t++;
 			}
 			writer.write(vnBuilder.toString());
 			writer.write(fBuilder.toString());
 		}
 	}
 
-	private List<Polygon> bufferLine(SimpleFeature sf, double width, BufferParameters bufferParam) {
-
-		List<Polygon> pgList = new ArrayList<>();
-		Geometry geom = (Geometry) sf.getDefaultGeometry();
-		int g = geom.getNumGeometries();
-		for (int i = 0; i < g; i++) {
-			Geometry bufferGeom = null;
-			if (bufferParam == null) {
-				bufferGeom = BufferOp.bufferOp(geom.getGeometryN(i), width);
-			} else {
-				bufferGeom = BufferOp.bufferOp(geom.getGeometryN(i), width, bufferParam);
+	public void fileCopy(InputStream is, OutputStream os) {
+		try {
+			int data = 0;
+			while ((data = is.read()) != -1) {
+				os.write(data);
 			}
-			if (bufferGeom != null) {
-				String bufferGeomType = bufferGeom.getGeometryType();
-				if (bufferGeomType.equals("MultiPolygon")) {
-					int m = bufferGeom.getNumGeometries();
-					for (int j = 0; j < m; j++) {
-						Polygon pg = (Polygon) bufferGeom.getGeometryN(j);
-						pgList.add(pg);
-					}
-				} else if (bufferGeomType.equals("Polygon")) {
-					Polygon pg = (Polygon) bufferGeom;
-					pgList.add(pg);
-				}
-			}
+			is.close();
+			os.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return pgList;
 	}
-
-//	try {
-//		SimpleFeatureType sfType = DataUtilities.createType("test", "the_geom:MultiLineString");
-//		SimpleFeature sf1 = SimpleFeatureBuilder.build(sfType, new Object[] { arcFir }, String.valueOf(g));
-//		g++;
-//		SimpleFeature sf2 = SimpleFeatureBuilder.build(sfType, new Object[] { arcSec }, String.valueOf(g));
-//		g++;
-//		dfc.add(sf1);
-//		dfc.add(sf2);
-//	} catch (SchemaException e) {
-//		// TODO Auto-generated catch block
-//		e.printStackTrace();
-//	}
 
 }

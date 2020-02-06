@@ -1366,21 +1366,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 						String objPath = basePath + File.separator + "obj";
 						createFileDirectory(objPath);
 
-						// copy mtl, texture image to obj path
-						// polygon
-//						String mtl = "building.mtl";
-//						String image = "building.jpg";
-//
-//						InputStream mtlIs = this.getClass().getResourceAsStream("/textures/" + mtl);
-//						OutputStream mtlOs = new FileOutputStream(objPath + File.separator + mtl);
-//						fileCopy(mtlIs, mtlOs);
-//						InputStream imageIs = this.getClass().getResourceAsStream("/textures/" + image);
-//						OutputStream imageOs = new FileOutputStream(objPath + File.separator + image);
-//						fileCopy(imageIs, imageOs);
-
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
-//						shpToObj.setMtl(mtl);
+						if (!texture.equals("notset")) {
+							// copy mtl, texture image to obj path
+							String mtl = texture + ".mtl";
+							shpToObj.setMtl(mtl);
+							shpToObj.setTexture(texture);
+						}
 
 						// set height
 						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {

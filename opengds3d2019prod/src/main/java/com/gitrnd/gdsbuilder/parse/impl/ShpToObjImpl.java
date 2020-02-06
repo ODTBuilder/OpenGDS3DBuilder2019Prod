@@ -268,37 +268,31 @@ public class ShpToObjImpl {
 				this.objfilenum = polyToObj.getObjfilenum();
 			}
 		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
-
-			// tmp
-			BufferParameters bufferParam = new BufferParameters();
-			bufferParam.setEndCapStyle(bufferParam.CAP_ROUND);
-			bufferParam.setJoinStyle(bufferParam.JOIN_ROUND);
-
-//			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
-//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-//						this.wType, defaultHeight, defaultWidth, bufferParam, outputPath);
-//				lineToObj.parseToObjFile();
-//				this.outputPath = lineToObj.getOutputPath();
-//				this.objfilenum = lineToObj.getObjfilenum();
-//			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
-//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-//						this.wType, defaultHeight, widthAttribute, bufferParam, outputPath);
-//				lineToObj.parseToObjFile();
-//				this.outputPath = lineToObj.getOutputPath();
-//				this.objfilenum = lineToObj.getObjfilenum();
-//			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
-//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-//						this.wType, heightAttribute, defaultWidth, bufferParam, outputPath);
-//				lineToObj.parseToObjFile();
-//				this.outputPath = lineToObj.getOutputPath();
-//				this.objfilenum = lineToObj.getObjfilenum();
-//			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
-//				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-//						this.wType, heightAttribute, widthAttribute, bufferParam, outputPath);
-//				lineToObj.parseToObjFile();
-//				this.outputPath = lineToObj.getOutputPath();
-//				this.objfilenum = lineToObj.getObjfilenum();
-//			}
+			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+						this.wType, defaultHeight, defaultWidth, outputPath);
+				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
+			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+						this.wType, defaultHeight, widthAttribute, outputPath);
+				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
+			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+						this.wType, heightAttribute, defaultWidth, outputPath);
+				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
+			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
+				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
+						this.wType, heightAttribute, widthAttribute, outputPath);
+				lineToObj.parseToObjFile();
+				this.outputPath = lineToObj.getOutputPath();
+				this.objfilenum = lineToObj.getObjfilenum();
+			}
 		}
 	}
 

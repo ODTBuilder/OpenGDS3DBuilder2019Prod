@@ -222,7 +222,6 @@ public class PolygonLayerToObjImpl {
 
 				int dfcSize = dfc.size();
 				if (dfcSize > 0) {
-					// D:\node\objTo3d-tiles-master\bin\shptoobj\obj\tmp
 					String enPath = this.outputPath + File.separator + tmp;
 					ShpToObjImpl.createFileDirectory(enPath);
 					tmp++;
