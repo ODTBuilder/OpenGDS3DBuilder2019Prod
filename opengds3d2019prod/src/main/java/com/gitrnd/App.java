@@ -2,76 +2,65 @@ package com.gitrnd;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.FeatureCollection;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.operation.TransformException;
 
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
+import com.gitrnd.gdsbuilder.parse.impl.LineLayerToObjImpl;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 
 public class App {
 
-	public static void main(String[] args) throws IOException, NoSuchAuthorityCodeException, FactoryException,
-			MismatchedDimensionException, TransformException {
-
-
-		try {
-			decompress("C:\\gdofiles\\admin\\upload\\20191202_163529\\20191202_163529_obj.zip", "D:\\test");
-		} catch (Throwable e) {
-			e.printStackTrace();
+	public static FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionFromFileWithFilter(File file,
+			Filter filter) throws Exception {
+		if (!file.exists()) {
+			throw new FileNotFoundException("Failed to find file: " + file.getAbsolutePath());
 		}
 
-		File buildingFile = new File("D:\\node\\objTo3d-tiles-master\\bin\\shptoobj\\hoho\\4.shp");
-		Filter filter = Filter.INCLUDE;
+		Map<String, Object> map = new HashMap<>();
+		map.put("url", file.toURI().toURL());
 
-		try {
-//			new ShpToObjImpl(buildingFile, filter, 50, "D:\\node\\objTo3d-tiles-master\\bin\\shptoobj\\hoho\\obj")
-//					.exec();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		DataStore dataStore = DataStoreFinder.getDataStore(map);
+		String typeName = dataStore.getTypeNames()[0];
 
-//		FileDataStore store = FileDataStoreFinder.getDataStore(file);
-//		SimpleFeatureSource fs = store.getFeatureSource();
-//
-//		CoordinateReferenceSystem sourceCRS = fs.getSchema().getCoordinateReferenceSystem();
-//		CoordinateReferenceSystem worldCRS = CRS.decode("EPSG:4326");
-//
-//		Query query = new Query("Reproject");
-//		query.setCoordinateSystem(sourceCRS);
-//		query.setCoordinateSystemReproject(worldCRS);
-//		SimpleFeatureCollection sfc = fs.getFeatures(query);
-//		SimpleFeatureIterator sfIter = sfc.features();
-//		
-//		while (sfIter.hasNext()) {
-//			SimpleFeature feature = sfIter.next();
-//			Geometry geom = (Geometry) feature.getDefaultGeometry();
-//			if (geom instanceof Point) {
-//				
-//			} else if (geom instanceof LineString) {
-//
-//			} else if (geom instanceof Polygon) {
-//
-//			} else if (geom instanceof MultiPoint) {
-//
-//			} else if (geom instanceof MultiLineString) {
-//
-//			} else if (geom instanceof MultiPolygon) {
-//
-//			} else {
-//				throw new IllegalArgumentException("Unsupported geometry type " + geom.getClass());
-//			}
-//
-//		}
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(typeName);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(filter);
+		return collection;
+	}
+
+
+	public static void main(String[] args) throws Exception {
+
+//		Obj originObj = ObjReader.read(new FileInputStream("C:\\gdofiles\\guest\\upload\\20200205_162328\\obj\\1.obj"));
+//		ObjWriter.write(originObj, new FileOutputStream("C:\\gdofiles\\guest\\upload\\20200205_162328\\obj\\test.obj"));
+
+		File file = new File("D:\\admin_shp\\geogig_files\\gis_osm_roads_160.shp");
+		FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection = getFeatureCollectionFromFileWithFilter(
+				file, Filter.INCLUDE);
+
+//		PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, null, null,
+//				EnShpToObjHeightType.DEFAULT, 5, "D:\\test");
+//		polyToObj.parseToObjFile();
+
+		LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, "road", EnShpToObjHeightType.DEFAULT,
+				EnShpToObjWidthType.DEFAULT, 5, 5, "D:\\test\\linetest");
+		lineToObj.parseToObjFile();
+
 	}
 
 	public static void decompress(String zipFileName, String directory) throws Throwable {
@@ -133,4 +122,20 @@ public class App {
 		}
 	}
 
+	public static FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionFromFileWithFilter(File file)
+			throws Exception {
+		if (!file.exists()) {
+			throw new FileNotFoundException("Failed to find file: " + file.getAbsolutePath());
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("url", file.toURI().toURL());
+
+		DataStore dataStore = DataStoreFinder.getDataStore(map);
+		String typeName = dataStore.getTypeNames()[0];
+
+		FeatureSource<SimpleFeatureType, SimpleFeature> source = dataStore.getFeatureSource(typeName);
+		FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures();
+		return collection;
+	}
 }
