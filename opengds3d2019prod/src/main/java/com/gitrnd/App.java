@@ -43,19 +43,6 @@ public class App {
 		return collection;
 	}
 
-	public static void fileCopy(InputStream is, OutputStream os) {
-		try {
-			int data = 0;
-			while ((data = is.read()) != -1) {
-				os.write(data);
-			}
-			is.close();
-			os.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	public static void main(String[] args) throws Exception {
 
