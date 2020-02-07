@@ -329,7 +329,8 @@ html, body {
 			featureNumberURL : "geoserver/getNumberOfFeatures.ajax?${_csrf.parameterName}=${_csrf.token}",
 			wfstURL : urlList.wfst + urlList.token,
 			layerInfoURL : urlList.getLayerInfo + urlList.token,
-			modelRecord : mrecord
+			modelRecord : mrecord,
+			gbMap : gbMap
 		});
 
 		var tilesDownloader = new gb3d.io.TilesDownloader({

@@ -264,7 +264,7 @@ public class DTGeoserverPublisher extends GeoServerRESTPublisher {
 	 * @param wfstXml WFST 요청 XML
 	 * @return WFST 요청결과
 	 */
-	public String requestWFSTransaction(String workspace, String wfstXml) {
+	public String requestWFSTransaction(String workspace, String datastore, String layername, String wfstXml) {
 		StringBuilder postUrl = new StringBuilder(restURL).append("/" + workspace).append("/ows");
 
 		Charset charset = Charset.forName("utf-8");
@@ -278,6 +278,7 @@ public class DTGeoserverPublisher extends GeoServerRESTPublisher {
 			LOGGER.warn("WFST 요청 실패");
 		} else {
 			LOGGER.info("WFST 요청 성공");
+			this.recalculate(workspace, datastore, layername, EnLayerBboxRecalculate.ALL);
 		}
 		return configuredResult;
 	}

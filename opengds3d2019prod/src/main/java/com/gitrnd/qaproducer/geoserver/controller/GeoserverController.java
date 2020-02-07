@@ -210,9 +210,11 @@ public class GeoserverController extends AbstractController {
 		}
 		String serverName = (String) jsonObject.get("serverName");
 		String workspace = (String) jsonObject.get("workspace");
+		String datastore = (String) jsonObject.get("datastore");
+		String layername = (String) jsonObject.get("layer");
 		String wfstXml = (String) jsonObject.get("wfstXml");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		return geoserverService.requestWFSTransaction(dtGeoserverManager, workspace, wfstXml);
+		return geoserverService.requestWFSTransaction(dtGeoserverManager, workspace, datastore, layername, wfstXml);
 	}
 
 	/**
