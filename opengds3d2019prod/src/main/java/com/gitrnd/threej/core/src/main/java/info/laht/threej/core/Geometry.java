@@ -84,6 +84,34 @@ public class Geometry implements IGeometry {
 		return boundingSphere;
 	}
 
+	public List<Vector3d> getVertices() {
+		return vertices;
+	}
+
+	public void setVertices(List<Vector3d> vertices) {
+		this.vertices = vertices;
+	}
+
+	public List<Face3> getFaces() {
+		return faces;
+	}
+
+	public void setFaces(List<Face3> faces) {
+		this.faces = faces;
+	}
+
+	public List<List<List<Vector2d>>> getFaceVertexUvs() {
+		return faceVertexUvs;
+	}
+
+	public void setFaceVertexUvs(List<List<List<Vector2d>>> faceVertexUvs) {
+		this.faceVertexUvs = faceVertexUvs;
+	}
+
+	public void setBoundingBox(Box3d boundingBox) {
+		this.boundingBox = boundingBox;
+	}
+
 	public void applyMatrix(Matrix4d matrix) {
 		Matrix3d normalMatrix = new Matrix3d().getNormalMatrix(matrix);
 

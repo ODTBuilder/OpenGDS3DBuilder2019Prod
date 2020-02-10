@@ -85,7 +85,7 @@ import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
 import com.gitrnd.gdsbuilder.geoserver.service.en.EnLayerBboxRecalculate;
 import com.gitrnd.gdsbuilder.parse.impl.DataConvertorImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjDepthType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
 import com.vividsolutions.jts.geom.Geometry;
@@ -1232,11 +1232,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 						}
 
 						// set height
-						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+						if (heightType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjDepthType.DEFAULT);
 							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
-						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.FIX);
+						} else if (heightType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjDepthType.FIX);
 							shpToObj.setHeightAttribute(heightValue);
 						}
 
@@ -1376,11 +1376,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 						}
 
 						// set height
-						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+						if (heightType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjDepthType.DEFAULT);
 							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
-						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.FIX);
+						} else if (heightType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjDepthType.FIX);
 							shpToObj.setHeightAttribute(heightValue);
 						}
 						// set width

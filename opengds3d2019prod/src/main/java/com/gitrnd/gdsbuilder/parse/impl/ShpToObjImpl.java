@@ -42,7 +42,7 @@ public class ShpToObjImpl {
 
 	private int objfilenum = 0;
 
-	EnShpToObjHeightType hType = null;
+	EnShpToObjDepthType hType = null;
 	EnShpToObjWidthType wType = null;
 
 	private String mtl;
@@ -105,11 +105,11 @@ public class ShpToObjImpl {
 		this.file = file;
 	}
 
-	public EnShpToObjHeightType gethType() {
+	public EnShpToObjDepthType gethType() {
 		return hType;
 	}
 
-	public void sethType(EnShpToObjHeightType hType) {
+	public void sethType(EnShpToObjDepthType hType) {
 		this.hType = hType;
 	}
 
@@ -165,7 +165,7 @@ public class ShpToObjImpl {
 	 * 
 	 * @author SG.LEE
 	 */
-	public enum EnShpToObjHeightType {
+	public enum EnShpToObjDepthType {
 
 		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
 
@@ -173,19 +173,19 @@ public class ShpToObjImpl {
 		double defaultHeight;
 		double attributeKey;
 
-		private EnShpToObjHeightType(String type) {
+		private EnShpToObjDepthType(String type) {
 			this.type = type;
 		}
 
 		/**
-		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
+		 * type명으로 부터 {@link EnShpToObjDepthType} 조회
 		 * 
 		 * @author SG.LEE
 		 * @param type type명
 		 * @return {@link EnTreeType}
 		 */
-		public static EnShpToObjHeightType getFromType(String type) {
-			for (EnShpToObjHeightType tt : values()) {
+		public static EnShpToObjDepthType getFromType(String type) {
+			for (EnShpToObjDepthType tt : values()) {
 				if (tt == UNKNOWN)
 					continue;
 				if (tt.type.equals(type))
@@ -214,7 +214,7 @@ public class ShpToObjImpl {
 		}
 
 		/**
-		 * type명으로 부터 {@link EnShpToObjHeightType} 조회
+		 * type명으로 부터 {@link EnShpToObjDepthType} 조회
 		 * 
 		 * @author SG.LEE
 		 * @param type type명
@@ -222,6 +222,78 @@ public class ShpToObjImpl {
 		 */
 		public static EnShpToObjWidthType getFromType(String type) {
 			for (EnShpToObjWidthType tt : values()) {
+				if (tt == UNKNOWN)
+					continue;
+				if (tt.type.equals(type))
+					return tt;
+			}
+			return UNKNOWN;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+	}
+
+	public enum EnShpToObjHeightType {
+
+		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
+
+		String type;
+
+		private EnShpToObjHeightType(String type) {
+			this.type = type;
+		}
+
+		/**
+		 * type명으로 부터 {@link EnShpToObjDepthType} 조회
+		 * 
+		 * @author SG.LEE
+		 * @param type type명
+		 * @return {@link EnTreeType}
+		 */
+		public static EnShpToObjHeightType getFromType(String type) {
+			for (EnShpToObjHeightType tt : values()) {
+				if (tt == UNKNOWN)
+					continue;
+				if (tt.type.equals(type))
+					return tt;
+			}
+			return UNKNOWN;
+		}
+
+		public String getType() {
+			return type;
+		}
+
+		public void setType(String type) {
+			this.type = type;
+		}
+	}
+
+	public enum EnShpToObjRadiusType {
+
+		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
+
+		String type;
+
+		private EnShpToObjRadiusType(String type) {
+			this.type = type;
+		}
+
+		/**
+		 * type명으로 부터 {@link EnShpToObjDepthType} 조회
+		 * 
+		 * @author SG.LEE
+		 * @param type type명
+		 * @return {@link EnTreeType}
+		 */
+		public static EnShpToObjRadiusType getFromType(String type) {
+			for (EnShpToObjRadiusType tt : values()) {
 				if (tt == UNKNOWN)
 					continue;
 				if (tt.type.equals(type))
@@ -254,13 +326,13 @@ public class ShpToObjImpl {
 		String geomType = featureType.getGeometryDescriptor().getType().getBinding().getName();
 
 		if (geomType.contains("Polygon") || geomType.contains("MultiPolygon")) {
-			if (this.hType == EnShpToObjHeightType.DEFAULT) {
+			if (this.hType == EnShpToObjDepthType.DEFAULT) {
 				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
 						defaultHeight, outputPath);
 				polyToObj.parseToObjFile();
 				this.outputPath = polyToObj.getOutputPath();
 				this.objfilenum = polyToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX) {
+			} else if (this.hType == EnShpToObjDepthType.FIX) {
 				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
 						heightAttribute, outputPath);
 				polyToObj.parseToObjFile();
@@ -268,25 +340,25 @@ public class ShpToObjImpl {
 				this.objfilenum = polyToObj.getObjfilenum();
 			}
 		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
-			if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
+			if (this.hType == EnShpToObjDepthType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
 						this.wType, defaultHeight, defaultWidth, outputPath);
 				lineToObj.parseToObjFile();
 				this.outputPath = lineToObj.getOutputPath();
 				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
+			} else if (this.hType == EnShpToObjDepthType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
 						this.wType, defaultHeight, widthAttribute, outputPath);
 				lineToObj.parseToObjFile();
 				this.outputPath = lineToObj.getOutputPath();
 				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
+			} else if (this.hType == EnShpToObjDepthType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
 						this.wType, heightAttribute, defaultWidth, outputPath);
 				lineToObj.parseToObjFile();
 				this.outputPath = lineToObj.getOutputPath();
 				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjHeightType.FIX && this.wType == EnShpToObjWidthType.FIX) {
+			} else if (this.hType == EnShpToObjDepthType.FIX && this.wType == EnShpToObjWidthType.FIX) {
 				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
 						this.wType, heightAttribute, widthAttribute, outputPath);
 				lineToObj.parseToObjFile();

@@ -42,7 +42,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint;
 import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.delaunay.DelaunayTriangle;
 
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjDepthType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector2d;
@@ -72,7 +72,7 @@ public class PolygonLayerToObjImpl {
 
 	private int objfilenum = 0;
 
-	private EnShpToObjHeightType hType;
+	private EnShpToObjDepthType hType;
 
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
 	private String mtl;
@@ -80,7 +80,7 @@ public class PolygonLayerToObjImpl {
 	private String texture;
 
 	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjHeightType hType, double defaultHeight, String outputPath) {
+			EnShpToObjDepthType hType, double defaultHeight, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
 		this.hType = hType;
@@ -89,7 +89,7 @@ public class PolygonLayerToObjImpl {
 	}
 
 	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjHeightType hType, String attribute, String outputPath) {
+			EnShpToObjDepthType hType, String attribute, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
 		this.hType = hType;
@@ -129,11 +129,11 @@ public class PolygonLayerToObjImpl {
 		this.outputPath = outputPath;
 	}
 
-	public EnShpToObjHeightType gethType() {
+	public EnShpToObjDepthType gethType() {
 		return hType;
 	}
 
-	public void sethType(EnShpToObjHeightType hType) {
+	public void sethType(EnShpToObjDepthType hType) {
 		this.hType = hType;
 	}
 
@@ -171,7 +171,7 @@ public class PolygonLayerToObjImpl {
 		// 높이값 설정
 		double height = 0.0;
 		double maxHeight = 0.0;
-		if (this.hType == EnShpToObjHeightType.DEFAULT) {
+		if (this.hType == EnShpToObjDepthType.DEFAULT) {
 			height = defaultHeight;
 			maxHeight = defaultHeight;
 		}
@@ -297,7 +297,7 @@ public class PolygonLayerToObjImpl {
 									FeatureIterator<SimpleFeature> features = dfc.features();
 									while (features.hasNext()) {
 										SimpleFeature feature = features.next();
-										if (this.hType == EnShpToObjHeightType.FIX) {
+										if (this.hType == EnShpToObjDepthType.FIX) {
 											try {
 												height = (double) feature.getAttribute(attribute);
 											} catch (Exception e) {
@@ -316,7 +316,12 @@ public class PolygonLayerToObjImpl {
 											while (batchIter.hasNext()) {
 												String batchKey = (String) batchIter.next();
 												JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-												propertiesArr.add(feature.getAttribute(batchKey));
+												if (feature.getAttribute(batchKey) == null) {
+													double value = 0.0;
+													propertiesArr.add(value);
+												} else {
+													propertiesArr.add(feature.getAttribute(batchKey));
+												}
 												batchTable.put(batchKey, propertiesArr);
 											}
 										}
@@ -444,7 +449,7 @@ public class PolygonLayerToObjImpl {
 											FeatureIterator<SimpleFeature> features = tfc.features();
 											while (features.hasNext()) {
 												SimpleFeature feature = features.next();
-												if (this.hType == EnShpToObjHeightType.FIX) {
+												if (this.hType == EnShpToObjDepthType.FIX) {
 													try {
 														height = (double) feature.getAttribute(attribute);
 													} catch (Exception e) {
@@ -463,7 +468,12 @@ public class PolygonLayerToObjImpl {
 													while (batchIter.hasNext()) {
 														String batchKey = (String) batchIter.next();
 														JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-														propertiesArr.add(feature.getAttribute(batchKey));
+														if (feature.getAttribute(batchKey) == null) {
+															double value = 0.0;
+															propertiesArr.add(value);
+														} else {
+															propertiesArr.add(feature.getAttribute(batchKey));
+														}
 														batchTable.put(batchKey, propertiesArr);
 													}
 												}
@@ -581,7 +591,7 @@ public class PolygonLayerToObjImpl {
 				FeatureIterator<SimpleFeature> features = buildingCollection.features();
 				while (features.hasNext()) {
 					SimpleFeature feature = features.next();
-					if (this.hType == EnShpToObjHeightType.FIX) {
+					if (this.hType == EnShpToObjDepthType.FIX) {
 						try {
 							height = (double) feature.getAttribute(attribute);
 						} catch (Exception e) {
@@ -600,7 +610,12 @@ public class PolygonLayerToObjImpl {
 						while (batchIter.hasNext()) {
 							String batchKey = (String) batchIter.next();
 							JSONArray propertiesArr = (JSONArray) batchTable.get(batchKey);
-							propertiesArr.add(feature.getAttribute(batchKey));
+							if (feature.getAttribute(batchKey) == null) {
+								double value = 0.0;
+								propertiesArr.add(value);
+							} else {
+								propertiesArr.add(feature.getAttribute(batchKey));
+							}
 							batchTable.put(batchKey, propertiesArr);
 						}
 					}
@@ -672,8 +687,10 @@ public class PolygonLayerToObjImpl {
 			if (usemtl != null) {
 				writer.write("usemtl " + usemtl + "\n");
 			}
-
 			Geometry geom = multipolygon.getGeometryN(g);
+			if (!geom.getGeometryType().contains("Polygon")) {
+				return null;
+			}
 			geom.normalize();
 			Polygon pg = (Polygon) geom;
 
