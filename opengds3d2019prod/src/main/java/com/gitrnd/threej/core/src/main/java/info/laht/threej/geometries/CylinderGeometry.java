@@ -20,7 +20,7 @@ public class CylinderGeometry extends Geometry {
 	private final Angle thetaStart, thetaLength;
 
 	public CylinderGeometry(double radius, double height) {
-		this(radius, radius, height, 8, 1);
+		this(radius, radius, height, 50, 1);
 	}
 
 	public CylinderGeometry(double radiusTop, double radiusBottom, double height, int radialSegments,
