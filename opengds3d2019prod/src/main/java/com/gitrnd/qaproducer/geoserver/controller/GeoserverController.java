@@ -33,7 +33,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -224,24 +223,25 @@ public class GeoserverController extends AbstractController {
 	 * @param loginUser 사용자 정보
 	 * @return String WFST 요청 결과
 	 * @throws IOException
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	@SuppressWarnings({ "unchecked", "static-access" })
 	@RequestMapping(value = "/getNumberOfFeatures.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject getNumberOfFeaturesByLayers(HttpServletRequest request, HttpServletResponse response,
-			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser) throws IOException, ParseException {
+			@RequestBody JSONObject jsonObject, @AuthenticationPrincipal LoginUser loginUser)
+			throws IOException, ParseException {
 		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
 		}
-		
+
 		String serverName = (String) jsonObject.get("serverName");
 		String workspace = (String) jsonObject.get("workspace");
 		ArrayList<String> layers = (ArrayList<String>) jsonObject.get("layers");
-		
+
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		
+
 		// 피처 개수 가져오기
 		String url = dtGeoserverManager.getRestURL();
 		String user = dtGeoserverManager.getUsername();
@@ -249,12 +249,12 @@ public class GeoserverController extends AbstractController {
 		DTGeoserverReader reader = new DTGeoserverReader(url, user, password);
 
 		String version = "1.0.0";
-		JSONArray arr = new JSONArray(); 
+		JSONArray arr = new JSONArray();
 		for (int i = 0; i < layers.size(); i++) {
-			String jsonstr = reader.getNumberOfFeatures(version, workspace+":"+layers.get(i)).getBody();
+			String jsonstr = reader.getNumberOfFeatures(version, workspace + ":" + layers.get(i)).getBody();
 			JSONParser parse = new JSONParser();
 			JSONObject layer = (JSONObject) parse.parse(jsonstr);
-			arr.add(layer);	
+			arr.add(layer);
 		}
 		// 피처 개수 가져오기
 		JSONObject result = new JSONObject();
@@ -266,6 +266,7 @@ public class GeoserverController extends AbstractController {
 		}
 		return result;
 	}
+
 	/**
 	 * Geoserver Layer update요청 처리
 	 * 
@@ -930,21 +931,24 @@ public class GeoserverController extends AbstractController {
 		String layerName = (String) jsonObject.get("layerName");
 		String geom = (String) jsonObject.get("geometry2d");
 		String texture = (String) jsonObject.get("texture");
-		
-		// String srs = (String) request.getParameter("srs");
-		String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-		String heightValue = (String) jsonObject.get("depthValue");
 
 		JSONObject returnJson = new JSONObject();
 		if (geom.equals("Polygon")) {
+			String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+			String heightValue = (String) jsonObject.get("depthValue");
 			returnJson = geoserverService.geoPolygonlayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), heightType, heightValue, texture);
 		}
 		if (geom.equals("LineString")) {
+			String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+			String heightValue = (String) jsonObject.get("depthValue");
 			String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default)
 			String widthValue = (String) jsonObject.get("widthValue");
 			returnJson = geoserverService.geoLinelayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), heightType, heightValue, widthType, widthValue, texture);
+		}
+		if (geom.equals("Point")) {
+
 		}
 		return returnJson;
 	}

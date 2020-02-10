@@ -706,7 +706,7 @@ public class LineLayerToObjImpl {
 		List<String> idList = new ArrayList<>();
 		Geometry lineString = (Geometry) feature.getDefaultGeometry();
 
-		if (feature.getAttribute("osm_id").toString().equals("131381474")) {
+		if (feature.getAttribute("osm_id").toString().equals("435414638")) {
 			System.out.println("");
 		}
 
@@ -1720,6 +1720,11 @@ public class LineLayerToObjImpl {
 								this.isNext = true;
 							}
 						}
+
+						if (topInterset.isEmpty() && bottomIntersect.isEmpty()) {
+
+						}
+
 					} else {// 세 점이 평행
 
 						// line 1 top
@@ -1855,7 +1860,7 @@ public class LineLayerToObjImpl {
 						recSideFaceIdxs.add(faces.size() - 1);
 
 						if (c + 2 == lineCoors.length - 1) {
-							
+
 							// line 2 top
 							vector2dList.add(new Vector2d(firTopCoor2.x, firTopCoor2.y));
 							allCoordinates.add(firTopCoor2);
@@ -1891,7 +1896,7 @@ public class LineLayerToObjImpl {
 							vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
 							vBuilder.append(
 									"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
-							
+
 							// line 2 top line 밑면, 윗면
 							int top2FirIdx = vSize + allCoordinates.indexOf(lineSecCoor);
 							int top2SecIdx = vSize + allCoordinates.indexOf(secTopCoor2);
@@ -1987,14 +1992,14 @@ public class LineLayerToObjImpl {
 							faces.add(new Face3(bottomSide2SecIdx, bottomSide2FurIdx, bottomSide2FirIdx,
 									new Vector3d(0, 0, 0)));
 							recSideFaceIdxs.add(faces.size() - 1);
-							
+
 							// 다음 for 문 연산을 위해 저장
 							this.firTopCoor = null;
 							this.secTopCoor = null;
 							this.firBottomCoor = null;
 							this.secBottomCoor = null;
 							this.isNext = false;
-							
+
 						} else {
 							// 다음 for 문 연산을 위해 저장
 							this.firTopCoor = firTopCoor2;
