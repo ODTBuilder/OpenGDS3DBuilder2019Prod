@@ -769,7 +769,8 @@ public class LineLayerToObjImpl {
 				}
 				vector2dList.add(new Vector2d(xDistance, yDistance));
 
-				allCoordinates.add(lineCoors[c]);
+				lineCoors[c] = new Coordinate(xDistance, yDistance, 0);
+				allCoordinates.add(new Coordinate(lineCoors[c]));
 				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, 0));
 				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + 0 + "\n");
 
@@ -777,7 +778,6 @@ public class LineLayerToObjImpl {
 				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, defaultHeight));
 				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + defaultHeight + "\n");
 			}
-
 			// arc face idx
 			List<Integer> arcBottomFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 밑면 face idx
 
