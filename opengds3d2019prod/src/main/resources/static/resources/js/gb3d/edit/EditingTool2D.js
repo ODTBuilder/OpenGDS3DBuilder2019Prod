@@ -498,8 +498,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 								// that.getEditingTool3D().syncSelect(that.features.item(0).getId());
 
-								var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
-
+								var fidnum = parseInt(fid.substring(fid.indexOf(".")+1));
+								var bidnum = fidnum - 1; 
 								var gitAttr = slayer.get("git");
 
 // var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["id"]);
@@ -512,10 +512,37 @@ gb3d.edit.EditingTool2D = function(obj) {
 									var root = ctileset.root;
 
 									var recursiveSearch = function(tile, bid){
+										//==============
 										var result;
 										if (tile instanceof Cesium.Cesium3DTile) {
 											var content = tile.content;
-											if (content) {
+											if (!content) {
+												alert(that.translation.tilenotloaded[that.locale]);
+												return;
+											}
+											if (content.featuresLength === 1) {
+												var feature = content.getFeature(0);
+												var prop = feature.getProperty("featureId");
+												var num = prop.substr((prop.indexOf(".")+1));
+												if (!isNaN(parseInt(num))) {
+													num = parseInt(num);
+													if (num === bid+1) {
+														result = feature;
+													}
+												}
+											} else if(content.featuresLength <= bid){
+												console.log("out of bound");
+												if (tile.children.length > 0) {
+													for (var i = 0; i < tile.children.length; i++) {
+														var ctile = tile.children[i];
+														var feature = recursiveSearch(ctile, bid);
+														if (feature) {
+															result = feature;
+															break;
+														}
+													}
+												}
+											} else {
 												var feature = content.getFeature(bid);
 												if (feature) {
 													result = feature;
@@ -532,9 +559,30 @@ gb3d.edit.EditingTool2D = function(obj) {
 											}
 										}
 										return result;
+										//==============
+//										var result;
+//										if (tile instanceof Cesium.Cesium3DTile) {
+//											var content = tile.content;
+//											if (content) {
+//												var feature = content.getFeature(bid);
+//												if (feature) {
+//													result = feature;
+//												} else if (tile.children.length > 0) {
+//													for (var i = 0; i < tile.children.length; i++) {
+//														var ctile = tile.children[i];
+//														var feature = recursiveSearch(ctile, bid);
+//														if (feature) {
+//															result = feature;
+//															break;
+//														}
+//													}
+//												}
+//											}
+//										}
+//										return result;
 									};
 
-									var feature = recursiveSearch(root, fidnum);
+									var feature = recursiveSearch(root, bidnum);
 									if (feature) {
 										if (feature.show) {
 											that.getEditingTool3D().selectTilesetFeature(feature);	
@@ -1462,8 +1510,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				// threeJS Object Select
 				var fid = that.features.item(0).getId();
 
-				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
-
+// var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
+				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1));
+				var bidnum = fidnum - 1; 
 				var gitAttr = that.selectedSource.get("git");
 
 				var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["id"]);
@@ -1483,16 +1532,41 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 								alert(that.translation.tilenotloaded[that.locale]);
 								return;
 							}
-							var feature = content.getFeature(bid);
-							if (feature) {
-								result = feature;
-							} else if (tile.children.length > 0) {
-								for (var i = 0; i < tile.children.length; i++) {
-									var ctile = tile.children[i];
-									var feature = recursiveSearch(ctile, bid);
-									if (feature) {
+							if (content.featuresLength === 1) {
+								var feature = content.getFeature(0);
+								var prop = feature.getProperty("featureId");
+								var num = prop.substr((prop.indexOf(".")+1));
+								if (!isNaN(parseInt(num))) {
+									num = parseInt(num);
+									if (num === bid+1) {
 										result = feature;
-										break;
+									}
+								}
+							} else if(content.featuresLength <= bid){
+								console.log("out of bound");
+								if (tile.children.length > 0) {
+									for (var i = 0; i < tile.children.length; i++) {
+										var ctile = tile.children[i];
+										var feature = recursiveSearch(ctile, bid);
+										if (feature) {
+											result = feature;
+											break;
+										}
+									}
+								}
+//								return feature;
+							} else {
+								var feature = content.getFeature(bid);
+								if (feature) {
+									result = feature;
+								} else if (tile.children.length > 0) {
+									for (var i = 0; i < tile.children.length; i++) {
+										var ctile = tile.children[i];
+										var feature = recursiveSearch(ctile, bid);
+										if (feature) {
+											result = feature;
+											break;
+										}
 									}
 								}
 							}
@@ -1500,7 +1574,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						return result;
 					};
 
-					var feature = recursiveSearch(root, fidnum);
+					var feature = recursiveSearch(root, bidnum);
 					if (feature) {
 						if (feature.show) {
 							if (that.getActiveTool()) {

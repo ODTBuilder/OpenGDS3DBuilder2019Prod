@@ -94,7 +94,7 @@ public class GeoserverLayerProxyServiceImpl implements GeoserverLayerProxyServic
 		String time = "";
 		String sld = "";
 		String sld_body = "";
-
+		String salt = "";
 		
 		Enumeration paramNames = request.getParameterNames();
 		while (paramNames.hasMoreElements()) {
@@ -139,10 +139,12 @@ public class GeoserverLayerProxyServiceImpl implements GeoserverLayerProxyServic
 				sld = value;
 			} else if (key.toLowerCase().equals("sld_body")) {
 				sld_body = value;
+			} else if (key.toLowerCase().equals("salt")) {
+				salt = value;
 			}
 		}
 		return new WMSGetMap(serverURL, version, format, layers, tiled, transparent, bgcolor, crs, srs, bbox, width, height,
-				styles, exceptions, time, sld, sld_body);
+				styles, exceptions, time, sld, sld_body, salt);
 	}
 
 	@Override

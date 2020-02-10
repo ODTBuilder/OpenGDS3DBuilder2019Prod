@@ -182,7 +182,9 @@ public class Edit3dService {
 
 		// 파일 폴더 압축
 		String zipfile = timeStr + "_obj.zip";
-		String zipPath = originFile.getParent() + File.separator + zipfile; // zip 파일 이름
+		String zipPath = originFile.getParent() + File.separator + zipfile; // zip
+																			// 파일
+																			// 이름
 		createZipFile(directory, zipPath);
 
 		// web path
@@ -191,7 +193,9 @@ public class Edit3dService {
 
 		// obj to gltf
 		// API 요청 파라미터 생성
-		String nodeURL = "http://" + nodeHost + ":" + nodePort + "/convert/objTogltf"; // 압축폴더 업로드 경로
+		String nodeURL = "http://" + nodeHost + ":" + nodePort + "/convert/objTogltf"; // 압축폴더
+																						// 업로드
+																						// 경로
 
 		// body
 		JSONObject bodyJson = new JSONObject();
@@ -344,28 +348,32 @@ public class Edit3dService {
 					String editTexturePath = null;
 					String editMtlPath = null;
 					String useMtl = null;
-					if (!editTextureStr.equals("notset")) {
-						editTexturePath = zipPath + File.separator + featureId + ".jpg";
-						String data = editTextureStr.split(",")[1];
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
-						bos.write(Base64.decodeBase64(data));
-						bos.close();
-						editMtlPath = new File(originObjPath).getParentFile().getPath() + File.separator
-								+ originObj.getMtlFileNames().get(0);
-						File originMtlPath = new File(editMtlPath);
-						try (PrintWriter out = new PrintWriter(
-								new BufferedWriter(new FileWriter(originMtlPath, true)))) {
-							String mtl = "\n" + "newmtl " + featureId + "\n";
-							mtl += "Ka 0.5 0.5 0.5" + "\n";
-							mtl += "Kd 1 1 1" + "\n";
-							mtl += "Ks 0.5 0.5 0.5" + "\n";
-							mtl += "illum 2" + "\n";
-							mtl += "map_Kd " + featureId + ".jpg" + "\n";
-							out.println(mtl);
-						} catch (IOException e) {
-							// exception handling left as an exercise for the reader
+					if (editTextureStr != null) {
+						if (!editTextureStr.equals("notset")) {
+							editTexturePath = zipPath + File.separator + featureId + ".jpg";
+							String data = editTextureStr.split(",")[1];
+							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
+							bos.write(Base64.decodeBase64(data));
+							bos.close();
+							editMtlPath = new File(originObjPath).getParentFile().getPath() + File.separator
+									+ originObj.getMtlFileNames().get(0);
+							File originMtlPath = new File(editMtlPath);
+							try (PrintWriter out = new PrintWriter(
+									new BufferedWriter(new FileWriter(originMtlPath, true)))) {
+								String mtl = "\n" + "newmtl " + featureId + "\n";
+								mtl += "Ka 0.5 0.5 0.5" + "\n";
+								mtl += "Kd 1 1 1" + "\n";
+								mtl += "Ks 0.5 0.5 0.5" + "\n";
+								mtl += "illum 2" + "\n";
+								mtl += "map_Kd " + featureId + ".jpg" + "\n";
+								out.println(mtl);
+							} catch (IOException e) {
+								// exception handling left as an exercise for
+								// the
+								// reader
+							}
+							useMtl = featureId;
 						}
-						useMtl = featureId;
 					}
 
 					// 원본 타일셋 영역
@@ -702,28 +710,30 @@ public class Edit3dService {
 					String editTextureStr = (String) editInfo.get("texture");
 					String editTexturePath = null;
 					String editMtlPath = null;
-					if (!editTextureStr.equals("notset")) {
-						editTexturePath = objBasePath + File.separator + featureId + ".jpg";
-						String data = editTextureStr.split(",")[1];
-						BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
-						bos.write(Base64.decodeBase64(data));
-						bos.close();
+					if (editTextureStr != null) {
+						if (!editTextureStr.equals("notset")) {
+							editTexturePath = objBasePath + File.separator + featureId + ".jpg";
+							String data = editTextureStr.split(",")[1];
+							BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(editTexturePath));
+							bos.write(Base64.decodeBase64(data));
+							bos.close();
 
-						String mtl = "newmtl " + featureId + "\n";
-						mtl += "Ka 0.5 0.5 0.5" + "\n";
-						mtl += "Kd 1 1 1" + "\n";
-						mtl += "Ks 0.5 0.5 0.5" + "\n";
-						mtl += "illum 2" + "\n";
-						mtl += "map_Kd " + featureId + ".jpg" + "\n";
+							String mtl = "newmtl " + featureId + "\n";
+							mtl += "Ka 0.5 0.5 0.5" + "\n";
+							mtl += "Kd 1 1 1" + "\n";
+							mtl += "Ks 0.5 0.5 0.5" + "\n";
+							mtl += "illum 2" + "\n";
+							mtl += "map_Kd " + featureId + ".jpg" + "\n";
 
-						editMtlPath = objBasePath + File.separator + featureId + ".mtl";
-						File file = new File(editMtlPath);
-						FileWriter writer = null;
-						writer = new FileWriter(file, false);
-						writer.write(mtl);
-						writer.flush();
-						if (writer != null)
-							writer.close();
+							editMtlPath = objBasePath + File.separator + featureId + ".mtl";
+							File file = new File(editMtlPath);
+							FileWriter writer = null;
+							writer = new FileWriter(file, false);
+							writer.write(mtl);
+							writer.flush();
+							if (writer != null)
+								writer.close();
+						}
 					}
 
 					// batch table file 생성
@@ -756,12 +766,13 @@ public class Edit3dService {
 						List<String> groupnames = new ArrayList<>();
 						groupnames.add(featureId);
 						resultObj.setActiveGroupNames(groupnames);
-
-						if (!editTextureStr.equals("notset")) {
-							List<String> mtlNames = new ArrayList<>();
-							mtlNames.add(featureId + ".mtl");
-							resultObj.setMtlFileNames(mtlNames);
-							resultObj.setActiveMaterialGroupName(featureId);
+						if (editTextureStr != null) {
+							if (!editTextureStr.equals("notset")) {
+								List<String> mtlNames = new ArrayList<>();
+								mtlNames.add(featureId + ".mtl");
+								resultObj.setMtlFileNames(mtlNames);
+								resultObj.setActiveMaterialGroupName(featureId);
+							}
 						}
 						List<Integer> vertexIndices = new ArrayList<>();
 						List<Integer> texCoordIndices = new ArrayList<>();

@@ -31,9 +31,9 @@ public class DTGeoserverServiceFactoryImpl implements DTGeoserverServiceFactory 
 	@Override
 	public WMSGetMap createWMSGetMap(String serverURL, String version, EnWMSOutputFormat format, String layers,
 			String tiled, String transparent, String bgcolor, String crs, String srs, String bbox, int width,
-			int height, String styles, String exceptions, String time, String sld, String sld_body) {
+			int height, String styles, String exceptions, String time, String sld, String sld_body, String salt) {
 		return new WMSGetMap(serverURL, version, format, layers, tiled, transparent, bgcolor, crs, srs, bbox, width,
-				height, styles, exceptions, time, sld, sld_body);
+				height, styles, exceptions, time, sld, sld_body, salt);
 	};
 
 	@Override

@@ -92,7 +92,10 @@ public class WMSGetMap {
 	 * SLD 스타일 형식 body
 	 */
 	private String sld_body="";
-	
+	/**
+	 * 브라우저 캐시를 무시하기 위한 salt값
+	 */
+	private String salt="";	
 	
 	/**
 	 * {@link WMSGetMap} 생성자
@@ -117,7 +120,7 @@ public class WMSGetMap {
 	 */
 	public WMSGetMap(String serverURL, String version, EnWMSOutputFormat format, String layers, String tiled, String transparent,
 			String bgcolor, String crs, String srs, String bbox, int width, int height, String styles, String exceptions,
-			String time, String sld, String sld_body) {
+			String time, String sld, String sld_body, String salt) {
 		super();
 		if (!serverURL.trim().equals("")) {
 			this.serverURL = serverURL;
@@ -166,6 +169,9 @@ public class WMSGetMap {
 		}
 		if (!transparent.trim().equals("")) {
 			this.transparent = transparent;
+		}
+		if (!salt.trim().equals("")) {
+			this.salt = salt;
 		}
 		
 	}
@@ -334,11 +340,16 @@ public class WMSGetMap {
 	public String getTiled() {
 		return tiled;
 	}
-
 	public String getTransparent() {
 		return transparent;
 	}
-	
+	public String getSalt() {
+		return salt;
+	}
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+
 	/**
 	 * WMS GetMap 서비스 URL 생성
 	 * @author SG.LEE
@@ -423,6 +434,10 @@ public class WMSGetMap {
 			if(this.height!=0){
 				urlBuffer.append("&");
 				urlBuffer.append("height="+String.valueOf(this.height));
+			}
+			if(!this.salt.trim().equals("")){
+				urlBuffer.append("&");
+				urlBuffer.append("salt="+salt);
 			}
 		}
 		else

@@ -257,6 +257,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 									"TILED" : true,
 									"FORMAT" : 'image/png8',
 									"SLD_BODY" : data[i].sld
+//									"salt" : Math.random()
 								};
 								obj[gb.module.serviceVersion.getWMSCrs()] = data[i].srs;
 
@@ -521,6 +522,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 								"TILED" : true,
 								"FORMAT" : 'image/png8',
 								"SLD_BODY" : data[i].sld
+//								"salt" : Math.random()
 							};
 
 							obj[gb.module.serviceVersion.getWMSCrs()] = data[i].srs;
@@ -761,6 +763,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 									"VERSION" : "1.1.0",
 									"TILED" : true,
 									"FORMAT" : 'image/png8'
+//									"salt" : Math.random()
 								// "SLD_BODY" : mysld
 								},
 								serverType : "geoserver"
@@ -837,6 +840,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 												"FORMAT" : 'image/png8',
 												"CRS" : data[i].srs,
 												"SLD_BODY" : data[i].sld
+//												"salt" : Math.random()
 											},
 											serverType : "geoserver"
 										})
@@ -1052,6 +1056,7 @@ $.jstree.plugins.geoserver = function(options, parent) {
 								"TILED" : true,
 								"FORMAT" : 'image/png8',
 								"SLD_BODY" : data[i].sld
+//								"salt" : Math.random()
 							};
 							obj[gb.module.serviceVersion.getWMSCrs()] = data[i].srs;
 

@@ -75,6 +75,7 @@ gb.edit.FeatureRecord = function(obj) {
 	}
 	this.modelRecord = obj.modelRecord ? obj.modelRecord : undefined; 
 	this.featureNumberURL = obj.featureNumberURL ? obj.featureNumberURL : undefined;
+	this.gbMap = obj.gbMap ? obj.gbMap : undefined;
 
 	/**
 	 * gb.edit.EditingTool 객체
@@ -772,6 +773,9 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 
 	if (Object.keys(this.created).length === 0 && Object.keys(this.modified).length === 0 && Object.keys(this.removed).length === 0) {
 		console.log("just now!");
+		// wms 레이어 새로고침
+// that.refreshAllTileWMS();
+		// 3차원 저장 시작
 		var mrecord = that.getModelRecord();
 		mrecord.setTotalFeatures(that.getTotalFeatures());
 		mrecord.startLoadTextureBase64();
@@ -859,6 +863,7 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 		this.wfstCallback(arr, "modified", {
 			geoserver: geoserver,
 			workspace: workspace,
+			datastore: repo,
 			layername: layername,
 			layer: layerid
 		});
@@ -880,6 +885,8 @@ gb.edit.FeatureRecord.prototype.sendWFSTTransaction = function(editTool){
 		param = {
 				"serverName": geoserver,
 				"workspace": workspace,
+				"datastore" : repo,
+				"layer" : layername,
 				"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
 		};
 
@@ -968,6 +975,8 @@ gb.edit.FeatureRecord.prototype.wfstCallback = function(array, type, options){
 	param = {
 			"serverName": opt.geoserver,
 			"workspace": opt.workspace,
+			"datastore" : opt.datastore,
+			"layer" : opt.layername,
 			"wfstXml": '<?xml version="1.0" encoding="utf-8"?>'+new XMLSerializer().serializeToString(node)
 	};
 
@@ -1124,4 +1133,63 @@ gb.edit.FeatureRecord.prototype.getTotalFeatures = function(){
  */
 gb.edit.FeatureRecord.prototype.setTotalFeatures = function(features){
 	this.totalFeatures = features;
+}
+
+/**
+ * gbMap 객체를 반환한다.
+ * 
+ * @method gb.edit.FeatureRecord#getGbMap
+ * @return {gb.Map} gbMap
+ */
+gb.edit.FeatureRecord.prototype.getGbMap = function(){
+	return this.gbMap;
+}
+
+/**
+ * 총 피처 개수를 할당한다.
+ * 
+ * @method gb.edit.FeatureRecord#setGbMap
+ * @param {gb.Map} gbMap
+ */
+gb.edit.FeatureRecord.prototype.setGbMap = function(map){
+	this.gbMap = map;
+}
+
+/**
+ * 저장 후 모든 WMS 레이어를 새로고침 한다.
+ * 
+ * @method gb.edit.FeatureRecord#refreshAllTileWMS
+ */
+gb.edit.FeatureRecord.prototype.refreshAllTileWMS = function(){
+	var that = this;
+	var map = that.getGbMap();
+	var olMap = map.getUpperMap();
+	if (olMap instanceof ol.Map) {
+		var layers = olMap.getLayers();
+		for (var i = 0; i < layers.getLength(); i++) {
+			var layer = layers.item(i);
+			if (layer instanceof ol.layer.Tile) {
+				that.refreshOneTileWMS(layer);				
+			}
+		}
+	}
+}
+
+/**
+ * wms 레이어 한 개를 새로고침한다.
+ * 
+ * @method gb.edit.FeatureRecord#refreshOneTileWMS
+ * @param {ol.layer.Tile} layer - 새로 고침할 레이어
+ */
+gb.edit.FeatureRecord.prototype.refreshOneTileWMS = function(layer){
+	if (layer instanceof ol.layer.Tile) {
+		var source = layer.getSource();
+		var updateParamFunc = source.updateParams;
+		if (typeof updateParamFunc === "function") {
+			var params = source.getParams();
+			source.updateParams(params);
+		}
+	} else {
+		console.log("it is not tile wms layer");
+	}
 }

@@ -443,6 +443,13 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		var geometry = feature.getGeometry();
 		var coordinates = geometry.getCoordinates();
+
+		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+		// var mesh;
+		if (result.length === 1) {
+			// mesh = result[0];
+			that.object = result[0];
+		}
 		var obj3d = new gb3d.object.ThreeObject({
 			"object" : that.object,
 			"center" : coordinates,
@@ -470,18 +477,18 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.object.rotateZ(Cesium.Math.toRadians(bearing));
 
 		// 오브젝트에서 메쉬를 꺼낸다
-		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+		// var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
 		// 레이어 지오메트리 타입을 꺼낸다
 		var gtype = that.layer.get("git").geometry;
 		// 메쉬에 유저정보로 지오메트리 타입을 넣는다 - 폴리곤
 		that.object.userData.type = gtype;
 		// featureId 를 넣는다
 		that.object.userData.featureId = fid;
-		for (var i = 0; i < result.length; i++) {
-			result[i].userData.type = gtype;
-			// featureId 를 넣는다
-			result[i].userData.featureId = fid;
-		}
+		// for (var i = 0; i < result.length; i++) {
+		// result[i].userData.type = gtype;
+		// // featureId 를 넣는다
+		// result[i].userData.featureId = fid;
+		// }
 
 		console.log(that.object);
 
@@ -826,13 +833,13 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 			var centerPoint = turf.point(center);
 
 			var face = faces[i];
-			var threeVertice = [vertices[face.a], vertices[face.b], vertices[face.c]];
+			var threeVertice = [ vertices[face.a], vertices[face.b], vertices[face.c] ];
 			for (var j = 0; j < threeVertice.length; j++) {
 				var oneVertex = threeVertice[j];
-				
+
 				// 좌표를 미터로 간주하고 킬로미터로 절대값 변환
 				var distance = Math.abs(oneVertex.x / 1000);
-				
+
 				// 진행방향 각도 x 축이면 서쪽 -90 또는 동쪽 90
 				var bearing;
 				if (oneVertex.x < 0) {
@@ -840,7 +847,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 				} else {
 					bearing = 90;
 				}
-				
+
 				// 중점으로부터 x좌표 만큼 이동한 곳
 				var offsetx = turf.destination(centerPoint, distance, bearing);
 				// x좌표 만큼 이동한 곳을 중점으로 y만큼 이동하기
@@ -858,7 +865,7 @@ gb3d.io.ImporterThree.getFloorPlan = function(obj, center, result) {
 				destination = turf.point([ parseFloat(destination.geometry.coordinates[0].toFixed(6)), parseFloat(destination.geometry.coordinates[1].toFixed(6)) ]);
 				worldPts.push(destination);
 			}
-			
+
 			var pt1 = worldPts[0];
 			var pt2 = worldPts[1];
 			var pt3 = worldPts[2];
@@ -1046,7 +1053,7 @@ gb3d.io.ImporterThree.injectFloorPlan = function(feature, threeObj) {
 					}
 				}
 				if (feature instanceof ol.Feature) {
-//					feature.getGeometry().setCoordinates(geom.getCoordinates());
+					// feature.getGeometry().setCoordinates(geom.getCoordinates());
 					feature.setGeometry(geom);
 				}
 			}
@@ -1068,11 +1075,10 @@ gb3d.io.ImporterThree.injectFloorPlan = function(feature, threeObj) {
  * 
  * @method gb3d.io.ImporterThree#loadGLTFToEdit
  * @param {string} url - GLTF 파일의 위치
- * @param {string} fid - 2d feature id
- * @param {ol.layer.Vector || ol.layer.Tile} layer - 선택한 레이어
- * @param {Cesium.}
+ * @param {Object} opt - 객체 생성 옵션
+ * @param {gb3d.edit.ModelRecord} mrecord - 3차원 편집이력 객체
  */
-gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
+gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 	var that = this;
 	// Instantiate a loader
 	var loader = new THREE.GLTFLoader();
@@ -1143,7 +1149,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"feature" : opt["feature"],
 				"feature3D" : opt["feature3D"],
 				"layer" : opt["layer"],
-				"file" : false
+				"file" : true
 			});
 
 			// Map에 ThreeJS 객체 추가
@@ -1163,6 +1169,10 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				opt.threeTree.getJSTree().select_node(inputData.uuid);
 			}
 		}
+
+		if (mrecord) {
+			mrecord.createLoaded(opt["layer"], obj3d);
+		}
 		// 스피너 해제
 		that.getGb3dMap().showSpinner(false);
 	},
@@ -1174,7 +1184,8 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	},
 	// called when loading has errors
 	function(error) {
-
+		// 스피너 해제
+		that.getGb3dMap().showSpinner(false);
 		console.log('An error happened');
 
 	});
@@ -1191,11 +1202,21 @@ gb3d.io.ImporterThree.prototype.getGb3dMap = function() {
 }
 
 /**
- * Three JSTree 객체를 설정한다.
+ * 2D 편집이력 객체를 반환한다.
  * 
  * @method gb3d.io.ImporterThree#getFeatureRecord
  * @return {gb.edit.FeatureRecord} 피처 편집이력 객체
  */
 gb3d.io.ImporterThree.prototype.getFeatureRecord = function() {
 	return this.frecord;
+}
+
+/**
+ * 2D 편집이력 객체를 설정한다.
+ * 
+ * @method gb3d.io.ImporterThree#setFeatureRecord
+ * @return {gb.edit.FeatureRecord} 피처 편집이력 객체
+ */
+gb3d.io.ImporterThree.prototype.setFeatureRecord = function(frecord) {
+	return this.frecord = frecord;
 }
