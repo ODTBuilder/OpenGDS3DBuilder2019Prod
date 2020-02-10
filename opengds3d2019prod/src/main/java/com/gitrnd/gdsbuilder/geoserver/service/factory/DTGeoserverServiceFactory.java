@@ -67,7 +67,7 @@ public interface DTGeoserverServiceFactory {
 	 * */
 	public WMSGetMap createWMSGetMap(String serverURL, String version, EnWMSOutputFormat format, String layers, String tiled, String transparent,
 			String bgcolor, String crs, String srs, String bbox, int width, int height, String styles, String exceptions,
-			String time, String sld, String sld_body);
+			String time, String sld, String sld_body, String salt);
 	
 	/**
 	 * Geoserver WMS GetMap 서비스(필수파라미터) 

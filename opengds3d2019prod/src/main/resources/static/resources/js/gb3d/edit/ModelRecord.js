@@ -504,7 +504,7 @@ gb3d.edit.ModelRecord.prototype.save = function(self) {
 	var total = load.total;
 	var loaded = load.loaded;
 	if (total !== loaded) {
-		console.error("texture not loaded ");
+		console.log("texture not loaded ");
 		return;
 	}
 	console.log(self.history);
@@ -724,7 +724,7 @@ gb3d.edit.ModelRecord.prototype.readTextureFromObject = function() {
 				"modelCenter" : threeObject.getCenter(),
 				"objPath" : undefined
 			};
-			load.total = load.total + 1;
+			// load.total = load.total + 1;
 			var resetObj = this.resetRotationAndPosition(object);
 			var result = exporter.parse(resetObj);
 			obj[layer]["created"][feature]["obj"] = result;
@@ -783,7 +783,7 @@ gb3d.edit.ModelRecord.prototype.readTextureFromObject = function() {
 				"tileCenter" : undefined,
 				"modelCenter" : threeObject.getCenter()
 			};
-			load.total = load.total + 1;
+			// load.total = load.total + 1;
 			var resetObj = this.resetRotationAndPosition(object);
 			var result = exporter.parse(resetObj);
 			obj[layer]["modified"][feature]["obj"] = result;
@@ -996,7 +996,6 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 				"modelCenter" : threeObject.getCenter(),
 				"objPath" : undefined
 			};
-			load.total = load.total + 1;
 			// 타일셋 경로 없으면 넣기
 			if (!obj[layer]["tileset"]) {
 				var tlayer = threeObject.getLayer();
@@ -1098,7 +1097,6 @@ gb3d.edit.ModelRecord.prototype.getStructureToOBJ = function(callback) {
 				"tileCenter" : undefined,
 				"modelCenter" : threeObject.getCenter()
 			};
-			load.total = load.total + 1;
 			// 타일셋 경로 없으면 넣기
 			if (!obj[layer]["tileset"]) {
 				var tlayer = threeObject.getLayer();
@@ -1274,6 +1272,10 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record, c
 	// 이미지를 base64로 변환한다.
 	// 소스가 base64인지 url인지
 	if (img) {
+		// 텍스처가 있는 경우에만 총 카운트 1증가
+		var load = that.getTextureLoaded();
+		load.total = load.total + 1;
+
 		var src = img.src;
 		if (src.substr(0, 5) == 'data:') {
 			// base64일 때
@@ -1289,6 +1291,12 @@ gb3d.edit.ModelRecord.prototype.getBase64FromObject = function(object, record, c
 			that.toDataURLFromBlobURL(img, record, callback, history);
 		} else {
 			that.toDataURL(src, record, undefined, callback, history);
+		}
+	} else {
+		var load = that.getTextureLoaded();
+		if (load.total === load.loaded && that.getRemoveCheck()) {
+			callback(history);
+			that.save(that);
 		}
 	}
 	return result;
@@ -1508,7 +1516,17 @@ gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
 			var three = created[layer][feature];
 			var mesh = three.getObject();
 			if (mesh) {
+				if (mesh.geometry) {
+					mesh.geometry.dispose();
+				}
+				if (mesh.material) {
+					if (mesh.material.texture) {
+						mesh.material.texture.dispose();
+					}
+					mesh.material.dispose();
+				}
 				that.getGb3dMap().getThreeScene().remove(mesh);
+				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
 			}
 		}
@@ -1532,7 +1550,17 @@ gb3d.edit.ModelRecord.prototype.removeMeshModified = function() {
 			var three = modified[layer][feature];
 			var mesh = three.getObject();
 			if (mesh) {
+				if (mesh.geometry) {
+					mesh.geometry.dispose();
+				}
+				if (mesh.material) {
+					if (mesh.material.texture) {
+						mesh.material.texture.dispose();
+					}
+					mesh.material.dispose();
+				}
 				that.getGb3dMap().getThreeScene().remove(mesh);
+				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
 			}
 		}
@@ -1556,7 +1584,17 @@ gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function() {
 			var three = removed[layer][feature];
 			var mesh = three.getObject();
 			if (mesh) {
+				if (mesh.geometry) {
+					mesh.geometry.dispose();
+				}
+				if (mesh.material) {
+					if (mesh.material.texture) {
+						mesh.material.texture.dispose();
+					}
+					mesh.material.dispose();
+				}
 				that.getGb3dMap().getThreeScene().remove(mesh);
+				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
 			}
 		}
@@ -1586,6 +1624,9 @@ gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
 	var resultLayers = Object.keys(result);
 
 	var map3d = that.getGb3dMap();
+	var cesiumViewer = map3d.getCesiumViewer();
+	var scene = cesiumViewer.scene;
+	var primitives = scene.primitives;
 	var map2d = map3d.getGbMap();
 	var olMap = map2d.getUpperMap();
 	var layers = olMap.getLayers();
@@ -1629,10 +1670,14 @@ gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
 			var ctileset = tileset.getCesiumTileset();
 			if (ctileset instanceof Cesium.Cesium3DTileset) {
 				// 현재 타일셋 삭제 후
-				ctileset.show = false;
-//				if(!ctileset.isDestroyed()){
-//					ctileset.destroy();	
-//				}
+				if (primitives.contains(ctileset)) {
+					primitives.remove(ctileset);
+					// ctileset.destroy();
+				}
+				// ctileset.show = false;
+				// if(!ctileset.isDestroyed()){
+				// ctileset.destroy();
+				// }
 				// 레이어가 가진 타일셋 키 삭제 후
 				git.tileset = undefined;
 				// 새로운 타일셋 추가

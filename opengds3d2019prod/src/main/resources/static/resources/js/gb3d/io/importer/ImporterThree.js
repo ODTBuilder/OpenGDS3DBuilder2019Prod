@@ -443,6 +443,13 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 
 		var geometry = feature.getGeometry();
 		var coordinates = geometry.getCoordinates();
+		
+		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+//		var mesh;
+		if (result.length === 1) {
+//			mesh = result[0];
+			that.object = result[0];
+		}
 		var obj3d = new gb3d.object.ThreeObject({
 			"object" : that.object,
 			"center" : coordinates,
@@ -470,18 +477,18 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 		that.object.rotateZ(Cesium.Math.toRadians(bearing));
 
 		// 오브젝트에서 메쉬를 꺼낸다
-		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
+//		var result = gb3d.io.ImporterThree.getChildrenMeshes(that.object, []);
 		// 레이어 지오메트리 타입을 꺼낸다
 		var gtype = that.layer.get("git").geometry;
 		// 메쉬에 유저정보로 지오메트리 타입을 넣는다 - 폴리곤
 		that.object.userData.type = gtype;
 		// featureId 를 넣는다
 		that.object.userData.featureId = fid;
-		for (var i = 0; i < result.length; i++) {
-			result[i].userData.type = gtype;
-			// featureId 를 넣는다
-			result[i].userData.featureId = fid;
-		}
+//		for (var i = 0; i < result.length; i++) {
+//			result[i].userData.type = gtype;
+//			// featureId 를 넣는다
+//			result[i].userData.featureId = fid;
+//		}
 
 		console.log(that.object);
 
@@ -1143,7 +1150,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 				"feature" : opt["feature"],
 				"feature3D" : opt["feature3D"],
 				"layer" : opt["layer"],
-				"file" : false
+				"file" : true
 			});
 
 			// Map에 ThreeJS 객체 추가
@@ -1174,7 +1181,8 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt) {
 	},
 	// called when loading has errors
 	function(error) {
-
+		// 스피너 해제
+		that.getGb3dMap().showSpinner(false);
 		console.log('An error happened');
 
 	});

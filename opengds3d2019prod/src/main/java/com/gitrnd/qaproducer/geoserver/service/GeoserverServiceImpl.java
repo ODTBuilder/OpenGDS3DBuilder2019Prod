@@ -1080,13 +1080,13 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String wfstXml) {
+	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layername, String wfstXml) {
 		if (dtGeoManager != null) {
 			dtPublisher = dtGeoManager.getPublisher();
 		} else {
 			throw new IllegalArgumentException("Geoserver 정보 없음");
 		}
-		return dtPublisher.requestWFSTransaction(workspace, wfstXml);
+		return dtPublisher.requestWFSTransaction(workspace, datastore, layername, wfstXml);
 	}
 
 	@Override

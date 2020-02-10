@@ -761,7 +761,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 		var interObjs = [];
 		var objects = that.map.getThreeObjects();
 		for (var i = 0; i < objects.length; i++) {
-			interObjs.push(objects[i].getObject());
+			if (objects[i].getObject()) {
+				interObjs.push(objects[i].getObject());	
+			}
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
@@ -1334,7 +1336,9 @@ gb3d.edit.EditingTool3D = function(obj) {
 		var interObjs = [];
 		var objects = that.map.getThreeObjects();
 		for (var i = 0; i < objects.length; i++) {
-			interObjs.push(objects[i].getObject());
+			if (objects[i].getObject()) {
+				interObjs.push(objects[i].getObject());	
+			}
 		}
 		raycaster.setFromCamera(mouse, that.map.threeCamera);
 		var intersects = raycaster.intersectObjects(interObjs, true);
