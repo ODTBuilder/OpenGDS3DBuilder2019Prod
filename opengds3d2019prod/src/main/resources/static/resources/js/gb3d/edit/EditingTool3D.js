@@ -1463,6 +1463,7 @@ gb3d.edit.EditingTool3D.prototype.editToolClose = function() {
 	this.attrPop_.close();
 	// this.attrPop_.setPositionY(5);
 	threeEditor.select(null);
+	this.getModelRecord().removeMeshLoaded(true);
 }
 
 /**
@@ -2961,7 +2962,7 @@ gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature, la
 				};
 				// thee js 씬 상에 gltf를 올리는 함수
 				var importer = that.getImporterThree();
-				importer.loadGLTFToEdit(path, opt);
+				importer.loadGLTFToEdit(path, opt, that.getModelRecord());
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown){

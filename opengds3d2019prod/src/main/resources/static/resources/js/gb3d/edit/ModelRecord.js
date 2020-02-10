@@ -66,6 +66,14 @@ gb3d.edit.ModelRecord = function(obj) {
 	this.removed = {};
 
 	/**
+	 * 3d tileset 피처에서 GLTF로 로드된 객체들을 담은 변수
+	 * 
+	 * @private
+	 * @type {Object.<string, gb3d.object.ThreeObject>}
+	 */
+	this.loaded = {};
+
+	/**
 	 * 표시될 언어 값을 저장한 변수
 	 * 
 	 * @type {String}
@@ -165,6 +173,16 @@ gb3d.edit.ModelRecord.prototype.getModified = function() {
  */
 gb3d.edit.ModelRecord.prototype.getRemoved = function() {
 	return this.removed;
+};
+/**
+ * 임시보관 중인 gtlf 로드된 Model들을 반환한다.
+ * 
+ * @method gb3d.edit.ModelRecord#getLoaded
+ * @function
+ * @return {Object.<string, gb3d.object.ThreeObject>}
+ */
+gb3d.edit.ModelRecord.prototype.getLoaded = function() {
+	return this.loaded;
 };
 /**
  * 임시보관 중인 Model의 목록을 삭제한다.
@@ -362,6 +380,41 @@ gb3d.edit.ModelRecord.prototype.remove = function(layer, model) {
 	}
 	console.log("model removed");
 }
+
+/**
+ * 새로 그린 model를 편집이력에 임시저장한다.
+ * 
+ * @method gb3d.edit.ModelRecord#createLoaded
+ * @function
+ * @param {String} layer - 편집이력에 임시저장할 layer id
+ * @param {gb3d.object.ThreeObject} model - 편집이력에 임시저장할 model 객체
+ */
+gb3d.edit.ModelRecord.prototype.createLoaded = function(layer, model) {
+	var id = layer;
+
+	if (!id) {
+		return;
+	}
+	if (id instanceof ol.layer.Base) {
+		id = id.get("id") ? id.get("id") : id.get("name");
+	}
+	if (!id) {
+		console.error("no layer id.");
+		return;
+	}
+	// if (!id.split(":")[1] || !id.split(":")[3]) {
+	// return;
+	// }
+
+	if (!this.loaded[id]) {
+		this.loaded[id] = {};
+		// this.requestLayerInfo(id.split(":")[0], id.split(":")[1],
+		// id.split(":")[3], this.created[id]);
+	}
+	this.loaded[id][this.id ? model.getFeature().get(this.id) : model.getFeature().getId()] = model;
+	console.log("model created");
+}
+
 /**
  * layer ID를 통해 해당 레이어의 편집이력을 모두 삭제한다.
  * 
@@ -412,6 +465,15 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 	if (!(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
 		return;
 	}
+	// ======== loaded에서 이력을 삭제하는 코드 - modified에 이력이 남으니까 loaded는 필요없음
+	var keys = Object.keys(this.loaded[id]);
+	for (var i = 0; i < keys.length; i++) {
+		if (keys[i] === (this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
+			delete this.loaded[id][keys[i]];
+			break;
+		}
+	}
+	// =========
 	if (((this.id ? model.getFeature().get(this.id) : model.getFeature().getId())).search(".new") !== -1) {
 		this.created[id][(this.id ? model.getFeature().get(this.id) : model.getFeature().getId())] = model;
 	} else {
@@ -1602,6 +1664,49 @@ gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function() {
 }
 
 /**
+ * loaded 목록에 있는 메쉬 객체를 삭제한다.
+ * 
+ * @method gb3d.edit.ModelRecord#removeMeshLoaded
+ * @param {boolean} flag - 삭제한 후 cesium 객체를 보여줄지 여부
+ */
+gb3d.edit.ModelRecord.prototype.removeMeshLoaded = function(flag) {
+	var that = this;
+	var loaded = that.getLoaded();
+	var layers = Object.keys(loaded);
+	for (var i = 0; i < layers.length; i++) {
+		var layer = layers[i];
+		var features = Object.keys(loaded[layer]);
+		for (var j = 0; j < features.length; j++) {
+			var feature = features[j];
+			var three = loaded[layer][feature];
+			var mesh = three.getObject();
+			if (mesh) {
+				if (mesh.geometry) {
+					mesh.geometry.dispose();
+				}
+				if (mesh.material) {
+					if (mesh.material.texture) {
+						mesh.material.texture.dispose();
+					}
+					mesh.material.dispose();
+				}
+				that.getGb3dMap().getThreeScene().remove(mesh);
+				that.getGb3dMap().getThreeScene().dispose();
+				three.setObject(undefined);
+			}
+			if (flag) {
+				var feature3d = three.getFeature3D();
+				if (feature3d instanceof Cesium.Cesium3DTileFeature) {
+					if (!feature3d.show) {
+						feature3d.show = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
  * 목록에 있는 모든 메쉬 객체를 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#removeMeshAll
@@ -1611,6 +1716,7 @@ gb3d.edit.ModelRecord.prototype.removeMeshAll = function() {
 	that.removeMeshCreated();
 	that.removeMeshModified();
 	that.removeMeshRemoved();
+	that.removeMeshLoaded();
 }
 
 /**
