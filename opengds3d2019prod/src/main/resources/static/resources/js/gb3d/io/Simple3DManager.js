@@ -450,31 +450,39 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 			"texture" : $(textureSelect).val()
 		};
 		if (type === "box") {
+			geom["widthType"] = $(widthType).val();
 			if ($(widthType).val() === "default") {
-				geom["width"] = $(widthInput).val();
+				geom["widthValue"] = $(widthInput).val();
 			} else if ($(widthType).val() === "fix") {
 				geom["widthAttr"] = $(attrKeyWidth).val();
 			}
-
+			geom["heightType"] = $(heightType).val();
 			if ($(heightType).val() === "default") {
-				geom["height"] = $(heightInput).val();
+				geom["heightValue"] = $(heightInput).val();
 			} else if ($(heightType).val() === "fix") {
 				geom["heightAttr"] = $(attrKeyHeight).val();
 			}
-
+			geom["depthType"] = $(depthType).val();
 			if ($(depthType).val() === "default") {
-				geom["depth"] = $(depthInput).val();
+				geom["depthValue"] = $(depthInput).val();
 			} else if ($(depthType).val() === "fix") {
 				geom["depthAttr"] = $(attrKey).val();
 			}
 		} else if (type === "cylinder") {
+			geom["radiusType"] = $(radiusType).val();
 			if ($(radiusType).val() === "default") {
-				geom["radius"] = $(radiusInput).val();
+				geom["radiusValue"] = $(radiusInput).val();
 			} else if ($(radiusType).val() === "fix") {
 				geom["radiusAttr"] = $(attrKeyRadius).val();
 			}
+			geom["depthType"] = $(depthType).val();
+			if ($(depthType).val() === "default") {
+				geom["depthValue"] = $(depthInput).val();
+			} else if ($(depthType).val() === "fix") {
+				geom["depthAttr"] = $(attrKey).val();
+			}
 		}
-		that.get3DTileset(geo, work, store, layer, geom, pointModal);
+		that.get3DTileset(geo, work, store, layer, geom, pointModal, callback);
 	});
 
 	$(typeSelect).change(function() {
@@ -762,21 +770,31 @@ gb3d.io.Simple3DManager.prototype.get3DTileset = function(geo, work, store, laye
 	if (geom.geometry2d === "Point") {
 		params["geometry3d"] = geom["geometry3d"];
 		if (geom["geometry3d"] === "box") {
-			if (geom["width"]) {
-				params["width"] = geom["width"] ? geom["width"] : undefined;
+			if (geom["widthType"]) {
+				params["widthType"] = geom["widthType"] ? geom["widthType"] : undefined;
 			}
-			if (geom["height"]) {
-				params["height"] = geom["height"] ? geom["height"] : undefined;
+			if (geom["widthValue"]) {
+				params["widthValue"] = geom["widthValue"] ? geom["widthValue"] : undefined;
 			}
 			if (geom["widthAttr"]) {
 				params["widthAttr"] = geom["widthAttr"] ? geom["widthAttr"] : undefined;
+			}
+			
+			if (geom["heightType"]) {
+				params["heightType"] = geom["heightType"] ? geom["heightType"] : undefined;
+			}
+			if (geom["heightValue"]) {
+				params["heightValue"] = geom["heightValue"] ? geom["heightValue"] : undefined;
 			}
 			if (geom["heightAttr"]) {
 				params["heightAttr"] = geom["heightAttr"] ? geom["heightAttr"] : undefined;
 			}
 		} else if (geom["geometry3d"] === "cylinder") {
-			if (geom["radius"]) {
-				params["radius"] = geom["radius"] ? geom["radius"] : undefined;
+			if (geom["radiusType"]) {
+				params["radiusType"] = geom["radiusType"] ? geom["radiusType"] : undefined;
+			}
+			if (geom["radiusValue"]) {
+				params["radiusValue"] = geom["radiusValue"] ? geom["radiusValue"] : undefined;
 			}
 			if (geom["radiusAttr"]) {
 				params["radiusAttr"] = geom["radiusAttr"] ? geom["radiusAttr"] : undefined;
