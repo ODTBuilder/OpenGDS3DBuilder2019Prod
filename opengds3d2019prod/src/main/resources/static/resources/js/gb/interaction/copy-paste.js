@@ -146,7 +146,9 @@ gb.interaction.Copypaste.prototype.paste = function(){
 							"center" : [x, y],
 							"extent" : extent,
 							"type" : threeObject.type,
-							"feature" : feature
+							"feature" : feature,
+							"editable" : true,
+							"file" : false
 						});
 
 						this.map3d_.addThreeObject(obj3d);

@@ -466,12 +466,14 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 		return;
 	}
 	// ======== loaded에서 이력을 삭제하는 코드 - modified에 이력이 남으니까 loaded는 필요없음
-	var keys = Object.keys(this.loaded[id]);
-	for (var i = 0; i < keys.length; i++) {
-		if (keys[i] === (this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
-			delete this.loaded[id][keys[i]];
-			break;
-		}
+	if (this.loaded[id]) {
+		var keys = Object.keys(this.loaded[id]);
+		for (var i = 0; i < keys.length; i++) {
+			if (keys[i] === (this.id ? model.getFeature().get(this.id) : model.getFeature().getId())) {
+				delete this.loaded[id][keys[i]];
+				break;
+			}
+		}	
 	}
 	// =========
 	if (((this.id ? model.getFeature().get(this.id) : model.getFeature().getId())).search(".new") !== -1) {

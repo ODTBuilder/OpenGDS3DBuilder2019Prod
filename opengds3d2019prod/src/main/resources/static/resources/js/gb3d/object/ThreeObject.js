@@ -44,6 +44,8 @@ gb3d.object.ThreeObject = function(obj) {
 	this.modCount = 0;
 	// 그린 객체인지 파일 객체인지
 	this.isFromFile = options.file ? true : false;
+	// 수정 가능한 객체인지
+	this.isEditable = options.editable ? true : false;
 }
 
 /**
@@ -291,4 +293,24 @@ gb3d.object.ThreeObject.prototype.getIsFromFile = function() {
  */
 gb3d.object.ThreeObject.prototype.setIsFromFile = function(flag) {
 	this.isFromFile = flag;
+};
+
+/**
+ * 수정 가능한 객체인지 반환
+ * 
+ * @method gb3d.object.ThreeObject#getIsEditable
+ * @return {boolean} 수정 가능 여부
+ */
+gb3d.object.ThreeObject.prototype.getIsEditable = function() {
+	return this.isEditable;
+};
+
+/**
+ * 수정 가능한 객체인지 설정
+ * 
+ * @method gb3d.object.ThreeObject#setIsEditable
+ * @param {boolean} flag - 수정가능 여부
+ */
+gb3d.object.ThreeObject.prototype.setIsEditable = function(flag) {
+	this.isEditable = flag;
 };

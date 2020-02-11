@@ -1696,7 +1696,9 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
 		"treeid" : this.objectAttr.treeid,
-		"layer" : this.objectAttr.layer
+		"layer" : this.objectAttr.layer,
+		"editable" : true,
+		"file" : false
 	});
 
 	// Map에 ThreeJS 객체 추가
@@ -1802,7 +1804,9 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 		"type" : this.objectAttr.type,
 		"feature" : this.objectAttr.feature,
 		"treeid" : this.objectAttr.treeid,
-		"layer" : this.objectAttr.layer
+		"layer" : this.objectAttr.layer,
+		"editable" : true,
+		"file" : false
 	});
 
 	this.getMap().addThreeObject(obj3d);
@@ -1912,7 +1916,9 @@ gb3d.edit.EditingTool3D.prototype.createLineStringObjectOnRoad = function(arr, e
 		"feature" : this.objectAttr.feature,
 		"treeid" : this.objectAttr.treeid,
 		"layer" : this.objectAttr.layer,
-		"buffer" : option["width"] / 2
+		"buffer" : option["width"] / 2,
+		"editable" : true,
+		"file" : false
 	});
 
 	this.getMap().addThreeObject(obj3d);
@@ -2333,6 +2339,7 @@ gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, e
 
 	var threeObject = this.getMap().getThreeObjectById(featureId);
 	var isFile = threeObject.getIsFromFile();
+	var isEditable = threeObject.getIsFromFile();
 	if(!threeObject){
 		return;
 	}

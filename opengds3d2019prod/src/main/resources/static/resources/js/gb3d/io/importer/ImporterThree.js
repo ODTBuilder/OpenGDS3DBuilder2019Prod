@@ -457,6 +457,7 @@ gb3d.io.ImporterThree.prototype.activeDraw = function() {
 			"type" : that.layer.get("git").geometry,
 			"feature" : feature,
 			"layer" : layer,
+			"editable" : false,
 			"file" : true
 		});
 		var center = [ coordinates[0], coordinates[1] ];
@@ -1149,6 +1150,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 				"feature" : opt["feature"],
 				"feature3D" : opt["feature3D"],
 				"layer" : opt["layer"],
+				"editable" : true,
 				"file" : true
 			});
 

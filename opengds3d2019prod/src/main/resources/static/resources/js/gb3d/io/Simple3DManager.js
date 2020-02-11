@@ -454,32 +454,32 @@ gb3d.io.Simple3DManager.prototype.showPointTo3DModal = function(geo, work, store
 			if ($(widthType).val() === "default") {
 				geom["widthValue"] = $(widthInput).val();
 			} else if ($(widthType).val() === "fix") {
-				geom["widthAttr"] = $(attrKeyWidth).val();
+				geom["widthValue"] = $(attrKeyWidth).val();
 			}
 			geom["heightType"] = $(heightType).val();
 			if ($(heightType).val() === "default") {
 				geom["heightValue"] = $(heightInput).val();
 			} else if ($(heightType).val() === "fix") {
-				geom["heightAttr"] = $(attrKeyHeight).val();
+				geom["heightValue"] = $(attrKeyHeight).val();
 			}
 			geom["depthType"] = $(depthType).val();
 			if ($(depthType).val() === "default") {
 				geom["depthValue"] = $(depthInput).val();
 			} else if ($(depthType).val() === "fix") {
-				geom["depthAttr"] = $(attrKey).val();
+				geom["depthValue"] = $(attrKey).val();
 			}
 		} else if (type === "cylinder") {
 			geom["radiusType"] = $(radiusType).val();
 			if ($(radiusType).val() === "default") {
 				geom["radiusValue"] = $(radiusInput).val();
 			} else if ($(radiusType).val() === "fix") {
-				geom["radiusAttr"] = $(attrKeyRadius).val();
+				geom["radiusValue"] = $(attrKeyRadius).val();
 			}
 			geom["depthType"] = $(depthType).val();
 			if ($(depthType).val() === "default") {
 				geom["depthValue"] = $(depthInput).val();
 			} else if ($(depthType).val() === "fix") {
-				geom["depthAttr"] = $(attrKey).val();
+				geom["depthValue"] = $(attrKey).val();
 			}
 		}
 		that.get3DTileset(geo, work, store, layer, geom, pointModal, callback);
