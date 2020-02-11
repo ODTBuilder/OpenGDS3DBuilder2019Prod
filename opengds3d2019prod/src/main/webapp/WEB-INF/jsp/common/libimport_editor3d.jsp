@@ -130,7 +130,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/gb/edit/command.js"></script>
 <!-- gb.interaction -->
 <script src="${pageContext.request.contextPath}/resources/js/gb/overriding/olinteractiondraw.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/gb/interaction/multitransform.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/gb3d/interaction/Multitransform.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/interaction/copy-paste.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/interaction/measuretip.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/gb/interaction/holedraw.js"></script>
