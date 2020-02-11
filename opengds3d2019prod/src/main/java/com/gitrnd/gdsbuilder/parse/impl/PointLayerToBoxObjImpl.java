@@ -43,7 +43,6 @@ import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
-import com.gitrnd.threej.core.src.main.java.info.laht.threej.geometries.BoxGeometry;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector2d;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -795,13 +794,22 @@ public class PointLayerToBoxObjImpl {
 				return null;
 			}
 
+			List<Coordinate> allCoordinates = new ArrayList<>();
+			StringBuilder vBuilder = new StringBuilder();
+			List<Vector3d> vertices = new ArrayList<>();
+			List<Face3> faces = new ArrayList<>();
+
+			// rectangle face idx
+			int bottomend = 0;
+			int topend = 0;
+			int sideend = 0;
+
+			double minX = 0;
+			double minY = 0;
+			double maxX = 0;
+			double maxY = 0;
+
 			Coordinate[] coordinates = geom.getCoordinates();
-
-			BoxGeometry geometry = new BoxGeometry(defaultWidth, defaultHeight, defaultDepth);
-			geometry.computeBoundingBox();
-			List<Vector3d> vertices = geometry.getVertices();
-
-			int v = 0;
 			for (int i = 0; i < coordinates.length; i++) {
 				GeodeticCalculator gc = new GeodeticCalculator();
 				gc.setStartingGeographicPoint(centerX, coordinates[i].y);
@@ -816,25 +824,228 @@ public class PointLayerToBoxObjImpl {
 				if (centerY > coordinates[i].y) {
 					yDistance = -yDistance;
 				}
-				for (Vector3d vertice : vertices) {
-					double distX = vertice.x() + xDistance;
-					double distY = vertice.y() + yDistance;
-					double distZ = vertice.z();
 
-					if (distZ < 0) {
-						distZ = 0;
-					} else {
-						distZ = defaultDepth;
-					}
-					Vector3d distVertice = new Vector3d(distX, distY, distZ);
-					vertices.set(v, distVertice);
-					v++;
-				}
+				double x1 = coordinates[i].x + (defaultWidth / 2);
+				double y1 = coordinates[i].y + (defaultHeight / 2);
+
+				double x2 = coordinates[i].x - (defaultWidth / 2);
+				double y2 = coordinates[i].y + (defaultHeight / 2);
+
+				double x3 = coordinates[i].x - (defaultWidth / 2);
+				double y3 = coordinates[i].y - (defaultHeight / 2);
+
+				double x4 = coordinates[i].x + (defaultWidth / 2);
+				double y4 = coordinates[i].y - (defaultHeight / 2);
+
+				minX = x3;
+				minY = y3;
+				maxX = x1;
+				maxY = y1;
+
+				// 밑면
+				Coordinate coorBottom1 = new Coordinate(x1 + xDistance, y1 + yDistance, 0);
+				Coordinate coorBottom2 = new Coordinate(x2 + xDistance, y2 + yDistance, 0);
+				Coordinate coorBottom3 = new Coordinate(x3 + xDistance, y3 + yDistance, 0);
+				Coordinate coorBottom4 = new Coordinate(x4 + xDistance, y4 + yDistance, 0);
+
+				vector2dList.add(new Vector2d(x1 + xDistance, y1 + yDistance));
+				vector2dList.add(new Vector2d(x2 + xDistance, y2 + yDistance));
+				vector2dList.add(new Vector2d(x3 + xDistance, y3 + yDistance));
+				vector2dList.add(new Vector2d(x4 + xDistance, y4 + yDistance));
+
+				// 윗면
+				Coordinate coorTop1 = new Coordinate(x1 + xDistance, y1 + yDistance, defaultDepth);
+				Coordinate coorTop2 = new Coordinate(x2 + xDistance, y2 + yDistance, defaultDepth);
+				Coordinate coorTop3 = new Coordinate(x3 + xDistance, y3 + yDistance, defaultDepth);
+				Coordinate coorTop4 = new Coordinate(x4 + xDistance, y4 + yDistance, defaultDepth);
+
+				allCoordinates.add(coorBottom1);
+				allCoordinates.add(coorTop1);
+				allCoordinates.add(coorBottom2);
+				allCoordinates.add(coorTop2);
+				allCoordinates.add(coorBottom3);
+				allCoordinates.add(coorTop3);
+				allCoordinates.add(coorBottom4);
+				allCoordinates.add(coorTop4);
+
+				vector3dList.add(new Vector3d(coorBottom1.x, coorBottom1.y, 0));
+				vector3dList.add(new Vector3d(coorTop1.x, coorTop1.y, defaultDepth));
+				vector3dList.add(new Vector3d(coorBottom2.x, coorBottom2.y, 0));
+				vector3dList.add(new Vector3d(coorTop2.x, coorTop2.y, defaultDepth));
+				vector3dList.add(new Vector3d(coorBottom3.x, coorBottom3.y, 0));
+				vector3dList.add(new Vector3d(coorTop3.x, coorTop3.y, defaultDepth));
+				vector3dList.add(new Vector3d(coorBottom4.x, coorBottom4.y, 0));
+				vector3dList.add(new Vector3d(coorTop4.x, coorTop4.y, defaultDepth));
+
+				vBuilder.append("v " + coorBottom1.x + " " + coorBottom1.y + " " + 0 + "\n");
+				vBuilder.append("v " + coorTop1.x + " " + coorTop1.y + " " + defaultDepth + "\n");
+				vBuilder.append("v " + coorBottom2.x + " " + coorBottom2.y + " " + 0 + "\n");
+				vBuilder.append("v " + coorTop2.x + " " + coorTop2.y + " " + defaultDepth + "\n");
+				vBuilder.append("v " + coorBottom3.x + " " + coorBottom3.y + " " + 0 + "\n");
+				vBuilder.append("v " + coorTop3.x + " " + coorTop3.y + " " + defaultDepth + "\n");
+				vBuilder.append("v " + coorBottom4.x + " " + coorBottom4.y + " " + 0 + "\n");
+				vBuilder.append("v " + coorTop4.x + " " + coorTop4.y + " " + defaultDepth + "\n");
+
+				// 밑면 face
+				int firBottomIdx = vSize + allCoordinates.indexOf(coorBottom3);
+				int secBottomIdx = vSize + allCoordinates.indexOf(coorBottom4);
+				int thrBottomIdx = vSize + allCoordinates.indexOf(coorBottom2);
+				int furBottomIdx = vSize + allCoordinates.indexOf(coorBottom1);
+
+				faces.add(new Face3(firBottomIdx, secBottomIdx, thrBottomIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrBottomIdx, secBottomIdx, firBottomIdx, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrBottomIdx, secBottomIdx, furBottomIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furBottomIdx, secBottomIdx, thrBottomIdx, new Vector3d(0, 0, 0)));
+
+				bottomend = faces.size();
+
+				// 윗면 face
+				int firTopIdx = firBottomIdx + 1;
+				int secTopIdx = secBottomIdx + 1;
+				int thrTopIdx = thrBottomIdx + 1;
+				int furTopIdx = furBottomIdx + 1;
+
+				faces.add(new Face3(firTopIdx, secTopIdx, thrTopIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrTopIdx, secTopIdx, firTopIdx, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrTopIdx, secTopIdx, furTopIdx, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furTopIdx, secTopIdx, thrTopIdx, new Vector3d(0, 0, 0)));
+
+				topend = faces.size();
+
+				// 옆면 face 1
+				int firSideIdx1 = vSize + allCoordinates.indexOf(coorBottom3);
+				int secSideIdx1 = vSize + allCoordinates.indexOf(coorBottom4);
+				int thrSideIdx1 = firSideIdx1 + 1;
+				int furSideIdx1 = secSideIdx1 + 1;
+
+				faces.add(new Face3(firSideIdx1, secSideIdx1, thrSideIdx1, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrSideIdx1, secSideIdx1, firSideIdx1, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrSideIdx1, secSideIdx1, furSideIdx1, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furSideIdx1, secSideIdx1, thrSideIdx1, new Vector3d(0, 0, 0)));
+
+				// 옆면 face 2
+				int firSideIdx2 = vSize + allCoordinates.indexOf(coorBottom2);
+				int secSideIdx2 = vSize + allCoordinates.indexOf(coorBottom3);
+				int thrSideIdx2 = firSideIdx2 + 1;
+				int furSideIdx2 = secSideIdx2 + 1;
+
+				faces.add(new Face3(firSideIdx2, secSideIdx2, thrSideIdx2, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrSideIdx2, secSideIdx2, firSideIdx2, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrSideIdx2, secSideIdx2, furSideIdx2, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furSideIdx2, secSideIdx2, thrSideIdx2, new Vector3d(0, 0, 0)));
+
+				// 옆면 face 3
+				int firSideIdx3 = vSize + allCoordinates.indexOf(coorBottom1);
+				int secSideIdx3 = vSize + allCoordinates.indexOf(coorBottom2);
+				int thrSideIdx3 = firSideIdx3 + 1;
+				int furSideIdx3 = secSideIdx3 + 1;
+
+				faces.add(new Face3(firSideIdx3, secSideIdx3, thrSideIdx3, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrSideIdx3, secSideIdx3, firSideIdx3, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrSideIdx3, secSideIdx3, furSideIdx3, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furSideIdx3, secSideIdx3, thrSideIdx3, new Vector3d(0, 0, 0)));
+
+				// 옆면 face 4
+				int firSideIdx4 = vSize + allCoordinates.indexOf(coorBottom4);
+				int secSideIdx4 = vSize + allCoordinates.indexOf(coorBottom1);
+				int thrSideIdx4 = firSideIdx4 + 1;
+				int furSideIdx4 = secSideIdx4 + 1;
+
+				faces.add(new Face3(firSideIdx4, secSideIdx4, thrSideIdx4, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(thrSideIdx4, secSideIdx4, firSideIdx4, new Vector3d(0, 0, 0)));
+
+				faces.add(new Face3(thrSideIdx4, secSideIdx4, furSideIdx4, new Vector3d(0, 0, 0)));
+				faces.add(new Face3(furSideIdx4, secSideIdx4, thrSideIdx4, new Vector3d(0, 0, 0)));
+
+				sideend = faces.size();
+
 			}
-			geometry.setVertices(vertices);
-			writeThreeGeometry(geometry);
 
-			vSize += v;
+			com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
+			threeGeom.faces = faces;
+			threeGeom.vertices = vector3dList;
+			threeGeom.computeBoundingBox();
+
+			// vt
+			List<List<Vector2d>> faceVertexUvs = new ArrayList<>();
+
+			// 바닥
+			for (int i = 0; i < bottomend; i++) {
+				List<Vector2d> innerFvt = new ArrayList<>();
+				innerFvt.add(new Vector2d(0, 0));
+				innerFvt.add(new Vector2d(0, 0));
+				innerFvt.add(new Vector2d(0, 0));
+
+				faceVertexUvs.add(innerFvt);
+			}
+
+			// 윗면
+			for (int i = bottomend; i < topend; i = i + 4) {
+				List<Vector2d> innerFvt1 = new ArrayList<>();
+				innerFvt1.add(new Vector2d(0, 0));
+				innerFvt1.add(new Vector2d(1, 0));
+				innerFvt1.add(new Vector2d(0, 1));
+
+				List<Vector2d> innerFvt1b = new ArrayList<>();
+				innerFvt1b.add(new Vector2d(0, 0));
+				innerFvt1b.add(new Vector2d(0, 0));
+				innerFvt1b.add(new Vector2d(0, 0));
+
+				List<Vector2d> innerFvt2 = new ArrayList<>();
+				innerFvt2.add(new Vector2d(0, 1));
+				innerFvt2.add(new Vector2d(1, 0));
+				innerFvt2.add(new Vector2d(1, 1));
+
+				List<Vector2d> innerFvt2b = new ArrayList<>();
+				innerFvt2b.add(new Vector2d(0, 0));
+				innerFvt2b.add(new Vector2d(0, 0));
+				innerFvt2b.add(new Vector2d(0, 0));
+
+				faceVertexUvs.add(innerFvt1);
+				faceVertexUvs.add(innerFvt1b);
+				faceVertexUvs.add(innerFvt2);
+				faceVertexUvs.add(innerFvt2b);
+			}
+
+			// 옆면
+			for (int i = topend; i < sideend; i = i + 4) {
+				List<Vector2d> innerFvt1 = new ArrayList<>();
+				innerFvt1.add(new Vector2d(0, 0));
+				innerFvt1.add(new Vector2d(1, 0));
+				innerFvt1.add(new Vector2d(0, 1));
+
+				List<Vector2d> innerFvt1b = new ArrayList<>();
+				innerFvt1b.add(new Vector2d(0, 0));
+				innerFvt1b.add(new Vector2d(0, 0));
+				innerFvt1b.add(new Vector2d(0, 0));
+
+				List<Vector2d> innerFvt2 = new ArrayList<>();
+				innerFvt2.add(new Vector2d(0, 1));
+				innerFvt2.add(new Vector2d(1, 0));
+				innerFvt2.add(new Vector2d(1, 1));
+
+				List<Vector2d> innerFvt2b = new ArrayList<>();
+				innerFvt2b.add(new Vector2d(0, 0));
+				innerFvt2b.add(new Vector2d(0, 0));
+				innerFvt2b.add(new Vector2d(0, 0));
+
+				faceVertexUvs.add(innerFvt1);
+				faceVertexUvs.add(innerFvt1b);
+				faceVertexUvs.add(innerFvt2);
+				faceVertexUvs.add(innerFvt2b);
+			}
+
+			threeGeom.faceVertexUvs.add(faceVertexUvs);
+			threeGeom.computeFlatVertexNormals();
+			threeGeom.computeFaceNormals();
+			writeThreeGeometry(threeGeom);
+
+			vSize += allCoordinates.size();
 		}
 		return idList;
 	}

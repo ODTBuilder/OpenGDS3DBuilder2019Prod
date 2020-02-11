@@ -781,8 +781,9 @@ public class LineLayerToObjImpl {
 					yDistance = -yDistance;
 				}
 				vector2dList.add(new Vector2d(xDistance, yDistance));
-
+				
 				lineCoors[c] = new Coordinate(xDistance, yDistance, 0);
+				
 				allCoordinates.add(new Coordinate(lineCoors[c]));
 				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, 0));
 				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + 0 + "\n");
@@ -793,21 +794,19 @@ public class LineLayerToObjImpl {
 			}
 			// arc face idx
 			List<Integer> arcBottomFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 밑면 face idx
-
 			List<Integer> arcFirTopFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 윗면 face idx
 			List<Integer> arcLasTopFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 윗면 face idx
 			List<Integer> arcCentTopFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 윗면 face idx
-
 			List<Integer> arcSideFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 옆면 face idx
-
-			Envelope firArc2dEv = null;
-			Envelope lasArc2dEv = null;
-			Envelope centerArc2dEv = null;
 
 			// rectangle face idx
 			List<Integer> recBottomFaceIdxs = new ArrayList<>(); // 사각형 밑면 face idx
 			List<Integer> recTopFaceIdxs = new ArrayList<>(); // 사각형 윗면 face idx
 			List<Integer> recSideFaceIdxs = new ArrayList<>(); // 사각형 옆면 face idx
+
+			Envelope firArc2dEv = null;
+			Envelope lasArc2dEv = null;
+			Envelope centerArc2dEv = null;
 
 			double maxX = 0;
 			double maxY = defaultWidth * 2;
