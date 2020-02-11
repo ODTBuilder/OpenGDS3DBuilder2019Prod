@@ -60,6 +60,10 @@ public class PointLayerToBoxObjImpl {
 	private String widthAttribute;
 	private String heightAttribute;
 
+	private String depthValue;
+	private String heightValue;
+	private String widthValue;
+
 	private static List<Vector3d> vector3dList;
 	private static List<Vector2d> vector2dList;
 
@@ -89,18 +93,17 @@ public class PointLayerToBoxObjImpl {
 
 	private static BufferedWriter writer;
 
-	// box geom
 	public PointLayerToBoxObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection,
-			String texture, EnShpToObjHeightType hType, double defaultHeight, EnShpToObjWidthType wType,
-			double defaultWidth, EnShpToObjDepthType dType, double defaultDepth, String outputPath) {
+			String texture, EnShpToObjHeightType hType, String heightValue, EnShpToObjWidthType wType,
+			String widthValue, EnShpToObjDepthType dType, String depthValue, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
 		this.hType = hType;
-		this.defaultHeight = defaultHeight; // 세로
+		this.heightValue = heightValue;
 		this.wType = wType;
-		this.defaultWidth = defaultWidth; // 가로
+		this.widthValue = widthValue;
 		this.dType = dType;
-		this.defaultDepth = defaultDepth; // 높이
+		this.depthValue = depthValue;
 		this.outputPath = outputPath;
 	}
 
@@ -184,6 +187,30 @@ public class PointLayerToBoxObjImpl {
 		this.heightAttribute = heightAttribute;
 	}
 
+	public String getDepthValue() {
+		return depthValue;
+	}
+
+	public void setDepthValue(String depthValue) {
+		this.depthValue = depthValue;
+	}
+
+	public String getHeightValue() {
+		return heightValue;
+	}
+
+	public void setHeightValue(String heightValue) {
+		this.heightValue = heightValue;
+	}
+
+	public String getWidthValue() {
+		return widthValue;
+	}
+
+	public void setWidthValue(String widthValue) {
+		this.widthValue = widthValue;
+	}
+
 	public String getOutputPath() {
 		return outputPath;
 	}
@@ -224,9 +251,10 @@ public class PointLayerToBoxObjImpl {
 		Map<String, Object> sfcMap = new HashMap<>();
 
 		// 높이값 설정
-		double maxHeight = 0.0;
+		double maxDepth = 0.0;
 		if (this.dType == EnShpToObjDepthType.DEFAULT) {
-			maxHeight = defaultDepth;
+			defaultDepth = Double.valueOf(depthValue);
+			maxDepth = defaultDepth;
 		}
 
 		// 대용량 처리
@@ -351,19 +379,22 @@ public class PointLayerToBoxObjImpl {
 										SimpleFeature feature = features.next();
 										// height
 										if (this.hType == EnShpToObjHeightType.FIX) {
+											heightAttribute = heightValue;
 											defaultHeight = (double) feature.getAttribute(heightAttribute);
 										}
 										// widht
 										if (this.wType == EnShpToObjWidthType.FIX) {
+											widthAttribute = widthValue;
 											defaultWidth = (double) feature.getAttribute(widthAttribute);
 										}
 										// depth
 										if (this.dType == EnShpToObjDepthType.FIX) {
+											depthAttribute = depthValue;
 											defaultDepth = (double) feature.getAttribute(depthAttribute);
 										}
 										// set tile height
-										if (maxHeight < defaultDepth) {
-											maxHeight = defaultDepth;
+										if (maxDepth < defaultDepth) {
+											maxDepth = defaultDepth;
 										}
 										List<String> idlist = buildingFeatureToObjGroup(feature);
 										for (String id : idlist) {
@@ -422,7 +453,7 @@ public class PointLayerToBoxObjImpl {
 								tileOption.put("sphere", false);
 								tileOption.put("gltfUpAxis", "Z");
 								tileOption.put("minHeight", 0);
-								tileOption.put("maxHeight", maxHeight);
+								tileOption.put("maxHeight", maxDepth);
 								tileOption.put("properties", tilesPropeties);
 
 								try (FileWriter file = new FileWriter(
@@ -508,19 +539,22 @@ public class PointLayerToBoxObjImpl {
 												SimpleFeature feature = features.next();
 												// height
 												if (this.hType == EnShpToObjHeightType.FIX) {
+													heightAttribute = heightValue;
 													defaultHeight = (double) feature.getAttribute(heightAttribute);
 												}
 												// widht
 												if (this.wType == EnShpToObjWidthType.FIX) {
+													widthAttribute = widthValue;
 													defaultWidth = (double) feature.getAttribute(widthAttribute);
 												}
 												// depth
 												if (this.dType == EnShpToObjDepthType.FIX) {
+													depthAttribute = depthValue;
 													defaultDepth = (double) feature.getAttribute(depthAttribute);
 												}
 												// set tile height
-												if (maxHeight < defaultDepth) {
-													maxHeight = defaultDepth;
+												if (maxDepth < defaultDepth) {
+													maxDepth = defaultDepth;
 												}
 												List<String> idlist = buildingFeatureToObjGroup(feature);
 												for (String id : idlist) {
@@ -579,7 +613,7 @@ public class PointLayerToBoxObjImpl {
 										tileOption.put("sphere", false);
 										tileOption.put("gltfUpAxis", "Z");
 										tileOption.put("minHeight", 0);
-										tileOption.put("maxHeight", maxHeight);
+										tileOption.put("maxHeight", maxDepth);
 										tileOption.put("properties", tilesPropeties);
 
 										try (FileWriter file = new FileWriter(
@@ -660,19 +694,22 @@ public class PointLayerToBoxObjImpl {
 					SimpleFeature feature = features.next();
 					// height
 					if (this.hType == EnShpToObjHeightType.FIX) {
+						heightAttribute = heightValue;
 						defaultHeight = (double) feature.getAttribute(heightAttribute);
 					}
 					// widht
 					if (this.wType == EnShpToObjWidthType.FIX) {
+						widthAttribute = widthValue;
 						defaultWidth = (double) feature.getAttribute(widthAttribute);
 					}
 					// depth
 					if (this.dType == EnShpToObjDepthType.FIX) {
+						depthAttribute = depthValue;
 						defaultDepth = (double) feature.getAttribute(depthAttribute);
 					}
 					// set tile height
-					if (maxHeight < defaultDepth) {
-						maxHeight = defaultDepth;
+					if (maxDepth < defaultDepth) {
+						maxDepth = defaultDepth;
 					}
 					List<String> idlist = buildingFeatureToObjGroup(feature);
 					for (String id : idlist) {
@@ -723,7 +760,7 @@ public class PointLayerToBoxObjImpl {
 			tileOption.put("sphere", false);
 			tileOption.put("gltfUpAxis", "Z");
 			tileOption.put("minHeight", 0);
-			tileOption.put("maxHeight", maxHeight);
+			tileOption.put("maxHeight", maxDepth);
 			tileOption.put("properties", tilesPropeties);
 
 			try (FileWriter file = new FileWriter(outputPath + File.separator + 1 + "tile.json")) {

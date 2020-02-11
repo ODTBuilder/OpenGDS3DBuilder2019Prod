@@ -936,21 +936,42 @@ public class GeoserverController extends AbstractController {
 
 		JSONObject returnJson = new JSONObject();
 		if (geom.equals("Polygon")) {
-			String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-			String heightValue = (String) jsonObject.get("depthValue");
+			String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+			String depthValue = (String) jsonObject.get("depthValue");
 			returnJson = geoserverService.geoPolygonlayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), heightType, heightValue, texture);
+					loginUser.getUsername(), depthType, depthValue, texture);
 		}
 		if (geom.equals("LineString")) {
-			String heightType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-			String heightValue = (String) jsonObject.get("depthValue");
+			String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
+			String depthValue = (String) jsonObject.get("depthValue");
 			String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default)
 			String widthValue = (String) jsonObject.get("widthValue");
 			returnJson = geoserverService.geoLinelayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
-					loginUser.getUsername(), heightType, heightValue, widthType, widthValue, texture);
+					loginUser.getUsername(), depthType, depthValue, widthType, widthValue, texture);
 		}
 		if (geom.equals("Point")) {
+			String geom3d = (String) jsonObject.get("geometry3d");
+			if (geom3d.equals("box")) {
+				String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default), 높이
+				String depthValue = (String) jsonObject.get("depthValue");
+				String heightType = (String) jsonObject.get("heightType"); // shp 컬럼명(fix) or 입력값(default), 세로
+				String heightValue = (String) jsonObject.get("heightValue");
+				String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default), 가로
+				String widthValue = (String) jsonObject.get("widthValue");
 
+				returnJson = geoserverService.geoPointlayerToBox3DTiles(dtGeoserverManager, workspace, datastore,
+						layerName, loginUser.getUsername(), depthType, depthValue, heightType, heightValue, widthType,
+						widthValue, texture);
+
+			} else if (geom3d.equals("cylinder")) {
+				String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default), 높이
+				String depthValue = (String) jsonObject.get("depthValue");
+				String radiusType = (String) jsonObject.get("radiusType"); // shp 컬럼명(fix) or 입력값(default), 세로
+				String radiusValue = (String) jsonObject.get("radiusValue");
+				
+				returnJson = geoserverService.geoPointlayerToBox3DTiles(dtGeoserverManager, workspace, datastore,
+						layerName, loginUser.getUsername(), depthType, depthValue, radiusType, radiusValue, texture);
+			}
 		}
 		return returnJson;
 	}

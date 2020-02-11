@@ -52,6 +52,9 @@ import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class PointLayerToCylinderObjImpl {
 
+	private String depthValue;
+	private String radiusValue;
+
 	private double defaultDepth = 5; // 높이
 	private double defaultRadius = 5; // 높이
 
@@ -88,14 +91,14 @@ public class PointLayerToCylinderObjImpl {
 
 	// box geom
 	public PointLayerToCylinderObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection,
-			String texture, EnShpToObjRadiusType rType, double defaultRadius, EnShpToObjDepthType dType,
-			double defaultDepth, String outputPath) {
+			String texture, EnShpToObjRadiusType rType, String radiusValue, EnShpToObjDepthType dType,
+			String depthValue, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
 		this.rType = rType;
-		this.defaultRadius = defaultRadius; // 반지름
+		this.radiusValue = radiusValue; // 반지름
 		this.dType = dType;
-		this.defaultDepth = defaultDepth; // 높이
+		this.depthValue = depthValue; // 높이
 		this.outputPath = outputPath;
 	}
 
@@ -137,6 +140,22 @@ public class PointLayerToCylinderObjImpl {
 
 	public void setRadiusAttribute(String radiusAttribute) {
 		this.radiusAttribute = radiusAttribute;
+	}
+
+	public String getDepthValue() {
+		return depthValue;
+	}
+
+	public void setDepthValue(String depthValue) {
+		this.depthValue = depthValue;
+	}
+
+	public String getRadiusValue() {
+		return radiusValue;
+	}
+
+	public void setRadiusValue(String radiusValue) {
+		this.radiusValue = radiusValue;
 	}
 
 	public EnShpToObjDepthType getdType() {
@@ -197,6 +216,7 @@ public class PointLayerToCylinderObjImpl {
 		// 높이값 설정
 		double maxHeight = 0.0;
 		if (this.dType == EnShpToObjDepthType.DEFAULT) {
+			defaultDepth = Double.parseDouble(depthValue);
 			maxHeight = defaultDepth;
 		}
 
@@ -322,10 +342,12 @@ public class PointLayerToCylinderObjImpl {
 										SimpleFeature feature = features.next();
 										// radius
 										if (this.rType == EnShpToObjRadiusType.FIX) {
+											radiusAttribute = radiusValue;
 											defaultRadius = (double) feature.getAttribute(radiusAttribute);
 										}
 										// depth
 										if (this.dType == EnShpToObjDepthType.FIX) {
+											depthAttribute = depthValue;
 											defaultDepth = (double) feature.getAttribute(depthAttribute);
 										}
 										// set tile height
@@ -475,10 +497,12 @@ public class PointLayerToCylinderObjImpl {
 												SimpleFeature feature = features.next();
 												// radius
 												if (this.rType == EnShpToObjRadiusType.FIX) {
+													radiusAttribute = radiusValue;
 													defaultRadius = (double) feature.getAttribute(radiusAttribute);
 												}
 												// depth
 												if (this.dType == EnShpToObjDepthType.FIX) {
+													depthAttribute = depthValue;
 													defaultDepth = (double) feature.getAttribute(depthAttribute);
 												}
 												// set tile height
@@ -623,10 +647,12 @@ public class PointLayerToCylinderObjImpl {
 					SimpleFeature feature = features.next();
 					// radius
 					if (this.rType == EnShpToObjRadiusType.FIX) {
+						radiusAttribute = radiusValue;
 						defaultRadius = (double) feature.getAttribute(radiusAttribute);
 					}
 					// depth
 					if (this.dType == EnShpToObjDepthType.FIX) {
+						depthAttribute = depthValue;
 						defaultDepth = (double) feature.getAttribute(depthAttribute);
 					}
 					// set tile height

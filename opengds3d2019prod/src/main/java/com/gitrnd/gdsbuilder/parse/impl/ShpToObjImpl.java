@@ -26,15 +26,13 @@ import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 public class ShpToObjImpl {
 
-	private double defaultHeight = 5;
-	private double defaultWidth = 5;
-
-	private String heightAttribute;
-	private String widthAttribute;
+	private String heightValue;
+	private String depthValue;
+	private String widthValue;
+	private String radiusValue;
 
 	private String outputPath;
 	private File file;
@@ -42,51 +40,48 @@ public class ShpToObjImpl {
 
 	private int objfilenum = 0;
 
-	EnShpToObjDepthType hType = null;
+	EnShpToObjDepthType dType = null;
+	EnShpToObjHeightType hType = null;
 	EnShpToObjWidthType wType = null;
+	EnShpToObjRadiusType rType = null;
 
 	private String mtl;
 	private String usemtl;
 	private String texture;
 
-	public int getObjfilenum() {
-		return objfilenum;
+	private boolean isBox = false;
+	private boolean isCylinder = false;
+
+	public String getHeightValue() {
+		return heightValue;
 	}
 
-	public void setObjfilenum(int objfilenum) {
-		this.objfilenum = objfilenum;
+	public void setHeightValue(String heightAttribute) {
+		this.heightValue = heightAttribute;
 	}
 
-	public double getDefaultHeight() {
-		return defaultHeight;
+	public String getDepthValue() {
+		return depthValue;
 	}
 
-	public void setDefaultHeight(double defaultHeight) {
-		this.defaultHeight = defaultHeight;
+	public void setDepthValue(String depthAttribute) {
+		this.depthValue = depthAttribute;
 	}
 
-	public double getDefaultWidth() {
-		return defaultWidth;
+	public String getWidthValue() {
+		return widthValue;
 	}
 
-	public void setDefaultWidth(double defaultWidth) {
-		this.defaultWidth = defaultWidth;
+	public void setWidthValue(String widthAttribute) {
+		this.widthValue = widthAttribute;
 	}
 
-	public String getHeightAttribute() {
-		return heightAttribute;
+	public String getRadiusValue() {
+		return radiusValue;
 	}
 
-	public void setHeightAttribute(String heightAttribute) {
-		this.heightAttribute = heightAttribute;
-	}
-
-	public String getWidthAttribute() {
-		return widthAttribute;
-	}
-
-	public void setWidthAttribute(String widthAttribute) {
-		this.widthAttribute = widthAttribute;
+	public void setRadiusValue(String radiusValue) {
+		this.radiusValue = radiusValue;
 	}
 
 	public String getOutputPath() {
@@ -105,11 +100,27 @@ public class ShpToObjImpl {
 		this.file = file;
 	}
 
-	public EnShpToObjDepthType gethType() {
+	public int getObjfilenum() {
+		return objfilenum;
+	}
+
+	public void setObjfilenum(int objfilenum) {
+		this.objfilenum = objfilenum;
+	}
+
+	public EnShpToObjDepthType getdType() {
+		return dType;
+	}
+
+	public void setdType(EnShpToObjDepthType dType) {
+		this.dType = dType;
+	}
+
+	public EnShpToObjHeightType gethType() {
 		return hType;
 	}
 
-	public void sethType(EnShpToObjDepthType hType) {
+	public void sethType(EnShpToObjHeightType hType) {
 		this.hType = hType;
 	}
 
@@ -121,35 +132,28 @@ public class ShpToObjImpl {
 		this.wType = wType;
 	}
 
+	public EnShpToObjRadiusType getrType() {
+		return rType;
+	}
+
+	public void setrType(EnShpToObjRadiusType rType) {
+		this.rType = rType;
+	}
+
 	public String getMtl() {
 		return mtl;
 	}
 
 	public void setMtl(String mtl) {
 		this.mtl = mtl;
-//		String usemtl = null;
-//		try {
-//			// 파일 객체 생성
-//			File mtlfile = new File(outputPath + File.separator + mtl);
-//			// 입력 스트림 생성
-//			FileReader filereader = new FileReader(mtlfile);
-//			// 입력 버퍼 생성
-//			BufferedReader bufReader = new BufferedReader(filereader);
-//			String line = "";
-//
-//			while ((line = bufReader.readLine()) != null) {
-//				if (line.startsWith("newmtl ")) {
-//					usemtl = line.replace("newmtl ", "");
-//				}
-//			}
-//			// .readLine()은 끝에 개행문자를 읽지 않는다.
-//			bufReader.close();
-//		} catch (FileNotFoundException e) {
-//			// TODO: handle exception
-//		} catch (IOException e) {
-//			System.out.println(e);
-//		}
-//		this.usemtl = usemtl;
+	}
+
+	public String getUsemtl() {
+		return usemtl;
+	}
+
+	public void setUsemtl(String usemtl) {
+		this.usemtl = usemtl;
 	}
 
 	public String getTexture() {
@@ -158,6 +162,22 @@ public class ShpToObjImpl {
 
 	public void setTexture(String texture) {
 		this.texture = texture;
+	}
+
+	public boolean isBox() {
+		return isBox;
+	}
+
+	public void setBox(boolean isBox) {
+		this.isBox = isBox;
+	}
+
+	public boolean isCylinder() {
+		return isCylinder;
+	}
+
+	public void setCylinder(boolean isCylinder) {
+		this.isCylinder = isCylinder;
 	}
 
 	/**
@@ -170,8 +190,6 @@ public class ShpToObjImpl {
 		DEFAULT("default"), FIX("fix"), UNKNOWN(null);
 
 		String type;
-		double defaultHeight;
-		double attributeKey;
 
 		private EnShpToObjDepthType(String type) {
 			this.type = type;
@@ -201,6 +219,7 @@ public class ShpToObjImpl {
 		public void setType(String type) {
 			this.type = type;
 		}
+
 	}
 
 	public enum EnShpToObjWidthType {
@@ -326,44 +345,30 @@ public class ShpToObjImpl {
 		String geomType = featureType.getGeometryDescriptor().getType().getBinding().getName();
 
 		if (geomType.contains("Polygon") || geomType.contains("MultiPolygon")) {
-			if (this.hType == EnShpToObjDepthType.DEFAULT) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
-						defaultHeight, outputPath);
-				polyToObj.parseToObjFile();
-				this.outputPath = polyToObj.getOutputPath();
-				this.objfilenum = polyToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjDepthType.FIX) {
-				PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.hType,
-						heightAttribute, outputPath);
-				polyToObj.parseToObjFile();
-				this.outputPath = polyToObj.getOutputPath();
-				this.objfilenum = polyToObj.getObjfilenum();
-			}
+			PolygonLayerToObjImpl polyToObj = new PolygonLayerToObjImpl(buildingCollection, texture, this.dType,
+					depthValue, outputPath);
+			polyToObj.parseToObjFile();
+			this.outputPath = polyToObj.getOutputPath();
+			this.objfilenum = polyToObj.getObjfilenum();
 		} else if (geomType.contains("LineString") || geomType.contains("MultiLineString")) {
-			if (this.hType == EnShpToObjDepthType.DEFAULT && this.wType == EnShpToObjWidthType.DEFAULT) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-						this.wType, defaultHeight, defaultWidth, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjDepthType.DEFAULT && this.wType == EnShpToObjWidthType.FIX) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-						this.wType, defaultHeight, widthAttribute, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjDepthType.FIX && this.wType == EnShpToObjWidthType.DEFAULT) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-						this.wType, heightAttribute, defaultWidth, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
-			} else if (this.hType == EnShpToObjDepthType.FIX && this.wType == EnShpToObjWidthType.FIX) {
-				LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.hType,
-						this.wType, heightAttribute, widthAttribute, outputPath);
-				lineToObj.parseToObjFile();
-				this.outputPath = lineToObj.getOutputPath();
-				this.objfilenum = lineToObj.getObjfilenum();
+			LineLayerToObjImpl lineToObj = new LineLayerToObjImpl(buildingCollection, texture, this.dType, this.wType,
+					depthValue, widthValue, outputPath);
+			lineToObj.parseToObjFile();
+			this.outputPath = lineToObj.getOutputPath();
+			this.objfilenum = lineToObj.getObjfilenum();
+		} else if (geomType.contains("Point") || geomType.contains("MultiPoint")) {
+			if (isBox) {
+				PointLayerToBoxObjImpl pointToObj = new PointLayerToBoxObjImpl(buildingCollection, texture, hType,
+						heightValue, wType, widthValue, dType, depthValue, outputPath);
+				pointToObj.parseToObjFile();
+				this.outputPath = pointToObj.getOutputPath();
+				this.objfilenum = pointToObj.getObjfilenum();
+			} else if (isCylinder) {
+				PointLayerToCylinderObjImpl pointToObj = new PointLayerToCylinderObjImpl(buildingCollection, texture,
+						rType, radiusValue, dType, depthValue, outputPath);
+				pointToObj.parseToObjFile();
+				this.outputPath = pointToObj.getOutputPath();
+				this.objfilenum = pointToObj.getObjfilenum();
 			}
 		}
 	}

@@ -86,6 +86,8 @@ import com.gitrnd.gdsbuilder.geoserver.service.en.EnLayerBboxRecalculate;
 import com.gitrnd.gdsbuilder.parse.impl.DataConvertorImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjDepthType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjRadiusType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
 import com.vividsolutions.jts.geom.Geometry;
@@ -1080,7 +1082,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layername, String wfstXml) {
+	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layername, String wfstXml) {
 		if (dtGeoManager != null) {
 			dtPublisher = dtGeoManager.getPublisher();
 		} else {
@@ -1232,13 +1235,12 @@ public class GeoserverServiceImpl implements GeoserverService {
 						}
 
 						// set height
-						if (heightType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
-							shpToObj.sethType(EnShpToObjDepthType.DEFAULT);
-							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
-						} else if (heightType.equals(EnShpToObjDepthType.FIX.getType())) {
-							shpToObj.sethType(EnShpToObjDepthType.FIX);
-							shpToObj.setHeightAttribute(heightValue);
+						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.FIX);
 						}
+						shpToObj.setHeightValue(heightValue);
 
 						try {
 							shpToObj.exec();
@@ -1325,7 +1327,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	@Override
 	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, String heightType, String heightValue, String widthType, String widthValue,
+			String layerName, String user, String depthType, String depthValue, String widthType, String widthValue,
 			String texture) throws Exception {
 
 		int puFlag = 500;
@@ -1375,22 +1377,330 @@ public class GeoserverServiceImpl implements GeoserverService {
 							shpToObj.setTexture(texture);
 						}
 
-						// set height
-						if (heightType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
-							shpToObj.sethType(EnShpToObjDepthType.DEFAULT);
-							shpToObj.setDefaultHeight(Double.parseDouble(heightValue));
-						} else if (heightType.equals(EnShpToObjDepthType.FIX.getType())) {
-							shpToObj.sethType(EnShpToObjDepthType.FIX);
-							shpToObj.setHeightAttribute(heightValue);
+						// set depth
+						if (depthType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.DEFAULT);
+						} else if (depthType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.FIX);
 						}
+						shpToObj.setDepthValue(depthValue);
 						// set width
 						if (widthType.equals(EnShpToObjWidthType.DEFAULT.getType())) {
 							shpToObj.setwType(EnShpToObjWidthType.DEFAULT);
-							shpToObj.setDefaultWidth(Double.parseDouble(heightValue));
-						} else if (heightType.equals(EnShpToObjWidthType.FIX.getType())) {
+						} else if (widthType.equals(EnShpToObjWidthType.FIX.getType())) {
 							shpToObj.setwType(EnShpToObjWidthType.FIX);
-							shpToObj.setWidthAttribute(heightValue);
 						}
+						shpToObj.setWidthValue(widthValue);
+
+						try {
+							shpToObj.exec();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						boolean combineFlag = false;
+						int objnum = shpToObj.getObjfilenum();
+						if (objnum > 1) {
+							combineFlag = true;
+						}
+
+						// obj 및 tileset option 파일 폴더 경로
+						String folderPath = shpToObj.getOutputPath();
+
+						// 파일 폴더 압축
+						String zipfile = timeStr + "_obj.zip";
+						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
+						createZipFile(folderPath, zipPath);
+
+						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
+								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
+
+						// API 요청 파라미터 생성
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더
+																													// 업로드
+																													// 경로
+
+						// body
+						JSONObject bodyJson = new JSONObject();
+
+						bodyJson.put("user", user);
+						bodyJson.put("time", timeStr);
+						bodyJson.put("file", zipfile);
+						bodyJson.put("path", path);
+						bodyJson.put("objnum", objnum);
+						bodyJson.put("combine", combineFlag);
+
+						String bodyString = bodyJson.toJSONString();
+
+						// restTemplate
+						HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+						factory.setReadTimeout(0);
+						factory.setConnectTimeout(0);
+						CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
+								.setMaxConnPerRoute(5).build();
+						factory.setHttpClient(httpClient);
+						RestTemplate restTemplate = new RestTemplate(factory);
+
+						// header
+						HttpHeaders headers = new HttpHeaders();
+						headers.setContentType(MediaType.APPLICATION_JSON);
+
+						HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
+						ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
+								String.class);
+
+						JSONParser parser = new JSONParser();
+						Object obj = parser.parse(res.getBody());
+						returnJSON = (JSONObject) obj;
+
+						logger.info(returnJSON.toString());
+
+						puFlag = 200;
+						// 다 처리하고 zip 삭제
+						File zipFile = new File(zipPath);
+						if (zipFile.exists()) {
+							zipFile.delete();
+						}
+						// shp 삭제
+						deleteDirectory(shpPath);
+					} else {
+						logger.warn("다운로드 실패");
+					}
+				} else {
+					logger.warn("레이어가 존재하지 않습니다.");
+				}
+			}
+		}
+		return returnJSON;
+
+	}
+
+	@Override
+	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layerName, String user, String depthType, String depthValue, String heightType, String heightValue,
+			String widthType, String widthValue, String texture) throws ParseException {
+
+		int puFlag = 500;
+		JSONObject returnJSON = new JSONObject();
+		if (dtGeoManager != null && workspace != null && datastore != null) {
+			if (layerName == null) {
+				logger.warn("레이어명 null");
+				puFlag = 610;
+			} else {
+				String serverURL = dtGeoManager.getRestURL();
+				dtReader = dtGeoManager.getReader();
+				dtPublisher = dtGeoManager.getPublisher();
+
+				boolean wsFlag = false;
+				boolean dsFlag = false;
+
+				wsFlag = dtReader.existsWorkspace(workspace);
+				dsFlag = dtReader.existsDatastore(workspace, datastore);
+				if (wsFlag && dsFlag) {
+					SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
+					Date time = new Date();
+					String timeStr = format.format(time);
+					String basePath = basedrive + ":" + File.separator + basedir + File.separator + user
+							+ File.separator + "upload" + File.separator + timeStr;
+
+					// shp 경로
+					String shpPath = basePath + File.separator + "shp";
+					createFileDirectory(shpPath);
+
+					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
+							.export();
+					if (downReNum == 200) {
+						// shp 파일 경로
+						File buildingFile = new File(shpPath);
+						Filter filter = Filter.INCLUDE;
+
+						// obj 경로
+						String objPath = basePath + File.separator + "obj";
+						createFileDirectory(objPath);
+
+						// shp to obj
+						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
+						shpToObj.setBox(true);
+
+						if (!texture.equals("notset")) {
+							// copy mtl, texture image to obj path
+							String mtl = texture + ".mtl";
+							shpToObj.setMtl(mtl);
+							shpToObj.setTexture(texture);
+						}
+						// set depth
+						if (depthType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.DEFAULT);
+						} else if (depthType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.FIX);
+						}
+						shpToObj.setDepthValue(depthValue);
+						// set height
+						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
+						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
+							shpToObj.sethType(EnShpToObjHeightType.FIX);
+						}
+						shpToObj.setHeightValue(heightValue);
+						// set width
+						if (widthType.equals(EnShpToObjWidthType.DEFAULT.getType())) {
+							shpToObj.setwType(EnShpToObjWidthType.DEFAULT);
+						} else if (widthType.equals(EnShpToObjWidthType.FIX.getType())) {
+							shpToObj.setwType(EnShpToObjWidthType.FIX);
+						}
+						shpToObj.setWidthValue(widthValue);
+
+						try {
+							shpToObj.exec();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						boolean combineFlag = false;
+						int objnum = shpToObj.getObjfilenum();
+						if (objnum > 1) {
+							combineFlag = true;
+						}
+
+						// obj 및 tileset option 파일 폴더 경로
+						String folderPath = shpToObj.getOutputPath();
+
+						// 파일 폴더 압축
+						String zipfile = timeStr + "_obj.zip";
+						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
+						createZipFile(folderPath, zipPath);
+
+						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
+								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
+
+						// API 요청 파라미터 생성
+						String nodeURL = protocol + "://" + nodeHost + ":" + nodePort + "/convert/objTo3dtiles"; // 압축폴더
+																													// 업로드
+																													// 경로
+
+						// body
+						JSONObject bodyJson = new JSONObject();
+
+						bodyJson.put("user", user);
+						bodyJson.put("time", timeStr);
+						bodyJson.put("file", zipfile);
+						bodyJson.put("path", path);
+						bodyJson.put("objnum", objnum);
+						bodyJson.put("combine", combineFlag);
+
+						String bodyString = bodyJson.toJSONString();
+
+						// restTemplate
+						HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+						factory.setReadTimeout(0);
+						factory.setConnectTimeout(0);
+						CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(100)
+								.setMaxConnPerRoute(5).build();
+						factory.setHttpClient(httpClient);
+						RestTemplate restTemplate = new RestTemplate(factory);
+
+						// header
+						HttpHeaders headers = new HttpHeaders();
+						headers.setContentType(MediaType.APPLICATION_JSON);
+
+						HttpEntity<String> requestEntity = new HttpEntity<>(bodyString, headers);
+						ResponseEntity<String> res = restTemplate.exchange(nodeURL, HttpMethod.POST, requestEntity,
+								String.class);
+
+						JSONParser parser = new JSONParser();
+						Object obj = parser.parse(res.getBody());
+						returnJSON = (JSONObject) obj;
+
+						logger.info(returnJSON.toString());
+
+						puFlag = 200;
+						// 다 처리하고 zip 삭제
+						File zipFile = new File(zipPath);
+						if (zipFile.exists()) {
+							zipFile.delete();
+						}
+						// shp 삭제
+						deleteDirectory(shpPath);
+					} else {
+						logger.warn("다운로드 실패");
+					}
+				} else {
+					logger.warn("레이어가 존재하지 않습니다.");
+				}
+			}
+		}
+		return returnJSON;
+	}
+
+	@Override
+	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layerName, String user, String depthType, String depthValue, String radiusType, String radiusValue,
+			String texture) throws ParseException {
+
+		int puFlag = 500;
+		JSONObject returnJSON = new JSONObject();
+		if (dtGeoManager != null && workspace != null && datastore != null) {
+			if (layerName == null) {
+				logger.warn("레이어명 null");
+				puFlag = 610;
+			} else {
+				String serverURL = dtGeoManager.getRestURL();
+				dtReader = dtGeoManager.getReader();
+				dtPublisher = dtGeoManager.getPublisher();
+
+				boolean wsFlag = false;
+				boolean dsFlag = false;
+
+				wsFlag = dtReader.existsWorkspace(workspace);
+				dsFlag = dtReader.existsDatastore(workspace, datastore);
+				if (wsFlag && dsFlag) {
+					SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmss");
+					Date time = new Date();
+					String timeStr = format.format(time);
+					String basePath = basedrive + ":" + File.separator + basedir + File.separator + user
+							+ File.separator + "upload" + File.separator + timeStr;
+
+					// shp 경로
+					String shpPath = basePath + File.separator + "shp";
+					createFileDirectory(shpPath);
+
+					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
+							.export();
+					if (downReNum == 200) {
+						// shp 파일 경로
+						File buildingFile = new File(shpPath);
+						Filter filter = Filter.INCLUDE;
+
+						// obj 경로
+						String objPath = basePath + File.separator + "obj";
+						createFileDirectory(objPath);
+
+						// shp to obj
+						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
+						shpToObj.setCylinder(true);
+
+						if (!texture.equals("notset")) {
+							// copy mtl, texture image to obj path
+							String mtl = texture + ".mtl";
+							shpToObj.setMtl(mtl);
+							shpToObj.setTexture(texture);
+						}
+						// set depth
+						if (depthType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.DEFAULT);
+						} else if (depthType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.FIX);
+						}
+						shpToObj.setDepthValue(depthValue);
+						// set radius
+						if (radiusType.equals(EnShpToObjRadiusType.DEFAULT.getType())) {
+							shpToObj.setrType(EnShpToObjRadiusType.DEFAULT);
+						} else if (radiusType.equals(EnShpToObjRadiusType.FIX.getType())) {
+							shpToObj.setrType(EnShpToObjRadiusType.FIX);
+						}
+						shpToObj.setRadiusValue(radiusValue);
 
 						try {
 							shpToObj.exec();

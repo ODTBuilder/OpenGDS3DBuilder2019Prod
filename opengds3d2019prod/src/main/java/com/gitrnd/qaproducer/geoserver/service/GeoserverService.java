@@ -307,7 +307,8 @@ public interface GeoserverService {
 	 * @param wfstXml
 	 * @return String
 	 */
-	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String datastore, String layername, String wfstXml);
+	public String requestWFSTransaction(DTGeoserverManager dtGeoManager, String workspace, String datastore,
+			String layername, String wfstXml);
 
 	/**
 	 * sld 조회
@@ -374,4 +375,13 @@ public interface GeoserverService {
 	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
 			String layerName, String username, String heightType, String heightValue, String widthType,
 			String widthValue, String texture) throws Exception;
+
+	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
+			String datastore, String layerName, String username, String depthType, String depthValue, String heightType,
+			String heightValue, String widthType, String widthValue, String texture) throws ParseException;
+
+	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
+			String datastore, String layerName, String username, String depthType, String depthValue, String radiusType,
+			String radiusValue, String texture) throws ParseException;
+
 }

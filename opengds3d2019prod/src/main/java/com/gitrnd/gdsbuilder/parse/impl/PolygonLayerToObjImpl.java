@@ -54,7 +54,10 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class PolygonLayerToObjImpl {
 
-	private double defaultHeight = 5;
+	private double defaultDepth = 5;
+	private String depthAttribute;
+	private String depthValue;
+
 	private static BufferedWriter writer;
 
 	private static double centerX;
@@ -63,7 +66,6 @@ public class PolygonLayerToObjImpl {
 	private static List<Vector3d> vertices;
 	private static List<Vector2d> vCoordinates;
 
-	private String attribute;
 	private String outputPath;
 
 	private int vIdx;
@@ -72,7 +74,7 @@ public class PolygonLayerToObjImpl {
 
 	private int objfilenum = 0;
 
-	private EnShpToObjDepthType hType;
+	private EnShpToObjDepthType dType;
 
 	private FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection;
 	private String mtl;
@@ -80,20 +82,11 @@ public class PolygonLayerToObjImpl {
 	private String texture;
 
 	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, double defaultHeight, String outputPath) {
+			EnShpToObjDepthType dType, String depthValue, String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
-		this.hType = hType;
-		this.defaultHeight = defaultHeight;
-		this.outputPath = outputPath;
-	}
-
-	public PolygonLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, String attribute, String outputPath) {
-		this.buildingCollection = buildingCollection;
-		this.texture = texture;
-		this.hType = hType;
-		this.attribute = attribute;
+		this.dType = dType;
+		this.depthValue = depthValue;
 		this.outputPath = outputPath;
 	}
 
@@ -105,20 +98,20 @@ public class PolygonLayerToObjImpl {
 		this.objfilenum = objfilenum;
 	}
 
-	public double getDefaultHeight() {
-		return defaultHeight;
+	public double getDefaultDepth() {
+		return defaultDepth;
 	}
 
-	public void setDefaultHeight(double defaultHeight) {
-		this.defaultHeight = defaultHeight;
+	public void setDefaultDepth(double defaultDepth) {
+		this.defaultDepth = defaultDepth;
 	}
 
 	public String getAttribute() {
-		return attribute;
+		return depthAttribute;
 	}
 
 	public void setAttribute(String attribute) {
-		this.attribute = attribute;
+		this.depthAttribute = attribute;
 	}
 
 	public String getOutputPath() {
@@ -129,12 +122,12 @@ public class PolygonLayerToObjImpl {
 		this.outputPath = outputPath;
 	}
 
-	public EnShpToObjDepthType gethType() {
-		return hType;
+	public EnShpToObjDepthType getdType() {
+		return dType;
 	}
 
-	public void sethType(EnShpToObjDepthType hType) {
-		this.hType = hType;
+	public void setdType(EnShpToObjDepthType hType) {
+		this.dType = hType;
 	}
 
 	public String getMtl() {
@@ -171,9 +164,9 @@ public class PolygonLayerToObjImpl {
 		// 높이값 설정
 		double height = 0.0;
 		double maxHeight = 0.0;
-		if (this.hType == EnShpToObjDepthType.DEFAULT) {
-			height = defaultHeight;
-			maxHeight = defaultHeight;
+		if (this.dType == EnShpToObjDepthType.DEFAULT) {
+			defaultDepth = Double.valueOf(depthValue);
+			maxHeight = defaultDepth;
 		}
 
 		// 대용량 처리
@@ -297,11 +290,12 @@ public class PolygonLayerToObjImpl {
 									FeatureIterator<SimpleFeature> features = dfc.features();
 									while (features.hasNext()) {
 										SimpleFeature feature = features.next();
-										if (this.hType == EnShpToObjDepthType.FIX) {
+										if (this.dType == EnShpToObjDepthType.FIX) {
+											depthAttribute = depthValue;
 											try {
-												height = (double) feature.getAttribute(attribute);
+												height = (double) feature.getAttribute(depthAttribute);
 											} catch (Exception e) {
-												height = defaultHeight;
+												height = defaultDepth;
 											}
 										}
 										if (height > maxHeight) {
@@ -449,11 +443,12 @@ public class PolygonLayerToObjImpl {
 											FeatureIterator<SimpleFeature> features = tfc.features();
 											while (features.hasNext()) {
 												SimpleFeature feature = features.next();
-												if (this.hType == EnShpToObjDepthType.FIX) {
+												if (this.dType == EnShpToObjDepthType.FIX) {
+													depthAttribute = depthValue;
 													try {
-														height = (double) feature.getAttribute(attribute);
+														height = (double) feature.getAttribute(depthAttribute);
 													} catch (Exception e) {
-														height = defaultHeight;
+														height = defaultDepth;
 													}
 												}
 												if (height > maxHeight) {
@@ -591,11 +586,12 @@ public class PolygonLayerToObjImpl {
 				FeatureIterator<SimpleFeature> features = buildingCollection.features();
 				while (features.hasNext()) {
 					SimpleFeature feature = features.next();
-					if (this.hType == EnShpToObjDepthType.FIX) {
+					if (this.dType == EnShpToObjDepthType.FIX) {
+						depthAttribute = depthValue;
 						try {
-							height = (double) feature.getAttribute(attribute);
+							height = (double) feature.getAttribute(depthAttribute);
 						} catch (Exception e) {
-							height = defaultHeight;
+							height = defaultDepth;
 						}
 					}
 					if (height > maxHeight) {

@@ -61,14 +61,17 @@ public class LineLayerToObjImpl {
 
 	private String outputPath;
 
-	private EnShpToObjDepthType hType;
+	private EnShpToObjDepthType dType;
 	private EnShpToObjWidthType wType;
 
-	private double defaultHeight = 5;
+	private double defaultDepth = 5;
 	private double defaultWidth = 5;
 
-	private String heightAttribute;
+	private String depthAttribute;
 	private String widthAttribute;
+
+	private String depthValue;
+	private String widthValue;
 
 	private static BufferedWriter writer;
 
@@ -119,12 +122,12 @@ public class LineLayerToObjImpl {
 		this.outputPath = outputPath;
 	}
 
-	public EnShpToObjDepthType gethType() {
-		return hType;
+	public EnShpToObjDepthType getdType() {
+		return dType;
 	}
 
-	public void sethType(EnShpToObjDepthType hType) {
-		this.hType = hType;
+	public void setdType(EnShpToObjDepthType dType) {
+		this.dType = dType;
 	}
 
 	public EnShpToObjWidthType getwType() {
@@ -135,12 +138,12 @@ public class LineLayerToObjImpl {
 		this.wType = wType;
 	}
 
-	public double getDefaultHeight() {
-		return defaultHeight;
+	public double getDefaultDepth() {
+		return defaultDepth;
 	}
 
-	public void setDefaultHeight(double defaultHeight) {
-		this.defaultHeight = defaultHeight;
+	public void setDefaultDepth(double defaultDepth) {
+		this.defaultDepth = defaultDepth;
 	}
 
 	public double getDefaultWidth() {
@@ -149,6 +152,38 @@ public class LineLayerToObjImpl {
 
 	public void setDefaultWidth(double defaultWidth) {
 		this.defaultWidth = defaultWidth;
+	}
+
+	public String getDepthAttribute() {
+		return depthAttribute;
+	}
+
+	public void setDepthAttribute(String depthAttribute) {
+		this.depthAttribute = depthAttribute;
+	}
+
+	public String getWidthAttribute() {
+		return widthAttribute;
+	}
+
+	public void setWidthAttribute(String widthAttribute) {
+		this.widthAttribute = widthAttribute;
+	}
+
+	public String getDepthValue() {
+		return depthValue;
+	}
+
+	public void setDepthValue(String depthValue) {
+		this.depthValue = depthValue;
+	}
+
+	public String getWidthValue() {
+		return widthValue;
+	}
+
+	public void setWidthValue(String widthValue) {
+		this.widthValue = widthValue;
 	}
 
 	public static BufferedWriter getWriter() {
@@ -168,42 +203,12 @@ public class LineLayerToObjImpl {
 	}
 
 	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, EnShpToObjWidthType wType, double defaultHeight, double defaultWidth,
+			EnShpToObjDepthType dType, EnShpToObjWidthType wType, String depthValue, String widthValue,
 			String outputPath) {
 		this.buildingCollection = buildingCollection;
 		this.texture = texture;
-		this.defaultHeight = defaultHeight;
-		this.defaultWidth = defaultWidth;
-		this.outputPath = outputPath;
-	}
-
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, EnShpToObjWidthType wType, double defaultHeight, String widthAttribute,
-			String outputPath) {
-		this.buildingCollection = buildingCollection;
-		this.texture = texture;
-		this.defaultHeight = defaultHeight;
-		this.widthAttribute = widthAttribute;
-		this.outputPath = outputPath;
-	}
-
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, EnShpToObjWidthType wType, String heightAttribute, double defaultWidth,
-			String outputPath) {
-		this.buildingCollection = buildingCollection;
-		this.texture = texture;
-		this.heightAttribute = heightAttribute;
-		this.defaultWidth = defaultWidth;
-		this.outputPath = outputPath;
-	}
-
-	public LineLayerToObjImpl(FeatureCollection<SimpleFeatureType, SimpleFeature> buildingCollection, String texture,
-			EnShpToObjDepthType hType, EnShpToObjWidthType wType, String heightAttribute, String widthAttribute,
-			String outputPath) {
-		this.buildingCollection = buildingCollection;
-		this.texture = texture;
-		this.heightAttribute = heightAttribute;
-		this.widthAttribute = widthAttribute;
+		this.depthValue = depthValue;
+		this.widthValue = widthValue;
 		this.outputPath = outputPath;
 	}
 
@@ -216,8 +221,12 @@ public class LineLayerToObjImpl {
 
 		// 높이값 설정
 		double maxHeight = 0.0;
-		if (this.hType == EnShpToObjDepthType.DEFAULT) {
-			maxHeight = defaultHeight;
+		if (this.dType == EnShpToObjDepthType.DEFAULT) {
+			defaultDepth = Double.valueOf(depthValue);
+			maxHeight = defaultDepth;
+		}
+		if (this.wType == EnShpToObjWidthType.DEFAULT) {
+			defaultWidth = Double.valueOf(widthValue);
 		}
 
 		// 대용량 처리
@@ -342,18 +351,19 @@ public class LineLayerToObjImpl {
 										SimpleFeature feature = features.next();
 										// widht
 										if (this.wType == EnShpToObjWidthType.FIX) {
+											widthAttribute = widthValue;
 											defaultWidth = (double) feature.getAttribute(widthAttribute);
 										}
 										// height
-										if (this.hType == EnShpToObjDepthType.FIX) {
-											defaultHeight = (double) feature.getAttribute(heightAttribute);
+										if (this.dType == EnShpToObjDepthType.FIX) {
+											depthAttribute = depthValue;
+											defaultDepth = (double) feature.getAttribute(depthAttribute);
 										}
 										// set tile height
-										if (maxHeight < defaultHeight) {
-											maxHeight = defaultHeight;
+										if (maxHeight < defaultDepth) {
+											maxHeight = defaultDepth;
 										}
-										List<String> idlist = buildingFeatureToObjGroup(feature, defaultWidth,
-												defaultHeight);
+										List<String> idlist = buildingFeatureToObjGroup(feature);
 										for (String id : idlist) {
 											// featureId
 											batchIdArr.add(id);
@@ -496,18 +506,19 @@ public class LineLayerToObjImpl {
 												SimpleFeature feature = features.next();
 												// widht
 												if (this.wType == EnShpToObjWidthType.FIX) {
+													widthAttribute = widthValue;
 													defaultWidth = (double) feature.getAttribute(widthAttribute);
 												}
 												// height
-												if (this.hType == EnShpToObjDepthType.FIX) {
-													defaultHeight = (double) feature.getAttribute(heightAttribute);
+												if (this.dType == EnShpToObjDepthType.FIX) {
+													depthAttribute = depthValue;
+													defaultDepth = (double) feature.getAttribute(depthAttribute);
 												}
 												// set tile height
-												if (maxHeight < defaultHeight) {
-													maxHeight = defaultHeight;
+												if (maxHeight < defaultDepth) {
+													maxHeight = defaultDepth;
 												}
-												List<String> idlist = buildingFeatureToObjGroup(feature, defaultWidth,
-														defaultHeight);
+												List<String> idlist = buildingFeatureToObjGroup(feature);
 												for (String id : idlist) {
 													// featureId
 													batchIdArr.add(id);
@@ -645,17 +656,19 @@ public class LineLayerToObjImpl {
 					SimpleFeature feature = features.next();
 					// widht
 					if (this.wType == EnShpToObjWidthType.FIX) {
+						widthAttribute = widthValue;
 						defaultWidth = (double) feature.getAttribute(widthAttribute);
 					}
 					// height
-					if (this.hType == EnShpToObjDepthType.FIX) {
-						defaultHeight = (double) feature.getAttribute(heightAttribute);
+					if (this.dType == EnShpToObjDepthType.FIX) {
+						depthAttribute = depthValue;
+						defaultDepth = (double) feature.getAttribute(depthAttribute);
 					}
 					// set tile height
-					if (maxHeight < defaultHeight) {
-						maxHeight = defaultHeight;
+					if (maxHeight < defaultDepth) {
+						maxHeight = defaultDepth;
 					}
-					List<String> idlist = buildingFeatureToObjGroup(feature, defaultWidth, defaultHeight);
+					List<String> idlist = buildingFeatureToObjGroup(feature);
 					for (String id : idlist) {
 						// featureId
 						batchIdArr.add(id);
@@ -715,7 +728,7 @@ public class LineLayerToObjImpl {
 
 	GeometryFactory gf = new GeometryFactory();
 
-	private List<String> buildingFeatureToObjGroup(SimpleFeature feature, double defaultWidth, double defaultHeight)
+	private List<String> buildingFeatureToObjGroup(SimpleFeature feature)
 			throws FactoryException, TransformException, IOException {
 
 		List<String> idList = new ArrayList<>();
@@ -774,9 +787,9 @@ public class LineLayerToObjImpl {
 				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, 0));
 				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + 0 + "\n");
 
-				allCoordinates.add(new Coordinate(lineCoors[c].x, lineCoors[c].y, defaultHeight));
-				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, defaultHeight));
-				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + defaultHeight + "\n");
+				allCoordinates.add(new Coordinate(lineCoors[c].x, lineCoors[c].y, defaultDepth));
+				vector3dList.add(new Vector3d(lineCoors[c].x, lineCoors[c].y, defaultDepth));
+				vBuilder.append("v " + lineCoors[c].x + " " + lineCoors[c].y + " " + defaultDepth + "\n");
 			}
 			// arc face idx
 			List<Integer> arcBottomFaceIdxs = new ArrayList<>(); // 첫점, 마지막점, 중간 부채꼴 밑면 face idx
@@ -915,10 +928,10 @@ public class LineLayerToObjImpl {
 							vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + 0 + "\n");
 							vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, 0));
 
-							allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
+							allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
 							vBuilder.append(
-									"v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultHeight + "\n");
-							vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
+									"v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultDepth + "\n");
+							vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
 						}
 						// 부채꼴 face 생성
 						// 첫점 부채꼴 밑면, 윗면
@@ -977,10 +990,10 @@ public class LineLayerToObjImpl {
 							vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + 0 + "\n");
 							vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, 0));
 							// 부채꼴 윗면 vertex add
-							allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
+							allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
 							vBuilder.append(
-									"v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultHeight + "\n");
-							vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
+									"v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultDepth + "\n");
+							vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
 						}
 						// 마지막점 부채꼴 밑면, 윗면
 						int lineLasBottomIdx = vSize + allCoordinates.indexOf(lineThrCoor);
@@ -1029,37 +1042,37 @@ public class LineLayerToObjImpl {
 							allCoordinates.add(firTopCoor1);
 							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+							allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(intersectionCoor.x, intersectionCoor.y));
 							allCoordinates.add(intersectionCoor);
 							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, 0));
 							vBuilder.append("v " + intersectionCoor.x + " " + intersectionCoor.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultHeight));
-							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultHeight));
+							allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultDepth));
+							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultDepth));
 							vBuilder.append(
-									"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultHeight + "\n");
+									"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultDepth + "\n");
 
 							// line 1 bottom
 							vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 							allCoordinates.add(firBottomCoor1);
 							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 							vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
+							allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
 							vBuilder.append(
-									"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+									"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(secBottomCoor1.x, secBottomCoor1.y));
 							allCoordinates.add(secBottomCoor1);
 							vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, 0));
 							vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
+							allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
 							vBuilder.append(
-									"v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultHeight + "\n");
+									"v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultDepth + "\n");
 
 							// 꺾인부분 부채꼴
 							double angleCenter = Angle.angle(lineSecCoor, secBottomCoor1);
@@ -1087,11 +1100,11 @@ public class LineLayerToObjImpl {
 								vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, 0));
 								// 윗면 vertex add
 								allCoordinates
-										.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+										.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 								vBuilder.append("v " + arcCenterCoors[ac].x + " " + arcCenterCoors[ac].y + " "
-										+ defaultHeight + "\n");
+										+ defaultDepth + "\n");
 								vector3dList
-										.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+										.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 							}
 							// face
 							int lineSecBottomIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -1232,29 +1245,28 @@ public class LineLayerToObjImpl {
 								allCoordinates.add(secTopCoor2);
 								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vBuilder.append(
-										"v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 								// line 2 bottom
 								vector2dList.add(new Vector2d(firBottomCoor2.x, firBottomCoor2.y));
 								allCoordinates.add(firBottomCoor2);
 								vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, 0));
 								vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
+								allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
 								vBuilder.append(
-										"v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultHeight + "\n");
+										"v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultDepth + "\n");
 
 								vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 								allCoordinates.add(secBottomCoor2);
 								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 								vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
+								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
 								vBuilder.append(
-										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 								// line 2 top line 밑면, 윗면
 								int top2FirIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -1409,11 +1421,11 @@ public class LineLayerToObjImpl {
 								vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, 0));
 								// 윗면 vertex add
 								allCoordinates
-										.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+										.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 								vBuilder.append("v " + arcCenterCoors[ac].x + " " + arcCenterCoors[ac].y + " "
-										+ defaultHeight + "\n");
+										+ defaultDepth + "\n");
 								vector3dList
-										.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+										.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 							}
 							// face
 							int lineSecBottomIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -1454,36 +1466,36 @@ public class LineLayerToObjImpl {
 							allCoordinates.add(firTopCoor1);
 							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+							allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+							vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(secTopCoor1.x, secTopCoor1.y));
 							allCoordinates.add(secTopCoor1);
 							vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, 0));
 							vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-							vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultHeight + "\n");
+							allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+							vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultDepth + "\n");
 
 							// line 1 bottom
 							vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 							allCoordinates.add(firBottomCoor1);
 							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 							vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
+							allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+							vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
 							vBuilder.append(
-									"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+									"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(intersectionCoor.x, intersectionCoor.y));
 							allCoordinates.add(intersectionCoor);
 							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, 0));
 							vBuilder.append("v " + intersectionCoor.x + " " + intersectionCoor.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultHeight));
-							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultHeight));
+							allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultDepth));
+							vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultDepth));
 							vBuilder.append(
-									"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultHeight + "\n");
+									"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultDepth + "\n");
 
 							// line 1 top line 밑면, 윗면
 							int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
@@ -1589,29 +1601,27 @@ public class LineLayerToObjImpl {
 								allCoordinates.add(firTopCoor2);
 								vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, 0));
 								vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-								vBuilder.append(
-										"v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultHeight + "\n");
+								allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+								vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultDepth + "\n");
 
 								vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 								allCoordinates.add(secTopCoor2);
 								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vBuilder.append(
-										"v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 								// line 2 bottom
 								vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 								allCoordinates.add(secBottomCoor2);
 								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 								vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
+								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
 								vBuilder.append(
-										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 								// line 2 top line 밑면, 윗면
 								int top2FirIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -1745,40 +1755,38 @@ public class LineLayerToObjImpl {
 								allCoordinates.add(firTopCoor1);
 								vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 								vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-								vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-								vBuilder.append(
-										"v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+								allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+								vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+								vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 								// line 2 top
 								vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 								allCoordinates.add(secTopCoor2);
 								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-								vBuilder.append(
-										"v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+								allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+								vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 								// line 1 bottom
 								vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 								allCoordinates.add(firBottomCoor1);
 								vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 								vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-								vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
+								allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+								vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
 								vBuilder.append(
-										"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+										"v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 								// line 2 bottom
 								vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 								allCoordinates.add(secBottomCoor2);
 								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 								vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
+								allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+								vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
 								vBuilder.append(
-										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+										"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 								// line 1 top line 밑면, 윗면
 								int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
@@ -1912,34 +1920,34 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(firTopCoor1);
 						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secTopCoor1.x, secTopCoor1.y));
 						allCoordinates.add(secTopCoor1);
 						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, 0));
 						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultDepth + "\n");
 
 						// line 1 bottom
 						vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 						allCoordinates.add(firBottomCoor1);
 						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secBottomCoor1.x, secBottomCoor1.y));
 						allCoordinates.add(secBottomCoor1);
 						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, 0));
 						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultDepth + "\n");
 
 						// line 1 top line 밑면, 윗면
 						int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
@@ -2046,36 +2054,36 @@ public class LineLayerToObjImpl {
 							allCoordinates.add(firTopCoor2);
 							vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, 0));
 							vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-							vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-							vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultHeight + "\n");
+							allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+							vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+							vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 							allCoordinates.add(secTopCoor2);
 							vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 							vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-							vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-							vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+							allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+							vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+							vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 							// line 2 bottom
 							vector2dList.add(new Vector2d(firBottomCoor2.x, firBottomCoor2.y));
 							allCoordinates.add(firBottomCoor2);
 							vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, 0));
 							vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-							vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
+							allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+							vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
 							vBuilder.append(
-									"v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultHeight + "\n");
+									"v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultDepth + "\n");
 
 							vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 							allCoordinates.add(secBottomCoor2);
 							vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 							vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-							allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-							vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
+							allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+							vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
 							vBuilder.append(
-									"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+									"v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 							// line 2 top line 밑면, 윗면
 							int top2FirIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -2215,17 +2223,17 @@ public class LineLayerToObjImpl {
 				allCoordinates.add(firTopCoor1);
 				vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 				vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-				allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-				vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-				vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+				allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+				vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+				vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 				vector2dList.add(new Vector2d(secTopCoor1.x, secTopCoor1.y));
 				allCoordinates.add(secTopCoor1);
 				vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, 0));
 				vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + 0 + "\n");
-				allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-				vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-				vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultHeight + "\n");
+				allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+				vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+				vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultDepth + "\n");
 
 				double ux1Bottom = -1 * defaultWidth * dx1 / len1;
 				double uy1Bottom = -1 * defaultWidth * dy1 / len1;
@@ -2238,17 +2246,17 @@ public class LineLayerToObjImpl {
 				allCoordinates.add(firBottomCoor1);
 				vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 				vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-				allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-				vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-				vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+				allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+				vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+				vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 				vector2dList.add(new Vector2d(secBottomCoor1.x, secBottomCoor1.y));
 				allCoordinates.add(secBottomCoor1);
 				vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, 0));
 				vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + 0 + "\n");
-				allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-				vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-				vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultHeight + "\n");
+				allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+				vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+				vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultDepth + "\n");
 
 				double angle1 = Angle.angle(lineFirCoor, firTopCoor1);
 				GeometricShapeFactory f1 = new GeometricShapeFactory();
@@ -2271,9 +2279,9 @@ public class LineLayerToObjImpl {
 					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + 0 + "\n");
 					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, 0));
 					// 부채꼴 윗면 vertex add
-					allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
-					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultHeight + "\n");
-					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
+					allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
+					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultDepth + "\n");
+					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
 				}
 
 				double angle2 = Angle.angle(lineSecCoor, secBottomCoor1);
@@ -2297,9 +2305,9 @@ public class LineLayerToObjImpl {
 					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + 0 + "\n");
 					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, 0));
 					// 부채꼴 윗면 vertex add
-					allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
-					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultHeight + "\n");
-					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
+					allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
+					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultDepth + "\n");
+					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
 				}
 
 				// 부채꼴 face 생성
@@ -2523,9 +2531,9 @@ public class LineLayerToObjImpl {
 					allCoordinates.add(firArcCoors[ac]);
 					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + 0 + "\n");
 					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, 0));
-					allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
-					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultHeight + "\n");
-					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultHeight));
+					allCoordinates.add(new Coordinate(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
+					vBuilder.append("v " + firArcCoors[ac].x + " " + firArcCoors[ac].y + " " + defaultDepth + "\n");
+					vector3dList.add(new Vector3d(firArcCoors[ac].x, firArcCoors[ac].y, defaultDepth));
 				}
 
 				// center line 2
@@ -2581,9 +2589,9 @@ public class LineLayerToObjImpl {
 					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + 0 + "\n");
 					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, 0));
 					// 부채꼴 윗면 vertex add
-					allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
-					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultHeight + "\n");
-					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultHeight));
+					allCoordinates.add(new Coordinate(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
+					vBuilder.append("v " + lasArcCoors[ac].x + " " + lasArcCoors[ac].y + " " + defaultDepth + "\n");
+					vector3dList.add(new Vector3d(lasArcCoors[ac].x, lasArcCoors[ac].y, defaultDepth));
 				}
 				// 부채꼴 face 생성
 				// 첫점 부채꼴 밑면, 윗면
@@ -2665,35 +2673,35 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(firTopCoor1);
 						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(intersectionCoor.x, intersectionCoor.y));
 						allCoordinates.add(intersectionCoor);
 						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, 0));
 						vBuilder.append("v " + intersectionCoor.x + " " + intersectionCoor.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultHeight));
-						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultHeight));
+						allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultDepth));
+						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultDepth));
 						vBuilder.append(
-								"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultHeight + "\n");
+								"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultDepth + "\n");
 
 						// line 1 bottom
 						vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 						allCoordinates.add(firBottomCoor1);
 						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secBottomCoor1.x, secBottomCoor1.y));
 						allCoordinates.add(secBottomCoor1);
 						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, 0));
 						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultDepth + "\n");
 
 						// line 2 top
 						// line 2 firTopCoor2는 intersection, line 1 secTopCoor1로 추가함
@@ -2701,26 +2709,26 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(secTopCoor2);
 						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 						// line 2 bottom
 						vector2dList.add(new Vector2d(firBottomCoor2.x, firBottomCoor2.y));
 						allCoordinates.add(firBottomCoor2);
 						vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, 0));
 						vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-						vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+						vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 						allCoordinates.add(secBottomCoor2);
 						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 						// 꺾인부분 부채꼴
 						double angleCenter = Angle.angle(lineSecCoor, secBottomCoor1);
@@ -2747,10 +2755,10 @@ public class LineLayerToObjImpl {
 							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, 0));
 							// 윗면 vertex add
 							allCoordinates
-									.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+									.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 							vBuilder.append("v " + arcCenterCoors[ac].x + " " + arcCenterCoors[ac].y + " "
-									+ defaultHeight + "\n");
-							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+									+ defaultDepth + "\n");
+							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 						}
 						// face
 						int lineSecBottomIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -3010,10 +3018,10 @@ public class LineLayerToObjImpl {
 							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, 0));
 							// 윗면 vertex add
 							allCoordinates
-									.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+									.add(new Coordinate(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 							vBuilder.append("v " + arcCenterCoors[ac].x + " " + arcCenterCoors[ac].y + " "
-									+ defaultHeight + "\n");
-							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultHeight));
+									+ defaultDepth + "\n");
+							vector3dList.add(new Vector3d(arcCenterCoors[ac].x, arcCenterCoors[ac].y, defaultDepth));
 						}
 						// face
 						int lineSecBottomIdx = vSize + allCoordinates.indexOf(lineSecCoor);
@@ -3057,52 +3065,52 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(firTopCoor1);
 						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secTopCoor1.x, secTopCoor1.y));
 						allCoordinates.add(secTopCoor1);
 						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, 0));
 						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultDepth + "\n");
 
 						// line 1 bottom
 						vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 						allCoordinates.add(firBottomCoor1);
 						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(intersectionCoor.x, intersectionCoor.y));
 						allCoordinates.add(intersectionCoor);
 						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, 0));
 						vBuilder.append("v " + intersectionCoor.x + " " + intersectionCoor.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultHeight));
-						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultHeight));
+						allCoordinates.add(new Coordinate(intersectionCoor.x, intersectionCoor.y, defaultDepth));
+						vector3dList.add(new Vector3d(intersectionCoor.x, intersectionCoor.y, defaultDepth));
 						vBuilder.append(
-								"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultHeight + "\n");
+								"v " + intersectionCoor.x + " " + intersectionCoor.y + " " + defaultDepth + "\n");
 
 						// line 2 top
 						vector2dList.add(new Vector2d(firTopCoor2.x, firTopCoor2.y));
 						allCoordinates.add(firTopCoor2);
 						vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, 0));
 						vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-						vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+						vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultDepth + "\n");
 
 						vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 						allCoordinates.add(secTopCoor2);
 						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 						// line 2 bottom
 						// line 2 firBottomCoor2는 intersectionCoor, line 1 secBottomCoor1로 저장
@@ -3110,9 +3118,9 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(secBottomCoor2);
 						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 						// line 1 top line 밑면, 윗면
 						int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
@@ -3316,36 +3324,36 @@ public class LineLayerToObjImpl {
 						allCoordinates.add(firTopCoor1);
 						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+						vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 						// line 2 top
 						vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 						allCoordinates.add(secTopCoor2);
 						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+						vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 						// line 1 bottom
 						vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 						allCoordinates.add(firBottomCoor1);
 						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+						vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 						// line 2 bottom
 						vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 						allCoordinates.add(secBottomCoor2);
 						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+						allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+						vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 						// line 1 top line 밑면, 윗면
 						int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
@@ -3454,68 +3462,68 @@ public class LineLayerToObjImpl {
 					allCoordinates.add(firTopCoor1);
 					vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, 0));
 					vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-					vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultHeight));
-					vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+					vector3dList.add(new Vector3d(firTopCoor1.x, firTopCoor1.y, defaultDepth));
+					vBuilder.append("v " + firTopCoor1.x + " " + firTopCoor1.y + " " + defaultDepth + "\n");
 
 					vector2dList.add(new Vector2d(secTopCoor1.x, secTopCoor1.y));
 					allCoordinates.add(secTopCoor1);
 					vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, 0));
 					vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-					vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultHeight));
-					vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+					vector3dList.add(new Vector3d(secTopCoor1.x, secTopCoor1.y, defaultDepth));
+					vBuilder.append("v " + secTopCoor1.x + " " + secTopCoor1.y + " " + defaultDepth + "\n");
 
 					// line 1 bottom
 					vector2dList.add(new Vector2d(firBottomCoor1.x, firBottomCoor1.y));
 					allCoordinates.add(firBottomCoor1);
 					vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, 0));
 					vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-					vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultHeight));
-					vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+					vector3dList.add(new Vector3d(firBottomCoor1.x, firBottomCoor1.y, defaultDepth));
+					vBuilder.append("v " + firBottomCoor1.x + " " + firBottomCoor1.y + " " + defaultDepth + "\n");
 
 					vector2dList.add(new Vector2d(secBottomCoor1.x, secBottomCoor1.y));
 					allCoordinates.add(secBottomCoor1);
 					vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, 0));
 					vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-					vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultHeight));
-					vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+					vector3dList.add(new Vector3d(secBottomCoor1.x, secBottomCoor1.y, defaultDepth));
+					vBuilder.append("v " + secBottomCoor1.x + " " + secBottomCoor1.y + " " + defaultDepth + "\n");
 
 					// line 2 top
 					vector2dList.add(new Vector2d(firTopCoor2.x, firTopCoor2.y));
 					allCoordinates.add(firTopCoor2);
 					vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, 0));
 					vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-					vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultHeight));
-					vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+					vector3dList.add(new Vector3d(firTopCoor2.x, firTopCoor2.y, defaultDepth));
+					vBuilder.append("v " + firTopCoor2.x + " " + firTopCoor2.y + " " + defaultDepth + "\n");
 
 					vector2dList.add(new Vector2d(secTopCoor2.x, secTopCoor2.y));
 					allCoordinates.add(secTopCoor2);
 					vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, 0));
 					vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-					vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultHeight));
-					vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+					vector3dList.add(new Vector3d(secTopCoor2.x, secTopCoor2.y, defaultDepth));
+					vBuilder.append("v " + secTopCoor2.x + " " + secTopCoor2.y + " " + defaultDepth + "\n");
 
 					// line 2 bottom
 					vector2dList.add(new Vector2d(firBottomCoor2.x, firBottomCoor2.y));
 					allCoordinates.add(firBottomCoor2);
 					vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, 0));
 					vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-					vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultHeight));
-					vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+					vector3dList.add(new Vector3d(firBottomCoor2.x, firBottomCoor2.y, defaultDepth));
+					vBuilder.append("v " + firBottomCoor2.x + " " + firBottomCoor2.y + " " + defaultDepth + "\n");
 
 					vector2dList.add(new Vector2d(secBottomCoor2.x, secBottomCoor2.y));
 					allCoordinates.add(secBottomCoor2);
 					vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, 0));
 					vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + 0 + "\n");
-					allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-					vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultHeight));
-					vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultHeight + "\n");
+					allCoordinates.add(new Coordinate(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+					vector3dList.add(new Vector3d(secBottomCoor2.x, secBottomCoor2.y, defaultDepth));
+					vBuilder.append("v " + secBottomCoor2.x + " " + secBottomCoor2.y + " " + defaultDepth + "\n");
 
 					// line 1 top line 밑면, 윗면
 					int top1FirIdx = vSize + allCoordinates.indexOf(lineFirCoor);
