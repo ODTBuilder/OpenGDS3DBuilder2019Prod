@@ -211,6 +211,7 @@ gb3d.Map = function(obj) {
 	var near = 1;
 	var far = 10*1000*1000;
 
+//	THREE.Object3D.DefaultUp.set( 0, 0, 1 );
 	/**
 	 * three js scene 객체
 	 * 
