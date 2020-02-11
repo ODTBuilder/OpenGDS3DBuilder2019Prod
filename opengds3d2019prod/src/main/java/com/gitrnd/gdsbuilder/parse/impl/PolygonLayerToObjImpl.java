@@ -166,6 +166,7 @@ public class PolygonLayerToObjImpl {
 		double maxHeight = 0.0;
 		if (this.dType == EnShpToObjDepthType.DEFAULT) {
 			defaultDepth = Double.valueOf(depthValue);
+			height = defaultDepth;
 			maxHeight = defaultDepth;
 		}
 

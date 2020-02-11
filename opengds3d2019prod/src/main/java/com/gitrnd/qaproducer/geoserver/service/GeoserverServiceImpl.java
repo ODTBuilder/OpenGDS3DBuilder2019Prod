@@ -1182,7 +1182,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	@Override
 	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoManager, String workspace, String datastore,
-			String layerName, String user, String heightType, String heightValue, String texture)
+			String layerName, String user, String depthType, String depthValue, String texture)
 			throws FileNotFoundException, ParseException {
 
 		int puFlag = 500;
@@ -1235,12 +1235,12 @@ public class GeoserverServiceImpl implements GeoserverService {
 						}
 
 						// set height
-						if (heightType.equals(EnShpToObjHeightType.DEFAULT.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.DEFAULT);
-						} else if (heightType.equals(EnShpToObjHeightType.FIX.getType())) {
-							shpToObj.sethType(EnShpToObjHeightType.FIX);
+						if (depthType.equals(EnShpToObjDepthType.DEFAULT.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.DEFAULT);
+						} else if (depthType.equals(EnShpToObjDepthType.FIX.getType())) {
+							shpToObj.setdType(EnShpToObjDepthType.FIX);
 						}
-						shpToObj.setHeightValue(heightValue);
+						shpToObj.setDepthValue(depthValue);
 
 						try {
 							shpToObj.exec();
