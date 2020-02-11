@@ -42,12 +42,13 @@ import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjDepthType;
 import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjRadiusType;
 import com.gitrnd.gdsbuilder.parse.impl.test.qaud.Quadtree;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Face3;
-import com.gitrnd.threej.core.src.main.java.info.laht.threej.geometries.CylinderGeometry;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector2d;
 import com.gitrnd.threej.core.src.main.java.info.laht.threej.math.Vector3d;
+import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class PointLayerToCylinderObjImpl {
 
@@ -718,11 +719,10 @@ public class PointLayerToCylinderObjImpl {
 
 			Coordinate[] coordinates = geom.getCoordinates();
 
-			CylinderGeometry geometry = new CylinderGeometry(defaultRadius, defaultDepth);
-			geometry.computeBoundingBox();
-			List<Vector3d> vertices = geometry.getVertices();
+			List<Coordinate> allCoordinates = new ArrayList<>();
+			List<Face3> faces = new ArrayList<>();
+			StringBuilder vBuilder = new StringBuilder();
 
-			int v = 0;
 			for (int i = 0; i < coordinates.length; i++) {
 				GeodeticCalculator gc = new GeodeticCalculator();
 				gc.setStartingGeographicPoint(centerX, coordinates[i].y);
@@ -737,25 +737,74 @@ public class PointLayerToCylinderObjImpl {
 				if (centerY > coordinates[i].y) {
 					yDistance = -yDistance;
 				}
-				for (Vector3d vertice : vertices) {
-					double distX = vertice.x() + xDistance;
-					double distY = vertice.y() + yDistance;
-					double distZ = vertice.z();
 
-					if (distZ < 0) {
-						distZ = 0;
-					} else {
-						distZ = defaultDepth;
-					}
-					Vector3d distVertice = new Vector3d(distX, distY, distZ);
-					vertices.set(v, distVertice);
-					v++;
-				}
+				coordinates[i] = new Coordinate(xDistance, yDistance, 0);
+				allCoordinates.add(new Coordinate(coordinates[i]));
+				vector3dList.add(new Vector3d(coordinates[i].x, coordinates[i].y, 0));
+				vBuilder.append("v " + coordinates[i].x + " " + coordinates[i].y + " " + 0 + "\n");
+
+				allCoordinates.add(new Coordinate(coordinates[i].x, coordinates[i].y, defaultDepth));
+				vector3dList.add(new Vector3d(coordinates[i].x, coordinates[i].y, defaultDepth));
+				vBuilder.append("v " + coordinates[i].x + " " + coordinates[i].y + " " + defaultDepth + "\n");
 			}
-			geometry.setVertices(vertices);
-			writeThreeGeometry(geometry);
 
-			vSize += v;
+			for (int i = 0; i < coordinates.length; i++) {
+
+				Coordinate coor = coordinates[i];
+				GeometricShapeFactory f = new GeometricShapeFactory();
+				f.setCentre(coor);
+				f.setSize(defaultRadius * 2);
+				f.setNumPoints(32);
+				f.setRotation(0);
+				Geometry circle = f.createArc(Math.toRadians(0), Math.toRadians(360));
+				Coordinate[] circleCoors = circle.getCoordinates();
+				if (!CGAlgorithms.isCCW(circleCoors)) {
+					circle = circle.reverse();
+					circleCoors = circle.getCoordinates();
+				}
+
+				// circle vertex add
+				for (int c = 0; c < circleCoors.length; c++) {
+					vector2dList.add(new Vector2d(circleCoors[c].x, circleCoors[c].y));
+					// 밑면
+					allCoordinates.add(circleCoors[c]);
+					vBuilder.append("v " + circleCoors[c].x + " " + circleCoors[c].y + " " + 0 + "\n");
+					vector3dList.add(new Vector3d(circleCoors[c].x, circleCoors[c].y, 0));
+					// 윗면
+					allCoordinates.add(new Coordinate(circleCoors[c].x, circleCoors[c].y, defaultDepth));
+					vBuilder.append("v " + circleCoors[c].x + " " + circleCoors[c].y + " " + defaultDepth + "\n");
+					vector3dList.add(new Vector3d(circleCoors[c].x, circleCoors[c].y, defaultDepth));
+				}
+
+				// circle face 생성
+				// circle 밑면, 윗면
+				int centerIdx = vSize + allCoordinates.indexOf(coor); // 중점
+				for (int ac = 0; ac < circleCoors.length - 1; ac++) {
+					int secIdx = vSize + allCoordinates.indexOf(circleCoors[ac]);
+					int thrIdx = vSize + allCoordinates.indexOf(circleCoors[ac + 1]);
+					// circle 밑면 face
+					faces.add(new Face3(centerIdx, secIdx, thrIdx, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(thrIdx, secIdx, centerIdx, new Vector3d(0, 0, 0)));
+					// circle 윗면 face
+					faces.add(new Face3(centerIdx + 1, secIdx + 1, thrIdx + 1, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(thrIdx + 1, secIdx + 1, centerIdx + 1, new Vector3d(0, 0, 0)));
+				}
+				// circle 옆면 face
+				for (int ac = 0; ac < circleCoors.length - 1; ac++) {
+					int firIdx = vSize + allCoordinates.indexOf(circleCoors[ac]);
+					int secIdx = vSize + allCoordinates.indexOf(circleCoors[ac + 1]);
+					int thrIdx = firIdx + 1;
+					faces.add(new Face3(firIdx, secIdx, thrIdx, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(thrIdx, secIdx, firIdx, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(thrIdx, secIdx, secIdx + 1, new Vector3d(0, 0, 0)));
+					faces.add(new Face3(secIdx + 1, secIdx, thrIdx, new Vector3d(0, 0, 0)));
+				}
+				com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
+				threeGeom.setFaces(faces);
+				threeGeom.setVertices(vector3dList);
+				writeThreeGeometry(threeGeom);
+				vSize += allCoordinates.size();
+			}
 		}
 		return idList;
 	}
@@ -809,26 +858,28 @@ public class PointLayerToCylinderObjImpl {
 					int b = face.b + 1 + vSize;
 					int c = face.c + 1 + vSize;
 
-					if (isVt) {
-						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
-						vtIdx++;
-						vnIdx++;
-						fBuilder.append(b + "/" + vnIdx + "/" + vtIdx + " ");
-						vtIdx++;
-						vnIdx++;
-						fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
-						vtIdx++;
-						vnIdx++;
-					} else {
-						fBuilder.append("f " + a + "/" + vnIdx + " ");
-						vnIdx++;
-						fBuilder.append(b + "/" + vnIdx + " ");
-						vnIdx++;
-						fBuilder.append(c + "/" + vnIdx + "\n");
-						vnIdx++;
-					}
+					fBuilder.append("f " + a + " " + b + " " + c + "\n");
+
+//					if (isVt) {
+//						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
+//						vtIdx++;
+//						vnIdx++;
+//						fBuilder.append(b + "/" + vnIdx + "/" + vtIdx + " ");
+//						vtIdx++;
+//						vnIdx++;
+//						fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
+//						vtIdx++;
+//						vnIdx++;
+//					} else {
+//						fBuilder.append("f " + a + "/" + vnIdx + " ");
+//						vnIdx++;
+//						fBuilder.append(b + "/" + vnIdx + " ");
+//						vnIdx++;
+//						fBuilder.append(c + "/" + vnIdx + "\n");
+//						vnIdx++;
+//					}
 				}
-				writer.write(vnBuilder.toString());
+//				writer.write(vnBuilder.toString());
 				writer.write(fBuilder.toString());
 			}
 		}
