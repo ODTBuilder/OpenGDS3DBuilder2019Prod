@@ -1111,7 +1111,13 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 		}
 		// 피처 아이디 입력
 		inputData.userData.featureId = opt["featureId"];
-
+		// 지오메트리 타입 입력
+		var typeselect = opt["layer"].get("git").geometry; 
+//		if (typeselect === "MultiPolygon") {
+//			typeselect = "Polygon";
+//		}
+		inputData.userData.type = typeselect;
+		
 		var center = opt["featureCenter"];
 		var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
 		var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);

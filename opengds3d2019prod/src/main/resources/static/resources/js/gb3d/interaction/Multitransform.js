@@ -1,17 +1,17 @@
-var gb;
-if (!gb)
-	gb = {};
-if (!gb.interaction)
-	gb.interaction = {};
+var gb3d;
+if (!gb3d)
+	gb3d = {};
+if (!gb3d.interaction)
+	gb3d.interaction = {};
 
 /**
  * @classdesc 피처에 대해 Scale, Rotate, Flip 편집을 수행할 수 있는 Interaction. ol.Map에 추가하여
  *            기능을 사용한다.
- * @class gb.interaction.MultiTransform
- * @memberof gb.interaction
+ * @class gb3d.interaction.MultiTransform
+ * @memberof gb3d.interaction
  * @constructor
  * @param {Object}
- *            opt_options - gb.interaction.MultiTransform 생성 옵션
+ *            opt_options - gb3d.interaction.MultiTransform 생성 옵션
  * @param {ol.Collection.
  *            <ol.Feature>} opt_options.features - MultiTransform을 적용시킬 feature
  *            객체 집합
@@ -19,12 +19,12 @@ if (!gb.interaction)
  * @date 2019. 03. 25
  * @version 0.01
  */
-gb.interaction.MultiTransform = function(opt_options) {
+gb3d.interaction.MultiTransform = function(opt_options) {
 	ol.interaction.Pointer.call(this, {
-		handleDownEvent : gb.interaction.MultiTransform.prototype.handleDownEvent,
-		handleDragEvent : gb.interaction.MultiTransform.prototype.handleDragEvent,
-		handleMoveEvent : gb.interaction.MultiTransform.prototype.handleMoveEvent,
-		handleUpEvent : gb.interaction.MultiTransform.prototype.handleUpEvent
+		handleDownEvent : gb3d.interaction.MultiTransform.prototype.handleDownEvent,
+		handleDragEvent : gb3d.interaction.MultiTransform.prototype.handleDragEvent,
+		handleMoveEvent : gb3d.interaction.MultiTransform.prototype.handleMoveEvent,
+		handleUpEvent : gb3d.interaction.MultiTransform.prototype.handleUpEvent
 	});
 
 	/**
@@ -95,18 +95,18 @@ gb.interaction.MultiTransform = function(opt_options) {
 	var options = opt_options ? opt_options : {};
 	this.features_ = options.features;
 };
-ol.inherits(gb.interaction.MultiTransform, ol.interaction.Pointer);
+ol.inherits(gb3d.interaction.MultiTransform, ol.interaction.Pointer);
 
 /**
  * map 객체에 있는 interaction 중에 ol.interaction.Select 객체를 찾아 비활성화 시키거나 활성화 시킴
  * MultiTransform 버튼을 클릭하였을때 객체 선택이 풀리는 경우를 방지하기 위해 사용
  * 
- * @method gb.interaction.MultiTransform#setActiveSelect_
+ * @method gb3d.interaction.MultiTransform#setActiveSelect_
  * @function
  * @param {boolean}
  *            bool - true일 시 Select Interaction을 활성화
  */
-gb.interaction.MultiTransform.prototype.setActiveSelect_ = function(bool) {
+gb3d.interaction.MultiTransform.prototype.setActiveSelect_ = function(bool) {
 	var map = this.getMap();
 	map.getInteractions().forEach(function(interaction) {
 		if (interaction instanceof ol.interaction.Select) {
@@ -118,11 +118,11 @@ gb.interaction.MultiTransform.prototype.setActiveSelect_ = function(bool) {
 /**
  * ol.interaction.Select의 active상태를 반환
  * 
- * @method gb.interaction.MultiTransform#getActiveSelect_
+ * @method gb3d.interaction.MultiTransform#getActiveSelect_
  * @function
  * @return {boolean}
  */
-gb.interaction.MultiTransform.prototype.getActiveSelect_ = function() {
+gb3d.interaction.MultiTransform.prototype.getActiveSelect_ = function() {
 	var map = this.getMap();
 	var bool = null;
 	map.getInteractions().forEach(function(interaction) {
@@ -140,13 +140,13 @@ gb.interaction.MultiTransform.prototype.getActiveSelect_ = function() {
  * interaction의 click 이벤트와 겹치기때문에 동시 실행되어 예기치 못한 상황이 발생할 수 있으므로 select active를
  * false로 설정한다.
  * 
- * @method gb.interaction.MultiTransform#handleDownEvent
+ * @method gb3d.interaction.MultiTransform#handleDownEvent
  * @function
  * @param {ol.events.Event}
  *            evt - ol.Map 이벤트 객체
  * @return {boolean} true 반환시 drag squence 시작
  */
-gb.interaction.MultiTransform.prototype.handleDownEvent = function(evt) {
+gb3d.interaction.MultiTransform.prototype.handleDownEvent = function(evt) {
 	var feature = this.features_.item(0);
 
 	if (!this.getActiveSelect_()) {
@@ -179,22 +179,22 @@ gb.interaction.MultiTransform.prototype.handleDownEvent = function(evt) {
 		}
 	}
 	// this.dispatchEvent(new
-	// gb.interaction.MultiTransform.Event(gb.interaction.MultiTransformEventType.TRANSFORMSTART,
+	// gb3d.interaction.MultiTransform.Event(gb3d.interaction.MultiTransformEventType.TRANSFORMSTART,
 	// feature, evt));
-	// this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMSTART);
-	this.dispatchEvent(new gb.interaction.MultiTransform.Event.TransformEvent(gb.interaction.MultiTransformEventType.TRANSFORMSTART, this.angle_, this.scaleRatio_));
+	// this.dispatchEvent(gb3d.interaction.MultiTransformEventType.TRANSFORMSTART);
+	this.dispatchEvent(new gb3d.interaction.MultiTransform.Event.TransformEvent(gb3d.interaction.MultiTransformEventType.TRANSFORMSTART, this.angle_, this.scaleRatio_));
 	return (!!feature && !!this.task_);
 };
 
 /**
  * rotate 또는 scale을 수행한다. Click & Drag 방식의 이벤트 처리 함수.
  * 
- * @method gb.interaction.MultiTransform#handleDragEvent
+ * @method gb3d.interaction.MultiTransform#handleDragEvent
  * @function
  * @param {ol.events.Event}
  *            evt - ol.Map 이벤트 객체
  */
-gb.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
+gb3d.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
 
 	var feature = this.features_.item(0);
 
@@ -227,10 +227,10 @@ gb.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
 		this.angle_ = 0;
 	}
 	// this.dispatchEvent(new
-	// gb.interaction.MultiTransform.Event(gb.interaction.MultiTransformEventType.TRANSFORMING,
+	// gb3d.interaction.MultiTransform.Event(gb3d.interaction.MultiTransformEventType.TRANSFORMING,
 	// feature, evt));
-	// this.dispatchEvent(gb.interaction.MultiTransformEventType.TRANSFORMING);
-	this.dispatchEvent(new gb.interaction.MultiTransform.Event.TransformEvent(gb.interaction.MultiTransformEventType.TRANSFORMING, this.angle_, this.scaleRatio_));
+	// this.dispatchEvent(gb3d.interaction.MultiTransformEventType.TRANSFORMING);
+	this.dispatchEvent(new gb3d.interaction.MultiTransform.Event.TransformEvent(gb3d.interaction.MultiTransformEventType.TRANSFORMING, this.angle_, this.scaleRatio_));
 	this.prevCursor_ = evt.coordinate;
 };
 
@@ -238,12 +238,12 @@ gb.interaction.MultiTransform.prototype.handleDragEvent = function(evt) {
  * 커서 이동 이벤트 처리 함수.drag 실행 중에는 실행되지 않는다. {this.selectTask_} 함수를 통해
  * MultiTransform 버튼의 위치를 인식하고 커서가 버튼위에 있을때 {this.task_}의 값과 마우스 커서 스타일 값을 변경한다.
  * 
- * @method gb.interaction.MultiTransform#handleMoveEvent
+ * @method gb3d.interaction.MultiTransform#handleMoveEvent
  * @function
  * @param {ol.events.Event}
  *            evt - ol.Map 이벤트 객체
  */
-gb.interaction.MultiTransform.prototype.handleMoveEvent = function(evt) {
+gb3d.interaction.MultiTransform.prototype.handleMoveEvent = function(evt) {
 	if (!evt.dragging) {
 		var map = evt.map
 		var feature = this.features_.item(0);
@@ -292,13 +292,13 @@ gb.interaction.MultiTransform.prototype.handleMoveEvent = function(evt) {
  * {this.task_}가 flip 작업을 위한 값일때 flip을 실행한다. {this.rotate_}와 {this.scale_}의 값이
  * true 일때 해당작업들에서 설정되었던 멤버변수들을 모두 초기화시킨다.
  * 
- * @method gb.interaction.MultiTransform#handleUpEvent
+ * @method gb3d.interaction.MultiTransform#handleUpEvent
  * @function
  * @param {ol.events.Event}
  *            evt - ol.Map 이벤트 객체
  * @return {boolean}
  */
-gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
+gb3d.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 	var feature = this.features_.item(0);
 	var task = null;
 	var map = evt.map;
@@ -306,7 +306,7 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 	var from;
 	if (feature) {
 		if (element.style.cursor !== '' && this.task_ !== 'rotate' && !this.task_.match(/^scale/i)) {
-			this.flipAlgorithm_(feature, this.task_);
+//			this.flipAlgorithm_(feature, this.task_);
 
 			task = this.selectTask_(map, feature, evt.pixel);
 
@@ -339,8 +339,6 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 		from = "rotate";
 	} else if (this.scale_) {
 		from = "scale";
-	} else if (!this.rotate_ && !this.scale_) {
-		from = "flip";
 	}
 	console.log(from);
 	if (this.rotate_ || this.scale_) {
@@ -351,9 +349,9 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 		element.style.cursor = '';
 	}
 	// this.dispatchEvent(new
-	// gb.interaction.MultiTransform.Event(gb.interaction.MultiTransformEventType.TRANSFORMEND,
+	// gb3d.interaction.MultiTransform.Event(gb3d.interaction.MultiTransformEventType.TRANSFORMEND,
 	// feature, evt));
-	this.dispatchEvent(new gb.interaction.MultiTransform.Event.TransformEvent(gb.interaction.MultiTransformEventType.TRANSFORMEND, this.angle_, this.scaleRatio_, from));
+	this.dispatchEvent(new gb3d.interaction.MultiTransform.Event.TransformEvent(gb3d.interaction.MultiTransformEventType.TRANSFORMEND, this.angle_, this.scaleRatio_, from));
 	this.angle_ = 0;
 	this.scaleRatio_ = 1;
 	return false;
@@ -362,12 +360,12 @@ gb.interaction.MultiTransform.prototype.handleUpEvent = function(evt) {
 /**
  * 'flip', 'rotate', 'scale' 기능을 수행할 수 있는 마우스 이벤트 영역을 {ol.style.Style}객체로 그려낸다.
  * 
- * @method gb.interaction.MultiTransform#drawMbr
+ * @method gb3d.interaction.MultiTransform#drawMbr
  * @function
  * @param {ol.render.Event}
  *            evt - ol.render 이벤트 객체
  */
-gb.interaction.MultiTransform.prototype.drawMbr = function(evt) {
+gb3d.interaction.MultiTransform.prototype.drawMbr = function(evt) {
 
 	var map = this.getMap();
 
@@ -385,18 +383,18 @@ gb.interaction.MultiTransform.prototype.drawMbr = function(evt) {
 
 		var strokes = {
 			'line' : new ol.style.Stroke({
-				color : 'rgba(152,152,152,0.6)',
+				color : 'rgb(152,152,152,0.6)',
 				width : 3,
 				lineDash : [ 1, 4 ]
 			}),
 			'default' : new ol.style.Stroke({
-				color : 'rgba(152,152,152,0.8)',
+				color : 'rgb(152,152,152,0.8)',
 				width : 1.5
 			})
 		};
 
 		var fill = new ol.style.Fill({
-			color : 'rgba(152,152,152,0.9)'
+			color : 'rgb(152,152,152,0.9)'
 		});
 
 		var styles = {
@@ -465,18 +463,18 @@ gb.interaction.MultiTransform.prototype.drawMbr = function(evt) {
 			}), styles['square']);
 		}
 
-		triangle.push(new ol.geom.Point([ (extent[0] + extent[2]) / 2, extent[3] ]));
-		triangle.push(new ol.geom.Point([ extent[2], (extent[1] + extent[3]) / 2 ]));
-		triangle.push(new ol.geom.Point([ (extent[0] + extent[2]) / 2, extent[1] ]));
-		triangle.push(new ol.geom.Point([ extent[0], (extent[1] + extent[3]) / 2 ]));
-
-		for ( var i in triangle) {
-			styles['triangle'].getImage().setRotation(i * Math.PI / 2);
-			vectorContext.drawFeature(new ol.Feature({
-				geometry : triangle[i],
-				name : 'flip'
-			}), styles['triangle']);
-		}
+//		triangle.push(new ol.geom.Point([ (extent[0] + extent[2]) / 2, extent[3] ]));
+//		triangle.push(new ol.geom.Point([ extent[2], (extent[1] + extent[3]) / 2 ]));
+//		triangle.push(new ol.geom.Point([ (extent[0] + extent[2]) / 2, extent[1] ]));
+//		triangle.push(new ol.geom.Point([ extent[0], (extent[1] + extent[3]) / 2 ]));
+//
+//		for ( var i in triangle) {
+//			styles['triangle'].getImage().setRotation(i * Math.PI / 2);
+//			vectorContext.drawFeature(new ol.Feature({
+//				geometry : triangle[i],
+//				name : 'flip'
+//			}), styles['triangle']);
+//		}
 
 		vectorContext.setStyle(styles['line']);
 		vectorContext.drawGeometry(mbr);
@@ -487,11 +485,11 @@ gb.interaction.MultiTransform.prototype.drawMbr = function(evt) {
 /**
  * 선택된 피처들을 담은 객체를 반환한다.
  * 
- * @method gb.interaction.MultiTransform#getFeatures
+ * @method gb3d.interaction.MultiTransform#getFeatures
  * @function
  * @return {ol.Collection.<ol.Feature>}
  */
-gb.interaction.MultiTransform.prototype.getFeatures = function() {
+gb3d.interaction.MultiTransform.prototype.getFeatures = function() {
 	return this.features_;
 };
 
@@ -499,7 +497,7 @@ gb.interaction.MultiTransform.prototype.getFeatures = function() {
  * style로 그려진 MultiTransform의 버튼들의 영역을 설정하고 cursor가 그 위치에 있을때 해당버튼에 맞는 작업의 이름을
  * String으로 반환한다. 커서가 버튼 영역에 놓여있지 않다면 null 값을 반환한다.
  * 
- * @method gb.interaction.MultiTransform#selectTask_
+ * @method gb3d.interaction.MultiTransform#selectTask_
  * @function
  * @param {ol.Map}
  *            map - MultiTransform 기능이 적용된 맵 객체
@@ -509,7 +507,7 @@ gb.interaction.MultiTransform.prototype.getFeatures = function() {
  *            <number>} cursor - 맵 위에서의 마우스 커서 좌표
  * @return {string} 실행해야할 작업명
  */
-gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cursor) {
+gb3d.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cursor) {
 
 	var AREA = 6;
 
@@ -532,10 +530,11 @@ gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cur
 	scale.push(map.getPixelFromCoordinate([ extent[2], extent[3] ]));
 	scale.push(map.getPixelFromCoordinate([ extent[2], extent[1] ]));
 
-	flip.push(map.getPixelFromCoordinate([ (extent[0] + extent[2]) / 2, extent[1] ]));
-	flip.push(map.getPixelFromCoordinate([ (extent[0] + extent[2]) / 2, extent[3] ]));
-	flip.push(map.getPixelFromCoordinate([ extent[0], (extent[1] + extent[3]) / 2 ]));
-	flip.push(map.getPixelFromCoordinate([ extent[2], (extent[1] + extent[3]) / 2 ]));
+	// 플립 제거
+//	flip.push(map.getPixelFromCoordinate([ (extent[0] + extent[2]) / 2, extent[1] ]));
+//	flip.push(map.getPixelFromCoordinate([ (extent[0] + extent[2]) / 2, extent[3] ]));
+//	flip.push(map.getPixelFromCoordinate([ extent[0], (extent[1] + extent[3]) / 2 ]));
+//	flip.push(map.getPixelFromCoordinate([ extent[2], (extent[1] + extent[3]) / 2 ]));
 
 	if ((cursor[0] >= rotate[0] - AREA && cursor[0] <= rotate[0] + AREA) && (cursor[1] >= rotate[1] - AREA && cursor[1] <= rotate[1] + AREA)) {
 		task = 'rotate';
@@ -547,19 +546,19 @@ gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cur
 		}
 	}
 
-	for ( var i in flip) {
-		if ((cursor[0] >= flip[i][0] - AREA && cursor[0] <= flip[i][0] + AREA) && (cursor[1] >= flip[i][1] - AREA && cursor[1] <= flip[i][1] + AREA)) {
-			if (i === '0') {
-				task = 'down';
-			} else if (i === '1') {
-				task = 'up';
-			} else if (i === '2') {
-				task = 'left';
-			} else if (i === '3') {
-				task = 'right';
-			}
-		}
-	}
+//	for ( var i in flip) {
+//		if ((cursor[0] >= flip[i][0] - AREA && cursor[0] <= flip[i][0] + AREA) && (cursor[1] >= flip[i][1] - AREA && cursor[1] <= flip[i][1] + AREA)) {
+//			if (i === '0') {
+//				task = 'down';
+//			} else if (i === '1') {
+//				task = 'up';
+//			} else if (i === '2') {
+//				task = 'left';
+//			} else if (i === '3') {
+//				task = 'right';
+//			}
+//		}
+//	}
 
 	return task;
 };
@@ -568,7 +567,7 @@ gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cur
  * 피처 회전 알고리즘. 'pointerdrag' 이벤트 발생전의 커서 위치값과 이벤트 발생시의 커서값을 인자로 받아 선택된 피쳐의 중점을
  * 기준으로 두 점 사이의 각도를 반환
  * 
- * @method gb.interaction.MultiTransform#rotateAlgorithm_
+ * @method gb3d.interaction.MultiTransform#rotateAlgorithm_
  * @function
  * @param {Array.
  *            <number>} prevCursorPosition - 'pointerdrag'이벤트 발생 전의 커서 위치값
@@ -576,7 +575,7 @@ gb.interaction.MultiTransform.prototype.selectTask_ = function(map, feature, cur
  *            <number>} currentCursorPosition - 'pointerdrag'이벤트 발생 시의 커서 위치값
  * @return {number} 사이각을 radian 형식으로 반환
  */
-gb.interaction.MultiTransform.prototype.rotateAlgorithm_ = function(prevCursorPosition, currentCursorPosition) {
+gb3d.interaction.MultiTransform.prototype.rotateAlgorithm_ = function(prevCursorPosition, currentCursorPosition) {
 	var feature = this.features_.item(0);
 	var result = null;
 	var extent = feature.getGeometry().getExtent();
@@ -604,16 +603,16 @@ gb.interaction.MultiTransform.prototype.rotateAlgorithm_ = function(prevCursorPo
  * 피처 확대, 축소 알고리즘. 선택된 scale버튼의 이전 좌표값과 pointer를 drag함으로서 변경된 커서의 좌표, 두 좌표값사이
  * 길이의 배율값을 구하여 그 배율의 절대값을 리턴한다.
  * 
- * @method gb.interaction.MultiTransform#scaleAlgorithm_
+ * @method gb3d.interaction.MultiTransform#scaleAlgorithm_
  * @function
  * @param {ol.Feature}
  *            feature - ol.Feature 객체
  * @param {Array.
  *            <number>} currentCursorPoint - drag를 통해 변경된 커서의 위치
  * @return {Array.<number>} 늘어난 x좌표, y좌표 배율의 절대값
- * @this {gb.interaction.MultiTransform}
+ * @this {gb3d.interaction.MultiTransform}
  */
-gb.interaction.MultiTransform.prototype.scaleAlgorithm_ = function(feature, currentCursorPoint) {
+gb3d.interaction.MultiTransform.prototype.scaleAlgorithm_ = function(feature, currentCursorPoint) {
 	var map = this.getMap();
 	var extent = feature.getGeometry().getExtent();
 	var cursor = currentCursorPoint;
@@ -642,14 +641,14 @@ gb.interaction.MultiTransform.prototype.scaleAlgorithm_ = function(feature, curr
 /**
  * 피처 플립 알고리즘. 선택한 방향으로 feature를 Flip.
  * 
- * @method gb.interaction.MultiTransform#flipAlgorithm_
+ * @method gb3d.interaction.MultiTransform#flipAlgorithm_
  * @function
  * @param {ol.Feature}
  *            feature - ol.Feature 객체
  * @param {String}
  *            direction - Flip을 할 방향("up", "down", "right", "left")
  */
-gb.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direction) {
+gb3d.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direction) {
 	var extentIndex = null;
 	var geometry = feature.getGeometry();
 	var extent = feature.getGeometry().getExtent();
@@ -755,11 +754,11 @@ gb.interaction.MultiTransform.prototype.flipAlgorithm_ = function(feature, direc
  * 
  * @enum {string}
  */
-gb.interaction.MultiTransformEventType = {
+gb3d.interaction.MultiTransformEventType = {
 	/**
 	 * Triggered upon feature multiTransform start
 	 * 
-	 * @event gb.interaction.MultiTransform#transformstart
+	 * @event gb3d.interaction.MultiTransform#transformstart
 	 * @type {string}
 	 * @api
 	 */
@@ -767,20 +766,20 @@ gb.interaction.MultiTransformEventType = {
 	/**
 	 * Triggered upon feature multiTransforming
 	 * 
-	 * @event gb.interaction.MultiTransform#transforming
+	 * @event gb3d.interaction.MultiTransform#transforming
 	 * @api
 	 */
 	TRANSFORMING : 'transforming',
 	/**
 	 * Triggered upon feature multiTransform end
 	 * 
-	 * @event gb.interaction.MultiTransform#transformend
+	 * @event gb3d.interaction.MultiTransform#transformend
 	 * @api
 	 */
 	TRANSFORMEND : 'transformend'
 };
 
-// gb.interaction.MultiTransform.Event = function(type, feature,
+// gb3d.interaction.MultiTransform.Event = function(type, feature,
 // mapBrowserPointerEvent) {
 //
 // ol.events.condition.call(this, type);
@@ -801,17 +800,17 @@ gb.interaction.MultiTransformEventType = {
 // */
 // this.mapBrowserEvent = mapBrowserPointerEvent;
 // };
-// ol.inherits(gb.interaction.MultiTransform.Event, ol.events.condition);
+// ol.inherits(gb3d.interaction.MultiTransform.Event, ol.events.condition);
 
 /**
  * @classdesc Events emitted by {@link module:ol/interaction/Draw~Draw}
  *            instances are instances of this type.
  */
 
-if (!gb.interaction.MultiTransform.Event) {
-	gb.interaction.MultiTransform["Event"] = {};
+if (!gb3d.interaction.MultiTransform.Event) {
+	gb3d.interaction.MultiTransform["Event"] = {};
 }
-gb.interaction.MultiTransform.Event.TransformEvent = function(type, angle, ratio, from) {
+gb3d.interaction.MultiTransform.Event.TransformEvent = function(type, angle, ratio, from) {
 	this.propagationStopped;
 
 	/**
