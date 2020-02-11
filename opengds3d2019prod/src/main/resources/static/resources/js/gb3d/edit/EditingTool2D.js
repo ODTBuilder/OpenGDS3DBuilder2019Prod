@@ -239,7 +239,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 		source : this.tempSource
 	});
 	var git = {
-		"temp" : true
+			"temp" : true
 	};
 	this.tempVector.set("git", git);
 	this.tempVector.set("name", this.translation.tempLayer[this.locale]);
@@ -444,7 +444,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.isEditing = options.isEditing instanceof Object ? options.isEditing : undefined;
 
 	this.threeTree = options.threeTree ? options.threeTree : undefined; 
-	
+
 	this.otree.setEditingTool(this);
 
 	var view = this.map.getView(); 
@@ -512,7 +512,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 									var root = ctileset.root;
 
 									var recursiveSearch = function(tile, bid){
-										//==============
+										// ==============
 										var result;
 										if (tile instanceof Cesium.Cesium3DTile) {
 											var content = tile.content;
@@ -559,27 +559,27 @@ gb3d.edit.EditingTool2D = function(obj) {
 											}
 										}
 										return result;
-										//==============
-//										var result;
-//										if (tile instanceof Cesium.Cesium3DTile) {
-//											var content = tile.content;
-//											if (content) {
-//												var feature = content.getFeature(bid);
-//												if (feature) {
-//													result = feature;
-//												} else if (tile.children.length > 0) {
-//													for (var i = 0; i < tile.children.length; i++) {
-//														var ctile = tile.children[i];
-//														var feature = recursiveSearch(ctile, bid);
-//														if (feature) {
-//															result = feature;
-//															break;
-//														}
-//													}
-//												}
-//											}
-//										}
-//										return result;
+										// ==============
+// var result;
+// if (tile instanceof Cesium.Cesium3DTile) {
+// var content = tile.content;
+// if (content) {
+// var feature = content.getFeature(bid);
+// if (feature) {
+// result = feature;
+// } else if (tile.children.length > 0) {
+// for (var i = 0; i < tile.children.length; i++) {
+// var ctile = tile.children[i];
+// var feature = recursiveSearch(ctile, bid);
+// if (feature) {
+// result = feature;
+// break;
+// }
+// }
+// }
+// }
+// }
+// return result;
 									};
 
 									var feature = recursiveSearch(root, bidnum);
@@ -747,7 +747,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 	this.map.on('postcompose', function(evt) {
 		that.map.getInteractions().forEach(function(interaction) {
-			if (interaction instanceof gb.interaction.MultiTransform) {
+			if (interaction instanceof gb3d.interaction.MultiTransform) {
 				if (interaction.getFeatures().getLength() && interaction.getActive()) {
 					interaction.drawMbr(evt);
 				}
@@ -1554,7 +1554,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 										}
 									}
 								}
-//								return feature;
+// return feature;
 							} else {
 								var feature = content.getFeature(bid);
 								if (feature) {
@@ -1807,8 +1807,8 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 						"title" : that.translation.attr2DTitle[that.locale],
 						"width" : 540,
 						"autoOpen" : source.get("git").attribute.length !== 0 ? true : false,
-						"body" : body,
-						"footer" : modalFooter
+								"body" : body,
+								"footer" : modalFooter
 					});
 
 					okBtn.click(function(){
@@ -2152,7 +2152,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			return;
 		}
 
-		this.interaction.rotate = new gb.interaction.MultiTransform({
+		this.interaction.rotate = new gb3d.interaction.MultiTransform({
 			features : this.interaction.select.getFeatures()
 		});
 
@@ -2428,12 +2428,12 @@ gb3d.edit.EditingTool2D.prototype.remove = function(layer) {
 		$(okBtn).click(function() {
 			if (selectSource.get("git").tempLayer instanceof ol.layer.Vector) {
 				for (var i = 0; i < features.getLength(); i++) {
-					
+
 					var fid = features.item(i).getId(); 
 					// three tree 에서 노드 삭제
 					var edit3d = that.getEditingTool3D();
 					edit3d.removeNode(fid);
-					
+
 					if (features.item(i).getId().search(".new") !== -1) {
 						selectSource.removeFeature(features.item(i));
 					} else {
@@ -2611,7 +2611,7 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 // * false; } this.select(this.layer);
 // */
 // if (newFeature.length === 1) {
-// // this.interaction.select.getFeatures().extend(newFeature);
+// //this.interaction.select.getFeatures().extend(newFeature);
 // this.open();
 // this.attrPop.getPanel().position({
 // "my" : "left top",
@@ -2723,13 +2723,13 @@ gb3d.edit.EditingTool2D.prototype.clearUnmanaged = function() {
 // if (git.fake === "parent") {
 // console.error("fake parent layer can not edit");
 // } else {
-// // this.headerTag.css("display", "block");
+// //this.headerTag.css("display", "block");
 // }
 // } else {
-// // this.headerTag.css("display", "block");
+// //this.headerTag.css("display", "block");
 // }
 // } else if (layer instanceof ol.layer.Base) {
-// // this.headerTag.css("display", "block");
+// //this.headerTag.css("display", "block");
 // }
 // };
 
@@ -4108,7 +4108,7 @@ gb3d.edit.EditingTool2D.prototype.editToolOpen = function(){
 		// 줌 레벨이 일정 이상이면 화면확대 요구 메세지창 생성
 		this.displayEditZoomHint(true);
 	}
-	
+
 	this.attrPop.close();
 	this.attrPop.setPositionY(55);
 }
@@ -4179,10 +4179,10 @@ gb3d.edit.EditingTool2D.prototype.editToolClose = function(){
 	this.selectedSource = undefined;
 	this.vectorSourcesOfServer_ = {};
 	this.vectorSourcesOfVector_ = {};
-	
+
 	this.attrPop.close();
 	this.attrPop.setPositionY(5);
-	
+
 	this.getEditingTool3D().editToolClose();
 }
 
@@ -4347,7 +4347,7 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 				if (tempSource instanceof ol.source.Vector) {
 					console.log(tempSource);
 					var sfeature = tempSource.getFeatureById(fid);
-					
+
 				}
 			}
 		} else {
@@ -4355,12 +4355,12 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 			var url = this.wfsURL;
 
 			params = {
-				"serverName": git.geoserver,
-				"workspace": git.workspace,
-				"version" : gb.module.serviceVersion.WFS,
-				"typeName" : git.layers.split(",")[0],
-				"featureID" : fid,
-				"outputformat" : "application/json"
+					"serverName": git.geoserver,
+					"workspace": git.workspace,
+					"version" : gb.module.serviceVersion.WFS,
+					"typeName" : git.layers.split(",")[0],
+					"featureID" : fid,
+					"outputformat" : "application/json"
 			};
 
 			$.ajax({
@@ -4373,7 +4373,7 @@ gb3d.edit.EditingTool2D.prototype.selectFeatureById = function(fid){
 					console.log(data);
 					var gjson = new ol.format.GeoJSON();
 					var features = gjson.readFeatures(data);
-					
+
 					if (features.length > 0) {
 						if (that.interaction.select instanceof ol.interaction.Select) {
 							that.interaction.select.getFeatures().clear();
@@ -4454,4 +4454,56 @@ gb3d.edit.EditingTool2D.prototype.getThreeTree = function(){
  */
 gb3d.edit.EditingTool2D.prototype.setThreeTree = function(tree){
 	this.threeTree = tree;
+}
+
+/**
+ * 버튼을 비활성화 시킨다
+ * 
+ * @method gb3d.edit.EditingTool2D#disableButton
+ * @param {string} btn - 비활성화 시킬 버튼 별칭
+ */
+gb3d.edit.EditingTool2D.prototype.disableButtonModify = function(){
+	if (this.btn["modiBtn"]) {
+		$(this.btn["modiBtn"]).css("color", "rgb(197, 197, 197)");
+		$(this.btn["modiBtn"]).unbind('click');		
+		$(this.btn["modiBtn"]).hover(function(){
+			if(!$(this).hasClass("active")){
+				$(this).css("color", "rgb(197, 197, 197)");
+				$(this).css("text-decoration", "none");
+			}
+		},function(){
+			if(!$(this).hasClass("active")){
+				$(this).css("color", "rgb(197, 197, 197)");
+			}
+		});
+	}
+}
+
+/**
+ * 버튼을 활성화 시킨다
+ * 
+ * @method gb3d.edit.EditingTool2D#enableButton
+ * @param {string} btn - 활성화 시킬 버튼 별칭
+ */
+gb3d.edit.EditingTool2D.prototype.enableButtonModify = function(){
+	var that = this;
+	if (this.btn["modiBtn"]) {
+		$(this.btn["modiBtn"]).css("color", "#23527c");
+		$(this.btn["modiBtn"]).css("text-decoration", "none");
+		$(this.btn["modiBtn"]).css("color", "rgb(85, 85, 85)");
+		$(this.btn["modiBtn"]).click(function(){
+			console.log("modify");
+			that.modify();
+		});
+		$(this.btn["modiBtn"]).hover(function(){
+			if(!$(this).hasClass("active")){
+				$(this).css("color", "#23527c");
+				$(this).css("text-decoration", "none");
+			}
+		},function(){
+			if(!$(this).hasClass("active")){
+				$(this).css("color", "rgb(85, 85, 85)");
+			}
+		});
+	}
 }
