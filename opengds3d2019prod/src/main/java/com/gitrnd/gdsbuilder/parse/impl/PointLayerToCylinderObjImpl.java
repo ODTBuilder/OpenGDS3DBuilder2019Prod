@@ -219,6 +219,9 @@ public class PointLayerToCylinderObjImpl {
 			defaultDepth = Double.parseDouble(depthValue);
 			maxHeight = defaultDepth;
 		}
+		if (this.rType == EnShpToObjRadiusType.DEFAULT) {
+			defaultRadius = Double.parseDouble(radiusValue);
+		}
 
 		// 대용량 처리
 		int totalSize = buildingCollection.size();

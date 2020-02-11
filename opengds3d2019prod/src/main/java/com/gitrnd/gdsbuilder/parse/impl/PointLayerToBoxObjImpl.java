@@ -255,6 +255,12 @@ public class PointLayerToBoxObjImpl {
 			defaultDepth = Double.valueOf(depthValue);
 			maxDepth = defaultDepth;
 		}
+		if (this.hType == EnShpToObjHeightType.DEFAULT) {
+			defaultHeight = Double.valueOf(heightValue);
+		}
+		if (this.wType == EnShpToObjWidthType.DEFAULT) {
+			defaultWidth = Double.valueOf(widthValue);
+		}
 
 		// 대용량 처리
 		int totalSize = buildingCollection.size();
