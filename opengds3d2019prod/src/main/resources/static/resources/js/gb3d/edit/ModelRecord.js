@@ -421,15 +421,37 @@ gb3d.edit.ModelRecord.prototype.createLoaded = function(layer, model) {
  * @method gb3d.edit.ModelRecord#removeByLayer
  * @function
  * @param {String} layerId - 삭제할 Layer의 ID
+ * @param {boolean} del - threejs 객체도 같이 삭제할지 여부
  */
-gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId) {
+gb3d.edit.ModelRecord.prototype.removeByLayer = function(layerId, del) {
 	if (this.removed.hasOwnProperty(layerId)) {
+		if (del) {
+			var features = Object.keys(this.removed[layerId]);
+			for (var i = 0; i < features.length; i++) {
+				var three = this.removed[layerId][features[i]];
+				this.getGb3dMap().deleteThreeObject(three);
+			}
+		}
 		delete this.removed[layerId];
 	}
 	if (this.created.hasOwnProperty(layerId)) {
+		if (del) {
+			var features = Object.keys(this.created[layerId]);
+			for (var i = 0; i < features.length; i++) {
+				var three = this.created[layerId][features[i]];
+				this.getGb3dMap().deleteThreeObject(three);
+			}
+		}
 		delete this.created[layerId];
 	}
 	if (this.modified.hasOwnProperty(layerId)) {
+		if (del) {
+			var features = Object.keys(this.modified[layerId]);
+			for (var i = 0; i < features.length; i++) {
+				var three = this.modified[layerId][features[i]];
+				this.getGb3dMap().deleteThreeObject(three);
+			}
+		}
 		delete this.modified[layerId];
 	}
 }
@@ -473,7 +495,7 @@ gb3d.edit.ModelRecord.prototype.update = function(layer, model) {
 				delete this.loaded[id][keys[i]];
 				break;
 			}
-		}	
+		}
 	}
 	// =========
 	if (((this.id ? model.getFeature().get(this.id) : model.getFeature().getId())).search(".new") !== -1) {

@@ -449,6 +449,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 	var view = this.map.getView(); 
 	this.map.on('singleclick', function(evt) {
+		// 한 번 저장 후에는 fid가 꼬이는 문제로 비활성화
+		return;
 		if (!that.getActiveTool()) {
 			var viewResolution = (view.getResolution());
 			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
@@ -1261,84 +1263,87 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		if (that.features.getLength() > 1) {
 // vfeature.close();
 			that.featurePop.close();
-			for (var i = 0; i < that.features.getLength(); i++) {
-				var idx = that.features.item(i).getId();
-				var fno = idx ? idx.substring(that.features.item(i).getId().indexOf(".") + 1) : "";
-				var td1 = $("<td>").text(fno);
-				var feature = that.features.item(i);
-				var anc = $("<a>").addClass("gb-edit-sel-flist").css("cursor", "pointer").attr({
-					"value" : gitAttr.treeid + "," + feature.getId()
-				}).text("Selecting feature").click(function() {
-					var param = $(this).attr("value").split(",");
-					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-					if (slayers.length !== 1) {
-						console.error(this.translation.alertSelectOneLayer[this.locale]);
-						return;
-					}
-					if (slayers[0] instanceof ol.layer.Tile) {
-						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
-					} else if (slayers[0] instanceof ol.layer.Vector) {
-						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-					}
-					that.count = 1;
-					clearInterval(that.interval);
-					feature.setStyle(undefined);
-					that.interaction.select.getFeatures().clear();
-					that.interaction.select.getFeatures().push(feature);
-					that.featurePop.close();
-					console.log(feature);
-				});
-				var td2 = $("<td>").append(anc);
-				var tr = $("<tr>").append(td1).append(td2).mouseenter(function(evt) {
-					var param = $(this).find("a").attr("value").split(",");
-					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-					if (slayers.length !== 1) {
-						console.error(this.translation.alertSelectOneLayer[this.locale]);
-						return;
-					}
-					if (slayers[0] instanceof ol.layer.Tile) {
-						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
-					} else if (slayers[0] instanceof ol.layer.Vector) {
-						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-					}
-					feature.setStyle(that.highlightStyles1);
-					that.interval = setInterval(function() {
-						var val = that.count % 2;
-						if (val === 0) {
-							feature.setStyle(that.highlightStyles1);
-						} else {
-							feature.setStyle(that.highlightStyles2);
-						}
-						that.count++;
-					}, 500);
-				}).mouseleave(function() {
-					var param = $(this).find("a").attr("value").split(",");
-					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-					if (slayers.length !== 1) {
-						console.error(this.translation.alertSelectOneLayer[this.locale]);
-						return;
-					}
-					if (slayers[0] instanceof ol.layer.Tile) {
-						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
-					} else if (slayers[0] instanceof ol.layer.Vector) {
-						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-					}
-					that.count = 1;
-					clearInterval(that.interval);
-					feature.setStyle(undefined);
-				});
-				$(that.featureTB).append(tr);
-			}
-
-			that.featurePop.open();
-			that.featurePop.getPanel().position({
-				"my" : "left top",
-				"at" : "left bottom",
-				"of" : that.headerTag,
-				"collision" : "fit"
-			});
+			that.features.removeAt(0);
+//			for (var i = 0; i < that.features.getLength(); i++) {
+//				var idx = that.features.item(i).getId();
+//				var fno = idx ? idx.substring(that.features.item(i).getId().indexOf(".") + 1) : "";
+//				var td1 = $("<td>").text(fno);
+//				var feature = that.features.item(i);
+//				var anc = $("<a>").addClass("gb-edit-sel-flist").css("cursor", "pointer").attr({
+//					"value" : gitAttr.treeid + "," + feature.getId()
+//				}).text("Selecting feature").click(function() {
+//					var param = $(this).attr("value").split(",");
+//					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+//					if (slayers.length !== 1) {
+//						console.error(this.translation.alertSelectOneLayer[this.locale]);
+//						return;
+//					}
+//					if (slayers[0] instanceof ol.layer.Tile) {
+//						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
+//					} else if (slayers[0] instanceof ol.layer.Vector) {
+//						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+//					}
+//					that.count = 1;
+//					clearInterval(that.interval);
+//					feature.setStyle(undefined);
+//					that.interaction.select.getFeatures().clear();
+//					that.interaction.select.getFeatures().push(feature);
+//					that.featurePop.close();
+//					console.log(feature);
+//				});
+//				var td2 = $("<td>").append(anc);
+//				var tr = $("<tr>").append(td1).append(td2).mouseenter(function(evt) {
+//					var param = $(this).find("a").attr("value").split(",");
+//					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+//					if (slayers.length !== 1) {
+//						console.error(this.translation.alertSelectOneLayer[this.locale]);
+//						return;
+//					}
+//					if (slayers[0] instanceof ol.layer.Tile) {
+//						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
+//					} else if (slayers[0] instanceof ol.layer.Vector) {
+//						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+//					}
+//					feature.setStyle(that.highlightStyles1);
+//					that.interval = setInterval(function() {
+//						var val = that.count % 2;
+//						if (val === 0) {
+//							feature.setStyle(that.highlightStyles1);
+//						} else {
+//							feature.setStyle(that.highlightStyles2);
+//						}
+//						that.count++;
+//					}, 500);
+//				}).mouseleave(function() {
+//					var param = $(this).find("a").attr("value").split(",");
+//					var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+//					if (slayers.length !== 1) {
+//						console.error(this.translation.alertSelectOneLayer[this.locale]);
+//						return;
+//					}
+//					if (slayers[0] instanceof ol.layer.Tile) {
+//						feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);	
+//					} else if (slayers[0] instanceof ol.layer.Vector) {
+//						feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+//					}
+//					that.count = 1;
+//					clearInterval(that.interval);
+//					feature.setStyle(undefined);
+//				});
+//				$(that.featureTB).append(tr);
+//			}
+//
+//			that.featurePop.open();
+//			that.featurePop.getPanel().position({
+//				"my" : "left top",
+//				"at" : "left bottom",
+//				"of" : that.headerTag,
+//				"collision" : "fit"
+//			});
 // that.attrPop.close();
-		} else if (that.features.getLength() === 1) {
+//		} else if (that.features.getLength() === 1) {
+		}
+		if (that.features.getLength() === 1) {
 			// 피처 버저닝 이력 시작
 			var features = that.interaction.select.getFeatures();
 			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
