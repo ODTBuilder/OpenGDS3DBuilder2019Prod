@@ -47,7 +47,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import com.gitrnd.gdsbuilder.fileread.en.EnFileFormat;
+import com.gitrnd.gdsbuilder.file.en.EnFileFormat;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayer;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerCollection;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerCollectionList;

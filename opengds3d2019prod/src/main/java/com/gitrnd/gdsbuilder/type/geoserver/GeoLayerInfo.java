@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.gitrnd.gdsbuilder.fileread.FileMeta;
+import com.gitrnd.gdsbuilder.file.FileMeta;
 
 /**
  * Geoserver에 발행할 레이어 정보를 저장하는 클래스

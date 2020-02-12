@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.gitrnd.gdsbuilder.fileread.FileMeta;
+import com.gitrnd.gdsbuilder.file.FileMeta;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.qaproducer.common.security.LoginUser;
 import com.gitrnd.qaproducer.controller.AbstractController;
@@ -46,7 +46,7 @@ import com.gitrnd.qaproducer.upload.service.FileUploadService;
  */
 @Controller("fileUploadController")
 @RequestMapping("/file")
-public class FileUploadController extends AbstractController{
+public class FileUploadController extends AbstractController {
 	/**
 	 * {@link FileUploadController} {@link Logger}
 	 */
@@ -61,25 +61,26 @@ public class FileUploadController extends AbstractController{
 
 	/**
 	 * 검수대상 파일 업로드
+	 * 
 	 * @author SG.LEE
 	 * @since 2017. 4
-	 * @param request {@link MultipartHttpServletRequest} 
-	 * @param response {@link HttpServletResponse} 
-	 * @param loginUser 
+	 * @param request   {@link MultipartHttpServletRequest}
+	 * @param response  {@link HttpServletResponse}
+	 * @param loginUser
 	 * @return
 	 * @throws Throwable
 	 */
 	@RequestMapping(value = "/fileUpload.ajax", method = RequestMethod.POST)
 	public @ResponseBody LinkedList<FileMeta> fileUploadRequest(MultipartHttpServletRequest request,
 			HttpServletResponse response, @AuthenticationPrincipal LoginUser loginUser) throws Throwable {
-		if(loginUser==null){
+		if (loginUser == null) {
 			response.sendError(600);
 			throw new NullPointerException("로그인 세션이 존재하지 않습니다.");
 		}
 		String serverName = request.getParameter("serverName");
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
 		LinkedList<FileMeta> files = new LinkedList<FileMeta>();
-		files = fileService.filesUpload(dtGeoserverManager,loginUser,request, response);
+		files = fileService.filesUpload(dtGeoserverManager, loginUser, request, response);
 		return files;
 	}
 

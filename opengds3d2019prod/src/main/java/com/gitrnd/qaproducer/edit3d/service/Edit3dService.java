@@ -1,6 +1,5 @@
 package com.gitrnd.qaproducer.edit3d.service;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,8 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -54,12 +51,13 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.gitrnd.gdsbuilder.file.FileManager;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.gdsbuilder.geoserver.converter.type.GeneralMapExport;
-import com.gitrnd.gdsbuilder.parse.impl.ObjParser;
-import com.gitrnd.gdsbuilder.parse.impl.test.DefaultObjFace;
-import com.gitrnd.gdsbuilder.parse.impl.test.ObjReader;
-import com.gitrnd.gdsbuilder.parse.impl.test.ObjWriter;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ObjParser;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.objfile.DefaultObjFace;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.objfile.ObjReader;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.objfile.ObjWriter;
 
 import de.javagl.obj.FloatTuple;
 import de.javagl.obj.Obj;
@@ -100,6 +98,20 @@ public class Edit3dService {
 	@Value("${gitrnd.apache.basedir}")
 	private String apacheBasedir;
 
+	/**
+	 * @param user        사용자명
+	 * @param objPath     원본 obj 경로
+	 * @param centerXtile 원본 obj 중심점 x
+	 * @param centerYtile 원본 obj 중심점 y
+	 * @param featureId   변환 객체 id
+	 * @param centerXedit 변환 객체 중심점 x
+	 * @param centerYedit 변환 객체 중심점 y
+	 * @return 변환 성공 여부 및 gltf 파일 경로
+	 * @throws ParseException
+	 * @throws IOException
+	 * 
+	 * @author DY.Oh
+	 */
 	public JSONObject convertObjToGltf(String user, String objPath, double centerXtile, double centerYtile,
 			String featureId, double centerXedit, double centerYedit) throws ParseException, IOException {
 
@@ -147,17 +159,17 @@ public class Edit3dService {
 		}
 
 		String directory = originFile.getParent() + File.separator + "edit";
-		createFileDirectory(directory);
+		FileManager.createFileDirectory(directory);
 		// Write an Mtl, Image file
 		if (mtlPath != null && image != null) {
 			File mtlFile = new File(mtlPath);
 			InputStream mtlIs = new FileInputStream(mtlFile);
 			OutputStream mtlOs = new FileOutputStream(directory + File.separator + mtlFile.getName());
-			fileCopy(mtlIs, mtlOs);
+			FileManager.fileCopy(mtlIs, mtlOs);
 			File imageFile = new File(image);
 			InputStream imageIs = new FileInputStream(imageFile);
 			OutputStream imageOs = new FileOutputStream(directory + File.separator + imageFile.getName());
-			fileCopy(imageIs, imageOs);
+			FileManager.fileCopy(imageIs, imageOs);
 		}
 		// Write an OBJ file
 		OutputStream objOutputStream = null;
@@ -185,7 +197,7 @@ public class Edit3dService {
 		String zipPath = originFile.getParent() + File.separator + zipfile; // zip
 																			// 파일
 																			// 이름
-		createZipFile(directory, zipPath);
+		FileManager.createZipFile(directory, zipPath);
 
 		// web path
 		String webPath = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?" + "user=" + user
@@ -229,11 +241,23 @@ public class Edit3dService {
 			zipFile.delete();
 		}
 		// edit 폴더 삭제
-		deleteDirectory(new File(directory));
+		FileManager.deleteDirectory(new File(directory));
 
 		return returnJson;
 	}
 
+	/**
+	 * @param dtGeoserverManager geoserver 정보
+	 * @param workspace          geoserver workspace명
+	 * @param datastore          geoserver datastore명
+	 * @param layerId            geoserver layer명
+	 * @param user               사용자명
+	 * @param editObjJSON        편집이력
+	 * @return 편집 성공 여부 및 최상위 tileset 경로 반환
+	 * @throws Exception
+	 * 
+	 * @author DY.Oh
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject editObjFiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
 			String layerId, String user, JSONObject editObjJSON) throws Exception {
@@ -272,7 +296,6 @@ public class Edit3dService {
 			if (editObjJSON.get("modified") != null) {
 
 				JSONObject modifiedResult = new JSONObject();
-
 				JSONObject modifiedFeatureObj = (JSONObject) editObjJSON.get("modified");
 				totalFeautresStr = editObjJSON.get("totalFeatures").toString();
 
@@ -495,7 +518,7 @@ public class Edit3dService {
 					// 편집 obj 파일 -> 3d tiles로 변환
 					// obj 압축
 					String zipfile = "edit_obj.zip";
-					createZipFile(zipPath, zipPath + File.separator + zipfile);
+					FileManager.createZipFile(zipPath, zipPath + File.separator + zipfile);
 
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
 							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -591,7 +614,7 @@ public class Edit3dService {
 					// 수정 후 zip path
 					String zipPath = new File(originObjPath).getParent();
 					String zipfile = "edit_obj.zip";
-					createZipFile(zipPath, zipPath + File.separator + zipfile);
+					FileManager.createZipFile(zipPath, zipPath + File.separator + zipfile);
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
 							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
 					// body
@@ -865,7 +888,7 @@ public class Edit3dService {
 					if (editMtlPath != null) {
 						zipFiles.add(new File(editMtlPath));
 					}
-					createZipFile(zipFiles, zipPath);
+					FileManager.createZipFile(zipFiles, zipPath);
 
 					String downloadURL = "http://" + serverIP + ":" + serverPort + context + "/downloadObj.do" + "?"
 							+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -908,7 +931,7 @@ public class Edit3dService {
 
 						String combinezipfile = "combine.zip";
 						String combinezipPath = tilesetParent.getPath() + File.separator + combinezipfile;
-						createZipFile(tilesetParent.getPath(), combinezipPath);
+						FileManager.createZipFile(tilesetParent.getPath(), combinezipPath);
 
 						String downloadUrl = "http://" + serverIP + ":" + serverPort + context + "/download3dtiles.do"
 								+ "?" + "user=" + user + "&time=" + timeStr + "&file=" + combinezipfile;
@@ -939,153 +962,6 @@ public class Edit3dService {
 			}
 		}
 		return resultJSON;
-	}
-
-	public void createZipPathFile(String path, String toPath) {
-
-		File dir = new File(path);
-		String[] list = dir.list();
-		String _path;
-
-		if (!dir.canRead() || !dir.canWrite())
-			return;
-
-		int len = list.length;
-
-		if (path.charAt(path.length() - 1) != '/')
-			_path = path + "/";
-		else
-			_path = path;
-
-		try {
-			ZipOutputStream zip_out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(toPath), 2048));
-			for (int i = 0; i < len; i++)
-				zip_folder(path, "", new File(_path + list[i]), zip_out);
-			zip_out.close();
-		} catch (FileNotFoundException e) {
-			e.getMessage();
-		} catch (IOException e) {
-			e.getMessage();
-		} finally {
-
-		}
-	}
-
-	public void createZipFile(List<File> files, String toPath) {
-
-		try {
-			ZipOutputStream zip_out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(toPath), 2048));
-			for (int i = 0; i < files.size(); i++) {
-				File file = files.get(i);
-				zip_folder(file.getAbsolutePath(), "", file, zip_out);
-			}
-			zip_out.close();
-		} catch (FileNotFoundException e) {
-			e.getMessage();
-		} catch (IOException e) {
-			e.getMessage();
-		}
-	}
-
-	public void createZipFile(String path, String toPath) {
-
-		File dir = new File(path);
-		String[] list = dir.list();
-		String _path;
-
-		if (!dir.canRead() || !dir.canWrite())
-			return;
-
-		int len = list.length;
-
-		if (path.charAt(path.length() - 1) != '/')
-			_path = path + "/";
-		else
-			_path = path;
-
-		try {
-			ZipOutputStream zip_out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(toPath), 2048));
-			for (int i = 0; i < len; i++)
-				zip_folder(path, "", new File(_path + list[i]), zip_out);
-			zip_out.close();
-		} catch (FileNotFoundException e) {
-			e.getMessage();
-		} catch (IOException e) {
-			e.getMessage();
-		} finally {
-
-		}
-	}
-
-	private void zip_folder(String ZIP_FROM_PATH, String parent, File file, ZipOutputStream zout) throws IOException {
-
-		byte[] data = new byte[2048];
-		int read;
-
-		if (file.isFile()) {
-			ZipEntry entry = new ZipEntry(parent + file.getName());
-
-			zout.putNextEntry(entry);
-			BufferedInputStream instream = new BufferedInputStream(new FileInputStream(file));
-
-			while ((read = instream.read(data, 0, 2048)) != -1)
-				zout.write(data, 0, read);
-
-			zout.flush();
-			zout.closeEntry();
-			instream.close();
-		} else if (file.isDirectory()) {
-			String parentString = file.getPath().replace(ZIP_FROM_PATH, "");
-			parentString = parentString.substring(0, parentString.length() - file.getName().length());
-			ZipEntry entry = new ZipEntry(parentString + file.getName() + "/");
-
-			zout.putNextEntry(entry);
-
-			String[] list = file.list();
-			if (list != null) {
-				int len = list.length;
-				for (int i = 0; i < len; i++) {
-					zip_folder(ZIP_FROM_PATH, entry.getName(), new File(file.getPath() + "/" + list[i]), zout);
-				}
-			}
-		}
-
-	}
-
-	private void createFileDirectory(String directory) {
-		File file = new File(directory);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-	}
-
-	private void deleteDirectory(File dir) {
-
-		if (dir.exists()) {
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					deleteDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
-
-	private void fileCopy(InputStream is, OutputStream os) {
-		try {
-			int data = 0;
-			while ((data = is.read()) != -1) {
-				os.write(data);
-			}
-			is.close();
-			os.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	public FeatureCollection<SimpleFeatureType, SimpleFeature> getFeatureCollectionFromFileWithFilter(File file,

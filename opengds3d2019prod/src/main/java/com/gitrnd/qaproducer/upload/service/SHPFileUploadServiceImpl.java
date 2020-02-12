@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.gitrnd.gdsbuilder.fileread.FileMeta;
-import com.gitrnd.gdsbuilder.fileread.UnZipFile;
+import com.gitrnd.gdsbuilder.file.FileMeta;
+import com.gitrnd.gdsbuilder.file.UnZipFile;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.qaproducer.geoserver.service.GeoserverService;
 

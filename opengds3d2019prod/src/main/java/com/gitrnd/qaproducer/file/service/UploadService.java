@@ -2,7 +2,6 @@ package com.gitrnd.qaproducer.file.service;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -11,8 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -26,6 +23,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.gitrnd.gdsbuilder.file.FileManager;
 import com.gitrnd.qaproducer.common.security.LoginUser;
 import com.gitrnd.qaproducer.filestatus.domain.FileStatus;
 import com.gitrnd.qaproducer.filestatus.service.FileStatusService;
@@ -39,10 +37,6 @@ public class UploadService {
 
 	@Value("${gitrnd.serverhost}")
 	private String serverIP;
-
-	/*
-	 * @Value("${gitrnd.apache.port}") private String apachePort;
-	 */
 
 	@Value("${gitrnd.apache.basedir}")
 	private String baseDir;
@@ -158,7 +152,7 @@ public class UploadService {
 
 		boolean isSucc = true;
 		// 1. build an iterator
-		//Iterator<String> itr = request.getFileNames();
+		// Iterator<String> itr = request.getFileNames();
 		MultipartFile mpf = request.getFile("file");
 
 //		MultipartFile mpf = null;
@@ -174,7 +168,7 @@ public class UploadService {
 			// D:/temp/files" exists)
 			FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
 			try {
-				decompress(zipFile, basePath);
+				FileManager.decompress(zipFile, basePath);
 				// tileset.json 유무 확인
 				File baseFile = new File(basePath);
 				boolean isture = false;
@@ -188,7 +182,7 @@ public class UploadService {
 				}
 				if (!isture) {
 					isSucc = false;
-					deleteDirectory(baseFile);
+					FileManager.deleteDirectory(baseFile);
 				}
 				// zip 파일 삭제
 				File file = new File(zipFile);
@@ -206,7 +200,7 @@ public class UploadService {
 //		}
 
 		if (!isSucc) {
-			deleteDirectory(path.getParentFile());
+			FileManager.deleteDirectory(path.getParentFile());
 		}
 
 		returnJson.put("succ", isSucc);
@@ -337,7 +331,7 @@ public class UploadService {
 				// D:/temp/files" exists)
 				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
 				try {
-					decompress(zipFile, uploadPath);
+					FileManager.decompress(zipFile, uploadPath);
 					File file = new File(zipFile);
 					file.delete();
 				} catch (Throwable e) {
@@ -395,7 +389,7 @@ public class UploadService {
 				// D:/temp/files" exists)
 				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(zipFile));
 				try {
-					decompress(zipFile, originObjFolder);
+					FileManager.decompress(zipFile, originObjFolder);
 					File file = new File(zipFile);
 					file.delete();
 				} catch (Throwable e) {
@@ -459,82 +453,4 @@ public class UploadService {
 		}
 	}
 
-	private void decompress(String zipFileName, String directory) throws Throwable {
-
-		File zipFile = new File(zipFileName);
-		FileInputStream fis = null;
-		ZipInputStream zis = null;
-		ZipEntry zipentry = null;
-		try {
-			// 파일 스트림
-			fis = new FileInputStream(zipFile);
-			// Zip 파일 스트림
-			zis = new ZipInputStream(fis);
-			// entry가 없을때까지 뽑기
-			while ((zipentry = zis.getNextEntry()) != null) {
-				String filename = zipentry.getName();
-				File file = new File(directory, filename);
-				// entiry가 폴더면 폴더 생성
-				if (zipentry.isDirectory()) {
-					file.mkdirs();
-				} else {
-					// 파일이면 파일 만들기
-					if (file.getName().contains(".mtl") || file.getName().contains(".jpg")) {
-						continue;
-					} else {
-						createFile(file, zis);
-					}
-				}
-			}
-		} catch (Throwable e) {
-			throw e;
-		} finally {
-			if (zis != null)
-				zis.close();
-			if (fis != null)
-				fis.close();
-		}
-	}
-
-	/**
-	 * 파일 만들기 메소드
-	 * 
-	 * @param file 파일
-	 * @param zis  Zip스트림
-	 */
-	private void createFile(File file, ZipInputStream zis) throws Throwable {
-		// 디렉토리 확인
-		File parentDir = new File(file.getParent());
-		// 디렉토리가 없으면 생성하자
-		if (!parentDir.exists()) {
-			parentDir.mkdirs();
-		}
-		// 파일 스트림 선언
-		try (FileOutputStream fos = new FileOutputStream(file)) {
-			byte[] buffer = new byte[256];
-			int size = 0;
-			// Zip스트림으로부터 byte뽑아내기
-			while ((size = zis.read(buffer)) > 0) {
-				// byte로 파일 만들기
-				fos.write(buffer, 0, size);
-			}
-		} catch (Throwable e) {
-			throw e;
-		}
-	}
-
-	private void deleteDirectory(File dir) {
-
-		if (dir.exists()) {
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					deleteDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
 }

@@ -1,7 +1,6 @@
 /**
+ * edit 3d controller
  * 
- */
-/**
  * @author DY.Oh
  *
  */

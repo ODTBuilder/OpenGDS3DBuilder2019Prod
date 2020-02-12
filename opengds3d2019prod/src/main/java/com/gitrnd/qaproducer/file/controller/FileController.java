@@ -15,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,9 +92,8 @@ public class FileController extends AbstractController {
 	}
 
 	@RequestMapping(value = "/tilesdownload.ajax", method = RequestMethod.POST)
-	public void download3dtilesZip(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam String path) throws IOException {
-//		String path = (String) params.get("path");
+	public void download3dtilesZip(HttpServletRequest request, HttpServletResponse response, @RequestParam String path)
+			throws IOException {
 		downloadService.download3dtilesZip(path, response);
 	}
 

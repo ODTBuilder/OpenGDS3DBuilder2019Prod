@@ -38,6 +38,19 @@ public class Edit3dController extends AbstractController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Edit3dController.class);
 
+	/**
+	 * 아파치 경로에 저장되어 있는 Obj 파일 내 featureId를 가지는 1개 객체를 gltf로 변환하여 경로 반환
+	 * 
+	 * @param request   HttpServletRequest
+	 * @param response  HttpServletResponse
+	 * @param params    필수 파라미터
+	 * @param loginUser 사용자 정보
+	 * @return JSONObject 변환 성공 여부 및 gltf 파일 경로
+	 * @throws IOException
+	 * @throws ParseException
+	 * 
+	 * @author DY.Oh
+	 */
 	@RequestMapping(value = "/objToGltf.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject convertObjToGltf(HttpServletRequest request, HttpServletResponse response,
@@ -59,6 +72,18 @@ public class Edit3dController extends AbstractController {
 
 	}
 
+	/**
+	 * 아파치 경로에 있는 3d tiles(.b3dm, tileset.json)을 수정하여 경로 반환
+	 * 
+	 * @param request   HttpServletRequest
+	 * @param response  HttpServletResponse
+	 * @param editInfo  필수 파라미터 (편집이력)
+	 * @param loginUser 사용자 정보
+	 * @return 편집 성공 여부 및 최상위 tileset 경로 반환
+	 * @throws Exception
+	 * 
+	 * @author DY.Oh
+	 */
 	@RequestMapping(value = "/edit3dLayers.do", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject editSingleObj(HttpServletRequest request, HttpServletResponse response,

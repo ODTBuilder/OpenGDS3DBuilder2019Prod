@@ -17,15 +17,11 @@
 
 package com.gitrnd.qaproducer.geoserver.service;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -68,8 +63,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.gitrnd.gdsbuilder.fileread.UnZipFile;
-import com.gitrnd.gdsbuilder.fileread.shp.SHPFileWriter;
+import com.gitrnd.gdsbuilder.file.FileManager;
+import com.gitrnd.gdsbuilder.file.UnZipFile;
+import com.gitrnd.gdsbuilder.file.shp.SHPFileWriter;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverPublisher;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverReader;
@@ -84,11 +80,11 @@ import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayer;
 import com.gitrnd.gdsbuilder.geoserver.layer.DTGeoLayerList;
 import com.gitrnd.gdsbuilder.geoserver.service.en.EnLayerBboxRecalculate;
 import com.gitrnd.gdsbuilder.parse.impl.DataConvertorImpl;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjDepthType;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjHeightType;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjRadiusType;
-import com.gitrnd.gdsbuilder.parse.impl.ShpToObjImpl.EnShpToObjWidthType;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ShpToObjImpl;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ShpToObjImpl.EnShpToObjDepthType;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ShpToObjImpl.EnShpToObjHeightType;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ShpToObjImpl.EnShpToObjRadiusType;
+import com.gitrnd.gdsbuilder.parse.impl.objparser.ShpToObjImpl.EnShpToObjWidthType;
 import com.gitrnd.gdsbuilder.type.geoserver.GeoLayerInfo;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -289,11 +285,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 								// 압축파일 삭제
 								File delFile = unZipFile.getZipFile();
-								deleteDirectory(new File(tmp.toFile() + File.separator + trimOName));
+								FileManager.deleteDirectory(new File(tmp.toFile() + File.separator + trimOName));
 								delFile.delete();
 							} catch (Throwable e) {
 								// TODO Auto-generated catch block
-								deleteDirectory(tmp.toFile());
+								FileManager.deleteDirectory(tmp.toFile());
 								logger.warn("압축파일 풀기 실패");
 								resultJson.put("status_Code", 608);
 								return resultJson;
@@ -305,7 +301,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							if (targetDir.exists() == false) {
 								logger.warn("폴더경로가 존재하지 않습니다");
 								resultJson.put("status_Code", 608);
-								deleteDirectory(tmp.toFile());
+								FileManager.deleteDirectory(tmp.toFile());
 								return resultJson;
 							}
 
@@ -317,7 +313,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 									// 파일구조 이상
 									logger.warn("압축파일내에 폴더가 있습니다.");
 									resultJson.put("status_Code", 608);
-									deleteDirectory(tmp.toFile());
+									FileManager.deleteDirectory(tmp.toFile());
 									return resultJson;
 								}
 							}
@@ -334,10 +330,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 									 */
 
 									if (_fileName.contains(".")) {
-										moveDirectory(_fileName.substring(0, _fileName.lastIndexOf(".")),
+										FileManager.moveDirectory(_fileName.substring(0, _fileName.lastIndexOf(".")),
 												_fileName + "." + ext, filePath, unzipPath);
 									} else {
-										moveDirectory(_fileName, _fileName + "." + ext, filePath, unzipPath);
+										FileManager.moveDirectory(_fileName, _fileName + "." + ext, filePath,
+												unzipPath);
 									}
 								}
 							}
@@ -352,7 +349,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 								fileName = targetFile.getName() + ".zip";
 
 								String zipPath = filePath + File.separator + fileName;
-								createZipFile(filePath, zipPath);
+								FileManager.createZipFile(filePath, zipPath);
 
 								String fileZipPath = filePath + File.separator + fileName;
 								int result = this.singleFileUpload(new File(fileZipPath), dtGeoManager, workspace,
@@ -364,7 +361,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 								tempArray.add(lResultJson);
 							}
 						} else {
-							deleteDirectory(tmp.toFile());
+							FileManager.deleteDirectory(tmp.toFile());
 							logger.warn("zip파일이 아님");
 							resultJson.put("status_Code", 608);
 							return resultJson;
@@ -374,14 +371,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 						e.printStackTrace();
 					}
 				} else {
-					deleteDirectory(tmp.toFile());
+					FileManager.deleteDirectory(tmp.toFile());
 					logger.warn("파일이 2개이상");
 					resultJson.put("status_Code", 608);
 					return resultJson;
 				}
 			}
 			// 성공 or 실패시 파일삭제
-			deleteDirectory(tmp.toFile());
+			FileManager.deleteDirectory(tmp.toFile());
 		} else {
 			logger.warn("workspace 또는 datastore 존재 X");
 			resultJson.put("status_Code", 607);
@@ -665,12 +662,13 @@ public class GeoserverServiceImpl implements GeoserverService {
 							} catch (SchemaException | FactoryException e) {
 								// TODO Auto-generated catch block
 								if (tmpFile != null) {
-									deleteDirectory(tmpFile);
+									FileManager.deleteDirectory(tmpFile);
 								}
 								logger.warn("shp파일 생성불가");
 								return 610;
 							}
-							createZipFile(tmpBasedir.toString(), tmpBasedir.toString() + layerName + ".zip");
+							FileManager.createZipFile(tmpBasedir.toString(),
+									tmpBasedir.toString() + layerName + ".zip");
 
 							String saveFilePath = tmpBasedir + File.separator + layerName + ".zip";
 
@@ -680,21 +678,21 @@ public class GeoserverServiceImpl implements GeoserverService {
 							if (serverPFlag) {
 								puFlag = 200;
 							} else {
-								deleteDirectory(tmpBasedir.toFile());
+								FileManager.deleteDirectory(tmpBasedir.toFile());
 								puFlag = 610;
 								logger.warn("발행실패");
 							}
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							if (tmpFile != null) {
-								deleteDirectory(tmpFile);
+								FileManager.deleteDirectory(tmpFile);
 							}
 							puFlag = 610;
 							logger.warn("발행실패");
 						}
 						// 성공 or 실패시 파일삭제
 						if (tmpFile != null) {
-							deleteDirectory(tmpFile);
+							FileManager.deleteDirectory(tmpFile);
 						}
 					} else {
 						logger.warn("geojson 오류로 인한 SimpleFeatureCollection 생성불가");
@@ -1210,7 +1208,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 					// shp 경로
 					String shpPath = basePath + File.separator + "shp";
-					createFileDirectory(shpPath);
+					FileManager.createFileDirectory(shpPath);
 
 					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
 							.export();
@@ -1221,7 +1219,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// obj 경로
 						String objPath = basePath + File.separator + "obj";
-						createFileDirectory(objPath);
+						FileManager.createFileDirectory(objPath);
 
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
@@ -1261,7 +1259,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						// 파일 폴더 압축
 						String zipfile = timeStr + "_obj.zip";
 						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
-						createZipFile(folderPath, zipPath);
+						FileManager.createZipFile(folderPath, zipPath);
 
 						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -1313,7 +1311,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							zipFile.delete();
 						}
 						// shp 삭제
-						deleteDirectory(shpPath);
+						FileManager.deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1355,7 +1353,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 					// shp 경로
 					String shpPath = basePath + File.separator + "shp";
-					createFileDirectory(shpPath);
+					FileManager.createFileDirectory(shpPath);
 
 					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
 							.export();
@@ -1366,7 +1364,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// obj 경로
 						String objPath = basePath + File.separator + "obj";
-						createFileDirectory(objPath);
+						FileManager.createFileDirectory(objPath);
 
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
@@ -1411,7 +1409,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						// 파일 폴더 압축
 						String zipfile = timeStr + "_obj.zip";
 						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
-						createZipFile(folderPath, zipPath);
+						FileManager.createZipFile(folderPath, zipPath);
 
 						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -1463,7 +1461,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							zipFile.delete();
 						}
 						// shp 삭제
-						deleteDirectory(shpPath);
+						FileManager.deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1506,7 +1504,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 					// shp 경로
 					String shpPath = basePath + File.separator + "shp";
-					createFileDirectory(shpPath);
+					FileManager.createFileDirectory(shpPath);
 
 					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
 							.export();
@@ -1517,7 +1515,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// obj 경로
 						String objPath = basePath + File.separator + "obj";
-						createFileDirectory(objPath);
+						FileManager.createFileDirectory(objPath);
 
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
@@ -1570,7 +1568,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						// 파일 폴더 압축
 						String zipfile = timeStr + "_obj.zip";
 						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
-						createZipFile(folderPath, zipPath);
+						FileManager.createZipFile(folderPath, zipPath);
 
 						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -1622,7 +1620,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							zipFile.delete();
 						}
 						// shp 삭제
-						deleteDirectory(shpPath);
+						FileManager.deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1664,7 +1662,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 					// shp 경로
 					String shpPath = basePath + File.separator + "shp";
-					createFileDirectory(shpPath);
+					FileManager.createFileDirectory(shpPath);
 
 					int downReNum = new GeneralMapExport(serverURL, workspace, layerName, shpPath, "EPSG:4326")
 							.export();
@@ -1675,7 +1673,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 						// obj 경로
 						String objPath = basePath + File.separator + "obj";
-						createFileDirectory(objPath);
+						FileManager.createFileDirectory(objPath);
 
 						// shp to obj
 						ShpToObjImpl shpToObj = new ShpToObjImpl(buildingFile, filter, objPath);
@@ -1721,7 +1719,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						// 파일 폴더 압축
 						String zipfile = timeStr + "_obj.zip";
 						String zipPath = basePath + File.separator + zipfile; // zip 파일 이름
-						createZipFile(folderPath, zipPath);
+						FileManager.createZipFile(folderPath, zipPath);
 
 						String path = "http://" + serverIP + ":" + serverPort + context + "/downloadzip.do" + "?"
 								+ "user=" + user + "&time=" + timeStr + "&file=" + zipfile;
@@ -1773,7 +1771,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 							zipFile.delete();
 						}
 						// shp 삭제
-						deleteDirectory(shpPath);
+						FileManager.deleteDirectory(shpPath);
 					} else {
 						logger.warn("다운로드 실패");
 					}
@@ -1785,199 +1783,6 @@ public class GeoserverServiceImpl implements GeoserverService {
 		return returnJSON;
 
 	}
-
-	private void createFileDirectory(String directory) {
-		File file = new File(directory);
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-	}
-
-	public void createZipFile(String path, String toPath) {
-
-		File dir = new File(path);
-		String[] list = dir.list();
-		String _path;
-
-		if (!dir.canRead() || !dir.canWrite())
-			return;
-
-		int len = list.length;
-
-		if (path.charAt(path.length() - 1) != '/')
-			_path = path + "/";
-		else
-			_path = path;
-
-		try {
-			ZipOutputStream zip_out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(toPath), 2048));
-			for (int i = 0; i < len; i++)
-				zip_folder(path, "", new File(_path + list[i]), zip_out);
-			zip_out.close();
-		} catch (FileNotFoundException e) {
-			e.getMessage();
-		} catch (IOException e) {
-			e.getMessage();
-		} finally {
-
-		}
-	}
-
-	private void zip_folder(String ZIP_FROM_PATH, String parent, File file, ZipOutputStream zout) throws IOException {
-
-		byte[] data = new byte[2048];
-		int read;
-
-		if (file.isFile()) {
-			ZipEntry entry = new ZipEntry(parent + file.getName());
-
-			zout.putNextEntry(entry);
-			BufferedInputStream instream = new BufferedInputStream(new FileInputStream(file));
-
-			while ((read = instream.read(data, 0, 2048)) != -1)
-				zout.write(data, 0, read);
-
-			zout.flush();
-			zout.closeEntry();
-			instream.close();
-		} else if (file.isDirectory()) {
-			String parentString = file.getPath().replace(ZIP_FROM_PATH, "");
-			parentString = parentString.substring(0, parentString.length() - file.getName().length());
-			ZipEntry entry = new ZipEntry(parentString + file.getName() + "/");
-
-			zout.putNextEntry(entry);
-
-			String[] list = file.list();
-			if (list != null) {
-				int len = list.length;
-				for (int i = 0; i < len; i++) {
-					zip_folder(ZIP_FROM_PATH, entry.getName(), new File(file.getPath() + "/" + list[i]), zout);
-				}
-			}
-		}
-
-	}
-
-	/**
-	 * ZipOutputStream를 넘겨 받아서 하나의 압축파일로 만든다.
-	 * 
-	 * @param parent 상위폴더명
-	 * @param file   압축할 파일
-	 * @param zout   압축전체스트림
-	 * @throws IOException
-	 */
-	private static void zip_folder(String parent, File file, ZipOutputStream zout) throws IOException {
-		byte[] data = new byte[2048];
-		int read;
-
-		if (file.isFile()) {
-			ZipEntry entry = new ZipEntry(parent + file.getName());
-			zout.putNextEntry(entry);
-			BufferedInputStream instream = new BufferedInputStream(new FileInputStream(file));
-
-			while ((read = instream.read(data, 0, 2048)) != -1)
-				zout.write(data, 0, read);
-
-			zout.flush();
-			zout.closeEntry();
-			instream.close();
-		}
-	}
-
-	/**
-	 * 파일이동
-	 * 
-	 * @author SG.Lee
-	 * @since 2018. 4. 18. 오전 9:46:27
-	 * @param folderName
-	 * @param fileName
-	 * @param beforeFilePath
-	 * @param afterFilePath
-	 * @return String
-	 */
-	private static String moveDirectory(String folderName, String fileName, String beforeFilePath,
-			String afterFilePath) {
-		String path = afterFilePath + "/" + folderName;
-		String filePath = path + "/" + fileName;
-
-		File dir = new File(path);
-
-		if (!dir.exists()) { // 폴더 없으면 폴더 생성
-			dir.mkdirs();
-		}
-
-		try {
-			File file = new File(beforeFilePath);
-
-			if (file.renameTo(new File(filePath))) { // 파일 이동
-				return filePath; // 성공시 성공 파일 경로 return
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			e.getMessage();
-			return null;
-		}
-	}
-
-	/**
-	 * 파일복사
-	 * 
-	 * @author SG.Lee
-	 * @since 2018. 4. 18. 오전 9:45:55
-	 * @param source
-	 * @param dest
-	 * @throws IOException void
-	 */
-	private void FileNio2Copy(String source, String dest) throws IOException {
-		Files.copy(new File(source).toPath(), new File(dest).toPath());
-	}
-
-	private void deleteDirectory(File dir) {
-
-		if (dir.exists()) {
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					deleteDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
-
-	private void deleteDirectory(String path) {
-
-		File dir = new File(path);
-		if (dir.exists()) {
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					deleteDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
-
-	public void fileCopy(InputStream is, OutputStream os) {
-		try {
-			int data = 0;
-			while ((data = is.read()) != -1) {
-				os.write(data);
-			}
-			is.close();
-			os.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 }
 
 /**

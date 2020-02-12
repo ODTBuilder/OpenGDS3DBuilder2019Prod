@@ -18,7 +18,6 @@
 package com.gitrnd.qaproducer.geoserver.service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -368,18 +367,95 @@ public interface GeoserverService {
 	 */
 	public List<String> getStyleList(DTGeoserverManager geoserverManager, String workspace);
 
+	/**
+	 * geoserver에 저장된 Polygon 타입의 2D 레이어를 3D tiles 파일 포맷으로 변환 후 변환 성공 여부 및
+	 * tileset.json 파일 경로를 반환한다.
+	 * 
+	 * @param dtGeoserverManager Geoserver API 연동 클래스
+	 * @param workspace          workspace명
+	 * @param datastore          datastore명
+	 * @param layerName          layer명
+	 * @param username           사용자명
+	 * @param depthType          높이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param depthtValue        입력 높이값 (입력 타입이 default인 경우 고정값, 입력 타입이 fix인 경우 속성명)
+	 * @param texture            입력 texture명
+	 * @return JSONObject {"succ": 변환 성공 여부, "path" : tileset.json 경로}
+	 * @throws Exception
+	 * 
+	 * @author DY.Oh
+	 */
 	public JSONObject geoPolygonlayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
-			String datastore, String layerName, String username, String heightType, String heightValue, String texture)
+			String datastore, String layerName, String username, String depthType, String depthtValue, String texture)
 			throws Exception;
 
+	/**
+	 * geoserver에 저장된 LineString 타입의 2D 레이어를 3D tiles 파일 포맷으로 변환 후 변환 성공 여부 및
+	 * tileset.json 파일 경로를 반환한다.
+	 * 
+	 * @param dtGeoserverManager Geoserver API 연동 클래스
+	 * @param workspace          workspace명
+	 * @param datastore          datastore명
+	 * @param layerName          layer명
+	 * @param username           사용자명
+	 * @param depthType          높이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param depthtValue        입력 높이값 (입력 타입이 default인 경우 고정값, 입력 타입이 fix인 경우 속성명)
+	 * @param widthType          넓이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param widthValue         넓이값 (넓이 타입이 default인 경우 고정값, 넓이 타입이 fix인 경우 속성명)
+	 * @param texture            입력 texture명
+	 * @return JSONObject {"succ": 변환 성공 여부, "path" : tileset.json 경로}
+	 * @throws Exception
+	 * 
+	 * @author DY.Oh
+	 */
 	public JSONObject geoLinelayerTo3DTiles(DTGeoserverManager dtGeoserverManager, String workspace, String datastore,
-			String layerName, String username, String heightType, String heightValue, String widthType,
+			String layerName, String username, String defaultType, String defaultValue, String widthType,
 			String widthValue, String texture) throws Exception;
 
+	/**
+	 * geoserver에 저장된 Point 타입의 2D 레이어를 Box 타입의 3D tiles 파일 포맷으로 변환 후 변환 성공 여부 및
+	 * tileset.json 파일 경로를 반환한다.
+	 * 
+	 * @param dtGeoserverManager Geoserver API 연동 클래스
+	 * @param workspace          workspace명
+	 * @param datastore          datastore명
+	 * @param layerName          layer명
+	 * @param username           사용자명
+	 * @param depthType          높이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param depthtValue        입력 높이값 (입력 타입이 default인 경우 고정값, 입력 타입이 fix인 경우 속성명)
+	 * @param heightType         세로 넓이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param heightValue        세로 넓이값 (넓이 타입이 default인 경우 고정값, 넓이 타입이 fix인 경우 속성명)
+	 * @param widthType          가로 넓이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param widthValue         가로 넓이값 (넓이 타입이 default인 경우 고정값, 넓이 타입이 fix인 경우 속성명)
+	 * @param texture            입력 texture명
+	 * @return JSONObject {"succ": 변환 성공 여부, "path" : tileset.json 경로}
+	 * @throws ParseException
+	 * 
+	 * @author DY.Oh
+	 */
 	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
 			String datastore, String layerName, String username, String depthType, String depthValue, String heightType,
 			String heightValue, String widthType, String widthValue, String texture) throws ParseException;
 
+	/**
+	 * geoserver에 저장된 Point 타입의 2D 레이어를 Cylinder 타입의 3D tiles 파일 포맷으로 변환 후 변환 성공 여부
+	 * 및 tileset.json 파일 경로를 반환한다.
+	 * 
+	 * @param dtGeoserverManager Geoserver API 연동 클래스
+	 * @param workspace          workspace명
+	 * @param datastore          datastore명
+	 * @param layerName          layer명
+	 * @param username           사용자명
+	 * @param depthType          높이값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param depthtValue        입력 높이값 (입력 타입이 default인 경우 고정값, 입력 타입이 fix인 경우 속성명)
+	 * @param radiusType         반지름값 입력 타입 (default : 고정값 , fix : shp 속성값)
+	 * @param radiusValue        반지름 높이값 (입력 타입이 default인 경우 고정값, 입력 타입이 fix인 경우
+	 *                           속성명)
+	 * @param texture            입력 texture명
+	 * @return JSONObject {"succ": 변환 성공 여부, "path" : tileset.json 경로}
+	 * @throws ParseException
+	 * 
+	 * @author DY.Oh
+	 */
 	public JSONObject geoPointlayerToBox3DTiles(DTGeoserverManager dtGeoserverManager, String workspace,
 			String datastore, String layerName, String username, String depthType, String depthValue, String radiusType,
 			String radiusValue, String texture) throws ParseException;

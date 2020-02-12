@@ -894,15 +894,18 @@ public class GeoserverController extends AbstractController {
 	}
 
 	/**
-	 * @author SG.LEE
-	 * @param request
-	 * @param loginUser
-	 * @param serverName
-	 * @param workspace
-	 * @param datastore
-	 * @param branch
-	 * @return
+	 * Geoserver에 저장된 Geogig 저장소 상태(Branch checkout) 업데이트
+	 * 
+	 * @param request    HttpServletRequest
+	 * @param loginUser  사용자 정보
+	 * @param serverName Geoserver 명
+	 * @param workspace  Workspace 명
+	 * @param datastore  Datastore 명
+	 * @param branch     Branch 명
+	 * @return 업데이트 여부 (true : 성공, false : 실패)
 	 * @throws JAXBException
+	 * 
+	 * @author DY.Oh
 	 */
 	@RequestMapping(value = "/updateGeogigGsStore.do", method = RequestMethod.POST)
 	@ResponseBody
@@ -915,6 +918,18 @@ public class GeoserverController extends AbstractController {
 		return geoserverService.updateGeogigGsStore(geoserverManager, workspace, datastore, branch);
 	}
 
+	/**
+	 * Geoserver에 저장된 2D Layer를 3D tiles 파일로 변환 후 tileset.json 경로를 반환한다
+	 * 
+	 * @param request    HttpServletRequest
+	 * @param response   HttpServletResponse
+	 * @param jsonObject 2D Layer -> 3D tiles 파일 변환 필수 파라미터
+	 * @param loginUser  사용자 정보
+	 * @return 변환 성공 여부 및 tileset.json 경로
+	 * @throws Exception
+	 * 
+	 * @author DY.Oh
+	 */
 	@RequestMapping(value = "/requestGeoLayerTo3DTiles.ajax", method = RequestMethod.POST)
 	@ResponseBody
 	public JSONObject requestGeoLayerTo3DTiles(HttpServletRequest request, HttpServletResponse response,
@@ -926,49 +941,49 @@ public class GeoserverController extends AbstractController {
 		}
 
 		// 필수파라미터
-		String serverName = (String) jsonObject.get("serverName");
+		String serverName = (String) jsonObject.get("serverName"); // geoserver 명
 		DTGeoserverManager dtGeoserverManager = super.getGeoserverManagerToSession(request, loginUser, serverName);
-		String workspace = (String) jsonObject.get("workspace");
-		String datastore = (String) jsonObject.get("datastore");
-		String layerName = (String) jsonObject.get("layerName");
-		String geom = (String) jsonObject.get("geometry2d");
-		String texture = (String) jsonObject.get("texture");
+		String workspace = (String) jsonObject.get("workspace"); // workspace 명
+		String datastore = (String) jsonObject.get("datastore"); // datastore 명
+		String layerName = (String) jsonObject.get("layerName"); // layerName 명
+		String geom = (String) jsonObject.get("geometry2d"); // 2D geoserver 타입 (Point or LineString or Polygon)
+		String texture = (String) jsonObject.get("texture"); // 프로젝트 경로에 저장되어있는 texture 파일명
 
 		JSONObject returnJson = new JSONObject();
 		if (geom.equals("Polygon")) {
-			String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-			String depthValue = (String) jsonObject.get("depthValue");
+			String depthType = (String) jsonObject.get("depthType"); // 높이 입력 타입 (fix or default)
+			String depthValue = (String) jsonObject.get("depthValue"); // shp 컬럼명(fix) or 입력값(default)
 			returnJson = geoserverService.geoPolygonlayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), depthType, depthValue, texture);
 		}
 		if (geom.equals("LineString")) {
-			String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default)
-			String depthValue = (String) jsonObject.get("depthValue");
-			String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default)
-			String widthValue = (String) jsonObject.get("widthValue");
+			String depthType = (String) jsonObject.get("depthType"); // 높이 입력 타입 (fix or default)
+			String depthValue = (String) jsonObject.get("depthValue"); // shp 컬럼명(fix) or 입력값(default)
+			String widthType = (String) jsonObject.get("widthType"); // 넓이 입력 타입 (fix or default)
+			String widthValue = (String) jsonObject.get("widthValue"); // shp 컬럼명(fix) or 입력값(default)
 			returnJson = geoserverService.geoLinelayerTo3DTiles(dtGeoserverManager, workspace, datastore, layerName,
 					loginUser.getUsername(), depthType, depthValue, widthType, widthValue, texture);
 		}
 		if (geom.equals("Point")) {
 			String geom3d = (String) jsonObject.get("geometry3d");
 			if (geom3d.equals("box")) {
-				String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default), 높이
-				String depthValue = (String) jsonObject.get("depthValue");
-				String heightType = (String) jsonObject.get("heightType"); // shp 컬럼명(fix) or 입력값(default), 세로
-				String heightValue = (String) jsonObject.get("heightValue");
-				String widthType = (String) jsonObject.get("widthType"); // shp 컬럼명(fix) or 입력값(default), 가로
-				String widthValue = (String) jsonObject.get("widthValue");
+				String depthType = (String) jsonObject.get("depthType"); // 높이 입력 타입 (fix or default)
+				String depthValue = (String) jsonObject.get("depthValue"); // shp 컬럼명(fix) or 입력값(default)
+				String heightType = (String) jsonObject.get("heightType"); // 세로 넓이 입력 타입 (fix or default)
+				String heightValue = (String) jsonObject.get("heightValue"); // 세로 넓이 shp 컬럼명(fix) or 입력값(default)
+				String widthType = (String) jsonObject.get("widthType"); // 가로 넓이 입력 타입 (fix or default)
+				String widthValue = (String) jsonObject.get("widthValue"); // 가로 넓이 shp 컬럼명(fix) or 입력값(default)
 
 				returnJson = geoserverService.geoPointlayerToBox3DTiles(dtGeoserverManager, workspace, datastore,
 						layerName, loginUser.getUsername(), depthType, depthValue, heightType, heightValue, widthType,
 						widthValue, texture);
 
 			} else if (geom3d.equals("cylinder")) {
-				String depthType = (String) jsonObject.get("depthType"); // shp 컬럼명(fix) or 입력값(default), 높이
-				String depthValue = (String) jsonObject.get("depthValue");
-				String radiusType = (String) jsonObject.get("radiusType"); // shp 컬럼명(fix) or 입력값(default), 세로
-				String radiusValue = (String) jsonObject.get("radiusValue");
-				
+				String depthType = (String) jsonObject.get("depthType"); // 높이 입력 타입 (fix or default)
+				String depthValue = (String) jsonObject.get("depthValue"); // shp 컬럼명(fix) or 입력값(default)
+				String radiusType = (String) jsonObject.get("radiusType"); // 반지름 넓이 입력 타입 (fix or default)
+				String radiusValue = (String) jsonObject.get("radiusValue"); // 반지름 넓이 shp 컬럼명(fix) or 입력값(default)
+
 				returnJson = geoserverService.geoPointlayerToBox3DTiles(dtGeoserverManager, workspace, datastore,
 						layerName, loginUser.getUsername(), depthType, depthValue, radiusType, radiusValue, texture);
 			}

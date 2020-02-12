@@ -1,6 +1,6 @@
 package com.gitrnd.qaproducer.upload.service;
 
-import com.gitrnd.gdsbuilder.fileread.FileMeta;
+import com.gitrnd.gdsbuilder.file.FileMeta;
 import com.gitrnd.gdsbuilder.geoserver.DTGeoserverManager;
 
 public interface SHPFileUploadService {

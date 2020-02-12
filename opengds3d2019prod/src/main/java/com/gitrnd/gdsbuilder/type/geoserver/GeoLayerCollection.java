@@ -20,7 +20,7 @@ package com.gitrnd.gdsbuilder.type.geoserver;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gitrnd.gdsbuilder.fileread.en.EnFileFormat;
+import com.gitrnd.gdsbuilder.file.en.EnFileFormat;
 
 /**
  * GeoLayerCollection 객체 정보를 담고있는 클래스. 검수 대상 레이어 목록, 검수 대상영역 등의 정보가 포함됨.
