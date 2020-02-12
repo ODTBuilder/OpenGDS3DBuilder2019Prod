@@ -485,7 +485,12 @@ public class Edit3dService {
 						if (!batchKey.equals("featureId")) {
 							// batch.json
 							JSONArray batchProperty = (JSONArray) batchObj.get(batchKey);
-							batchProperty.set(featureIdx, feature.getProperty(batchKey).getValue());
+							if (feature.getProperty(batchKey).getValue() == null) {
+								double value = 0.0;
+								batchProperty.set(featureIdx, value);
+							} else {
+								batchProperty.set(featureIdx, feature.getProperty(batchKey).getValue());
+							}
 							batchObj.put(batchKey, batchProperty);
 							// tile.json
 							JSONObject tileProperty = (JSONObject) tileProperties.get(batchKey);
@@ -772,7 +777,12 @@ public class Edit3dService {
 						String type = property.getType().getBinding().getSimpleName();
 						if (type.equals("Double") || type.equals("Integer") || type.equals("Long")) {
 							JSONArray propertiesArr = new JSONArray();
-							propertiesArr.add(feature.getAttribute(name));
+							if (feature.getAttribute(name) == null) {
+								double value = 0.0;
+								propertiesArr.add(value);
+							} else {
+								propertiesArr.add(feature.getAttribute(name));
+							}
 							batchTable.put(name, propertiesArr);
 						}
 					}
