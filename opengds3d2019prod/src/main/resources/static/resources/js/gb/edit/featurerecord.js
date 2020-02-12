@@ -709,6 +709,10 @@ gb.edit.FeatureRecord.prototype.save = function(editTool, editTool3D){
 		if(gb.undo){
 			gb.undo.invalidateAll();
 		}
+		var mrecord = that.getModelRecord();
+		if (mrecord) {
+			mrecord.removeMeshAll(true);
+		}
 		openSaveModal.close();
 	});
 }
