@@ -802,18 +802,12 @@ public class PointLayerToBoxObjImpl {
 
 			List<Coordinate> allCoordinates = new ArrayList<>();
 			StringBuilder vBuilder = new StringBuilder();
-			List<Vector3d> vertices = new ArrayList<>();
 			List<Face3> faces = new ArrayList<>();
 
-			// rectangle face idx
+			// face idx
 			int bottomend = 0;
 			int topend = 0;
 			int sideend = 0;
-
-			double minX = 0;
-			double minY = 0;
-			double maxX = 0;
-			double maxY = 0;
 
 			Coordinate[] coordinates = geom.getCoordinates();
 			for (int i = 0; i < coordinates.length; i++) {

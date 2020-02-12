@@ -48,6 +48,7 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class PointLayerToCylinderObjImpl {
@@ -590,11 +591,9 @@ public class PointLayerToCylinderObjImpl {
 			}
 		} else {
 			objfilenum++;
-
 			if (texture != null) {
 				String mtl = texture + ".mtl";
 				this.mtl = mtl;
-
 				String image = texture + ".jpg";
 				InputStream mtlIs = this.getClass().getResourceAsStream("/img/texture/" + texture + "/" + mtl);
 				OutputStream mtlOs = new FileOutputStream(outputPath + File.separator + mtl);
@@ -746,12 +745,16 @@ public class PointLayerToCylinderObjImpl {
 				return null;
 			}
 
-			Coordinate[] coordinates = geom.getCoordinates();
-
 			List<Coordinate> allCoordinates = new ArrayList<>();
-			List<Face3> faces = new ArrayList<>();
 			StringBuilder vBuilder = new StringBuilder();
+			List<Face3> faces = new ArrayList<>();
 
+			// face idx
+			int bottomend = 0;
+			int topend = 0;
+			int sideend = 0;
+
+			Coordinate[] coordinates = geom.getCoordinates();
 			for (int i = 0; i < coordinates.length; i++) {
 				GeodeticCalculator gc = new GeodeticCalculator();
 				gc.setStartingGeographicPoint(centerX, coordinates[i].y);
@@ -777,13 +780,15 @@ public class PointLayerToCylinderObjImpl {
 				vBuilder.append("v " + coordinates[i].x + " " + coordinates[i].y + " " + defaultDepth + "\n");
 			}
 
+			Envelope circleEv = null;
+
 			for (int i = 0; i < coordinates.length; i++) {
 
 				Coordinate coor = coordinates[i];
 				GeometricShapeFactory f = new GeometricShapeFactory();
 				f.setCentre(coor);
 				f.setSize(defaultRadius * 2);
-				f.setNumPoints(32);
+				f.setNumPoints(8);
 				f.setRotation(0);
 				Geometry circle = f.createArc(Math.toRadians(0), Math.toRadians(360));
 				Coordinate[] circleCoors = circle.getCoordinates();
@@ -791,6 +796,8 @@ public class PointLayerToCylinderObjImpl {
 					circle = circle.reverse();
 					circleCoors = circle.getCoordinates();
 				}
+				LineString circleLine = (LineString) circle;
+				circleEv = circleLine.getEnvelopeInternal();
 
 				// circle vertex add
 				for (int c = 0; c < circleCoors.length; c++) {
@@ -804,33 +811,105 @@ public class PointLayerToCylinderObjImpl {
 					vBuilder.append("v " + circleCoors[c].x + " " + circleCoors[c].y + " " + defaultDepth + "\n");
 					vector3dList.add(new Vector3d(circleCoors[c].x, circleCoors[c].y, defaultDepth));
 				}
-
 				// circle face 생성
-				// circle 밑면, 윗면
+				// circle 밑면
 				int centerIdx = vSize + allCoordinates.indexOf(coor); // 중점
-				for (int ac = 0; ac < circleCoors.length - 1; ac++) {
-					int secIdx = vSize + allCoordinates.indexOf(circleCoors[ac]);
-					int thrIdx = vSize + allCoordinates.indexOf(circleCoors[ac + 1]);
-					// circle 밑면 face
+				for (int c = 0; c < circleCoors.length - 1; c++) {
+					int secIdx = vSize + allCoordinates.indexOf(circleCoors[c]);
+					int thrIdx = vSize + allCoordinates.indexOf(circleCoors[c + 1]);
 					faces.add(new Face3(centerIdx, secIdx, thrIdx, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(thrIdx, secIdx, centerIdx, new Vector3d(0, 0, 0)));
-					// circle 윗면 face
+				}
+				bottomend = faces.size();
+				// circle 윗면
+				for (int c = 0; c < circleCoors.length - 1; c++) {
+					int secIdx = vSize + allCoordinates.indexOf(circleCoors[c]);
+					int thrIdx = vSize + allCoordinates.indexOf(circleCoors[c + 1]);
 					faces.add(new Face3(centerIdx + 1, secIdx + 1, thrIdx + 1, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(thrIdx + 1, secIdx + 1, centerIdx + 1, new Vector3d(0, 0, 0)));
 				}
+				topend = faces.size();
 				// circle 옆면 face
-				for (int ac = 0; ac < circleCoors.length - 1; ac++) {
-					int firIdx = vSize + allCoordinates.indexOf(circleCoors[ac]);
-					int secIdx = vSize + allCoordinates.indexOf(circleCoors[ac + 1]);
+				for (int c = 0; c < circleCoors.length - 1; c++) {
+					int firIdx = vSize + allCoordinates.indexOf(circleCoors[c]);
+					int secIdx = vSize + allCoordinates.indexOf(circleCoors[c + 1]);
 					int thrIdx = firIdx + 1;
 					faces.add(new Face3(firIdx, secIdx, thrIdx, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(thrIdx, secIdx, firIdx, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(thrIdx, secIdx, secIdx + 1, new Vector3d(0, 0, 0)));
 					faces.add(new Face3(secIdx + 1, secIdx, thrIdx, new Vector3d(0, 0, 0)));
 				}
+				sideend = faces.size();
+
 				com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
 				threeGeom.setFaces(faces);
 				threeGeom.setVertices(vector3dList);
+
+				// vt
+				List<List<Vector2d>> faceVertexUvs = new ArrayList<>();
+				// 바닥
+				for (int fIdx = 0; fIdx < bottomend; fIdx++) {
+					List<Vector2d> innerFvt = new ArrayList<>();
+					innerFvt.add(new Vector2d(0, 0));
+					innerFvt.add(new Vector2d(0, 0));
+					innerFvt.add(new Vector2d(0, 0));
+					faceVertexUvs.add(innerFvt);
+				}
+				// 윗면
+				if (circleEv != null) {
+					Vector2d offset2dCircle = new Vector2d(0 - circleEv.getMinX(), 0 - circleEv.getMinY());
+					Vector2d range2dCircle = new Vector2d(((circleEv.getMinX() - circleEv.getMaxX()) * -1),
+							((circleEv.getMinY() - circleEv.getMaxY()) * -1));
+
+					for (int fIdx = bottomend; fIdx < topend; fIdx++) {
+						Face3 face = threeGeom.faces.get(fIdx);
+						List<Vector2d> innerFvt = new ArrayList<>();
+						Vector3d v1 = threeGeom.vertices.get(face.a);
+						Vector3d v2 = threeGeom.vertices.get(face.b);
+						Vector3d v3 = threeGeom.vertices.get(face.c);
+
+						Vector2d vt1 = new Vector2d((v1.x() + offset2dCircle.x()) / range2dCircle.x(),
+								(v1.y() + offset2dCircle.y()) / range2dCircle.y());
+						Vector2d vt2 = new Vector2d((v2.x() + offset2dCircle.x()) / range2dCircle.x(),
+								(v2.y() + offset2dCircle.y()) / range2dCircle.y());
+						Vector2d vt3 = new Vector2d((v3.x() + offset2dCircle.x()) / range2dCircle.x(),
+								(v3.y() + offset2dCircle.y()) / range2dCircle.y());
+						innerFvt.add(vt1);
+						innerFvt.add(vt2);
+						innerFvt.add(vt3);
+						faceVertexUvs.add(innerFvt);
+					}
+				}
+				// 옆면
+				for (int fIdx = topend; fIdx < sideend; fIdx = fIdx + 4) {
+					List<Vector2d> innerFvt1 = new ArrayList<>();
+					innerFvt1.add(new Vector2d(0, 0));
+					innerFvt1.add(new Vector2d(1, 0));
+					innerFvt1.add(new Vector2d(0, 1));
+
+					List<Vector2d> innerFvt1b = new ArrayList<>();
+					innerFvt1b.add(new Vector2d(0, 0));
+					innerFvt1b.add(new Vector2d(0, 0));
+					innerFvt1b.add(new Vector2d(0, 0));
+
+					List<Vector2d> innerFvt2 = new ArrayList<>();
+					innerFvt2.add(new Vector2d(0, 1));
+					innerFvt2.add(new Vector2d(1, 0));
+					innerFvt2.add(new Vector2d(1, 1));
+
+					List<Vector2d> innerFvt2b = new ArrayList<>();
+					innerFvt2b.add(new Vector2d(0, 0));
+					innerFvt2b.add(new Vector2d(0, 0));
+					innerFvt2b.add(new Vector2d(0, 0));
+
+					faceVertexUvs.add(innerFvt1);
+					faceVertexUvs.add(innerFvt1b);
+					faceVertexUvs.add(innerFvt2);
+					faceVertexUvs.add(innerFvt2b);
+				}
+				threeGeom.faceVertexUvs.add(faceVertexUvs);
+				threeGeom.computeFlatVertexNormals();
+				threeGeom.computeFaceNormals();
 				writeThreeGeometry(threeGeom);
 				vSize += allCoordinates.size();
 			}
@@ -887,28 +966,26 @@ public class PointLayerToCylinderObjImpl {
 					int b = face.b + 1 + vSize;
 					int c = face.c + 1 + vSize;
 
-					fBuilder.append("f " + a + " " + b + " " + c + "\n");
-
-//					if (isVt) {
-//						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
-//						vtIdx++;
-//						vnIdx++;
-//						fBuilder.append(b + "/" + vnIdx + "/" + vtIdx + " ");
-//						vtIdx++;
-//						vnIdx++;
-//						fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
-//						vtIdx++;
-//						vnIdx++;
-//					} else {
-//						fBuilder.append("f " + a + "/" + vnIdx + " ");
-//						vnIdx++;
-//						fBuilder.append(b + "/" + vnIdx + " ");
-//						vnIdx++;
-//						fBuilder.append(c + "/" + vnIdx + "\n");
-//						vnIdx++;
-//					}
+					if (isVt) {
+						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");
+						vtIdx++;
+						vnIdx++;
+						fBuilder.append(b + "/" + vnIdx + "/" + vtIdx + " ");
+						vtIdx++;
+						vnIdx++;
+						fBuilder.append(c + "/" + vnIdx + "/" + vtIdx + "\n");
+						vtIdx++;
+						vnIdx++;
+					} else {
+						fBuilder.append("f " + a + "/" + vnIdx + " ");
+						vnIdx++;
+						fBuilder.append(b + "/" + vnIdx + " ");
+						vnIdx++;
+						fBuilder.append(c + "/" + vnIdx + "\n");
+						vnIdx++;
+					}
 				}
-//				writer.write(vnBuilder.toString());
+				writer.write(vnBuilder.toString());
 				writer.write(fBuilder.toString());
 			}
 		}
