@@ -526,6 +526,7 @@ gb3d.tree.OpenLayers = function(obj) {
 			{
 				"core" : {
 					"map" : this.map,
+					"gb3dMap" : this.gb3dMap,
 					"animation" : 0,
 					"themes" : {
 						"stripes" : true
@@ -1803,8 +1804,17 @@ gb3d.tree.OpenLayers.prototype.openDeleteLayer = function(layer) {
  */
 gb3d.tree.OpenLayers.prototype.deleteLayer = function(layers, callback){
 	var that = this;
+	var frecord = that.getFeatureRecord();
+	var mrecord;
+	if (frecord) {
+		mrecord = frecord.getModelRecord();
+	}
 	if (Array.isArray(layers)) {
 		for (var i = 0; i < layers.length; i++) {
+			var delLayer = that.getJSTree().get_LayerById(layers[i].id);
+			if (mrecord) {
+				mrecord.removeByLayer(delLayer.get("id"), true);
+			}
 			that.getJSTree().delete_node_layer(layers[i].id);
 		}
 	}

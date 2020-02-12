@@ -507,7 +507,48 @@ gb3d.Map.prototype.addThreeObject = function(object){
 	}
 }
 
-
+/**
+ * ThreeJS 객체를 삭제한다. (객체를 씬에서 삭제함, 렌더링도 취소함)
+ * 
+ * @method gb3d.Map#removeThreeObjectById
+ * @param {gb3d.object.ThreeObject} object - ThreeObject
+ */
+gb3d.Map.prototype.deleteThreeObject = function(object){
+	if (object instanceof gb3d.object.ThreeObject) {
+		var fid = object.getFeature().getId();
+		if (fid) {
+			var objs = this.getThreeObjects();
+			var idx = -1;
+			if (Array.isArray(objs)) {
+				for (var i = 0; i < objs.length; i++) {
+					if (objs[i].getFeature().getId() === fid) {
+						idx = i;
+						break;
+					}
+				}
+				if (idx !== -1) {
+					var three = objs[idx];
+					var mesh = three.getObject();
+					if (mesh) {
+						if (mesh.geometry) {
+							mesh.geometry.dispose();
+						}
+						if (mesh.material) {
+							if (mesh.material.texture) {
+								mesh.material.texture.dispose();
+							}
+							mesh.material.dispose();
+						}
+						this.getThreeScene().remove(mesh);
+						this.getThreeScene().dispose();
+						three.setObject(undefined);
+					}
+					objs.splice(idx, 1);
+				}
+			}
+		}
+	}
+}
 /**
  * Feature id로 Three Object 객체를 검색 및 반환
  * 
