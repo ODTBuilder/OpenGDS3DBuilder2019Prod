@@ -49,6 +49,7 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
@@ -685,7 +686,7 @@ public class PointLayerToCylinderObjImpl {
 			}
 
 			// set center
-			ReferencedEnvelope reEnv = buildingCollection.getBounds();
+			Envelope reEnv = buildingCollection.getBounds();
 			Coordinate center = reEnv.centre();
 			centerX = center.x;
 			centerY = center.y;
@@ -851,7 +852,6 @@ public class PointLayerToCylinderObjImpl {
 				if (centerY > coordinates[i].y) {
 					yDistance = -yDistance;
 				}
-
 				coordinates[i] = new Coordinate(xDistance, yDistance, 0);
 				allCoordinates.add(new Coordinate(coordinates[i]));
 				vector3dList.add(new Vector3d(coordinates[i].x, coordinates[i].y, 0));
@@ -867,6 +867,7 @@ public class PointLayerToCylinderObjImpl {
 			for (int i = 0; i < coordinates.length; i++) {
 
 				Coordinate coor = coordinates[i];
+
 				GeometricShapeFactory f = new GeometricShapeFactory();
 				f.setCentre(coor);
 				f.setSize(defaultRadius * 2);
@@ -922,6 +923,7 @@ public class PointLayerToCylinderObjImpl {
 					faces.add(new Face3(secIdx + 1, secIdx, thrIdx, new Vector3d(0, 0, 0)));
 				}
 				sideend = faces.size();
+				writer.write(vBuilder.toString());
 
 				com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
 				threeGeom.setFaces(faces);
@@ -994,6 +996,7 @@ public class PointLayerToCylinderObjImpl {
 				threeGeom.computeFaceNormals();
 				writeThreeGeometry(threeGeom);
 				vSize += allCoordinates.size();
+
 			}
 		}
 		return idList;
@@ -1003,16 +1006,16 @@ public class PointLayerToCylinderObjImpl {
 			throws IOException {
 
 		// v
-		if (threeGeom.getVertices() != null) {
-			if (threeGeom.getVertices().size() > 0) {
-				StringBuilder vBuilder = new StringBuilder();
-				List<Vector3d> vertices = threeGeom.getVertices();
-				for (Vector3d vertice : vertices) {
-					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
-				}
-				writer.write(vBuilder.toString());
-			}
-		}
+//		if (threeGeom.getVertices() != null) {
+//			if (threeGeom.getVertices().size() > 0) {
+//				StringBuilder vBuilder = new StringBuilder();
+//				List<Vector3d> vertices = threeGeom.getVertices();
+//				for (Vector3d vertice : vertices) {
+//					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
+//				}
+//				writer.write(vBuilder.toString());
+//			}
+//		}
 		// vt
 		boolean isVt = false;
 		if (threeGeom.faceVertexUvs != null) {
@@ -1044,9 +1047,9 @@ public class PointLayerToCylinderObjImpl {
 					vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
 					vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
 
-					int a = face.a + 1 + vSize;
-					int b = face.b + 1 + vSize;
-					int c = face.c + 1 + vSize;
+					int a = face.a + 1;
+					int b = face.b + 1;
+					int c = face.c + 1;
 
 					if (isVt) {
 						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");

@@ -923,34 +923,34 @@ public class PointLayerToBoxObjImpl {
 					yDistance = -yDistance;
 				}
 
-				double x1 = coordinates[i].x + (defaultWidth / 2);
-				double y1 = coordinates[i].y + (defaultHeight / 2);
+				double x1 = xDistance + (defaultWidth / 2);
+				double y1 = yDistance + (defaultHeight / 2);
 
-				double x2 = coordinates[i].x - (defaultWidth / 2);
-				double y2 = coordinates[i].y + (defaultHeight / 2);
+				double x2 = xDistance - (defaultWidth / 2);
+				double y2 = yDistance + (defaultHeight / 2);
 
-				double x3 = coordinates[i].x - (defaultWidth / 2);
-				double y3 = coordinates[i].y - (defaultHeight / 2);
+				double x3 = xDistance - (defaultWidth / 2);
+				double y3 = yDistance - (defaultHeight / 2);
 
-				double x4 = coordinates[i].x + (defaultWidth / 2);
-				double y4 = coordinates[i].y - (defaultHeight / 2);
+				double x4 = xDistance + (defaultWidth / 2);
+				double y4 = yDistance - (defaultHeight / 2);
 
 				// 밑면
-				Coordinate coorBottom1 = new Coordinate(x1 + xDistance, y1 + yDistance, 0);
-				Coordinate coorBottom2 = new Coordinate(x2 + xDistance, y2 + yDistance, 0);
-				Coordinate coorBottom3 = new Coordinate(x3 + xDistance, y3 + yDistance, 0);
-				Coordinate coorBottom4 = new Coordinate(x4 + xDistance, y4 + yDistance, 0);
+				Coordinate coorBottom1 = new Coordinate(x1, y1, 0);
+				Coordinate coorBottom2 = new Coordinate(x2, y2, 0);
+				Coordinate coorBottom3 = new Coordinate(x3, y3, 0);
+				Coordinate coorBottom4 = new Coordinate(x4, y4, 0);
 
-				vector2dList.add(new Vector2d(x1 + xDistance, y1 + yDistance));
-				vector2dList.add(new Vector2d(x2 + xDistance, y2 + yDistance));
-				vector2dList.add(new Vector2d(x3 + xDistance, y3 + yDistance));
-				vector2dList.add(new Vector2d(x4 + xDistance, y4 + yDistance));
+				vector2dList.add(new Vector2d(x1, y1));
+				vector2dList.add(new Vector2d(x2, y2));
+				vector2dList.add(new Vector2d(x3, y3));
+				vector2dList.add(new Vector2d(x4, y4));
 
 				// 윗면
-				Coordinate coorTop1 = new Coordinate(x1 + xDistance, y1 + yDistance, defaultDepth);
-				Coordinate coorTop2 = new Coordinate(x2 + xDistance, y2 + yDistance, defaultDepth);
-				Coordinate coorTop3 = new Coordinate(x3 + xDistance, y3 + yDistance, defaultDepth);
-				Coordinate coorTop4 = new Coordinate(x4 + xDistance, y4 + yDistance, defaultDepth);
+				Coordinate coorTop1 = new Coordinate(x1, y1, defaultDepth);
+				Coordinate coorTop2 = new Coordinate(x2, y2, defaultDepth);
+				Coordinate coorTop3 = new Coordinate(x3, y3, defaultDepth);
+				Coordinate coorTop4 = new Coordinate(x4, y4, defaultDepth);
 
 				allCoordinates.add(coorBottom1);
 				allCoordinates.add(coorTop1);
@@ -1056,9 +1056,9 @@ public class PointLayerToBoxObjImpl {
 				faces.add(new Face3(furSideIdx4, secSideIdx4, thrSideIdx4, new Vector3d(0, 0, 0)));
 
 				sideend = faces.size();
-
 			}
 
+			writer.write(vBuilder.toString());
 			com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom = new com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry();
 			threeGeom.faces = faces;
 			threeGeom.vertices = vector3dList;
@@ -1146,17 +1146,17 @@ public class PointLayerToBoxObjImpl {
 	public void writeThreeGeometry(com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom)
 			throws IOException {
 
-		// v
-		if (threeGeom.getVertices() != null) {
-			if (threeGeom.getVertices().size() > 0) {
-				StringBuilder vBuilder = new StringBuilder();
-				List<Vector3d> vertices = threeGeom.getVertices();
-				for (Vector3d vertice : vertices) {
-					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
-				}
-				writer.write(vBuilder.toString());
-			}
-		}
+//		// v
+//		if (threeGeom.getVertices() != null) {
+//			if (threeGeom.getVertices().size() > 0) {
+//				StringBuilder vBuilder = new StringBuilder();
+//				List<Vector3d> vertices = threeGeom.getVertices();
+//				for (Vector3d vertice : vertices) {
+//					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
+//				}
+//				writer.write(vBuilder.toString());
+//			}
+//		}
 		// vt
 		boolean isVt = false;
 		if (threeGeom.faceVertexUvs != null) {
@@ -1188,9 +1188,9 @@ public class PointLayerToBoxObjImpl {
 					vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
 					vnBuilder.append("vn " + normal.x() + " " + normal.y() + " " + normal.z() + "\n");
 
-					int a = face.a + 1 + vSize;
-					int b = face.b + 1 + vSize;
-					int c = face.c + 1 + vSize;
+					int a = face.a + 1;
+					int b = face.b + 1;
+					int c = face.c + 1;
 
 					if (isVt) {
 						fBuilder.append("f " + a + "/" + vnIdx + "/" + vtIdx + " ");

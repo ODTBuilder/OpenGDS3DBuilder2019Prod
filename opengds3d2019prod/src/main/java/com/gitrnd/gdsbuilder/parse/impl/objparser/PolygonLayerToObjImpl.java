@@ -514,7 +514,7 @@ public class PolygonLayerToObjImpl {
 														|| type.equals("Long")) {
 													batchTable.put(name, new JSONArray());
 												}
-											}
+											} 
 											FeatureIterator<SimpleFeature> features = tfc.features();
 											while (features.hasNext()) {
 												SimpleFeature feature = features.next();
