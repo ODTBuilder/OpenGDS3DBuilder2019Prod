@@ -1589,8 +1589,9 @@ gb3d.edit.ModelRecord.prototype.setRemoveCheck = function(bool) {
  * created 목록에 있는 메쉬 객체를 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#removeMeshCreated
+ * @param {boolean} flag - 삭제한 후 cesium 객체를 보여줄지 여부
  */
-gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
+gb3d.edit.ModelRecord.prototype.removeMeshCreated = function(flag) {
 	var that = this;
 	var created = that.getCreated();
 	var layers = Object.keys(created);
@@ -1615,6 +1616,16 @@ gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
 				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
 			}
+			if (flag) {
+				var feature3d = three.getFeature3D();
+				if (feature3d instanceof Cesium.Cesium3DTileFeature) {
+					if (!feature3d.tileset.isDestroyed()) {
+						if (!feature3d.show) {
+							feature3d.show = true;
+						}	
+					}
+				}
+			}
 		}
 	}
 }
@@ -1623,8 +1634,9 @@ gb3d.edit.ModelRecord.prototype.removeMeshCreated = function() {
  * modified 목록에 있는 메쉬 객체를 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#removeMeshModified
+ * @param {boolean} flag - 삭제한 후 cesium 객체를 보여줄지 여부
  */
-gb3d.edit.ModelRecord.prototype.removeMeshModified = function() {
+gb3d.edit.ModelRecord.prototype.removeMeshModified = function(flag) {
 	var that = this;
 	var modified = that.getModified();
 	var layers = Object.keys(modified);
@@ -1649,6 +1661,16 @@ gb3d.edit.ModelRecord.prototype.removeMeshModified = function() {
 				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
 			}
+			if (flag) {
+				var feature3d = three.getFeature3D();
+				if (feature3d instanceof Cesium.Cesium3DTileFeature) {
+					if (!feature3d.tileset.isDestroyed()) {
+						if (!feature3d.show) {
+							feature3d.show = true;
+						}	
+					}
+				}
+			}
 		}
 	}
 }
@@ -1657,8 +1679,9 @@ gb3d.edit.ModelRecord.prototype.removeMeshModified = function() {
  * modified 목록에 있는 메쉬 객체를 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#removeMeshRemoved
+ * @param {boolean} flag - 삭제한 후 cesium 객체를 보여줄지 여부
  */
-gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function() {
+gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function(flag) {
 	var that = this;
 	var removed = that.getRemoved();
 	var layers = Object.keys(removed);
@@ -1682,6 +1705,16 @@ gb3d.edit.ModelRecord.prototype.removeMeshRemoved = function() {
 				that.getGb3dMap().getThreeScene().remove(mesh);
 				that.getGb3dMap().getThreeScene().dispose();
 				three.setObject(undefined);
+			}
+			if (flag) {
+				var feature3d = three.getFeature3D();
+				if (feature3d instanceof Cesium.Cesium3DTileFeature) {
+					if (!feature3d.tileset.isDestroyed()) {
+						if (!feature3d.show) {
+							feature3d.show = true;
+						}	
+					}
+				}
 			}
 		}
 	}
@@ -1721,8 +1754,10 @@ gb3d.edit.ModelRecord.prototype.removeMeshLoaded = function(flag) {
 			if (flag) {
 				var feature3d = three.getFeature3D();
 				if (feature3d instanceof Cesium.Cesium3DTileFeature) {
-					if (!feature3d.show) {
-						feature3d.show = true;
+					if (!feature3d.tileset.isDestroyed()) {
+						if (!feature3d.show) {
+							feature3d.show = true;
+						}	
 					}
 				}
 			}
@@ -1734,14 +1769,16 @@ gb3d.edit.ModelRecord.prototype.removeMeshLoaded = function(flag) {
  * 목록에 있는 모든 메쉬 객체를 삭제한다.
  * 
  * @method gb3d.edit.ModelRecord#removeMeshAll
+ * @param {boolean} flag - cesium 객체를 다시 보여줄지 여부
  */
-gb3d.edit.ModelRecord.prototype.removeMeshAll = function() {
+gb3d.edit.ModelRecord.prototype.removeMeshAll = function(flag) {
 	var that = this;
-	that.removeMeshCreated();
-	that.removeMeshModified();
-	that.removeMeshRemoved();
-	that.removeMeshLoaded();
+	that.removeMeshCreated(flag);
+	that.removeMeshModified(flag);
+	that.removeMeshRemoved(flag);
+	that.removeMeshLoaded(flag);
 }
+
 
 /**
  * 타일셋 URL을 변경하여 타일을 다시 로드한다.
