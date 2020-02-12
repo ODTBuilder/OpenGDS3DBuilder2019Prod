@@ -1156,7 +1156,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 				"feature" : opt["feature"],
 				"feature3D" : opt["feature3D"],
 				"layer" : opt["layer"],
-				"editable" : true,
+				"editable" : false,
 				"file" : true
 			});
 

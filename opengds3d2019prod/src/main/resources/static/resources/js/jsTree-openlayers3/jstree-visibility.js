@@ -496,6 +496,7 @@ $.jstreeol3.plugins.visibility = function(options, parent) {
 				var player = this.get_LayerById(parentId);
 				if (player instanceof ol.layer.Group) {
 					player.setVisible(bool);
+					this.display3DTileset(player, bool);
 				}
 				var pnode = this.get_node(parentId);
 				if (pnode.parent !== "#") {
@@ -556,6 +557,7 @@ $.jstreeol3.plugins.visibility = function(options, parent) {
 		if (layer instanceof ol.layer.Vector) {
 			if (this._displayIndex) {
 				layer.setVisible(bool);
+				this.display3DTileset(layer, bool);
 			} else {
 				if (layer.get("renderMode").toLowerCase() === "image") {
 					if (layer.get("git").tempLayer instanceof ol.layer.Vector) {
@@ -569,6 +571,7 @@ $.jstreeol3.plugins.visibility = function(options, parent) {
 		} else if (layer instanceof ol.layer.Tile) {
 			if (this._displayIndex) {
 				layer.setVisible(bool);
+				this.display3DTileset(layer, bool);
 			} else {
 				if (layer.get("git") instanceof Object) {
 					if (layer.get("git").tempLayer instanceof ol.layer.Vector) {
@@ -629,9 +632,11 @@ $.jstreeol3.plugins.visibility = function(options, parent) {
 			var params = source.getParams();
 			if (showing.length === 0) {
 				layer.setVisible(false);
+				this.display3DTileset(layer, false);
 			} else if (showing.length > 0) {
 				params["LAYERS"] = showing.toString();
 				layer.setVisible(true);
+				this.display3DTileset(layer, true);
 			}
 			source.updateParams(params);
 		}
@@ -1254,6 +1259,27 @@ $.jstreeol3.plugins.visibility = function(options, parent) {
 		// this._data.visibility.selected = [];
 		// }
 		return parent.refresh.apply(this, arguments);
+	};
+	this.display3DTileset = function(layer, show) {
+		var gb3dMap = this._data.core.gb3dMap;
+		if (gb3dMap) {
+			var cesiumViewer = gb3dMap.getCesiumViewer();
+			var scene = cesiumViewer.scene;
+			var primitives = scene.primitives;
+			var git = layer.get("git");
+			if (git) {
+				var tileset = git.tileset;
+				if (tileset instanceof gb3d.object.Tileset) {
+					var ctileset = tileset.getCesiumTileset();
+					if (ctileset instanceof Cesium.Cesium3DTileset) {
+						// 현재 타일셋 삭제 후
+						if (primitives.contains(ctileset)) {
+							ctileset.show = show;
+						}
+					}
+				}
+			}						
+		}
 	};
 };
 
