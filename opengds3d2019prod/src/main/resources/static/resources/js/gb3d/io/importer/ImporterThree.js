@@ -1102,13 +1102,15 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 		var children = scene.children;
 		var inputData;
 		if (children.length === 1) {
-//			var material = children[0].material;
-//			if (material) {
-//				var texture = material.map;
-//				if (texture) {
-//					texture.flipY = false;
-//				}
-//			}
+			var material = children[0].material;
+			if (material) {
+				var texture = material.map;
+				if (texture) {
+					if (!texture.flipY) {
+						texture.flipY = true;
+					}
+				}
+			}
 			inputData = children[0];
 		} else if (children.length > 1) {
 			inputData = new THREE.Group();
@@ -1119,12 +1121,12 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 		// 피처 아이디 입력
 		inputData.userData.featureId = opt["featureId"];
 		// 지오메트리 타입 입력
-		var typeselect = opt["layer"].get("git").geometry; 
-//		if (typeselect === "MultiPolygon") {
-//			typeselect = "Polygon";
-//		}
+		var typeselect = opt["layer"].get("git").geometry;
+		// if (typeselect === "MultiPolygon") {
+		// typeselect = "Polygon";
+		// }
 		inputData.userData.type = typeselect;
-		
+
 		var center = opt["featureCenter"];
 		var centerCart = Cesium.Cartesian3.fromDegrees(center[0], center[1], 0);
 		var centerHigh = Cesium.Cartesian3.fromDegrees(center[0], center[1], 1);
