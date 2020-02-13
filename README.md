@@ -69,6 +69,17 @@ Getting Started
 - ServerRoot(서버 설치 경로) 설정
 - Listen(사용할 포트 번호) 설정
 - DocumentRoot(파일 저장 경로) 설정
+- Cross-origin 해제
+  <pre><code>#LoadModule headers_module modules/mod_headers.so</code></pre>
+  &nbsp;httpd.conf 파일에서 위 구문을 찾아서 #제거
+  
+  <pre><code>&lt;Directory "your root"\&gt;</code></pre>
+  위 태그 안에 아래 구문 추가<br>
+  <pre><code>
+  &lt;IfModule mod_headers.c&gt;<br>
+    Header set Access-Control-Allow-Origin "*"<br>
+  &lt;/IfModule&gt;<br>
+  </code></pre>
 
 ### 6. 소스코드 설치 및 프로젝트 실행 ###
 - https://github.com/ODTBuilder/OpenGDS3DBuilder2019Prod 접속 후 소스코드 다운로드

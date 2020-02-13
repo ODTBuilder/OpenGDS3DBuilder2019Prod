@@ -1096,7 +1096,7 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 	// called when the resource is loaded
 	function(gltf) {
 		// 피처 id로 threeObject를 조회
-		var three = that.getGb3dMap().getThreeObjectById(opt["featureId"]);
+		var three = that.getGb3dMap().getThreeObjectById(opt["featureId"], opt["layer"]);
 
 		var scene = gltf.scene;
 		var children = scene.children;
@@ -1162,22 +1162,20 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 
 			// Map에 ThreeJS 객체 추가
 			that.getGb3dMap().getThreeScene().add(inputData);
-
 			// threeobject 추가
 			that.getGb3dMap().addThreeObject(obj3d);
-			if (opt.threeTree) {
-				opt.threeTree.getJSTree().create_node(opt.layer.get("treeid"), {
-					"parent" : opt.layer.get("treeid"),
-					"id" : inputData.uuid,
-					"text" : opt.featureId,
-					"type" : "Three"
-				}, "last", false, false);
-				// gltf 선택 상태로 만듬
-				opt.threeTree.getJSTree().deselect_all();
-				opt.threeTree.getJSTree().select_node(inputData.uuid);
-			}
 		}
-
+		if (opt.threeTree) {
+			opt.threeTree.getJSTree().create_node(opt.layer.get("treeid"), {
+				"parent" : opt.layer.get("treeid"),
+				"id" : inputData.uuid,
+				"text" : opt.featureId,
+				"type" : "Three"
+			}, "last", false, false);
+			// gltf 선택 상태로 만듬
+			opt.threeTree.getJSTree().deselect_all();
+			opt.threeTree.getJSTree().select_node(inputData.uuid);
+		}
 		if (mrecord) {
 			mrecord.createLoaded(opt["layer"], obj3d);
 		}
