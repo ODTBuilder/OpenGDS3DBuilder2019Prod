@@ -150,7 +150,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * 선택된 객체들의 집합
 	 * 
 	 * @private
-	 * @type {ol.Collection.<ol.Feature>}
+	 * @type {ol.Collection}
 	 */
 	this.selected = undefined;
 
@@ -214,7 +214,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 	 * Move 기능을 적용할 Feature 객체들의 집합
 	 * 
 	 * @private
-	 * @type {ol.Collection.<ol.Feature>}
+	 * @type {ol.Collection}
 	 */
 	this.features = new ol.Collection();
 
@@ -244,12 +244,12 @@ gb3d.edit.EditingTool2D = function(obj) {
 	this.tempVector.set("git", git);
 	this.tempVector.set("name", this.translation.tempLayer[this.locale]);
 
-//	this.managed = new ol.layer.Vector({
-//	renderMode: "vector",
-//	source : this.tempSource
-//	});
-//	this.managed.set("name", "temp_vector");
-//	this.managed.set("id", "temp_vector");
+// this.managed = new ol.layer.Vector({
+// renderMode: "vector",
+// source : this.tempSource
+// });
+// this.managed.set("name", "temp_vector");
+// this.managed.set("id", "temp_vector");
 
 	/**
 	 * Feature 객체 강조 표시를 위한 Openlayers Style 객체 배열
@@ -454,7 +454,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 		if (!that.getActiveTool()) {
 			var viewResolution = (view.getResolution());
 			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-//			that.updateSelected();
+// that.updateSelected();
 			if (slayers.length === 1) {
 				var slayer = slayers[0] ;
 				if (slayer instanceof ol.layer.Tile) {
@@ -478,7 +478,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 
 								that.map.removeInteraction(that.interaction.select);
 								that.interaction.select = new ol.interaction.Select({
-//									layers: selectLayers,
+// layers: selectLayers,
 									toggleCondition : ol.events.condition.platformModifierKeyOnly,
 									style : that.selectedStyles
 								});
@@ -488,10 +488,10 @@ gb3d.edit.EditingTool2D = function(obj) {
 								that.map.addInteraction(that.interaction.select);
 								that.map.removeInteraction(that.interaction.dragbox);
 
-//								var source = that.selectedSource;
+// var source = that.selectedSource;
 								var git = slayer.get("git");
 								var props = git.attribute || [];
-//								var layer = source.get("git").tempLayer;
+// var layer = source.get("git").tempLayer;
 
 								that.showAttributePopup(props, features[0]);
 
@@ -504,7 +504,7 @@ gb3d.edit.EditingTool2D = function(obj) {
 								var bidnum = fidnum - 1; 
 								var gitAttr = slayer.get("git");
 
-//								var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["id"]);
+// var tLayer = that.otree.getJSTree().get_LayerByOLId(gitAttr["id"]);
 
 								var tileset = gitAttr.tileset;
 								if (tileset) {
@@ -562,26 +562,26 @@ gb3d.edit.EditingTool2D = function(obj) {
 										}
 										return result;
 										// ==============
-//										var result;
-//										if (tile instanceof Cesium.Cesium3DTile) {
-//										var content = tile.content;
-//										if (content) {
-//										var feature = content.getFeature(bid);
-//										if (feature) {
-//										result = feature;
-//										} else if (tile.children.length > 0) {
-//										for (var i = 0; i < tile.children.length; i++) {
-//										var ctile = tile.children[i];
-//										var feature = recursiveSearch(ctile, bid);
-//										if (feature) {
-//										result = feature;
-//										break;
-//										}
-//										}
-//										}
-//										}
-//										}
-//										return result;
+// var result;
+// if (tile instanceof Cesium.Cesium3DTile) {
+// var content = tile.content;
+// if (content) {
+// var feature = content.getFeature(bid);
+// if (feature) {
+// result = feature;
+// } else if (tile.children.length > 0) {
+// for (var i = 0; i < tile.children.length; i++) {
+// var ctile = tile.children[i];
+// var feature = recursiveSearch(ctile, bid);
+// if (feature) {
+// result = feature;
+// break;
+// }
+// }
+// }
+// }
+// }
+// return result;
 									};
 
 									var feature = recursiveSearch(root, bidnum);
@@ -744,8 +744,8 @@ gb3d.edit.EditingTool2D = function(obj) {
 		"overflow-y" : "auto"
 	});
 
-//	$("#attrAttr").find(".gb-table").remove();
-//	$("#attrAttr").append(atb);
+// $("#attrAttr").find(".gb-table").remove();
+// $("#attrAttr").append(atb);
 
 	this.map.on('postcompose', function(evt) {
 		that.map.getInteractions().forEach(function(interaction) {
@@ -817,10 +817,10 @@ gb3d.edit.EditingTool2D = function(obj) {
 			source.clear();
 			delete that.vectorSourcesOfVector_[id];
 		}
-//		if(that.customVector_[id]){
-//		that.customVector_[id].get("git").tempLayer.setVisible(false);
-//		delete that.customVector_[id];
-//		}
+// if(that.customVector_[id]){
+// that.customVector_[id].get("git").tempLayer.setVisible(false);
+// delete that.customVector_[id];
+// }
 		that.refreshTileLayer();
 	});
 
@@ -876,11 +876,11 @@ gb3d.edit.EditingTool2D.prototype.toggleFeatureHistoryModal = function(feature) 
 		return;
 	}
 	if ($(vfeature.getPanel().getPanel()).css("display") !== "none") {
-//		vfeature.close();
+// vfeature.close();
 	} else {
 		var nfeature = feature instanceof ol.Feature ? feature : this.interaction.select !== undefined ? this.interaction.select.getFeatures().getLength() === 1 ? this.interaction.select.getFeatures().item(0) : undefined : undefined;
-//		this.interaction.select.getFeatures().getLength() === 1 ?
-//		this.interaction.select.getFeatures().item(0) : undefined;
+// this.interaction.select.getFeatures().getLength() === 1 ?
+// this.interaction.select.getFeatures().item(0) : undefined;
 		if (nfeature === undefined) {
 			alert(this.translation.alertSelectFeature[this.locale]);
 			return;
@@ -901,9 +901,9 @@ gb3d.edit.EditingTool2D.prototype.toggleFeatureHistoryModal = function(feature) 
 			console.log(feature);
 			var path = layerName+"/"+nfeature.getId();
 			console.log(path);
-//			vfeature.open();
+// vfeature.open();
 			if (vfeature !== undefined) {
-//				if (vfeature !== undefined && branch === "master") {
+// if (vfeature !== undefined && branch === "master") {
 				if (geoserver+"/"+repo+"/"+path !== vfeature.getIDString()) {
 
 					vfeature.setServer(geoserver);
@@ -952,7 +952,7 @@ gb3d.edit.EditingTool2D.prototype.updateFeatureHistoryModal = function(feature) 
 		console.log(path);
 
 		if (vfeature !== undefined) {
-//			if (vfeature !== undefined && branch === "master") {
+// if (vfeature !== undefined && branch === "master") {
 			vfeature.open();
 			if (geoserver+"/"+repo+"/"+path !== vfeature.getIDString()) {
 				vfeature.setServer(geoserver);
@@ -965,7 +965,7 @@ gb3d.edit.EditingTool2D.prototype.updateFeatureHistoryModal = function(feature) 
 			}
 		} else {
 			if ($(vfeature.getPanel().getPanel()).css("display") !== "none") {
-//				vfeature.close();
+// vfeature.close();
 			}
 		}
 	}
@@ -1089,7 +1089,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 				selectInter = false;
 			} else {
 				this.isOn[intrct[j]] = false;
-//				this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 			}
 		}
 	} else if (typeof intrct === "string") {
@@ -1100,7 +1100,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 			this.isOn["select"] = false;
 		} else {
 			this.isOn[intrct] = false;
-//			this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 		}
 
 		if (intrct !== "select" && intrct !== "dragbox") {
@@ -1127,7 +1127,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 
 	if(!!this.selectedSource){
 		this.map.removeLayer(this.tempVector);
-//		this.getEditingTool3D().getThreeTree().getJSTree().delete_node();
+// this.getEditingTool3D().getThreeTree().getJSTree().delete_node();
 		if(this.getActiveTool()){
 			this.selectedSource.get("git").tempLayer.setMap(this.map);
 		} else {
@@ -1135,7 +1135,7 @@ gb3d.edit.EditingTool2D.prototype.deactiveIntrct_ = function(intrct) {
 		}
 	}
 
-//	this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 };
 /**
  * 버튼 Tag를 활성화된 상태의 Style로 변경한다.
@@ -1261,87 +1261,87 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		$(that.featureTB).empty();
 
 		if (that.features.getLength() > 1) {
-//			vfeature.close();
+// vfeature.close();
 			that.featurePop.close();
 			that.features.removeAt(0);
-//			for (var i = 0; i < that.features.getLength(); i++) {
-//			var idx = that.features.item(i).getId();
-//			var fno = idx ? idx.substring(that.features.item(i).getId().indexOf(".") + 1) : "";
-//			var td1 = $("<td>").text(fno);
-//			var feature = that.features.item(i);
-//			var anc = $("<a>").addClass("gb-edit-sel-flist").css("cursor", "pointer").attr({
-//			"value" : gitAttr.treeid + "," + feature.getId()
-//			}).text("Selecting feature").click(function() {
-//			var param = $(this).attr("value").split(",");
-//			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-//			if (slayers.length !== 1) {
-//			console.error(this.translation.alertSelectOneLayer[this.locale]);
-//			return;
-//			}
-//			if (slayers[0] instanceof ol.layer.Tile) {
-//			feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
-//			} else if (slayers[0] instanceof ol.layer.Vector) {
-//			feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-//			}
-//			that.count = 1;
-//			clearInterval(that.interval);
-//			feature.setStyle(undefined);
-//			that.interaction.select.getFeatures().clear();
-//			that.interaction.select.getFeatures().push(feature);
-//			that.featurePop.close();
-//			console.log(feature);
-//			});
-//			var td2 = $("<td>").append(anc);
-//			var tr = $("<tr>").append(td1).append(td2).mouseenter(function(evt) {
-//			var param = $(this).find("a").attr("value").split(",");
-//			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-//			if (slayers.length !== 1) {
-//			console.error(this.translation.alertSelectOneLayer[this.locale]);
-//			return;
-//			}
-//			if (slayers[0] instanceof ol.layer.Tile) {
-//			feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
-//			} else if (slayers[0] instanceof ol.layer.Vector) {
-//			feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-//			}
-//			feature.setStyle(that.highlightStyles1);
-//			that.interval = setInterval(function() {
-//			var val = that.count % 2;
-//			if (val === 0) {
-//			feature.setStyle(that.highlightStyles1);
-//			} else {
-//			feature.setStyle(that.highlightStyles2);
-//			}
-//			that.count++;
-//			}, 500);
-//			}).mouseleave(function() {
-//			var param = $(this).find("a").attr("value").split(",");
-//			var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
-//			if (slayers.length !== 1) {
-//			console.error(this.translation.alertSelectOneLayer[this.locale]);
-//			return;
-//			}
-//			if (slayers[0] instanceof ol.layer.Tile) {
-//			feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
-//			} else if (slayers[0] instanceof ol.layer.Vector) {
-//			feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
-//			}
-//			that.count = 1;
-//			clearInterval(that.interval);
-//			feature.setStyle(undefined);
-//			});
-//			$(that.featureTB).append(tr);
-//			}
+// for (var i = 0; i < that.features.getLength(); i++) {
+// var idx = that.features.item(i).getId();
+// var fno = idx ? idx.substring(that.features.item(i).getId().indexOf(".") + 1) : "";
+// var td1 = $("<td>").text(fno);
+// var feature = that.features.item(i);
+// var anc = $("<a>").addClass("gb-edit-sel-flist").css("cursor", "pointer").attr({
+// "value" : gitAttr.treeid + "," + feature.getId()
+// }).text("Selecting feature").click(function() {
+// var param = $(this).attr("value").split(",");
+// var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+// if (slayers.length !== 1) {
+// console.error(this.translation.alertSelectOneLayer[this.locale]);
+// return;
+// }
+// if (slayers[0] instanceof ol.layer.Tile) {
+// feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
+// } else if (slayers[0] instanceof ol.layer.Vector) {
+// feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+// }
+// that.count = 1;
+// clearInterval(that.interval);
+// feature.setStyle(undefined);
+// that.interaction.select.getFeatures().clear();
+// that.interaction.select.getFeatures().push(feature);
+// that.featurePop.close();
+// console.log(feature);
+// });
+// var td2 = $("<td>").append(anc);
+// var tr = $("<tr>").append(td1).append(td2).mouseenter(function(evt) {
+// var param = $(this).find("a").attr("value").split(",");
+// var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+// if (slayers.length !== 1) {
+// console.error(this.translation.alertSelectOneLayer[this.locale]);
+// return;
+// }
+// if (slayers[0] instanceof ol.layer.Tile) {
+// feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
+// } else if (slayers[0] instanceof ol.layer.Vector) {
+// feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+// }
+// feature.setStyle(that.highlightStyles1);
+// that.interval = setInterval(function() {
+// var val = that.count % 2;
+// if (val === 0) {
+// feature.setStyle(that.highlightStyles1);
+// } else {
+// feature.setStyle(that.highlightStyles2);
+// }
+// that.count++;
+// }, 500);
+// }).mouseleave(function() {
+// var param = $(this).find("a").attr("value").split(",");
+// var slayers = $(that.treeElement).jstreeol3("get_selected_layer");
+// if (slayers.length !== 1) {
+// console.error(this.translation.alertSelectOneLayer[this.locale]);
+// return;
+// }
+// if (slayers[0] instanceof ol.layer.Tile) {
+// feature = that.getVectorSourceOfServer(param[0]).getFeatureById(param[1]);
+// } else if (slayers[0] instanceof ol.layer.Vector) {
+// feature = that.getVectorSourceOfVector(param[0]).getFeatureById(param[1]);
+// }
+// that.count = 1;
+// clearInterval(that.interval);
+// feature.setStyle(undefined);
+// });
+// $(that.featureTB).append(tr);
+// }
 
-//			that.featurePop.open();
-//			that.featurePop.getPanel().position({
-//			"my" : "left top",
-//			"at" : "left bottom",
-//			"of" : that.headerTag,
-//			"collision" : "fit"
-//			});
-//			that.attrPop.close();
-//			} else if (that.features.getLength() === 1) {
+// that.featurePop.open();
+// that.featurePop.getPanel().position({
+// "my" : "left top",
+// "at" : "left bottom",
+// "of" : that.headerTag,
+// "collision" : "fit"
+// });
+// that.attrPop.close();
+// } else if (that.features.getLength() === 1) {
 		}
 		if (that.features.getLength() === 1) {
 			// 피처 버저닝 이력 시작
@@ -1362,7 +1362,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				that.updateFeatureHistoryModal(feature);
 			} else {
 				var vfeature = that.getVersioningFeature();
-//				vfeature.close();
+// vfeature.close();
 			}
 			// 피처 버저닝 이력 끝
 
@@ -1385,7 +1385,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 						"width" : "100%",
 						"border" : "none"
 					}).val(that.feature.get(props[i].fieldName)).on("input", function(e) {
-//						var attrTemp = attrInfo[$(this).parent().prev().text()];
+// var attrTemp = attrInfo[$(this).parent().prev().text()];
 						var key = $(this).parent().prev().prev().text();
 						var source = that.selectedSource;
 						var git = source.get("git");
@@ -1403,9 +1403,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 							}
 						}
 
-//						obj[$(this).parent().prev().text()] = $(this).val();
-//						that.feature.setProperties(obj);
-//						that.featureRecord.update(layer, that.feature);
+// obj[$(this).parent().prev().text()] = $(this).val();
+// that.feature.setProperties(obj);
+// that.featureRecord.update(layer, that.feature);
 
 						if(!nullable && $(this).val() === ""){
 							return;
@@ -1515,7 +1515,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				// threeJS Object Select
 				var fid = that.features.item(0).getId();
 
-//				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
+// var fidnum = parseInt(fid.substring(fid.indexOf(".")+1))-1;
 				var fidnum = parseInt(fid.substring(fid.indexOf(".")+1));
 				var bidnum = fidnum - 1; 
 				var gitAttr = that.selectedSource.get("git");
@@ -1525,7 +1525,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 				var tileset = tLayer.get("git").tileset;
 				if (tileset) {
 					console.log("tile exist");
-//					ctileset.root.children[0].children[0].content.getFeature(1717);
+// ctileset.root.children[0].children[0].content.getFeature(1717);
 					var ctileset = tileset.getCesiumTileset();
 					var root = ctileset.root;
 
@@ -1567,7 +1567,7 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 										}
 									}
 								}
-//								return feature;
+// return feature;
 							} else {
 								var feature = content.getFeature(bid);
 								if (feature instanceof Cesium.Cesium3DTileFeature) {
@@ -1623,9 +1623,9 @@ gb3d.edit.EditingTool2D.prototype.select = function(source) {
 		} else {
 			that.featurePop.close();
 			that.unselectFeature();
-//			that.attrPop.close();
-//			that.getEditingTool3D().unselectCesium();
-//			vfeature.close();
+// that.attrPop.close();
+// that.getEditingTool3D().unselectCesium();
+// vfeature.close();
 		}
 	});
 
@@ -1651,12 +1651,12 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 			this.deactiveIntrct_("snap");
 			this.deactiveIntrct_("draw");
 			this.deactiveBtn_("drawBtn");
-//			this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 			return;
 		}
 	}
 	// }
-//	this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 	var that = this;
 	if (this.interaction.select) {
 		this.interaction.select.getFeatures().clear();
@@ -1771,8 +1771,8 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 			}
 
 			// ----- ThreeJS Object Create --------
-//			that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry,
-//			feature, source.get("git").treeid, layer.get("id"));
+// that.getEditingTool3D().createObjectByCoord(that.selectedSource.get("git").geometry,
+// feature, source.get("git").treeid, layer.get("id"));
 
 			if(source.get("git") instanceof Object){
 				if(source.get("git").attribute instanceof Array){
@@ -1959,7 +1959,7 @@ gb3d.edit.EditingTool2D.prototype.draw = function(layer) {
 		this.activeIntrct_("snap");
 		this.activeBtn_("drawBtn");
 	} else if (git.editable === true && sourceLayer instanceof ol.layer.Base) {
-//		this.map.addLayer(this.managed);
+// this.map.addLayer(this.managed);
 
 		this.interaction.draw = new ol.interaction.Draw({
 			source : this.tempSource,
@@ -2029,12 +2029,12 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 			this.interaction.select.getFeatures().clear();
 			this.deactiveIntrct_("move");
 			this.deactiveBtn_("moveBtn");
-//			this.map.removeLayer(this.tempVector);
-//			this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.tempVector);
+// this.map.removeLayer(this.managed);
 		}
 		return;
 	}
-//	this.map.removeLayer(this.managed);
+// this.map.removeLayer(this.managed);
 	var that = this;
 
 	var selectSource = this.selectedSource;
@@ -2044,7 +2044,7 @@ gb3d.edit.EditingTool2D.prototype.move = function(layer) {
 
 	if (this.interaction.select.getFeatures().getLength() > 0) {
 
-//		this.map.addLayer(this.managed);
+// this.map.addLayer(this.managed);
 		this.interaction.move = new ol.interaction.Translate({
 			features : this.interaction.select.getFeatures()
 		});
@@ -2195,7 +2195,7 @@ gb3d.edit.EditingTool2D.prototype.rotate = function(layer) {
 			that.featureRecord.update(selectSource.get("git").tempLayer, feature);
 			// ThreeJS vertex modify
 			var floor = that.getEditingTool3D().modify3DVertices(feature.getGeometry().getCoordinates(true), feature.getId(), feature.getGeometry().getExtent(), evt);
-//			feature.setGeometry(floor);
+// feature.setGeometry(floor);
 
 			gb.undo.pushAction({
 				undo: function(data){
@@ -2595,25 +2595,25 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 	} else if(this.getVectorSourceOfVector(treeId)){
 		source = this.getVectorSourceOfVector(treeId);
 	} else {
-//		if(layer instanceof ol.layer.Vector){
-//		source = layer.getSource();
-//		if(!layer.get("id")){
-//		layer.set("id", layer.get("treeid"));
-//		}
-//		if(typeof source.get("git") !== "object"){
-//		source.set("git", {
-//		id: layer.get("id"),
-//		treeid: layer.get("treeid"),
-//		tempLayer: layer,
-//		editable: layer.get("git").editable,
-//		geometry: layer.get("git").geometry
-//		});
-//		}
+// if(layer instanceof ol.layer.Vector){
+// source = layer.getSource();
+// if(!layer.get("id")){
+// layer.set("id", layer.get("treeid"));
+// }
+// if(typeof source.get("git") !== "object"){
+// source.set("git", {
+// id: layer.get("id"),
+// treeid: layer.get("treeid"),
+// tempLayer: layer,
+// editable: layer.get("git").editable,
+// geometry: layer.get("git").geometry
+// });
+// }
 
-//		if(!this.customVector_[layer.get("treeid")]){
-//		this.customVector_[layer.get("treeid")] = source;
-//		}
-//		}
+// if(!this.customVector_[layer.get("treeid")]){
+// this.customVector_[layer.get("treeid")] = source;
+// }
+// }
 	}
 
 	this.selectedSource = source;
@@ -2623,31 +2623,31 @@ gb3d.edit.EditingTool2D.prototype.updateSelected = function() {
 	}
 	return source;
 };
-//gb3d.edit.EditingTool2D.prototype.setFeatures = function(newFeature) {
-//var that = this;
-///*
-//* if (this.isOn.select) { if (!!this.interaction.select) {
-//* this.interaction.select.getFeatures().clear(); this.deactiveIntrct_([
-//* "dragbox", "select"]); } this.deactiveBtn_("selectBtn"); this.isOn.select =
-//* false; } this.select(this.layer);
-//*/
-//if (newFeature.length === 1) {
-////this.interaction.select.getFeatures().extend(newFeature);
-//this.open();
-//this.attrPop.getPanel().position({
-//"my" : "left top",
-//"at" : "right top",
-//"of" : this.getPanel(),
-//"collision" : "fit"
-//});
-//}
-//};
+// gb3d.edit.EditingTool2D.prototype.setFeatures = function(newFeature) {
+// var that = this;
+// /*
+// * if (this.isOn.select) { if (!!this.interaction.select) {
+// * this.interaction.select.getFeatures().clear(); this.deactiveIntrct_([
+// * "dragbox", "select"]); } this.deactiveBtn_("selectBtn"); this.isOn.select =
+// * false; } this.select(this.layer);
+// */
+// if (newFeature.length === 1) {
+// //this.interaction.select.getFeatures().extend(newFeature);
+// this.open();
+// this.attrPop.getPanel().position({
+// "my" : "left top",
+// "at" : "right top",
+// "of" : this.getPanel(),
+// "collision" : "fit"
+// });
+// }
+// };
 /**
  * 선택한 Feature들의 집합을 반환한다.
  * 
  * @method gb3d.edit.EditingTool2D#getFeatures
  * @function
- * @return {ol.Collection.<ol.Feature>}
+ * @return {ol.Collection}
  */
 gb3d.edit.EditingTool2D.prototype.getFeatures = function() {
 	return this.features;
@@ -2734,137 +2734,137 @@ gb3d.edit.EditingTool2D.prototype.clearUnmanaged = function() {
 	return;
 };
 
-//gb3d.edit.EditingTool2D.prototype.open = function() {
-//var layer = this.updateSelected();
-//if (layer instanceof ol.layer.Group) {
-//console.error("group layer can not edit");
-//} else if (layer instanceof ol.layer.Tile) {
-//var git = layer.get("git");
-//if (git.hasOwnProperty("fake")) {
-//if (git.fake === "parent") {
-//console.error("fake parent layer can not edit");
-//} else {
-////this.headerTag.css("display", "block");
-//}
-//} else {
-////this.headerTag.css("display", "block");
-//}
-//} else if (layer instanceof ol.layer.Base) {
-////this.headerTag.css("display", "block");
-//}
-//};
+// gb3d.edit.EditingTool2D.prototype.open = function() {
+// var layer = this.updateSelected();
+// if (layer instanceof ol.layer.Group) {
+// console.error("group layer can not edit");
+// } else if (layer instanceof ol.layer.Tile) {
+// var git = layer.get("git");
+// if (git.hasOwnProperty("fake")) {
+// if (git.fake === "parent") {
+// console.error("fake parent layer can not edit");
+// } else {
+// //this.headerTag.css("display", "block");
+// }
+// } else {
+// //this.headerTag.css("display", "block");
+// }
+// } else if (layer instanceof ol.layer.Base) {
+// //this.headerTag.css("display", "block");
+// }
+// };
 
-//gb3d.edit.EditingTool2D.prototype.setWMSSource = function(sourceLayer,
-//callback) {
-//var that = this;
-//if (sourceLayer instanceof ol.layer.Vector || sourceLayer instanceof
-//ol.layer.Group) {
-//return;
-//}
-//var arr = {
-//"geoLayerList" : [ sourceLayer.get("id") ]
-//}
-//var names = [];
+// gb3d.edit.EditingTool2D.prototype.setWMSSource = function(sourceLayer,
+// callback) {
+// var that = this;
+// if (sourceLayer instanceof ol.layer.Vector || sourceLayer instanceof
+// ol.layer.Group) {
+// return;
+// }
+// var arr = {
+// "geoLayerList" : [ sourceLayer.get("id") ]
+// }
+// var names = [];
 
-//$.ajax({
-//url : this.layerInfo,
-//method : "POST",
-//contentType : "application/json; charset=UTF-8",
-//cache : false,
-//data : JSON.stringify(arr),
-//beforeSend : function() { // 호출전실행
-//$("body").css("cursor", "wait");
-//},
-//traditional : true,
-//success : function(data2, textStatus, jqXHR) {
-//console.log(data2);
-//if (Array.isArray(data2)) {
-//for (var i = 0; i < 1; i++) {
-//var source = new ol.source.TileWMS({
-//url : "geoserver/geoserverWMSLayerLoad.do",
-//params : {
-//'LAYERS' : data2[i].lName,
-//'TILED' : true,
-//'FORMAT' : 'image/png8',
-//'VERSION' : '1.1.0',
-//'CRS' : that.getMap().getView().getProjection().getCode(),
-//'SRS' : that.getMap().getView().getProjection().getCode(),
-//'BBOX' : data2[i].nbBox.minx.toString() + "," +
-//data2[i].nbBox.miny.toString() + ","
-//+ data2[i].nbBox.maxx.toString() + "," + data2[i].nbBox.maxy.toString()
-//},
-//serverType : 'geoserver'
-//});
-//sourceLayer.setSource(source);
-//var ogit = sourceLayer.get("git");
-//ogit["attribute"] = data2[i].attInfo;
-//ogit["geometry"] = data2[i].geomType;
-//var getPosition = function(str, subString, index) {
-//return str.split(subString, index).join(subString).length;
-//};
-//var id = sourceLayer.get("id");
-//var format = id.substring((getPosition(id, "_", 1) + 1), getPosition(id, "_",
-//2));
-//var layer;
-//if (format === "ngi") {
-//layer = new gb.layer.LayerInfo({
-//name : sourceLayer.get("name"),
-//id : id,
-//format : format,
-//epsg : data2[i].srs,
-//mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
-//],
-//[ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
-//lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
-//isNew : false,
-//geometry : id.substring(getPosition(id, "_", 4) + 1),
-//sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
-//3))
-//});
-//} else if (format === "dxf") {
-//layer = new gb.layer.LayerInfo({
-//name : sourceLayer.get("name"),
-//id : id,
-//format : format,
-//epsg : data2[i].srs,
-//mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
-//],
-//[ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
-//isNew : false,
-//lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
-//isNew : false,
-//geometry : id.substring(getPosition(id, "_", 4) + 1),
-//sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
-//3))
-//});
-//} else if (format === "shp") {
-//layer = new gb.layer.LayerInfo({
-//name : sourceLayer.get("name"),
-//id : id,
-//format : format,
-//epsg : data2[i].srs,
-//mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
-//],
-//[ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
-//lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
-//isNew : false,
-//geometry : id.substring(getPosition(id, "_", 4) + 1),
-//sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
-//3))
-//});
-//}
-//ogit["information"] = layer;
-//console.log(ogit["attribute"]);
-//console.log("source injected");
-//if (typeof callback === "function") {
-//callback(source);
-//}
-//}
-//$("body").css("cursor", "default");
-//}
-//}
-//});
-//};
+// $.ajax({
+// url : this.layerInfo,
+// method : "POST",
+// contentType : "application/json; charset=UTF-8",
+// cache : false,
+// data : JSON.stringify(arr),
+// beforeSend : function() { // 호출전실행
+// $("body").css("cursor", "wait");
+// },
+// traditional : true,
+// success : function(data2, textStatus, jqXHR) {
+// console.log(data2);
+// if (Array.isArray(data2)) {
+// for (var i = 0; i < 1; i++) {
+// var source = new ol.source.TileWMS({
+// url : "geoserver/geoserverWMSLayerLoad.do",
+// params : {
+// 'LAYERS' : data2[i].lName,
+// 'TILED' : true,
+// 'FORMAT' : 'image/png8',
+// 'VERSION' : '1.1.0',
+// 'CRS' : that.getMap().getView().getProjection().getCode(),
+// 'SRS' : that.getMap().getView().getProjection().getCode(),
+// 'BBOX' : data2[i].nbBox.minx.toString() + "," +
+// data2[i].nbBox.miny.toString() + ","
+// + data2[i].nbBox.maxx.toString() + "," + data2[i].nbBox.maxy.toString()
+// },
+// serverType : 'geoserver'
+// });
+// sourceLayer.setSource(source);
+// var ogit = sourceLayer.get("git");
+// ogit["attribute"] = data2[i].attInfo;
+// ogit["geometry"] = data2[i].geomType;
+// var getPosition = function(str, subString, index) {
+// return str.split(subString, index).join(subString).length;
+// };
+// var id = sourceLayer.get("id");
+// var format = id.substring((getPosition(id, "_", 1) + 1), getPosition(id, "_",
+// 2));
+// var layer;
+// if (format === "ngi") {
+// layer = new gb.layer.LayerInfo({
+// name : sourceLayer.get("name"),
+// id : id,
+// format : format,
+// epsg : data2[i].srs,
+// mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
+// ],
+// [ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
+// lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
+// isNew : false,
+// geometry : id.substring(getPosition(id, "_", 4) + 1),
+// sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
+// 3))
+// });
+// } else if (format === "dxf") {
+// layer = new gb.layer.LayerInfo({
+// name : sourceLayer.get("name"),
+// id : id,
+// format : format,
+// epsg : data2[i].srs,
+// mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
+// ],
+// [ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
+// isNew : false,
+// lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
+// isNew : false,
+// geometry : id.substring(getPosition(id, "_", 4) + 1),
+// sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
+// 3))
+// });
+// } else if (format === "shp") {
+// layer = new gb.layer.LayerInfo({
+// name : sourceLayer.get("name"),
+// id : id,
+// format : format,
+// epsg : data2[i].srs,
+// mbound : [ [ data2[i].nbBox.minx.toString(), data2[i].nbBox.miny.toString()
+// ],
+// [ data2[i].nbBox.maxx.toString(), data2[i].nbBox.maxy.toString() ] ],
+// lbound : [ [ 122.71, 28.6 ], [ 134.28, 40.27 ] ],
+// isNew : false,
+// geometry : id.substring(getPosition(id, "_", 4) + 1),
+// sheetNum : id.substring((getPosition(id, "_", 2) + 1), getPosition(id, "_",
+// 3))
+// });
+// }
+// ogit["information"] = layer;
+// console.log(ogit["attribute"]);
+// console.log("source injected");
+// if (typeof callback === "function") {
+// callback(source);
+// }
+// }
+// $("body").css("cursor", "default");
+// }
+// }
+// });
+// };
 
 /**
  * ol.Map 객체를 설정한다.
@@ -3103,7 +3103,7 @@ gb3d.edit.EditingTool2D.prototype.removeSnappingLayer = function(layer) {
  * 
  * @method gb3d.edit.EditingTool2D#loadSnappingLayer
  * @function
- * @param {Array.<number>} extent - 스냅핑 기능을 적용시킬 범위
+ * @param {number[]} extent - 스냅핑 기능을 적용시킬 범위
  */
 gb3d.edit.EditingTool2D.prototype.loadSnappingLayer = function(extent) {
 	var that = this;
@@ -3179,7 +3179,7 @@ gb3d.edit.EditingTool2D.prototype.zoomToFit = function(layer) {
 			}
 		};
 		if (typeof source === "undefined" || source === null) {
-//			this.setWMSSource(layer, func);
+// this.setWMSSource(layer, func);
 		} else if (source instanceof ol.source.TileWMS) {
 			func(source);
 		}
@@ -3415,27 +3415,27 @@ gb3d.edit.EditingTool2D.prototype.getTileLayersInMap = function(map){
 	// wms 성능 고도화 끝
 
 	// 이전 코드 시작
-//	map.getLayers().forEach(function(layer){
-//	if(layer instanceof ol.layer.Tile){
-//	tileLayers.push(layer);
-//	}
-//	if(layer instanceof ol.layer.Group){
-//	tileLayers.push(layer);
-//	layer.getLayers().forEach(function(tile){
-//	if(tile instanceof ol.layer.Tile){
-//	tileLayers.push(tile);
-//	}
-//	if(tile instanceof ol.layer.Group){
-//	tileLayers.push(tile);
-//	tile.getLayers().forEach(function(node){
-//	if(node instanceof ol.layer.Tile){
-//	tileLayers.push(node);
-//	}
-//	});
-//	}
-//	});
-//	}
-//	});
+// map.getLayers().forEach(function(layer){
+// if(layer instanceof ol.layer.Tile){
+// tileLayers.push(layer);
+// }
+// if(layer instanceof ol.layer.Group){
+// tileLayers.push(layer);
+// layer.getLayers().forEach(function(tile){
+// if(tile instanceof ol.layer.Tile){
+// tileLayers.push(tile);
+// }
+// if(tile instanceof ol.layer.Group){
+// tileLayers.push(tile);
+// tile.getLayers().forEach(function(node){
+// if(node instanceof ol.layer.Tile){
+// tileLayers.push(node);
+// }
+// });
+// }
+// });
+// }
+// });
 	// 이전 코드 끝
 
 	return tileLayers;
@@ -3573,9 +3573,9 @@ gb3d.edit.EditingTool2D.prototype.loadWFS_ = function(){
 
 	this.loadSnappingLayer(ext);
 
-//	for(var i in this.customVector_){
-//	this.customVector_[i].get("git").tempLayer.setVisible(true);
-//	}
+// for(var i in this.customVector_){
+// this.customVector_[i].get("git").tempLayer.setVisible(true);
+// }
 }
 
 /**
@@ -3661,9 +3661,9 @@ gb3d.edit.EditingTool2D.prototype.loadVector_ = function(){
 		}
 	}
 
-//	for(var i in this.customVector_){
-//	this.customVector_[i].get("git").tempLayer.setVisible(true);
-//	}
+// for(var i in this.customVector_){
+// this.customVector_[i].get("git").tempLayer.setVisible(true);
+// }
 }
 
 /**
@@ -3703,9 +3703,9 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWFS = function(bool){
 		}
 	}
 
-//	for(var i in this.customVector_){
-//	this.customVector_[i].get("git").tempLayer.setVisible(set);
-//	}
+// for(var i in this.customVector_){
+// this.customVector_[i].get("git").tempLayer.setVisible(set);
+// }
 }
 
 /**
@@ -3716,26 +3716,26 @@ gb3d.edit.EditingTool2D.prototype.setVisibleWFS = function(bool){
  * @param {boolean} bool - 가시화 여부
  */
 gb3d.edit.EditingTool2D.prototype.setVisibleWMS = function(bool){
-//	var tileLayers = this.getTileLayersInMap(this.map);
+// var tileLayers = this.getTileLayersInMap(this.map);
 	var tree = this.otree.getJSTree();
 
-//	for(var i = 0; i < tileLayers.length; i++){
-//	if(!!tree.get_node(tileLayers[i].get("treeid"))){
-//	if(!tree.get_node(tileLayers[i].get("treeid")).state.hiding){
-//	zidx = tileLayers[i].getZIndex();
-//	var git = tileLayers[i].get("git");
-//	if (git !== undefined) {
-//	var tlayer = git.tempLayer;
-//	if (tlayer !== undefined) {
-//	tlayer.setZIndex(zidx);
-//	}
-//	}
-//	tileLayers[i].setVisible(bool);
-//	} else {
-//	tileLayers[i].setVisible(false);
-//	}
-//	}
-//	}
+// for(var i = 0; i < tileLayers.length; i++){
+// if(!!tree.get_node(tileLayers[i].get("treeid"))){
+// if(!tree.get_node(tileLayers[i].get("treeid")).state.hiding){
+// zidx = tileLayers[i].getZIndex();
+// var git = tileLayers[i].get("git");
+// if (git !== undefined) {
+// var tlayer = git.tempLayer;
+// if (tlayer !== undefined) {
+// tlayer.setZIndex(zidx);
+// }
+// }
+// tileLayers[i].setVisible(bool);
+// } else {
+// tileLayers[i].setVisible(false);
+// }
+// }
+// }
 
 	// wms 성능 고도화 시작
 	this.map.getLayers().forEach(function(e){
@@ -3943,7 +3943,7 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfServer = function(obj, layerI
 		});
 		layer.set("id", layerid);
 		layer.set("name", layername);
-//		layer.setMap(this.map);
+// layer.setMap(this.map);
 
 		if(sld !== undefined){
 			var symbol = gb.style.LayerStyle.prototype.parseSymbolizer.call(this, sld);
@@ -4023,7 +4023,7 @@ gb3d.edit.EditingTool2D.prototype.setVectorSourceOfVector = function(obj, layerI
 		if (vlayer.getStyle() !== undefined) {
 			layer.setStyle(vlayer.getStyle());
 		}
-//		layer.setMap(this.map);
+// layer.setMap(this.map);
 
 		git.id = layerid;
 		git.tempLayer = layer;
@@ -4237,9 +4237,9 @@ gb3d.edit.EditingTool2D.prototype.displayEditZoomHint = function(bool){
 			var icon = $("<span>").html("<i class='fas fa-exclamation-circle'></i>");
 			var text = $("<span>").html(this.translation.editToolHint[this.locale]);
 
-//			editZoomHintTag.css("margin-top", "6px");
-//			editZoomHintTag.css("padding-left", "6px");
-//			editZoomHintTag.css("display", "inline-block");
+// editZoomHintTag.css("margin-top", "6px");
+// editZoomHintTag.css("padding-left", "6px");
+// editZoomHintTag.css("display", "inline-block");
 
 			editZoomHintTag.append(icon);
 			editZoomHintTag.append(text);

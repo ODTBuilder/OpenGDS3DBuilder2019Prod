@@ -95,7 +95,9 @@ gb3d.layer.Navigator.prototype.setFeatures = function(Layer) {
  * 
  * @method gb3d.layer.Navigator#requestFeatureList
  * @function
- * @param {ol.layer.Layer} Layer - 객체 추적 기능을 적용할 레이어 객체
+ * @param {string} serverName - 서버에 등록된 지오서버 이름
+ * @param {string} workspace - 지오서버에 등록된 워크스페이스 이름
+ * @param {string} layer - 지오서버에 등록된 레이어 이름
  */
 gb3d.layer.Navigator.prototype.requestFeatureList = function(serverName, workspace, layer) {
 	var that = this;
@@ -269,17 +271,17 @@ gb3d.layer.Navigator.prototype.showFeatureInfo = function(feature) {
 	} else if (geom instanceof ol.geom.MultiPoint) {
 		// 포인트는 줌이 너무 들어가니까 조절
 		this.map.getView().setZoom(20);
-		
+
 		ext = geom.getExtent();
-		var x = (ext[0] + ext[2])/2;
-		var y = (ext[1] + ext[3])/2;
-		center3d = [x, y];
+		var x = (ext[0] + ext[2]) / 2;
+		var y = (ext[1] + ext[3]) / 2;
+		center3d = [ x, y ];
 	} else {
 		// 다른 지오메트리의 경우 익스텐트로 중점을 뽑아서 저장
 		ext = geom.getExtent();
-		var x = (ext[0] + ext[2])/2;
-		var y = (ext[1] + ext[3])/2;
-		center3d = [x, y];
+		var x = (ext[0] + ext[2]) / 2;
+		var y = (ext[1] + ext[3]) / 2;
+		center3d = [ x, y ];
 	}
 	// 3d 영역 이동
 	if (this.map3D.cesiumViewer.camera) {
@@ -287,7 +289,7 @@ gb3d.layer.Navigator.prototype.showFeatureInfo = function(feature) {
 			this.map3D.cesiumViewer.camera.flyTo({
 				destination : Cesium.Cartesian3.fromDegrees(center3d[0], center3d[1], 200),
 				duration : 0
-			});	
+			});
 		} else {
 			var rect = Cesium.Rectangle.fromDegrees(ext[0], ext[1], ext[2], ext[3]);
 			this.map3D.cesiumViewer.camera.flyTo({
@@ -334,7 +336,7 @@ gb3d.layer.Navigator.prototype.prev = function() {
 /**
  * 다음 객체를 불러온다. count 변수가 1 증가한다.
  * 
- * @method gb3d.layer.Navigator#prev
+ * @method gb3d.layer.Navigator#next
  * @function
  */
 gb3d.layer.Navigator.prototype.next = function() {

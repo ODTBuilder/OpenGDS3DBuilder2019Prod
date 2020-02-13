@@ -67,7 +67,7 @@ gb3d.tree.GeoServer = function(obj) {
 	this.loadingList = [];
 	/**
 	 * @private
-	 * @type {Array.<number>}
+	 * @type {number[]}
 	 */
 	this.loadingNumber = [];
 
@@ -1700,7 +1700,7 @@ gb3d.tree.GeoServer.prototype.setJSTree = function(jstree) {
  * loadingNumber 객체를 반환한다.
  * 
  * @method gb3d.tree.GeoServer#getLoadingNumber
- * @return {Array.<number>} 로딩할 노드목록을 가진 객체
+ * @return {number[]} 로딩할 노드목록을 가진 객체
  */
 gb3d.tree.GeoServer.prototype.getLoadingNumber = function() {
 	return this.loadingNumber;

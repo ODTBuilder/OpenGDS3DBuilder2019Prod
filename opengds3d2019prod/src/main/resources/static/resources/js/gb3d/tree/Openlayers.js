@@ -724,22 +724,37 @@ gb3d.tree.OpenLayers = function(obj) {
 									if(layer instanceof ol.layer.Image){
 										layer = layer.get("vectorLayer");
 									}
-									var git = layer.get("git");
-									if (git) {
-										var tileset = git.tileset;
-										if (tileset) {
-											var ctileset = tileset.getCesiumTileset();
-											if (ctileset instanceof Cesium.Cesium3DTileset) {
-												that.gb3dMap.getCesiumViewer().zoomTo(ctileset);												
-											}
-										}
-									}
+									
 									var extent = ol.extent.createEmpty();
 									// inst._data.layerproperties.editingTool.zoomToFit(layer);
 									// inst._data.layerproperties.editingTool.setWMSSource(layer,
 									var wholeExt = inst.zoom_to_fit(layer, extent);
+									
 									var view = inst._data.core.map.getView();
 									view.fit(wholeExt, inst._data.core.map.getSize());
+									
+									var git = layer.get("git");
+									if (git) {
+// var tileset = git.tileset;
+// if (tileset) {
+// var ctileset = tileset.getCesiumTileset();
+// if (ctileset instanceof Cesium.Cesium3DTileset) {
+// that.gb3dMap.getCesiumViewer().zoomTo(ctileset);
+// }
+// } else {
+											var minx = Cesium.Math.toRadians(wholeExt[0]);
+											var miny = Cesium.Math.toRadians(wholeExt[1]); 
+											var maxx = Cesium.Math.toRadians(wholeExt[2]); 
+											var maxy = Cesium.Math.toRadians(wholeExt[3]); 
+											var rectangle = new Cesium.Rectangle(minx, miny, maxx, maxy);
+											that.gb3dMap.getCamera().getCesiumCamera().flyTo({
+												"destination" : rectangle,
+												"duration" : 0
+											});
+											that.gb3dMap.getCamera().getCesiumCamera().zoomOut(100);
+// }
+									}
+									
 								}
 						};
 

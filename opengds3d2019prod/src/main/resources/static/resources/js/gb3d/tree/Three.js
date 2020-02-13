@@ -5,7 +5,7 @@ if (!gb3d.tree)
 	gb3d.tree = {};
 
 /**
- * @classdesc Cesium 3D Tileset 선언적 스타일링 관리 객체
+ * @classdesc 3D 객체 목록 트리
  * @class gb3d.tree.Three
  * @memberof gb3d.tree
  * @param {Object} obj - 생성자 옵션

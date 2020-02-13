@@ -261,7 +261,7 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 초기화 위치
 	 * 
-	 * @type {Array.<number>}
+	 * @type {number[]}
 	 */
 	this.initPosition = Array.isArray(options.initPosition) ? Cesium.Cartesian3.fromDegrees(options.initPosition[0], options.initPosition[1] - 1, 200000) : Cesium.Cartesian3.fromDegrees(0, 0, 200000);
 
@@ -427,7 +427,7 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 커서 위치
 	 * 
-	 * @type {Array.<number>}
+	 * @type {number[]}
 	 */
 	this.cursorCoord = [];
 	this.olMap.on('pointermove', function(evt) {
@@ -497,7 +497,7 @@ gb3d.Camera = function(obj) {
 	/**
 	 * 커서의 이전 위치
 	 * 
-	 * @type {Array.<number>}
+	 * @type {number[]}
 	 */
 	this.prevCursorCoord = [];
 	/**
@@ -674,7 +674,7 @@ gb3d.Camera.prototype.getThreeCamera = function() {
  * cesium camera의 2차원 위치를 반환한다.
  * 
  * @method gb3d.Map#getCartographicPosition
- * @return {Array.<number>} 경위도 좌표
+ * @return {number[]} 경위도 좌표
  */
 gb3d.Camera.prototype.getCartographicPosition = function() {
 	var ccam = this.getCesiumCamera();
@@ -688,7 +688,7 @@ gb3d.Camera.prototype.getCartographicPosition = function() {
  * cesium camera의 2차원 지도상 위치 좌표 배열을 반환한다.
  * 
  * @method gb3d.Map#getCamGeometry
- * @return {Array.<number>} 카메라 point geometry
+ * @return {number[]} 카메라 point geometry
  */
 gb3d.Camera.prototype.getCamGeometry = function() {
 	return this.camGeom;

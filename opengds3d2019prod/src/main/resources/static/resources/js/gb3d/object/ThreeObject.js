@@ -13,7 +13,16 @@ if (!gb3d.object)
  * @memberof gb3d.object
  * @param {Object} obj - 생성자 옵션을 담은 객체
  * @param {THREE.Object3D} obj.object - Three Object3D 객체
- * @param {Array.<number>} obj.center - 모델의 위치점
+ * @param {number[]} obj.center - 모델의 위치점
+ * @param {number[]} obj.extent - 피처의 범위
+ * @param {string} obj.type - 피처의 지오메트리 타입
+ * @param {ol.Feature} obj.feature - 2차원 피처
+ * @param {number} obj.buffer - 라인스트링의 경우 3차원 객체의 반경
+ * @param {string} obj.tileId - 소속된 3D타일의 아이디
+ * @param {ol.layer.Base} obj.layer - 피처가 포함된 레이어
+ * @param {string} obj.treeid - 객체가 가진 트리 아이디
+ * @param {boolean} obj.file - 모델이 파일로부터 읽어진 객체인지
+ * @param {boolean} obj.editable - 모델의 버텍스가 수정가능한지
  * @author SOYIJUN
  */
 gb3d.object.ThreeObject = function(obj) {
@@ -152,7 +161,7 @@ gb3d.object.ThreeObject.prototype.setFeature3D = function(obj) {
  * 중심 위치점을 반환한다.
  * 
  * @method gb3d.object.ThreeObject#getCenter
- * @return {Array.<number>} 중심 위치 좌표
+ * @return {number[]} 중심 위치 좌표
  */
 gb3d.object.ThreeObject.prototype.getCenter = function() {
 	return this.center;
@@ -162,7 +171,7 @@ gb3d.object.ThreeObject.prototype.getCenter = function() {
  * 중심 위치점을 할당한다.
  * 
  * @method gb3d.object.ThreeObject#setCenter
- * @param {Array.<number>} center - 중심 위치 좌표
+ * @param {number[]} center - 중심 위치 좌표
  */
 gb3d.object.ThreeObject.prototype.setCenter = function(center) {
 	this.center = center;
@@ -181,7 +190,7 @@ gb3d.object.ThreeObject.prototype.updateExtent = function() {
  * Extent 반환
  * 
  * @method gb3d.object.ThreeObject#getExtent
- * @return {Array.<number>}
+ * @return {number[]}
  */
 gb3d.object.ThreeObject.prototype.getExtent = function() {
 	return this.extent;
@@ -191,7 +200,7 @@ gb3d.object.ThreeObject.prototype.getExtent = function() {
  * Extent 할당
  * 
  * @method gb3d.object.ThreeObject#setExtent
- * @param {Array.<number>} extent
+ * @param {number[]} extent
  */
 gb3d.object.ThreeObject.prototype.setExtent = function(extent) {
 	this.extent = extent;

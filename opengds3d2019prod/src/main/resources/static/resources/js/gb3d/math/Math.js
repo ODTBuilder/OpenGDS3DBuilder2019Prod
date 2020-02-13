@@ -11,9 +11,9 @@ if (!gb3d.Math)
  * 같은 시작점을 가진 두 벡터가 평행한지 검사한다.
  * 
  * @method gb3d.Math.isParallel
- * @param {Array.<number>} pointA - 점A
- * @param {Array.<number>} pointB - 점B
- * @param {Array.<number>} standard - 시작점
+ * @param {number[]} pointA - 점A
+ * @param {number[]} pointB - 점B
+ * @param {number[]} standard - 시작점
  * @return {boolean} 평행하면 True
  */
 gb3d.Math.isParallel = function(pointA, pointB, standard){
@@ -42,9 +42,9 @@ gb3d.Math.isParallel = function(pointA, pointB, standard){
  * 같은 시작점을 가진 두 벡터를 외적한다.
  * 
  * @method gb3d.Math.crossProductFromDegrees
- * @param {Array.<number>} pointA - 점A
- * @param {Array.<number>} pointB - 점B
- * @param {Array.<number>} standard - 시작점
+ * @param {number[]} pointA - 점A
+ * @param {number[]} pointB - 점B
+ * @param {number[]} standard - 시작점
  * @return {Object} 외적 결과
  */
 gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
@@ -92,8 +92,8 @@ gb3d.Math.crossProductFromDegrees = function(pointA, pointB, standard){
  * Degree 좌표값으로부터 설정한 높이만큼의 3차원 객체 Vertex와 Face 값을 계산하여 반환한다.
  * 
  * @method gb3d.Math.getPolygonVertexAndFaceFromDegrees
- * @param {Array.<Array.<number>>} arr - Polygon Feature의 좌표값
- * @param {Array.<number>} center - 중점
+ * @param {number[][]} arr - Polygon Feature의 좌표값
+ * @param {number[]} center - 중점
  * @param {number} depth - 3차원 객체의 높이
  * @return {Object} 외적 결과
  */
@@ -182,19 +182,19 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
 		if(i === 0){
 			faceSide.push([ 0, coordLength - 1, coordLength ]);
 			faceSide.push([ coordLength, coordLength - 1, 2*coordLength - 1]);
-//			faceSide.push([ 2*coordLength - 1, coordLength,0]);
-//			faceSide.push([ coordLength - 1, 2*coordLength - 1,0]);
+// faceSide.push([ 2*coordLength - 1, coordLength,0]);
+// faceSide.push([ coordLength - 1, 2*coordLength - 1,0]);
 		} else {
 			faceSide.push([ i, i - 1, i + coordLength]);
 			faceSide.push([ i + coordLength, i - 1, i - 1 + coordLength ]);
-//			faceSide.push([ i - 1 + coordLength, i + coordLength,i ]);
-//			faceSide.push([ i - 1, i - 1 + coordLength,i ]);
+// faceSide.push([ i - 1 + coordLength, i + coordLength,i ]);
+// faceSide.push([ i - 1, i - 1 + coordLength,i ]);
 		}
 
-//		if(i === 0){
-//		cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1],
-//		coord[i]);
-//		}
+// if(i === 0){
+// cp = gb3d.Math.crossProductFromDegrees(coord[i+1], coord[coordLength - 1],
+// coord[i]);
+// }
 
 		vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 		vect.sub(centerVec);
@@ -252,8 +252,8 @@ gb3d.Math.getPolygonVertexAndFaceFromDegrees = function(arr, center, depth){
  * 두 점을 중심선으로 하는 사각형을 반환한다.
  * 
  * @method gb3d.Math#getRectangleFromLine
- * @param {Array.<number>} start - 시작점
- * @param {Array.<number>} end - 끝점
+ * @param {number[]} start - 시작점
+ * @param {number[]} end - 끝점
  * @param {Number} radius - 반경
  * @return {Object} 사각형 정보
  */
@@ -291,10 +291,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY1 = ((perpenPoint1.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX1, perpenPoint1.geometry.coordinates[1] + offsetY1]);
-//	console.log(visedPerpenPoint1);
+// console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX1, perpenPoint2.geometry.coordinates[1] + offsetY1]);
-//	console.log(visedPerpenPoint2);
+// console.log(visedPerpenPoint2);
 	// 두 점중에 중심선의 점인 것을 찾는다
 	var center1;
 	var theOther1;
@@ -305,8 +305,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center1 = visedPerpenPoint2;
 		theOther1 = visedPerpenPoint1;
 	}
-//	console.log(center1);
-//	console.log(theOther1);
+// console.log(center1);
+// console.log(theOther1);
 	polygon.push(center1.geometry.coordinates);
 	// 각도를 잰다
 	var bearing1 = turf.bearing(center1, theOther1);
@@ -322,10 +322,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY2 = ((perpenPoint2.geometry.coordinates[1] * -1) + (startPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX2, perpenPoint1.geometry.coordinates[1] + offsetY2]);
-//	console.log(visedPerpenPoint1);
+// console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX2, perpenPoint2.geometry.coordinates[1] + offsetY2]);
-//	console.log(visedPerpenPoint2);
+// console.log(visedPerpenPoint2);
 
 	var center2;
 	var theOther2;
@@ -336,8 +336,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center2 = visedPerpenPoint2;
 		theOther2 = visedPerpenPoint1;
 	}
-//	console.log(center2);
-//	console.log(theOther2);
+// console.log(center2);
+// console.log(theOther2);
 	// 각도를 잰다
 	var bearing2 = turf.bearing(center2, theOther2);
 	angleSto2 = bearing2;
@@ -352,10 +352,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY3 = ((perpenPoint1.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX3, perpenPoint1.geometry.coordinates[1] + offsetY3]);
-//	console.log(visedPerpenPoint1);
+// console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX3, perpenPoint2.geometry.coordinates[1] + offsetY3]);
-//	console.log(visedPerpenPoint2);
+// console.log(visedPerpenPoint2);
 
 	var center3;
 	var theOther3;
@@ -366,8 +366,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center3 = visedPerpenPoint2;
 		theOther3 = visedPerpenPoint1;
 	}
-//	console.log(center3);
-//	console.log(theOther3);
+// console.log(center3);
+// console.log(theOther3);
 	// 각도를 잰다
 	var bearing3 = turf.bearing(center3, theOther3);
 	angleSto3 = bearing3;
@@ -382,10 +382,10 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 	var offsetY4 = ((perpenPoint2.geometry.coordinates[1] * -1) + (endPoint.geometry.coordinates[1]));
 	// 시작점에 맞춰진 수직선의 점 중 1
 	var visedPerpenPoint1 = turf.point([perpenPoint1.geometry.coordinates[0] + offsetX4, perpenPoint1.geometry.coordinates[1] + offsetY4]);
-//	console.log(visedPerpenPoint1);
+// console.log(visedPerpenPoint1);
 	// 시작점에 맞춰진 수직선의 점 중 2
 	var visedPerpenPoint2 = turf.point([perpenPoint2.geometry.coordinates[0] + offsetX4, perpenPoint2.geometry.coordinates[1] + offsetY4]);
-//	console.log(visedPerpenPoint2);
+// console.log(visedPerpenPoint2);
 
 	var center4;
 	var theOther4;
@@ -396,8 +396,8 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 		center4 = visedPerpenPoint2;
 		theOther4 = visedPerpenPoint1;
 	}
-//	console.log(center4);
-//	console.log(theOther4);
+// console.log(center4);
+// console.log(theOther4);
 	// 각도를 잰다
 	var bearing4 = turf.bearing(center4, theOther4);
 	angleSto4 = bearing4;
@@ -425,7 +425,7 @@ gb3d.Math.getRectangleFromLine = function(start, end, radius){
 /**
  * 부채꼴을 반환한다.
  * 
- * @param {Array.<Array.<number>>} center - 중심좌표
+ * @param {number[][]} center - 중심좌표
  * @param {number} radius - 부채꼴의 반지름(meter)
  * @param {number} sangle - 부채꼴의 시작각
  * @param {number} eangle - 부채꼴의 끝각
@@ -460,28 +460,28 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
 	// console.log(sector);
 	// 부채꼴에 가장 밖에 있는 포인트
 	// 부채꼴 가장 바깥점 생성시 정말 가까운 점이 두개 생김 거리를 측정해서 하나를 삭제해야함
-//	var from = turf.point(sector.geometry.coordinates[0][1]);
-//	var to = turf.point(sector.geometry.coordinates[0][2]);
-//	var distance = (turf.distance(from, to) * 100000);
+// var from = turf.point(sector.geometry.coordinates[0][1]);
+// var to = turf.point(sector.geometry.coordinates[0][2]);
+// var distance = (turf.distance(from, to) * 100000);
 	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-//	if (distance < 5) {
-//	sector.geometry.coordinates[0].splice(2, 1);
-//	}
+// if (distance < 5) {
+// sector.geometry.coordinates[0].splice(2, 1);
+// }
 
-//	var from =
-//	turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
-//	var to =
-//	turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
-//	var distance = (turf.distance(from, to) * 100000);
+// var from =
+// turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-3]);
+// var to =
+// turf.point(sector.geometry.coordinates[0][sector.geometry.coordinates[0].length-2]);
+// var distance = (turf.distance(from, to) * 100000);
 	// 두 점의 거리가 5센티보다 작으면 같은 점으로 간주하고 하나 삭제
-//	if (distance < 5) {
-//	sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3,
-//	1);
-//	}
+// if (distance < 5) {
+// sector.geometry.coordinates[0].splice(sector.geometry.coordinates[0].length-3,
+// 1);
+// }
 
-//	var po = new ol.geom.LineString(sector.geometry.coordinates[0], "XY");
-//	var fe = new ol.Feature(po);
-//	sourceyj.addFeature(fe);
+// var po = new ol.geom.LineString(sector.geometry.coordinates[0], "XY");
+// var fe = new ol.Feature(po);
+// sourceyj.addFeature(fe);
 	return {
 		"center" : center,
 		"sindex" : !changed ? 1 : sector.geometry.coordinates[0].length-2,
@@ -496,9 +496,9 @@ gb3d.Math.getSector = function(center, radius, sangle, eangle, narrow){
  * LineString 좌표를 통해 3D Vertex와 Face를 만들어 주는 함수
  * 
  * @method gb3d.Math#getLineStringVertexAndFaceFromDegrees
- * @param {Array.<Array.<number>>} arr - LineString 좌표
+ * @param {number[][]} arr - LineString 좌표
  * @param {Number} radius - 반경
- * @param {Array.<number>} center - 객체의 중점
+ * @param {number[]} center - 객체의 중점
  * @param {Number} depth - 깊이 값
  * @return {Object} 3D 객체 정보
  */
@@ -667,8 +667,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		vect.sub(centerVec);
 		sectorVertice.push(vect);
 	}
-//	console.log("지금까지 연결된 배열: ");
-//	console.log(bufferedLineString);
+// console.log("지금까지 연결된 배열: ");
+// console.log(bufferedLineString);
 
 	// 라인의 마지막 점에 수행할 부채꼴
 	var endPoint = turf.point(coord[coord.length - 1]);
@@ -801,7 +801,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 
 			// 부채꼴 폴리곤의 끝점을 빼고 좌표를 뽑아 저장한다
 			var exceptLast = outerSector.coordinates;
-//			var vlength = sectorVertice.length;
+// var vlength = sectorVertice.length;
 			var vlength = jointSectorVertice.length;
 			var currentSectorFaces = [];
 			for (var j = 0; j < exceptLast.length; j++) {
@@ -809,11 +809,11 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				vect = new THREE.Vector3(cart.x, cart.y, cart.z);
 				vect.sub(centerVec);
 				jointSectorVertice.push(vect);
-//				sectorVertice.push(vect);
+// sectorVertice.push(vect);
 				if (j !== 0 && j !== exceptLast.length - 1) {
 					if (exceptLast[0] && exceptLast[j] && exceptLast[j+1]) {
 						var face = [vlength, vlength + j, vlength + j + 1];
-//						sectorFacesBottom.push(face);
+// sectorFacesBottom.push(face);
 						jointSectorFacesBottom.push(face);
 						currentSectorFaces.push(face);
 					}	
@@ -828,8 +828,8 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 				sectorTopFaces[k].reverse();
 			}
-//			sectorFacesTop = sectorFacesTop.concat(sectorTopFaces);
-//			jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// sectorFacesTop = sectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 			jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 			// 3차원 객체 윗면 vertex 계산
 			var cp;
@@ -853,16 +853,16 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 			for (var j = 0; j < exceptLast.length; j++){
 				cart = Cesium.Cartesian3.fromDegrees(exceptLast[j][0], exceptLast[j][1]);
 				if(j > 1){
-//					sectorSides.push([ vlength + j, vlength + j - 1, vlength + j +
-//					exceptLast.length]);
-//					sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength
-//					+ j - 1 + exceptLast.length ]);
+// sectorSides.push([ vlength + j, vlength + j - 1, vlength + j +
+// exceptLast.length]);
+// sectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength
+// + j - 1 + exceptLast.length ]);
 					jointSectorSides.push([ vlength + j, vlength + j - 1, vlength + j + exceptLast.length]);
 					jointSectorSides.push([ vlength + j + exceptLast.length, vlength + j - 1, vlength + j - 1 + exceptLast.length ]);
 				}
 				vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 				vect.sub(centerVec);
-//				sectorVertice.push(vect);
+// sectorVertice.push(vect);
 				jointSectorVertice.push(vect);
 			}
 		} else if (intersects13.features.length === 0 && intersects24.features.length > 0) {
@@ -913,7 +913,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 				sectorTopFaces[k].reverse();
 			}
-//			jointSectorFacesTop = jointSectorFacesBottom.concat(sectorTopFaces);
+// jointSectorFacesTop = jointSectorFacesBottom.concat(sectorTopFaces);
 			jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 			// 3차원 객체 윗면 vertex 계산
 			var cp;
@@ -942,7 +942,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth);
 				vect.sub(centerVec);
-//				sectorVertice.push(vect);
+// sectorVertice.push(vect);
 				jointSectorVertice.push(vect);
 			}
 		} else if (intersects13.features.length === 0 && intersects24.features.length === 0) {
@@ -995,7 +995,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		}
 		// console.log("좌표 길이는: "+rectOrder.length);
 		// 사각형 윗면 버텍스
-//		rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 		for(var i = 0; i < rectOrder.length; i++){
 			cart = Cesium.Cartesian3.fromDegrees(rectOrder[i][0], rectOrder[i][1]);
 			// 보여야 할 사각형 옆면 페이스
@@ -1057,7 +1057,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		}
 		// console.log("좌표 길이는: "+rectOrder.length);
 		// 사각형 윗면 버텍스
-//		rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 		for(var i = 0; i < rectOrder.length; i++){
 			cart = Cesium.Cartesian3.fromDegrees(rectOrder[i][0], rectOrder[i][1]);
 			// 보여야 할 사각형 옆면 페이스
@@ -1120,7 +1120,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 		}
 		// console.log("좌표 길이는: "+rectOrder.length);
 		// 사각형 윗면 버텍스
-//		rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 		for(var i = 0; i < rectOrder.length; i++){
 			cart = Cesium.Cartesian3.fromDegrees(rectOrder[i][0], rectOrder[i][1]);
 			// 보여야 할 사각형 옆면 페이스
@@ -1213,7 +1213,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -1291,7 +1291,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -1372,7 +1372,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				// console.log("좌표 길이는: "+rectOrder.length);
 				// 사각형 윗면 버텍스
-//				rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 				for(var j = 0; j < rectOrder.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
 					// 보여야 할 사각형 옆면 페이스
@@ -1449,7 +1449,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
@@ -1527,7 +1527,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 							sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 							sectorTopFaces[k].reverse();
 						}
-//						jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 						jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 						// 3차원 객체 윗면 vertex 계산
 						var cp;
@@ -1623,39 +1623,48 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						rectangleVertice.push(vect);
 					}
 					/*
-					 * // 사각형 밑면 좌표 var rectOrder = [midRects[i+1]["p1"], midRects[i+1]["p3"], midRects[i+1]["end"],
-					 * midRects[i+1]["p4"], midRects[i+1]["p2"], midRects[i+1]["start"]]; var rvlength =
-					 * rectangleVertice.length; // 사각형 밑면 버텍스 for (var j = 0; j < rectOrder.length; j++) { cart =
-					 * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); vect = new THREE.Vector3(cart.x,
-					 * cart.y, cart.z); vect.sub(centerVec); rectangleVertice.push(vect); } // 사각형 밑면 페이스 var rface1 =
-					 * [rvlength + 4, rvlength + 3, rvlength + 5]; var rface2 = [rvlength + 3, rvlength + 2, rvlength +
-					 * 5]; var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var rface4 = [rvlength + 2, rvlength +
-					 * 1, rvlength + 0]; rectangleFacesBottom.push(rface1); rectangleFacesBottom.push(rface2);
+					 * // 사각형 밑면 좌표 var rectOrder = [midRects[i+1]["p1"], midRects[i+1]["p3"],
+					 * midRects[i+1]["end"], midRects[i+1]["p4"], midRects[i+1]["p2"],
+					 * midRects[i+1]["start"]]; var rvlength = rectangleVertice.length; // 사각형 밑면
+					 * 버텍스 for (var j = 0; j < rectOrder.length; j++) { cart =
+					 * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); vect = new
+					 * THREE.Vector3(cart.x, cart.y, cart.z); vect.sub(centerVec);
+					 * rectangleVertice.push(vect); } // 사각형 밑면 페이스 var rface1 = [rvlength + 4,
+					 * rvlength + 3, rvlength + 5]; var rface2 = [rvlength + 3, rvlength + 2,
+					 * rvlength + 5]; var rface3 = [rvlength + 5, rvlength + 2, rvlength + 0]; var
+					 * rface4 = [rvlength + 2, rvlength + 1, rvlength + 0];
+					 * rectangleFacesBottom.push(rface1); rectangleFacesBottom.push(rface2);
 					 * rectangleFacesBottom.push(rface3); rectangleFacesBottom.push(rface4); var
-					 * currentRectangleTopFaces = []; currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
+					 * currentRectangleTopFaces = [];
+					 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface1)));
 					 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface2)));
 					 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface3)));
-					 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); // 사각형 윗면 페이스 var rolength =
-					 * rectOrder.length; for (var j = 0; j < currentRectangleTopFaces.length; j++) {
-					 * currentRectangleTopFaces[j][0] = currentRectangleTopFaces[j][0] + rolength;
-					 * currentRectangleTopFaces[j][1] = currentRectangleTopFaces[j][1] + rolength;
-					 * currentRectangleTopFaces[j][2] = currentRectangleTopFaces[j][2] + rolength;
+					 * currentRectangleTopFaces.push(JSON.parse(JSON.stringify(rface4))); // 사각형 윗면
+					 * 페이스 var rolength = rectOrder.length; for (var j = 0; j <
+					 * currentRectangleTopFaces.length; j++) { currentRectangleTopFaces[j][0] =
+					 * currentRectangleTopFaces[j][0] + rolength; currentRectangleTopFaces[j][1] =
+					 * currentRectangleTopFaces[j][1] + rolength; currentRectangleTopFaces[j][2] =
+					 * currentRectangleTopFaces[j][2] + rolength;
 					 * currentRectangleTopFaces[j].reverse(); } var rectangleTopFaces =
 					 * JSON.parse(JSON.stringify(currentRectangleTopFaces)); rectangleFacesTop =
-					 * rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var cp; for (var j = 1; j <
-					 * rectOrder.length -1; j++){ if(!gb3d.Math.isParallel(rectOrder[j+1], rectOrder[j-1],
-					 * rectOrder[j])){ cp = gb3d.Math.crossProductFromDegrees(rectOrder[j+1], rectOrder[j-1],
-					 * rectOrder[j]); break; } } console.log("좌표 길이는: "+rectOrder.length); // 사각형 윗면 버텍스 // rvlength =
-					 * rectangleVertice.length; for(var j = 0; j < rectOrder.length; j++){ cart =
-					 * Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]); // 보여야 할 사각형 옆면 페이스 if (j === 0) {
-					 * rectangleSides.push([ rvlength + j + 1, rvlength + 1 + rectOrder.length, rvlength + j ]);
-					 * rectangleSides.push([ rvlength + 1 + rectOrder.length, rvlength + rectOrder.length, rvlength + j
-					 * ]); } else if (j === 3) { rectangleSides.push([ rvlength + j + 1, rvlength + (2 *
-					 * rectOrder.length - 2), rvlength + j ]); rectangleSides.push([ rvlength + (2 * rectOrder.length -
+					 * rectangleFacesTop.concat(rectangleTopFaces); // 사각형 벡터 계산 var cp; for (var j =
+					 * 1; j < rectOrder.length -1; j++){ if(!gb3d.Math.isParallel(rectOrder[j+1],
+					 * rectOrder[j-1], rectOrder[j])){ cp =
+					 * gb3d.Math.crossProductFromDegrees(rectOrder[j+1], rectOrder[j-1],
+					 * rectOrder[j]); break; } } console.log("좌표 길이는: "+rectOrder.length); // 사각형 윗면
+					 * 버텍스 // rvlength = rectangleVertice.length; for(var j = 0; j <
+					 * rectOrder.length; j++){ cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0],
+					 * rectOrder[j][1]); // 보여야 할 사각형 옆면 페이스 if (j === 0) { rectangleSides.push([
+					 * rvlength + j + 1, rvlength + 1 + rectOrder.length, rvlength + j ]);
+					 * rectangleSides.push([ rvlength + 1 + rectOrder.length, rvlength +
+					 * rectOrder.length, rvlength + j ]); } else if (j === 3) {
+					 * rectangleSides.push([ rvlength + j + 1, rvlength + (2 * rectOrder.length -
+					 * 2), rvlength + j ]); rectangleSides.push([ rvlength + (2 * rectOrder.length -
 					 * 2), rvlength + j + rectOrder.length, rvlength + j ]); }
 					 * 
-					 * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y + (cp.v/cp.s)*depth, cart.z +
-					 * (cp.w/cp.s)*depth); vect.sub(centerVec); rectangleVertice.push(vect); }
+					 * vect = new THREE.Vector3(cart.x + (cp.u/cp.s)*depth, cart.y +
+					 * (cp.v/cp.s)*depth, cart.z + (cp.w/cp.s)*depth); vect.sub(centerVec);
+					 * rectangleVertice.push(vect); }
 					 */
 				}
 			}  
@@ -1720,7 +1729,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -1798,7 +1807,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -1879,7 +1888,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				// console.log("좌표 길이는: "+rectOrder.length);
 				// 사각형 윗면 버텍스
-//				rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 				for(var j = 0; j < rectOrder.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
 					// 보여야 할 사각형 옆면 페이스
@@ -1998,7 +2007,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -2076,7 +2085,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 						sectorTopFaces[k][2] = sectorTopFaces[k][2] +  blength;
 						sectorTopFaces[k].reverse();
 					}
-//					jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
+// jointSectorFacesBottom = jointSectorFacesTop.concat(sectorTopFaces);
 					jointSectorFacesTop = jointSectorFacesTop.concat(sectorTopFaces);
 					// 3차원 객체 윗면 vertex 계산
 					var cp;
@@ -2157,7 +2166,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				// console.log("좌표 길이는: "+rectOrder.length);
 				// 사각형 윗면 버텍스
-//				rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 				for(var j = 0; j < rectOrder.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
 					// 보여야 할 사각형 옆면 페이스
@@ -2218,7 +2227,7 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 				}
 				// console.log("좌표 길이는: "+rectOrder.length);
 				// 사각형 윗면 버텍스
-//				rvlength = rectangleVertice.length;
+// rvlength = rectangleVertice.length;
 				for(var j = 0; j < rectOrder.length; j++){
 					cart = Cesium.Cartesian3.fromDegrees(rectOrder[j][0], rectOrder[j][1]);
 					// 보여야 할 사각형 옆면 페이스
@@ -2308,9 +2317,9 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	var rectangleSidesStart =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length;
 	var rectangleSidesEnd =  sectorFacesBottom.length + sectorFacesTop.length + sectorSides.length + jointSectorFacesBottom.length + jointSectorFacesTop.length + jointSectorSides.length + rectangleFacesBottom.length + rectangleFacesTop.length + rectangleSides.length;
 
-//	var jointSectorVertice = [];
-//	var jointSectorFacesTop = [];
-//	var jointSectorFacesBottom = [];
+// var jointSectorVertice = [];
+// var jointSectorFacesTop = [];
+// var jointSectorFacesBottom = [];
 
 	var points = sectorVertice.concat(jointSectorVertice).concat(rectangleVertice);
 	var bfaces = sectorFacesBottom.concat(sectorFacesTop).concat(sectorSides).concat(jointSectorFacesBottom).concat(jointSectorFacesTop).concat(jointSectorSides).concat(rectangleFacesBottom).concat(rectangleFacesTop).concat(rectangleSides);
@@ -2362,6 +2371,13 @@ gb3d.Math.getLineStringVertexAndFaceFromDegrees = function(arr, radius, center, 
 	}
 }
 
+/**
+ * 라인스트링 지오메트리에 따른 UV좌표를 생성한다.
+ * 
+ * @method gb3d.Math.createUVVerticeOnLineString
+ * @param {THREE.Geometry} geometry - UV좌표를 입력할 지오메트리 객체
+ * @param {Object} 지오메트리 객체에 덮어쓸 좌표값 객체
+ */
 gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 
 	geometry.vertices = result.points;
@@ -2485,29 +2501,29 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-//		console.log(v1.x+", "+v1.y);
-//		console.log(v2.x+", "+v2.y);
-//		console.log(v3.x+", "+v3.y);
+// console.log(v1.x+", "+v1.y);
+// console.log(v2.x+", "+v2.y);
+// console.log(v3.x+", "+v3.y);
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("절대적인 가로길이 비율은 "+val2);
+// console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from1to2 * topLimit / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
 			var ratioHeight = result.range.max.y/from1to2;
 			bottomLimit = topLimit - ratioHeight;
 		}
-//		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로
-//		길이"+from1to2+"의 비율은 "+ratioVal2);
+// console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로
+// 길이"+from1to2+"의 비율은 "+ratioVal2);
 
-//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-//		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+// console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-//		console.log("1부터 3까지 거리는: "+from2to3);
+// console.log("1부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, bottomLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -2519,12 +2535,12 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 		v3_2 = result.points[face2.c];
 		var from1to3 = parseFloat(v1_2.distanceTo(v3_2).toFixed(4));
 		var val2_2 = from1to3 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
+// console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
 		var from2to3 = v2_2.distanceTo(v3_2);
-//		console.log("2부터 3까지 거리는: "+from2to3);
+// console.log("2부터 3까지 거리는: "+from2to3);
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-//		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+// console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, topLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -2559,10 +2575,10 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 		var coord1 = result.coordinatesSSE[face.a];
 		var coord2 = result.coordinatesSSE[face.b];
 		var coord3 = result.coordinatesSSE[face.c];
-//		console.log("2d 좌표의 값은:");
-//		console.log(coord1);
-//		console.log(coord2);
-//		console.log(coord3);
+// console.log("2d 좌표의 값은:");
+// console.log(coord1);
+// console.log(coord2);
+// console.log(coord3);
 
 		var vt1 = new THREE.Vector2(0.04, 1);
 		var vt2 = new THREE.Vector2(0, 1);
@@ -2584,29 +2600,29 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 		var v1 = result.points[face.a],
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
-//		console.log(v1.x+", "+v1.y);
-//		console.log(v2.x+", "+v2.y);
-//		console.log(v3.x+", "+v3.y);
+// console.log(v1.x+", "+v1.y);
+// console.log(v2.x+", "+v2.y);
+// console.log(v3.x+", "+v3.y);
 
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("절대적인 가로길이 비율은 "+val2);
+// console.log("절대적인 가로길이 비율은 "+val2);
 		var ratioVal2 = from1to2 * topLimit / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
 			var ratioHeight = result.range.max.y/from1to2;
 			bottomLimit = topLimit - ratioHeight;
 		}
-//		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로
-//		길이"+from1to2+"의 비율은 "+ratioVal2);
+// console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.2으로하면 가로
+// 길이"+from1to2+"의 비율은 "+ratioVal2);
 
-//		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
+// console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 
 		var from1to3 = parseFloat(v1.distanceTo(v3).toFixed(4));
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
-//		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
+// console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-//		console.log("1부터 3까지 거리는: "+from2to3);
+// console.log("1부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, bottomLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -2618,12 +2634,12 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 		v3_2 = result.points[face2.c];
 		var from1to3 = parseFloat(v1_2.distanceTo(v3_2).toFixed(4));
 		var val2_2 = from1to3 > result.range.max.x ? 1 : from1to2/result.range.max.x;
-//		console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
+// console.log("1부터 3까지 거리(u축, x축)는: "+from1to3);
 		var from2to3 = v2_2.distanceTo(v3_2);
-//		console.log("2부터 3까지 거리는: "+from2to3);
+// console.log("2부터 3까지 거리는: "+from2to3);
 		var from1to2 = parseFloat(v1_2.distanceTo(v2_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
-//		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
+// console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(ratioVal2, topLimit),
 			new THREE.Vector2(0, bottomLimit),
@@ -2815,6 +2831,13 @@ gb3d.Math.createUVVerticeOnLineString = function(geometry, result){
 	geometry.uvsNeedUpdate = true;
 }
 
+/**
+ * 지오메트리에 따른 UV좌표를 생성한다.
+ * 
+ * @method gb3d.Math.createUVVerticeOnPolygon
+ * @param {THREE.Geometry} geometry - UV좌표를 입력할 지오메트리 객체
+ * @param {Object} 지오메트리 객체에 덮어쓸 좌표값 객체
+ */
 gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 
 	geometry.vertices = result.points;
@@ -2854,9 +2877,9 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 		v2 = result.points[face.b],
 		v3 = result.points[face.c];
 		geometry.faceVertexUvs[0].push([
-//			new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
-//			new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
-//			new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
+// new THREE.Vector2((v1.x + offset.x)/range.x ,(v1.y + offset.y)/range.y),
+// new THREE.Vector2((v2.x + offset.x)/range.x ,(v2.y + offset.y)/range.y),
+// new THREE.Vector2((v3.x + offset.x)/range.x ,(v3.y + offset.y)/range.y)
 			new THREE.Vector2(0, 0),
 			new THREE.Vector2(0, 0),
 			new THREE.Vector2(0, 0)
@@ -2879,9 +2902,9 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 		var vt1 = new THREE.Vector2((coord1[0] + offset2d.x)/range2d.x * 0.4,(coord1[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
 		var vt2 = new THREE.Vector2((coord2[0] + offset2d.x)/range2d.x * 0.4,(coord2[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
 		var vt3 = new THREE.Vector2((coord3[0] + offset2d.x)/range2d.x * 0.4,(coord3[1] + offset2d.y)/range2d.y * 0.4 + 0.6);
-//		console.log(vt1);
-//		console.log(vt2);
-//		console.log(vt3);
+// console.log(vt1);
+// console.log(vt2);
+// console.log(vt3);
 		geometry.faceVertexUvs[0].push([
 			vt1,
 			vt2,
@@ -2904,12 +2927,12 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 		var from1to2 = parseFloat(v1.distanceTo(v2).toFixed(4));
 		var val2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
 		console.log("절대적인 가로길이 비율은 "+val2);
-//		var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
+// var ratioVal2 = from1to2 * 0.6 / result.range.max.y;
 		var ratioVal2 = from1to2 / result.range.max.y;
 		if (ratioVal2 > 1) {
 			ratioVal2 = 1;
-//			var ratioHeight = result.range.max.y/from1to2;
-//			bottomStart = height - ratioHeight;
+// var ratioHeight = result.range.max.y/from1to2;
+// bottomStart = height - ratioHeight;
 		}
 
 		console.log("높이가 "+result.range.max.y+"일때 최고 높이에 대한 비율을 0.6으로하면 가로 길이"+from1to2+"의 비율은 "+ratioVal2);
@@ -2918,19 +2941,19 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 		var val3 = from1to3 > result.range.max.y ? 1 : from1to3/result.range.max.y;
 		console.log("1부터 3까지 거리(v축, y축)는: "+from1to3);
 		var from2to3 = v2.distanceTo(v3);
-//		console.log("2부터 3까지 거리는: "+from2to3);
+// console.log("2부터 3까지 거리는: "+from2to3);
 		geometry.faceVertexUvs[0].push([
 			new THREE.Vector2(0, bottomStart),
 			new THREE.Vector2(ratioVal2, bottomStart),
 			new THREE.Vector2(0, height)
-//			new THREE.Vector2(0, val3)
-//			new THREE.Vector2(0, 0),
-//			new THREE.Vector2(1, 0),
-//			new THREE.Vector2(0, 1),
+// new THREE.Vector2(0, val3)
+// new THREE.Vector2(0, 0),
+// new THREE.Vector2(1, 0),
+// new THREE.Vector2(0, 1),
 			]);
-//		console.log((v1.x + offset.x)/range.x, (v1.y + offset.y)/range.y);
-//		console.log((v2.x + offset.x)/range.x, (v2.y + offset.y)/range.y);
-//		console.log((v3.x + offset.x)/range.x, (v3.y + offset.y)/range.y);
+// console.log((v1.x + offset.x)/range.x, (v1.y + offset.y)/range.y);
+// console.log((v2.x + offset.x)/range.x, (v2.y + offset.y)/range.y);
+// console.log((v3.x + offset.x)/range.x, (v3.y + offset.y)/range.y);
 		var face2 = faces[i+1];
 		var v1_2 = result.points[face2.a],
 		v2_2 = result.points[face2.b],
@@ -2939,7 +2962,7 @@ gb3d.Math.createUVVerticeOnPolygon = function(geometry, result){
 		var val2_2 = from1to2 > result.range.max.x ? 1 : from1to2/result.range.max.x;
 		console.log("1부터 2까지 거리(u축, x축)는: "+from1to2);
 		var from1to3 = v1_2.distanceTo(v3_2);
-//		console.log("1부터 3까지 거리는: "+from1to3);
+// console.log("1부터 3까지 거리는: "+from1to3);
 		var from2to3 = parseFloat(v2_2.distanceTo(v3_2).toFixed(4));
 		var val3_2 = from2to3 > result.range.max.y ? 1 : from2to3/result.range.max.y;
 		console.log("2부터 3까지 거리(v축, y축)는: "+from2to3);
@@ -2970,9 +2993,9 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 	var center = centerHigh;
 	var look = new THREE.Vector3(center.x, center.y, center.z);
 	look.negate();
-//	if(object.userData.type){
-//	return;
-//	}
+// if(object.userData.type){
+// return;
+// }
 
 	if(!object.geometry){
 		if(object.children instanceof Array){
@@ -2983,18 +3006,18 @@ gb3d.Math.resetMatrixWorld = function( obj, quaternion, centerHigh ) {
 				quat = object.rotation.clone();
 				object.lookAt(new THREE.Vector3(0, 0, 1));
 				object.setRotationFromEuler(quat);
-//				object.matrix.makeRotationFromQuaternion(quat);
-//				object.matrixWorld.makeRotationFromQuaternion(quat);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
 				gb3d.Math.resetMatrixWorld(object.children[i], quat, center);
 			}
 		}
 	} else {
-//		object.position.copy(new THREE.Vector3(0, 0, 0));
+// object.position.copy(new THREE.Vector3(0, 0, 0));
 		object.lookAt(new THREE.Vector3(0, 0, 1));
 		object.setRotationFromEuler(quat);
-//		object.matrix.makeRotationFromQuaternion(quat);
-//		object.matrixWorld.makeRotationFromQuaternion(quat);
-//		object.setRotationFromQuaternion(quat);
+// object.matrix.makeRotationFromQuaternion(quat);
+// object.matrixWorld.makeRotationFromQuaternion(quat);
+// object.setRotationFromQuaternion(quat);
 	}
 };
 
