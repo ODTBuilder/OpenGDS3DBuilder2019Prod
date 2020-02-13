@@ -514,7 +514,7 @@ public class PolygonLayerToObjImpl {
 														|| type.equals("Long")) {
 													batchTable.put(name, new JSONArray());
 												}
-											} 
+											}
 											FeatureIterator<SimpleFeature> features = tfc.features();
 											while (features.hasNext()) {
 												SimpleFeature feature = features.next();
@@ -742,6 +742,10 @@ public class PolygonLayerToObjImpl {
 		List<String> idList = new ArrayList<>();
 
 		Geometry multipolygon = (Geometry) feature.getDefaultGeometry();
+		if (multipolygon == null) {
+			return null;
+		}
+
 		int numGeom = multipolygon.getNumGeometries();
 		for (int g = 0; g < numGeom; g++) {
 			String featureID = "g " + feature.getID();

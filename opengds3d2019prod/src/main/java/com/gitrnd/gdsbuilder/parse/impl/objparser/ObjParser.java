@@ -133,7 +133,7 @@ public class ObjParser {
 		}
 		// texCoordIndices
 		for (int t = 0; t < modifyObj.getNumVertices(); t++) {
-			newModifytObj.addTexCoord(modifyObj.getTexCoord(t));
+			newModifytObj.addTexCoord(modifyObj.getTexCoord(t).getX(), 1 - modifyObj.getTexCoord(t).getY());
 		}
 		// normalIndex
 		for (int n = 0; n < modifyObj.getNumVertices(); n++) {

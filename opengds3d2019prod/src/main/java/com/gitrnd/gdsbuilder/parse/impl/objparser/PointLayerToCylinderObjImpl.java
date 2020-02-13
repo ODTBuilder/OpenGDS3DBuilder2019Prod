@@ -49,7 +49,6 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
@@ -996,7 +995,6 @@ public class PointLayerToCylinderObjImpl {
 				threeGeom.computeFaceNormals();
 				writeThreeGeometry(threeGeom);
 				vSize += allCoordinates.size();
-
 			}
 		}
 		return idList;
@@ -1005,17 +1003,6 @@ public class PointLayerToCylinderObjImpl {
 	public void writeThreeGeometry(com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom)
 			throws IOException {
 
-		// v
-//		if (threeGeom.getVertices() != null) {
-//			if (threeGeom.getVertices().size() > 0) {
-//				StringBuilder vBuilder = new StringBuilder();
-//				List<Vector3d> vertices = threeGeom.getVertices();
-//				for (Vector3d vertice : vertices) {
-//					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
-//				}
-//				writer.write(vBuilder.toString());
-//			}
-//		}
 		// vt
 		boolean isVt = false;
 		if (threeGeom.faceVertexUvs != null) {

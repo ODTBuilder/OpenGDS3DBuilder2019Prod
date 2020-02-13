@@ -217,6 +217,20 @@ public class FileManager {
 		}
 		dir.delete();
 	}
+	
+	public static void deleteDirectoryFiles(File dir) {
+
+		if (dir.exists()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					file.delete();
+				}
+			}
+		}
+	}
 
 	/**
 	 * 파일 삭제

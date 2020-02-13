@@ -118,15 +118,15 @@ public class Edit3dService {
 		// 원본 obj read "20191212_173635/obj/1.obj"
 		String originPath = apachBasedrive + ":" + File.separator + apacheBasedir + File.separator + user
 				+ File.separator + "upload" + File.separator + objPath;
-
 		File originFile = new File(originPath);
-		String fileDir = originFile.getAbsoluteFile().getParent();
 
 		InputStream inputStream = new FileInputStream(originPath);
 		Obj originObj = ObjUtils.convertToRenderable(ObjReader.read(inputStream));
 
 		ObjParser objParser = new ObjParser();
 		Obj groupObj = objParser.groupToObj(originObj, featureId, centerXedit, centerYedit, centerXtile, centerYtile);
+		String usemtl = groupObj.getActivatedMaterialGroupName(groupObj.getFace(0));
+		groupObj.setActiveMaterialGroupName(featureId);
 
 		String mtlPath = null;
 		String image = null;
@@ -141,15 +141,20 @@ public class Edit3dService {
 				// 입력 버퍼 생성
 				BufferedReader bufReader = new BufferedReader(filereader);
 				String line = "";
-
-				while ((line = bufReader.readLine()) != null) {
-					if (line.contains("map_Kd ")) {
-						image = line.replace("\t", "");
-						image = image.replace(" ", "");
-						image = originFile.getParent() + File.separator + image.replace("map_Kd", "");
+				boolean isStop = false;
+				while ((line = bufReader.readLine()) != null && isStop == false) {
+					if (line.contains(usemtl)) {
+						while ((line = bufReader.readLine()) != null) {
+							if (line.contains("map_Kd ")) {
+								image = line.replace("\t", "");
+								image = image.replace(" ", "");
+								image = originFile.getParent() + File.separator + image.replace("map_Kd", "");
+								isStop = true;
+								break;
+							}
+						}
 					}
 				}
-				// .readLine()은 끝에 개행문자를 읽지 않는다.
 				bufReader.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -457,6 +462,7 @@ public class Edit3dService {
 							new File(shpPath), ff.id(Collections.singleton(ff.featureId(featureId))));
 					FeatureIterator<SimpleFeature> fcIter = collection.features();
 					SimpleFeature feature = fcIter.next();
+					fcIter.close();
 
 					Obj modifyObj = ObjReader.read(new FileInputStream(editObjPath));
 					Obj resultObj = parser.modifyObj(originObj, modifyObj, featureId, modelX, modelY, tileX, tileY,
@@ -534,6 +540,7 @@ public class Edit3dService {
 					bodyJson.put("file", zipfile);
 					bodyJson.put("path", downloadURL);
 					bodyJson.put("originObjFolder", new File(originObjPath).getParent().replace("obj", "3dtiles")); // "objPath":"20191212_172111/obj/1
+					bodyJson.put("gid", featureId);
 					String bodyString = bodyJson.toJSONString();
 
 					// restTemplate
@@ -557,6 +564,12 @@ public class Edit3dService {
 					if ((boolean) reJSON.get("succ")) {
 						modifiedResult.put(featureId, "success");
 					}
+
+					File zipFile = new File(zipPath + File.separator + zipfile);
+					if (zipFile.exists()) {
+						zipFile.delete();
+					}
+
 				}
 				resultJSON.put("modified", modifiedResult);
 			}
@@ -653,6 +666,11 @@ public class Edit3dService {
 					if ((boolean) reJSON.get("succ")) {
 						deletedResult.put(featureId, "success");
 					}
+
+					File zipFile = new File(zipPath + File.separator + zipfile);
+					if (zipFile.exists()) {
+						zipFile.delete();
+					}
 				}
 				resultJSON.put("removed", deletedResult);
 			}
@@ -712,6 +730,7 @@ public class Edit3dService {
 							new File(shpPath), ff.id(Collections.singleton(ff.featureId(featureId))));
 					FeatureIterator<SimpleFeature> fcIter = collection.features();
 					SimpleFeature feature = fcIter.next();
+					fcIter.close();
 
 					// mbr
 					JSONArray mbrArr = (JSONArray) editInfo.get("mbr");
@@ -967,9 +986,15 @@ public class Edit3dService {
 						}
 						new File(combinezipPath).delete();
 					}
+
+					File zipFile = new File(zipPath + File.separator + zipfile);
+					if (zipFile.exists()) {
+						zipFile.delete();
+					}
 				}
 				resultJSON.put("created", createResult);
 			}
+			FileManager.deleteDirectoryFiles(new File(editBasePath));
 		}
 		return resultJSON;
 	}

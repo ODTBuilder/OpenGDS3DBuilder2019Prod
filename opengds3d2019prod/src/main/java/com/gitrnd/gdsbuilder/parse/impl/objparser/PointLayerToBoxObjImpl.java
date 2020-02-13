@@ -1066,7 +1066,6 @@ public class PointLayerToBoxObjImpl {
 
 			// vt
 			List<List<Vector2d>> faceVertexUvs = new ArrayList<>();
-
 			// 바닥
 			for (int i = 0; i < bottomend; i++) {
 				List<Vector2d> innerFvt = new ArrayList<>();
@@ -1076,7 +1075,6 @@ public class PointLayerToBoxObjImpl {
 
 				faceVertexUvs.add(innerFvt);
 			}
-
 			// 윗면
 			for (int i = bottomend; i < topend; i = i + 4) {
 				List<Vector2d> innerFvt1 = new ArrayList<>();
@@ -1132,12 +1130,10 @@ public class PointLayerToBoxObjImpl {
 				faceVertexUvs.add(innerFvt2);
 				faceVertexUvs.add(innerFvt2b);
 			}
-
 			threeGeom.faceVertexUvs.add(faceVertexUvs);
 			threeGeom.computeFlatVertexNormals();
 			threeGeom.computeFaceNormals();
 			writeThreeGeometry(threeGeom);
-
 			vSize += allCoordinates.size();
 		}
 		return idList;
@@ -1146,17 +1142,6 @@ public class PointLayerToBoxObjImpl {
 	public void writeThreeGeometry(com.gitrnd.threej.core.src.main.java.info.laht.threej.core.Geometry threeGeom)
 			throws IOException {
 
-//		// v
-//		if (threeGeom.getVertices() != null) {
-//			if (threeGeom.getVertices().size() > 0) {
-//				StringBuilder vBuilder = new StringBuilder();
-//				List<Vector3d> vertices = threeGeom.getVertices();
-//				for (Vector3d vertice : vertices) {
-//					vBuilder.append("v " + vertice.x() + " " + vertice.y() + " " + vertice.z() + "\n");
-//				}
-//				writer.write(vBuilder.toString());
-//			}
-//		}
 		// vt
 		boolean isVt = false;
 		if (threeGeom.faceVertexUvs != null) {
