@@ -869,7 +869,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 	/**
 	 * 현재 선택한 3차원 객체를 저장
 	 * 
-	 * @type {Cesium.Cesium3DTileFeature || THREE.Object3D}
+	 * @type {(Cesium.Cesium3DTileFeature | THREE.Object3D)}
 	 */
 	this.selected3DFeature = undefined;
 
@@ -1608,8 +1608,8 @@ gb3d.edit.EditingTool3D.prototype.createObjectByCoord = function(type, feature, 
  * 설정한 좌표값 위치에 타입에 따른 모델링된 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createPointObject
- * @param {Array.<number>} arr - 좌표값
- * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {number[]} arr - 좌표값
+ * @param {number[]} extent - minX, minY, maxX, maxY
  * @param {Object} option - 3차원 객체 생성 옵션
  * @param {string} option.type - 생성하려는 3차원 객체 모양(box, cylinder, circle, dodecahedron, icosahedron)
  * @param {string} option.width - 가로 길이
@@ -1714,8 +1714,8 @@ gb3d.edit.EditingTool3D.prototype.createPointObject = function(arr, extent, opti
  * 설정한 좌표값에 따른 직육면체의 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createPolygonObject
- * @param {Array.<number>} arr - 좌표값
- * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {number[]} arr - 좌표값
+ * @param {number[]} extent - minX, minY, maxX, maxY
  * @param {Object} option - 3차원 객체 생성 옵션
  * @param {string} option.depth - 높이
  * @param {string} option.texture - 텍스처 타입
@@ -1743,7 +1743,7 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 		if(that.texture.hasOwnProperty(option.texture)){
 			var txturl = that.texture[option.texture];
 			texture = new THREE.TextureLoader().load(txturl);
-//			texture.flipY = false;
+// texture.flipY = false;
 		}
 	}
 	// 이준 끝
@@ -1822,8 +1822,8 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
  * 설정한 좌표값에 따른 LinePolygon 3차원 객체를 생성한다.
  * 
  * @method gb3d.edit.EditingTool3D#createLineStringObjectOnRoad
- * @param {Array.<number>} arr - 좌표값
- * @param {Array.<number>} extent - minX, minY, maxX, maxY
+ * @param {number[]} arr - 좌표값
+ * @param {number[]} extent - minX, minY, maxX, maxY
  * @param {Object} option - 3차원 객체 생성 옵션
  * @param {string} option.width - 가로 길이
  * @param {string} option.depth - 높이
@@ -2171,7 +2171,7 @@ gb3d.edit.EditingTool3D.prototype.clearSelect = function(){
  * ThreeJS Object와 연동된 Openlayers Feature를 특정 위치로 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#moveObject2Dfrom3D
- * @param {Array.<number>} center - 이동하려는 위치 좌표값
+ * @param {number[]} center - 이동하려는 위치 좌표값
  * @param {string} uuid - ThreeJS Object ID
  */
 gb3d.edit.EditingTool3D.prototype.moveObject2Dfrom3D = function(center, uuid){
@@ -2229,8 +2229,8 @@ gb3d.edit.EditingTool3D.prototype.modifyObject2Dfrom3D = function(vertices, uuid
  * 
  * @method gb3d.edit.EditingTool3D#moveObject3Dfrom2D
  * @param {string} id - Openlayers Feature ID
- * @param {Array.<number>} center - Openlayers Feature의 변경된 Center Coordinates 값
- * @param {Array.<number>} coord - Openlayers Feature의 변경된 Coordinates 값
+ * @param {number[]} center - Openlayers Feature의 변경된 Center Coordinates 값
+ * @param {number[]} coord - Openlayers Feature의 변경된 Coordinates 값
  */
 gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coord){
 	var that = this;
@@ -2323,9 +2323,9 @@ gb3d.edit.EditingTool3D.prototype.moveObject3Dfrom2D = function(id, center, coor
  * Openlayers Feature Coordinates 값으로 ThreeJS Object를 이동시킨다.
  * 
  * @method gb3d.edit.EditingTool3D#modify3DVertices
- * @param {Array.<number>} arr - Coordinates
+ * @param {number[]} arr - Coordinates
  * @param {string} id - Openlayers Feature ID
- * @param {Array.<number>} extent - MinX, MinY, MaxX, MaxY
+ * @param {number[]} extent - MinX, MinY, MaxX, MaxY
  * @param {Object} event
  */
 gb3d.edit.EditingTool3D.prototype.modify3DVertices = function(arr, id, extent, event) {
@@ -2945,6 +2945,8 @@ gb3d.edit.EditingTool3D.updateFloorPlan = function(selectedFeature, threeObj) {
  * 선택한 b3dm을 glb로 변환하여 편집화면에 불러온다
  * 
  * @method gb3d.edit.EditingTool3D#getGLTFfromServer
+ * @param {Cesium.Cesium3DTileFeature} pickedFeature - 선택한 3d tileset 피처
+ * @param {ol.layer.Base} layer - 선택한 레이어
  */
 gb3d.edit.EditingTool3D.prototype.getGLTFfromServer = function(pickedFeature, layer){
 	var that = this;
@@ -3188,7 +3190,7 @@ gb3d.edit.EditingTool3D.prototype.setThreeTree = function(tree){
  * ThreeTree에서 노드를 삭제한다.
  * 
  * @method gb3d.edit.EditingTool3D#removeNode
- * @param {gb3d.tree.ThreeTree} tree - 트리 객체
+ * @param {string} id - 삭제할 노드 id
  */
 gb3d.edit.EditingTool3D.prototype.removeNode = function(id){
 	var that = this;
@@ -3208,7 +3210,7 @@ gb3d.edit.EditingTool3D.prototype.removeNode = function(id){
  * 현재 선택한 객체를 반환한다.
  * 
  * @method gb3d.edit.EditingTool3D#getSelected3DFeature
- * @return {Cesium.Cesium3DTileFeature || THREE.Object3D}
+ * @return {(Cesium.Cesium3DTileFeature | THREE.Object3D)}
  */
 gb3d.edit.EditingTool3D.prototype.getSelected3DFeature = function(){
 	return this.selected3DFeature; 
@@ -3218,7 +3220,7 @@ gb3d.edit.EditingTool3D.prototype.getSelected3DFeature = function(){
  * 현재 선택한 객체를 설정한다.
  * 
  * @method gb3d.edit.EditingTool3D#setSelected3DFeature
- * @param {Cesium.Cesium3DTileFeature || THREE.Object3D} feature - 3차원 객체
+ * @param {(Cesium.Cesium3DTileFeature | THREE.Object3D)} feature - 3차원 객체
  */
 gb3d.edit.EditingTool3D.prototype.setSelected3DFeature = function(feature){
 	this.selected3DFeature = feature; 
@@ -3248,6 +3250,7 @@ gb3d.edit.EditingTool3D.prototype.setThreeEdit = function(flag){
  * 현재 선택한 객체의 스케일값을 반환한다.
  * 
  * @method gb3d.edit.EditingTool3D#getScale
+ * @return {THREE.Vector3} 스케일값 객체
  */
 gb3d.edit.EditingTool3D.prototype.getScale = function(){
 	return this.scale; 
@@ -3257,24 +3260,27 @@ gb3d.edit.EditingTool3D.prototype.getScale = function(){
  * 현재 선택한 객체의 스케일값을 저장한다.
  * 
  * @method gb3d.edit.EditingTool3D#setScale
+ * @param {THREE.Vector3} scale - 스케일값 객체
  */
 gb3d.edit.EditingTool3D.prototype.setScale = function(scale){
 	this.scale = scale; 
 }
 
 /**
- * 현재 선택한 객체의 스케일값을 반환한다.
+ * 현재 선택한 객체의 로테이션값을 반환한다.
  * 
  * @method gb3d.edit.EditingTool3D#getRotation
+ * @return {THREE.Euler} 회전값 객체
  */
 gb3d.edit.EditingTool3D.prototype.getRotation = function(){
 	return this.rotation; 
 }
 
 /**
- * 현재 선택한 객체의 스케일값을 저장한다.
+ * 현재 선택한 객체의 로테이션값을 저장한다.
  * 
  * @method gb3d.edit.EditingTool3D#setRotation
+ * @param {THREE.Euler} rotation - 회전값 객체
  */
 gb3d.edit.EditingTool3D.prototype.setRotation = function(rotation){
 	this.rotation = rotation; 

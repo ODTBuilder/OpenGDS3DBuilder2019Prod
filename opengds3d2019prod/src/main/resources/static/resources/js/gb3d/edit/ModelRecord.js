@@ -1859,6 +1859,7 @@ gb3d.edit.ModelRecord.prototype.replace3DTileset = function(result) {
  * 타일셋 매니저 객체를 반환한다.
  * 
  * @method gb3d.edit.ModelRecord#getTilesetManager
+ * @return {gb3d.edit.TilesetManager} 타일셋 매니저 객체
  */
 gb3d.edit.ModelRecord.prototype.getTilesetManager = function() {
 	var that = this;

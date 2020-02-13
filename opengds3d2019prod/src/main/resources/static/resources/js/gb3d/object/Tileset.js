@@ -12,6 +12,8 @@ if (!gb3d.object)
  * @class gb3d.object.Tileset
  * @memberof gb3d.object
  * @param {Object} obj - 생성자 옵션을 담은 객체
+ * @param {ol.layer.Base} obj.layer - 타일셋에 연동된 2d 레이어
+ * @param {Cesium.Cesium3DTileset} obj.cesiumTileset - cesium 3d타일셋 객체
  * @author SOYIJUN
  */
 gb3d.object.Tileset = function(obj) {
