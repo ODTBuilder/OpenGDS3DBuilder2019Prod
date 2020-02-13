@@ -71,7 +71,7 @@ Getting Started
 - DocumentRoot(파일 저장 경로) 설정
 - Cross-origin 해제
   <pre><code>#LoadModule headers_module modules/mod_headers.so</code></pre>
-  &nbsp;httpd.conf파일에서 위 구문을 찾아서 #제거
+  &nbsp;httpd.conf 파일에서 위 구문을 찾아서 #제거
   
   <pre><code>&lt;Directory "your root"\&gt;</code></pre>
   위 태그 안에 아래 구문 추가<br>
