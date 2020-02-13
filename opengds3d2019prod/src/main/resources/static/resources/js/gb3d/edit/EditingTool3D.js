@@ -1743,6 +1743,7 @@ gb3d.edit.EditingTool3D.prototype.createPolygonObject = function(arr, extent, op
 		if(that.texture.hasOwnProperty(option.texture)){
 			var txturl = that.texture[option.texture];
 			texture = new THREE.TextureLoader().load(txturl);
+//			texture.flipY = false;
 		}
 	}
 	// 이준 끝

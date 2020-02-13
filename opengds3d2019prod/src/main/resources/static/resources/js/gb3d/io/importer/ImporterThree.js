@@ -1102,6 +1102,13 @@ gb3d.io.ImporterThree.prototype.loadGLTFToEdit = function(url, opt, mrecord) {
 		var children = scene.children;
 		var inputData;
 		if (children.length === 1) {
+//			var material = children[0].material;
+//			if (material) {
+//				var texture = material.map;
+//				if (texture) {
+//					texture.flipY = false;
+//				}
+//			}
 			inputData = children[0];
 		} else if (children.length > 1) {
 			inputData = new THREE.Group();
