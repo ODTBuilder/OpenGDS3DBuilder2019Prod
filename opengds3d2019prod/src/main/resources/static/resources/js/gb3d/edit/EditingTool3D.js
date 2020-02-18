@@ -113,33 +113,49 @@ gb3d.edit.EditingTool3D = function(obj) {
 			"road" : {
 				"ko" : "도로",
 				"en" : "Road"
-			}
+			},
+			"move3d" : {
+				"ko" : "이동(W 키)",
+				"en" : "Move(W key)"
+			},
+			"scale3d" : {
+				"ko" : "크기 조절(E 키)",
+				"en" : "Scale(E key)"
+			},
+			"rotate3d" : {
+				"ko" : "회전(R 키)",
+				"en" : "Rotate(R key)"
+			},
+			"attach" : {
+				"ko" : "붙이기",
+				"en" : "Attach"
+			},
 	};
 
 	// EditingTool3D 작업 표시줄 기본 항목
 	var defaultList = [ {
-		content : "Move(W key)",
+		content : this.translation.move3d[this.locale],
 		icon : "fas fa-arrows-alt fa-lg",
 		clickEvent : function() {
 			that.threeTransformControls.setMode("translate");
 		},
 		color : ""
 	}, {
-		content : "Scale(E key)",
+		content : this.translation.scale3d[this.locale],
 		icon : "fas fa-expand fa-lg",
 		clickEvent : function() {
 			that.threeTransformControls.setMode("scale");
 		},
 		color : ""
 	}, {
-		content : "Rotate(R key)",
+		content : this.translation.rotate3d[this.locale],
 		icon : "fas fa-sync-alt fa-lg",
 		clickEvent : function() {
 			that.threeTransformControls.setMode("rotate");
 		},
 		color : ""
 	}, {
-		content : "Delete",
+		content : this.translation.delete[this.locale],
 		icon : "fas fa-eraser fa-lg",
 		clickEvent : function() {
 // that.getMap().removeThreeObject(that.pickedObject_.uuid);
@@ -148,7 +164,7 @@ gb3d.edit.EditingTool3D = function(obj) {
 		},
 		color : ""
 	}, {
-		content : "Attach",
+		content : this.translation.attach[this.locale],
 		icon : "fas fa-arrow-down fa-lg",
 		clickEvent : function() {
 			that.attachObjectToGround(that.pickedObject_);
