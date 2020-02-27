@@ -154,7 +154,7 @@ mybatis:
 - ### ThreeJS 편집 기능 지원<br>
 
 ### 8. 사용자매뉴얼 ###
-- [GeoDT_Web_3D_v1.0_사용자매뉴얼.pdf 참고](https://github.com/ODTBuilder/OpenGDS3DBuilder2019Prod/blob/master/GeoDT_Web_3D_v1.0_사용자매뉴얼.pdf)
+- [GeoDT_Web_3D_v1.0_사용자매뉴얼.pdf](https://github.com/ODTBuilder/OpenGDS3DBuilder2019Prod/blob/master/GeoDT_Web_3D_v1.0_사용자매뉴얼.pdf)
 
 사용 라이브러리
 =====
